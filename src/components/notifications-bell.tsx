@@ -30,7 +30,7 @@ export function NotificationsBell() {
   return (
     <Link
       to="/notifications"
-      aria-label={t("notificationsCenter.title", { defaultValue: "Notifications" })}
+      aria-label={t("notificationsCenter.title")}
       className={cn(
         "relative h-9 w-9 rounded-full bg-secondary text-secondary-foreground shadow-sm",
         "flex items-center justify-center hover:scale-105 active:scale-95 transition-transform",

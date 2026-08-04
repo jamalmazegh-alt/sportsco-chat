@@ -58,12 +58,7 @@ export function TournamentCreateChooser({ clubId, open, onOpenChange }: Props) {
   function requestClose() {
     const draft = readAssistantDraft();
     if (mode === "ai" && draftHasProgress(draft)) {
-      const ok = window.confirm(
-        t("createChooser.abandonConfirm", {
-          defaultValue:
-            "Quitter l'assistant ? Tes réponses seront effacées. Tu peux aussi fermer pour les retrouver à la prochaine ouverture.",
-        }),
-      );
+      const ok = window.confirm(t("createChooser.abandonConfirm"));
       if (!ok) return;
       clearAssistantDraft();
     }

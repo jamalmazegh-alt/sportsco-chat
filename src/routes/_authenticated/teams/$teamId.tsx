@@ -165,7 +165,7 @@ function TeamDetail() {
     }
     toast(t("teams.deleted"), {
       action: {
-        label: t("common.undo", { defaultValue: "Undo" }),
+        label: t("common.undo"),
         onClick: async () => {
           const { error: e2 } = await supabase.rpc("restore_entity", {
             _kind: "team",
@@ -195,7 +195,7 @@ function TeamDetail() {
     }
     toast(t("teams.archived"), {
       action: {
-        label: t("common.undo", { defaultValue: "Undo" }),
+        label: t("common.undo"),
         onClick: async () => {
           const { error: e2 } = await supabase.rpc("unarchive_team", { _id: teamId });
           if (e2) toast.error(e2.message);
@@ -485,11 +485,7 @@ function TeamDetail() {
     const isInternalTeam = Boolean((team as { is_internal?: boolean } | null)?.is_internal);
     // Équipe technique « Réunions internes » : pas de catégorie sportive.
     if (!isInternalTeam && !isCanonicalTeamAgeCategory(editAge)) {
-      toast.error(
-        t("teams.ageGroupRequired", {
-          defaultValue: "Choisissez une catégorie d'âge dans la liste officielle.",
-        }),
-      );
+      toast.error(t("teams.ageGroupRequired"));
       return;
     }
     setEditBusy(true);
@@ -539,13 +535,11 @@ function TeamDetail() {
   async function uploadPhoto(playerId: string, file: File): Promise<string | null> {
     // Limite côté client : refuse > 5 Mo (le bucket impose aussi la limite côté serveur)
     if (file.size > 5 * 1024 * 1024) {
-      toast.error(t("players.photoTooLarge", { defaultValue: "Photo trop lourde (max 5 Mo)." }));
+      toast.error(t("players.photoTooLarge"));
       return null;
     }
     if (!file.type.startsWith("image/")) {
-      toast.error(
-        t("players.photoInvalidType", { defaultValue: "Format de fichier non supporté." }),
-      );
+      toast.error(t("players.photoInvalidType"));
       return null;
     }
     const ext = file.name.split(".").pop() || "jpg";
@@ -586,8 +580,6 @@ function TeamDetail() {
     const count = emails.length;
     toast.error(
       t("players.inviteSuppressedSimple", {
-        defaultValue:
-          "{{count}} invitation(s) bloquée(s) : l'adresse est en suppression (bounce, spam ou désinscription). Corrigez l'e-mail ou contactez le support.",
         count,
       }),
     );
@@ -604,10 +596,7 @@ function TeamDetail() {
     } else if (r.skipped)
       toast.warning(
         r.reason === "account_exists"
-          ? t("players.inviteAccountExists", {
-              defaultValue:
-                "Un compte Clubero existe déjà avec cette adresse : la personne doit se connecter (ou utiliser « mot de passe oublié »).",
-            })
+          ? t("players.inviteAccountExists")
           : t(
               r.reason === "already_active"
                 ? "players.inviteAlreadyActive"
@@ -1023,10 +1012,7 @@ function TeamDetail() {
                   <AgeGroupSelect value={editAge} onValueChange={setEditAge} allowEmpty={false} />
                   {editAge && !isCanonicalTeamAgeCategory(editAge) && (
                     <p className="text-xs text-amber-700 dark:text-amber-400">
-                      {t("teams.ageGroupLegacyHint", {
-                        defaultValue:
-                          "Ancienne valeur — choisissez une catégorie officielle (ex. U7). Une plage du type U6-U7 peut rester dans le nom de l'équipe.",
-                      })}
+                      {t("teams.ageGroupLegacyHint")}
                     </p>
                   )}
                 </div>
@@ -1035,14 +1021,9 @@ function TeamDetail() {
               <div className="space-y-1.5 rounded-xl border border-dashed border-border bg-muted/30 p-3">
                 <Label className="flex items-center gap-2">
                   <Trophy className="h-4 w-4 text-muted-foreground" />
-                  {t("championships.title", { defaultValue: "Championnats" })}
+                  {t("championships.title")}
                 </Label>
-                <p className="text-xs text-muted-foreground">
-                  {t("championships.editHint", {
-                    defaultValue:
-                      "Les championnats sont gérés dans une section dédiée sur la page de l'équipe (plusieurs championnats possibles, avec archivage).",
-                  })}
-                </p>
+                <p className="text-xs text-muted-foreground">{t("championships.editHint")}</p>
                 <Button
                   type="button"
                   size="sm"
@@ -1056,7 +1037,7 @@ function TeamDetail() {
                     }, 150);
                   }}
                 >
-                  {t("championships.manage", { defaultValue: "Gérer les championnats" })}
+                  {t("championships.manage")}
                 </Button>
               </div>
               <div className="space-y-2">
@@ -1134,14 +1115,8 @@ function TeamDetail() {
           <BarChart3 className="h-4 w-4 text-primary" />
         </div>
         <div className="min-w-0 flex-1">
-          <p className="text-sm font-semibold">
-            {t("stats.teamStats", { defaultValue: "Statistiques de l'équipe" })}
-          </p>
-          <p className="text-xs text-muted-foreground">
-            {t("stats.teamStatsHint", {
-              defaultValue: "Présence, buts, défis",
-            })}
-          </p>
+          <p className="text-sm font-semibold">{t("stats.teamStats")}</p>
+          <p className="text-xs text-muted-foreground">{t("stats.teamStatsHint")}</p>
         </div>
         <ChevronRight className="h-4 w-4 text-muted-foreground shrink-0" />
       </Link>
@@ -1160,15 +1135,8 @@ function TeamDetail() {
           >
             <LockIcon className="h-5 w-5 text-violet-500 shrink-0" />
             <div className="flex-1 min-w-0">
-              <div className="text-sm font-semibold">
-                {t("teams.staffWall", { defaultValue: "Mur Staff" })}
-              </div>
-              <p className="text-xs text-muted-foreground">
-                {t("teams.staffWallHint", {
-                  defaultValue:
-                    "Espace privé des éducateurs et dirigeants de l'équipe. Non visible par les joueurs ni les parents.",
-                })}
-              </p>
+              <div className="text-sm font-semibold">{t("teams.staffWall")}</div>
+              <p className="text-xs text-muted-foreground">{t("teams.staffWallHint")}</p>
             </div>
             <ChevronRight className="h-4 w-4 text-muted-foreground shrink-0" />
           </Link>
@@ -1235,32 +1203,32 @@ function TeamDetail() {
                         [
                           {
                             key: "last_name",
-                            header: t("players.lastName", { defaultValue: "Last name" }),
+                            header: t("players.lastName"),
                           },
                           {
                             key: "first_name",
-                            header: t("players.firstName", { defaultValue: "First name" }),
+                            header: t("players.firstName"),
                           },
                           { key: "jersey_number", header: "#" },
                           {
                             key: "license_number",
-                            header: t("players.licenseNumber", { defaultValue: "License #" }),
+                            header: t("players.licenseNumber"),
                           },
                           {
                             key: "position",
-                            header: t("players.position", { defaultValue: "Position" }),
+                            header: t("players.position"),
                           },
                           { key: "email", header: "Email" },
-                          { key: "phone", header: t("players.phone", { defaultValue: "Phone" }) },
+                          { key: "phone", header: t("players.phone") },
                           {
                             key: "account",
-                            header: t("players.account", { defaultValue: "Account" }),
+                            header: t("players.account"),
                           },
                         ],
                       );
                       downloadCsv(`${team?.name ?? "team"}-players`, csv);
                     }}
-                    aria-label={t("common.exportCsv", { defaultValue: "Export CSV" })}
+                    aria-label={t("common.exportCsv")}
                   >
                     <Download className="h-4 w-4" />
                   </Button>
@@ -1273,10 +1241,7 @@ function TeamDetail() {
                       setSelectedIds(new Set(invitableIds));
                       setSelectMode(true);
                     }}
-                    title={t("players.inviteWholeTeamHint", {
-                      defaultValue:
-                        "Envoie une invitation à chaque joueur/parent sans compte. Les personnes déjà inscrites ou déjà invitées sont ignorées.",
-                    })}
+                    title={t("players.inviteWholeTeamHint")}
                   >
                     <Send className="h-4 w-4" />
                     {t("players.inviteWholeTeam", {
@@ -1293,7 +1258,7 @@ function TeamDetail() {
                     onClick={() => setImportOpen(true)}
                   >
                     <Upload className="h-4 w-4" />
-                    {t("players.import.button", { defaultValue: "Import CSV" })}
+                    {t("players.import.button")}
                   </Button>
                 )}
                 <Sheet
@@ -1723,9 +1688,7 @@ function TeamDetail() {
                             .join("\n")}
                         >
                           <span className="h-1.5 w-1.5 rounded-full bg-red-500" />
-                          {t("players.inviteFailedLabel", {
-                            defaultValue: "Envoi échoué",
-                          })}
+                          {t("players.inviteFailedLabel")}
                           <span className="text-muted-foreground truncate">
                             · {failures.map((f) => f.email).join(", ")}
                           </span>
@@ -1734,22 +1697,18 @@ function TeamDetail() {
                         <span className="inline-flex items-center gap-1 text-amber-600">
                           <span className="h-1.5 w-1.5 rounded-full bg-amber-500" />
                           {showPlayerInviteSent
-                            ? t("players.playerInviteSentLabel", {
-                                defaultValue: "Invitation joueur envoyée",
-                              })
-                            : t("players.inviteSentLabel", { defaultValue: "Invitation envoyée" })}
+                            ? t("players.playerInviteSentLabel")
+                            : t("players.inviteSentLabel")}
                         </span>
                       ) : showParentActivationPending ? (
                         <span className="inline-flex items-center gap-1 text-amber-600">
                           <span className="h-1.5 w-1.5 rounded-full bg-amber-500" />
-                          {t("players.parentActivationPending", {
-                            defaultValue: "En attente d'activation du compte parent",
-                          })}
+                          {t("players.parentActivationPending")}
                         </span>
                       ) : canInvite ? (
                         <span className="text-muted-foreground">
                           {hasContactHint
-                            ? t("players.inviteNotSent", { defaultValue: "Invitation non envoyée" })
+                            ? t("players.inviteNotSent")
                             : t("players.accountInactive")}
                         </span>
                       ) : (
@@ -1771,7 +1730,7 @@ function TeamDetail() {
                     key={`hdr-mine-${p.id}`}
                     className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground px-1 pt-1"
                   >
-                    {t("teams.myProfile", { defaultValue: "Mon profil" })}
+                    {t("teams.myProfile")}
                   </li>
                 )}
                 {isFirstOther && (
@@ -1779,7 +1738,7 @@ function TeamDetail() {
                     key={`hdr-others-${p.id}`}
                     className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground px-1 pt-3"
                   >
-                    {t("teams.myTeammates", { defaultValue: "Mes coéquipiers" })}
+                    {t("teams.myTeammates")}
                   </li>
                 )}
                 <li key={p.id}>
@@ -1835,8 +1794,8 @@ function TeamDetail() {
                               >
                                 <Send className="h-3.5 w-3.5" />
                                 {hasPendingInvite
-                                  ? t("players.resendAction", { defaultValue: "Renvoyer" })
-                                  : t("players.inviteSentAction", { defaultValue: "Inviter" })}
+                                  ? t("players.resendAction")
+                                  : t("players.inviteSentAction")}
                               </Button>
                             )}
                             <ChevronRight className="h-4 w-4 text-muted-foreground shrink-0" />
@@ -1854,7 +1813,7 @@ function TeamDetail() {
                               ]
                             : []),
                           {
-                            label: t("common.remove", { defaultValue: "Retirer" }),
+                            label: t("common.remove"),
                             icon: <Trash2 className="h-4 w-4" />,
                             variant: "destructive" as const,
                             onClick: () =>
@@ -1893,11 +1852,11 @@ function TeamImage({
   async function onPick(file: File) {
     if (!team?.club_id) return;
     if (file.size > 5 * 1024 * 1024) {
-      toast.error(t("teams.imageTooLarge", { defaultValue: "Image trop lourde (max 5 Mo)." }));
+      toast.error(t("teams.imageTooLarge"));
       return;
     }
     if (!file.type.startsWith("image/")) {
-      toast.error(t("teams.imageInvalidType", { defaultValue: "Format de fichier non supporté." }));
+      toast.error(t("teams.imageInvalidType"));
       return;
     }
     setBusy(true);
@@ -1922,7 +1881,7 @@ function TeamImage({
       toast.success(t("common.saved"));
     } catch (error: unknown) {
       const message = error instanceof Error ? error.message : null;
-      toast.error(message ?? t("common.error", { defaultValue: "Erreur" }));
+      toast.error(message ?? t("common.error"));
     } finally {
       setBusy(false);
     }
@@ -1981,9 +1940,7 @@ function CollapsibleTeamStats({
         onClick={() => setOpen((o) => !o)}
         className="w-full flex items-center justify-between px-4 py-3 text-sm font-medium hover:bg-muted/40"
       >
-        <span>
-          {t("stats.showAttendance", { defaultValue: "Voir les statistiques de présence" })}
-        </span>
+        <span>{t("stats.showAttendance")}</span>
         <ChevronRight className={cn("h-4 w-4 transition-transform", open && "rotate-90")} />
       </button>
       {open && (
@@ -2091,7 +2048,7 @@ function TeamCoaches({
       toast.error(error.message);
       return;
     }
-    toast.success(t("teams.coachAttached", { defaultValue: "Coach attaché" }));
+    toast.success(t("teams.coachAttached"));
     qc.invalidateQueries({ queryKey: ["team-coaches", teamId] });
 
     // Fire-and-forget email notification (in-app notification handled by DB trigger).
@@ -2116,7 +2073,7 @@ function TeamCoaches({
       toast.error(error.message);
       return;
     }
-    toast.success(t("teams.coachDetached", { defaultValue: "Coach retiré" }));
+    toast.success(t("teams.coachDetached"));
     qc.invalidateQueries({ queryKey: ["team-coaches", teamId] });
   }
 
@@ -2131,9 +2088,7 @@ function TeamCoaches({
             <UserCircle2 className="h-4 w-4" />
           </span>
           <h2 className="text-xs font-semibold uppercase tracking-wider text-amber-700 dark:text-amber-300">
-            {(coaches?.length ?? 0) > 1
-              ? t("teams.coaches", { defaultValue: "Coaches" })
-              : t("teams.coach", { defaultValue: "Coach" })}
+            {(coaches?.length ?? 0) > 1 ? t("teams.coaches") : t("teams.coach")}
           </h2>
         </div>
         {isAdmin && (
@@ -2145,22 +2100,17 @@ function TeamCoaches({
                 className="h-7 border-amber-500/40 text-amber-700 dark:text-amber-300 hover:bg-amber-500/10"
               >
                 <Plus className="h-3.5 w-3.5" />
-                {t("teams.attachCoach", { defaultValue: "Attacher" })}
+                {t("teams.attachCoach")}
               </Button>
             </SheetTrigger>
             <SheetContent side="bottom" className="rounded-t-3xl">
               <SheetHeader>
-                <SheetTitle>
-                  {t("teams.attachCoachTitle", { defaultValue: "Attacher un coach" })}
-                </SheetTitle>
+                <SheetTitle>{t("teams.attachCoachTitle")}</SheetTitle>
               </SheetHeader>
               <div className="mt-4 pb-6 space-y-2">
                 {(availableStaff ?? []).length === 0 ? (
                   <p className="text-sm text-muted-foreground text-center py-6">
-                    {t("teams.noAvailableCoach", {
-                      defaultValue:
-                        "Aucun coach disponible. Invitez d'abord un coach depuis Admin → Utilisateurs.",
-                    })}
+                    {t("teams.noAvailableCoach")}
                   </p>
                 ) : (
                   (availableStaff ?? []).map((s: any) => {
@@ -2189,7 +2139,7 @@ function TeamCoaches({
                         </span>
                         {(s.roles ?? []).includes("admin") && (
                           <span className="text-[9px] font-semibold uppercase tracking-wider px-1.5 py-0.5 rounded-full bg-primary/15 text-primary mr-1">
-                            {t("roles.admin", { defaultValue: "Admin" })}
+                            {t("roles.admin")}
                           </span>
                         )}
 
@@ -2232,7 +2182,7 @@ function TeamCoaches({
                     onClick={() => detach(c.id)}
                     disabled={busyUid === c.id}
                     className="ml-1 h-5 w-5 inline-flex items-center justify-center rounded-full hover:bg-destructive/15 text-muted-foreground hover:text-destructive disabled:opacity-50"
-                    aria-label={t("teams.coachDetach", { defaultValue: "Retirer" })}
+                    aria-label={t("teams.coachDetach")}
                   >
                     <X className="h-3 w-3" />
                   </button>
@@ -2242,11 +2192,7 @@ function TeamCoaches({
           })}
         </ul>
       ) : (
-        <p className="text-xs text-muted-foreground">
-          {t("teams.noCoachYet", {
-            defaultValue: "Aucun coach attaché. Cliquez sur Attacher pour en ajouter.",
-          })}
-        </p>
+        <p className="text-xs text-muted-foreground">{t("teams.noCoachYet")}</p>
       )}
     </section>
   );

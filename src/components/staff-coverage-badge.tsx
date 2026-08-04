@@ -21,24 +21,18 @@ export function StaffCoverageBadge({
     state === "assured"
       ? {
           Icon: CheckCircle2,
-          label: t("staffCoverage.badge.assured", {
-            defaultValue: "Encadrement assuré",
-          }),
+          label: t("staffCoverage.badge.assured"),
           cls: "border-emerald-500/40 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400",
         }
       : state === "unassigned"
         ? {
             Icon: AlertTriangle,
-            label: t("staffCoverage.badge.unassigned", {
-              defaultValue: "Pas de coach assigné",
-            }),
+            label: t("staffCoverage.badge.unassigned"),
             cls: "border-amber-500/40 bg-amber-500/10 text-amber-600 dark:text-amber-400",
           }
         : {
             Icon: AlertTriangle,
-            label: t("staffCoverage.badge.uncovered", {
-              defaultValue: "Aucun coach dispo",
-            }),
+            label: t("staffCoverage.badge.uncovered"),
             cls: "border-destructive/40 bg-destructive/10 text-destructive",
           };
 

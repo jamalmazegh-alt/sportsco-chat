@@ -1,12 +1,11 @@
+import { useTranslation } from "react-i18next";
 import { getChromeMajorVersion, MIN_CHROME_VERSION } from "@/lib/webview-support";
 
 /**
  * Écran affiché lorsque la WebView est trop ancienne pour rendre l'app.
  *
  * Styles écrits en CSS inline, volontairement : les classes Tailwind ne
- * s'appliqueraient pas, puisque c'est précisément ce qui ne fonctionne pas. Le
- * texte est en dur pour la même raison — i18n dépend du bundle applicatif, qui
- * peut ne pas être monté à ce stade.
+ * s'appliqueraient pas, puisque c'est précisément ce qui ne fonctionne pas.
  *
  * Deux boutons plutôt qu'un : sur certains appareils la WebView stable ne se
  * met plus à jour, et il faut alors passer par la version Beta puis la
@@ -14,6 +13,7 @@ import { getChromeMajorVersion, MIN_CHROME_VERSION } from "@/lib/webview-support
  * Galaxy S10 réel.
  */
 export function UnsupportedWebViewScreen() {
+  const { t } = useTranslation();
   const version = getChromeMajorVersion();
 
   const openPlayStore = (pkg: string) => {
@@ -36,11 +36,12 @@ export function UnsupportedWebViewScreen() {
         boxSizing: "border-box",
       }}
     >
-      <h1 style={{ fontSize: "22px", fontWeight: 700, margin: "0 0 12px" }}>Mise à jour requise</h1>
+      <h1 style={{ fontSize: "22px", fontWeight: 700, margin: "0 0 12px" }}>
+        {t("unsupportedWebview.title")}
+      </h1>
 
       <p style={{ fontSize: "15px", lineHeight: 1.5, margin: "0 0 8px", maxWidth: "340px" }}>
-        Clubero a besoin d&apos;une version plus récente du composant
-        <strong> Android System WebView</strong> pour s&apos;afficher correctement.
+        {t("unsupportedWebview.body")}
       </p>
 
       <p
@@ -53,10 +54,9 @@ export function UnsupportedWebViewScreen() {
         }}
       >
         {version
-          ? `Version détectée : ${version}. Version minimale : ${MIN_CHROME_VERSION}.`
-          : `Version minimale requise : ${MIN_CHROME_VERSION}.`}{" "}
-        C&apos;est une mise à jour gratuite, votre téléphone n&apos;a pas besoin d&apos;être
-        remplacé.
+          ? t("unsupportedWebview.versionDetected", { version, min: MIN_CHROME_VERSION })
+          : t("unsupportedWebview.versionMinOnly", { min: MIN_CHROME_VERSION })}{" "}
+        {t("unsupportedWebview.freeUpdate")}
       </p>
 
       <button
@@ -76,7 +76,7 @@ export function UnsupportedWebViewScreen() {
           maxWidth: "320px",
         }}
       >
-        Mettre à jour Android System WebView
+        {t("unsupportedWebview.updateCta")}
       </button>
 
       <button
@@ -94,7 +94,7 @@ export function UnsupportedWebViewScreen() {
           maxWidth: "320px",
         }}
       >
-        J&apos;ai mis à jour — réessayer
+        {t("unsupportedWebview.retryCta")}
       </button>
 
       <p
@@ -106,9 +106,7 @@ export function UnsupportedWebViewScreen() {
           opacity: 0.55,
         }}
       >
-        Si la mise à jour n&apos;est pas proposée, installez
-        <strong> Android System WebView Beta</strong> depuis le Play Store, puis sélectionnez-le
-        dans Options de développement → Implémentation WebView.
+        {t("unsupportedWebview.betaHint")}
       </p>
     </div>
   );

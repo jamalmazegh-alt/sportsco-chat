@@ -16,7 +16,7 @@
     "description": "Descrizione",
     "description_placeholder": "Sii il più preciso possibile...",
     "intent": "Cosa stavi cercando di fare?",
-    "intent_optional": "(opzionale)",
+    "intent_optional": "(facoltativo)",
     "intent_placeholder": "es. creare un evento",
     "attachments": "Screenshot",
     "attachments_hint": "(max. 5, 5 MB)",

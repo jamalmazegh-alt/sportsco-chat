@@ -1,4 +1,5 @@
 import { useEffect, useState, useCallback } from "react";
+import { useTranslation } from "react-i18next";
 import { Loader2, Filter, ChevronDown } from "lucide-react";
 import {
   listProductActivity,
@@ -30,6 +31,7 @@ type Filters = {
 };
 
 export function ProductActivityFeed({ clubId }: { clubId?: string }) {
+  const { t } = useTranslation();
   const [filters, setFilters] = useState<Filters>({ clubId });
   const [rows, setRows] = useState<ProductActivityRow[]>([]);
   const [loading, setLoading] = useState(false);
@@ -86,7 +88,7 @@ export function ProductActivityFeed({ clubId }: { clubId?: string }) {
           value={filters.category ?? ""}
           onChange={(e) => setFilters((f) => ({ ...f, category: e.target.value || undefined }))}
         >
-          <option value="">Toutes catégories</option>
+          <option value="">{t("superadmin.tickets.allCategories")}</option>
           {CATEGORIES.map((c) => (
             <option key={c} value={c}>
               {c}
@@ -103,7 +105,7 @@ export function ProductActivityFeed({ clubId }: { clubId?: string }) {
             }))
           }
         >
-          <option value="">Tous statuts</option>
+          <option value="">{t("superadmin.tickets.allStatuses")}</option>
           {STATUSES.map((s) => (
             <option key={s} value={s}>
               {s}
@@ -180,7 +182,12 @@ export function ProductActivityFeed({ clubId }: { clubId?: string }) {
 }
 
 function StatusTone({ status }: { status: string }) {
-  if (status === "failure") return <StatusBadge tone="danger">échec</StatusBadge>;
-  if (status === "warning") return <StatusBadge tone="warning">warn</StatusBadge>;
-  return <StatusBadge tone="success">ok</StatusBadge>;
+  const { t } = useTranslation();
+  if (status === "failure") {
+    return <StatusBadge tone="danger">{t("superadmin.components.failed")}</StatusBadge>;
+  }
+  if (status === "warning") {
+    return <StatusBadge tone="warn">{t("superadmin.components.statusWarning")}</StatusBadge>;
+  }
+  return <StatusBadge tone="success">{t("superadmin.components.statusOk")}</StatusBadge>;
 }

@@ -168,7 +168,7 @@
     },
     "currenttool": {
       "title": "Hoy gestionas todo con…",
-      "subtitle": "",
+      "subtitle": "WhatsApp, Excel, otra herramienta…",
       "options": {
         "whatsapp": {
           "label": "WhatsApp / SMS",
@@ -228,13 +228,13 @@
     "submit": "No se pudo enviar. Comprueba tu conexión."
   },
   "admin": {
-    "title": "Build Clubero",
+    "title": "Construir Clubero",
     "subtitle": "Feedback público recogido en /build-clubero",
     "stats": {
       "sessions": "Sesiones iniciadas",
       "completed": "Sesiones completadas",
-      "newsletter": "Leads newsletter",
-      "beta": "Leads beta",
+      "newsletter": "Contactos del boletín",
+      "beta": "Contactos beta",
       "duration": "Duración media (min)"
     },
     "sections": {

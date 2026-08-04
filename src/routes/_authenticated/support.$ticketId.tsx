@@ -35,9 +35,7 @@ function TicketDetailPage() {
       updateSupportTicket({ data: { ticket_id: ticketId, status: newStatus } }),
     onSuccess: (_r, newStatus) => {
       toast.success(
-        newStatus === "resolved"
-          ? t("actions.resolved_toast", { defaultValue: "Ticket marqué comme résolu" })
-          : t("actions.reopened_toast", { defaultValue: "Ticket rouvert" }),
+        newStatus === "resolved" ? t("actions.resolved_toast") : t("actions.reopened_toast"),
       );
       refetch();
     },
@@ -57,9 +55,7 @@ function TicketDetailPage() {
   const cls = STATUS_BADGE_CLASS[status] ?? STATUS_BADGE_CLASS.open;
   const closedLike = isClosedLike(status);
   const nextStatus: "resolved" | "open" = closedLike ? "open" : "resolved";
-  const actionLabel = closedLike
-    ? t("actions.reopen", { defaultValue: "Rouvrir le ticket" })
-    : t("actions.mark_resolved", { defaultValue: "Marquer comme résolu" });
+  const actionLabel = closedLike ? t("actions.reopen") : t("actions.mark_resolved");
 
   return (
     <div className="flex flex-col h-[100dvh] max-h-screen">

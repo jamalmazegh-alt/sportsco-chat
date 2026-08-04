@@ -270,7 +270,7 @@ const MeetingInviteEmail = ({
   const c = COPY[l];
   const when = formatWhen(meetingStartsAt, c.dateLocale);
   return (
-    <EmailShell preview={c.preview(meetingTitle)} locale={locale}>
+    <EmailShell preview={c.preview(meetingTitle)} locale={l}>
       <Heading style={h1}>{c.hello(displayName)}</Heading>
       <Heading style={h2}>{c.title}</Heading>
       <Text style={text}>{c.body(meetingTitle, clubName)}</Text>

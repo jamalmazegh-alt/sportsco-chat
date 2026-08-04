@@ -187,14 +187,12 @@ function PostMatchFeedback() {
     if (failed.length === 0) {
       toast.success(t("common.saved"), {
         description: t("feedback.bulkSaved", {
-          defaultValue: "{{count}} retour(s) enregistré(s).",
           count: okCount,
         }),
       });
     } else {
       toast.error(
         t("feedback.bulkPartial", {
-          defaultValue: "{{ok}} enregistré(s), {{ko}} en échec.",
           ok: okCount,
           ko: failed.length,
         }),
@@ -261,9 +259,7 @@ function PostMatchFeedback() {
       <BackLink to="/events/$eventId" params={{ eventId } as never} />
 
       <div>
-        <h1 className="text-xl font-semibold">
-          {t("feedback.postMatchTitle", { defaultValue: "Retours coach" })}
-        </h1>
+        <h1 className="text-xl font-semibold">{t("feedback.postMatchTitle")}</h1>
         {event && (
           <p className="text-sm text-muted-foreground mt-0.5 truncate">
             {(event as any).title}
@@ -271,11 +267,7 @@ function PostMatchFeedback() {
               ` · ${format(new Date((event as any).starts_at), "EEE d MMM", { locale })}`}
           </p>
         )}
-        <p className="text-xs text-muted-foreground mt-2">
-          {t("feedback.bulkHint", {
-            defaultValue: "Note rapide pour tous les joueurs. Tout est enregistré en une fois.",
-          })}
-        </p>
+        <p className="text-xs text-muted-foreground mt-2">{t("feedback.bulkHint")}</p>
       </div>
 
       {isLoading ? (
@@ -284,7 +276,7 @@ function PostMatchFeedback() {
         </div>
       ) : !data || data.players.length === 0 ? (
         <div className="rounded-2xl border border-dashed border-border bg-card p-8 text-center text-sm text-muted-foreground">
-          {t("feedback.noPlayers", { defaultValue: "Aucun joueur convoqué." })}
+          {t("feedback.noPlayers")}
         </div>
       ) : (
         <ul className="space-y-3">
@@ -314,10 +306,9 @@ function PostMatchFeedback() {
             <p className="text-xs text-muted-foreground flex-1">
               {dirty.size > 0
                 ? t("feedback.dirtyCount", {
-                    defaultValue: "{{count}} modification(s) en attente",
                     count: dirty.size,
                   })
-                : t("feedback.allSaved", { defaultValue: "Tout est à jour" })}
+                : t("feedback.allSaved")}
             </p>
             <Button
               type="button"
@@ -325,11 +316,7 @@ function PostMatchFeedback() {
               disabled={saving || dirty.size === 0}
               className="h-10 min-w-32"
             >
-              {saving ? (
-                <Loader2 className="h-4 w-4 animate-spin" />
-              ) : (
-                t("feedback.saveAll", { defaultValue: "Tout enregistrer" })
-              )}
+              {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : t("feedback.saveAll")}
             </Button>
           </div>
         </div>
@@ -446,9 +433,7 @@ const PlayerRow = memo(function PlayerRow({
           disabled={saving || (!isDirty && saved)}
           className="h-8"
         >
-          {saved && !isDirty
-            ? t("feedback.saved", { defaultValue: "Enregistré" })
-            : t("common.save")}
+          {saved && !isDirty ? t("feedback.saved") : t("common.save")}
         </Button>
       </div>
 
@@ -478,9 +463,7 @@ const PlayerRow = memo(function PlayerRow({
         onChange={(e) => onPatch(p.id, { note: e.target.value })}
         rows={2}
         className="mt-2 text-sm"
-        placeholder={t("feedback.notePlaceholder", {
-          defaultValue: "Note rapide (forces, axes de progrès…)",
-        })}
+        placeholder={t("feedback.notePlaceholder")}
       />
     </li>
   );

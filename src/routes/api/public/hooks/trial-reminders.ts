@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
 import { enqueueTransactionalEmailServer } from "@/lib/email/send.server";
+import { resolveEmailLocale } from "@/lib/email/locale";
 import { verifyCronSecret } from "@/lib/cron-secret.server";
 
 const MILESTONES = [0, 1, 3, 7] as const;
@@ -67,7 +68,7 @@ export const Route = createFileRoute("/api/public/hooks/trial-reminders")({
           // Fetch club + admin recipients
           const { data: club } = await supabaseAdmin
             .from("clubs")
-            .select("id, name")
+            .select("id, name, default_language")
             .eq("id", sub.club_id)
             .single();
           if (!club) continue;
@@ -82,21 +83,30 @@ export const Route = createFileRoute("/api/public/hooks/trial-reminders")({
           if (userIds.length === 0) continue;
 
           // Get emails via auth admin
-          const recipients: { email: string; firstName?: string }[] = [];
+          const recipients: {
+            email: string;
+            firstName?: string;
+            preferredLanguage?: string | null;
+          }[] = [];
           for (const uid of userIds) {
             const { data: u } = await supabaseAdmin.auth.admin.getUserById(uid);
             const email = u?.user?.email;
             if (!email) continue;
             const { data: profile } = await supabaseAdmin
               .from("profiles")
-              .select("first_name")
+              .select("first_name, preferred_language")
               .eq("id", uid)
               .maybeSingle();
-            recipients.push({ email, firstName: profile?.first_name ?? undefined });
+            recipients.push({
+              email,
+              firstName: profile?.first_name ?? undefined,
+              preferredLanguage: profile?.preferred_language ?? null,
+            });
           }
 
           const billingUrl = "https://www.clubero.app/admin/billing";
           const trialEndDate = formatFrDate(trialEnd);
+          const clubLang = (club as { default_language?: string | null }).default_language ?? null;
 
           for (const r of recipients) {
             try {
@@ -110,6 +120,7 @@ export const Route = createFileRoute("/api/public/hooks/trial-reminders")({
                   daysRemaining: milestone,
                   trialEndDate,
                   billingUrl,
+                  locale: resolveEmailLocale(r.preferredLanguage, clubLang),
                 },
               });
               sent++;

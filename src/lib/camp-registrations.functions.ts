@@ -13,6 +13,7 @@ import { assertClubRole, type ClubRole } from "@/lib/authz.server";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
 import { getRequest } from "@tanstack/react-start/server";
 import { enqueueTransactionalEmailServer } from "@/lib/email/send.server";
+import { resolveEmailLocale } from "@/lib/email/locale";
 
 const MANAGER_ROLES: ClubRole[] = ["admin", "dirigeant", "coach"];
 
@@ -646,7 +647,7 @@ export const reviewCampRegistrationDocument = createServerFn({ method: "POST" })
              access_token, guardian_email, guardian_first_name,
              participant_first_name, participant_last_name,
              camp_id,
-             club_camps!inner ( club_id, title, slug, clubs!inner ( name, slug ) )
+             club_camps!inner ( club_id, title, slug, clubs!inner ( name, slug, default_language ) )
            )`,
         )
         .eq("id", data.documentId)
@@ -708,6 +709,7 @@ export const reviewCampRegistrationDocument = createServerFn({ method: "POST" })
               documentLabel: (doc as any).club_camp_required_documents.title,
               rejectionReason: data.reason!.trim(),
               trackingUrl,
+              locale: resolveEmailLocale(club.default_language),
             },
             idempotencyKey: `camp-doc-rejected:${data.documentId}:${reasonHash}`,
           });

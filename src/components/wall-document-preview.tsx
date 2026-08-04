@@ -69,9 +69,7 @@ export function WallDocumentPreview({
           )}
           {doc && kind !== "image" && kind !== "pdf" && (
             <p className="p-8 text-center text-sm text-muted-foreground">
-              {t("wall.documents.noPreview", {
-                defaultValue: "Aperçu indisponible pour ce type de fichier.",
-              })}
+              {t("wall.documents.noPreview")}
             </p>
           )}
         </div>
@@ -79,7 +77,7 @@ export function WallDocumentPreview({
         <div className="flex justify-end gap-2">
           <Button variant="outline" size="sm" onClick={() => doc && void openDocument(doc.url)}>
             <ExternalLink className="h-4 w-4" />
-            {t("wall.documents.openExternal", { defaultValue: "Ouvrir" })}
+            {t("wall.documents.openExternal")}
           </Button>
           {/* `download` est ignoré en cross-origin (le fichier vient du bucket
               Supabase) : le navigateur ouvrait l'onglet au lieu de télécharger.
@@ -92,7 +90,7 @@ export function WallDocumentPreview({
             onClick={() => doc && void downloadDocument(documentDownloadUrl(doc), doc.name)}
           >
             <Download className="h-4 w-4" />
-            {t("wall.documents.download", { defaultValue: "Télécharger" })}
+            {t("wall.documents.download")}
           </Button>
         </div>
       </DialogContent>

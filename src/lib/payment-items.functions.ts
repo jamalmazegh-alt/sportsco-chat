@@ -49,6 +49,7 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
 import { enqueueTransactionalEmailServer } from "@/lib/email/send.server";
+import { resolveEmailLocale } from "@/lib/email/locale";
 
 const ITEM_TYPES = [
   "membership",
@@ -466,7 +467,9 @@ function fmtMoney(cents: number, currency: string): string {
 async function notifyMembersOfNewPaymentItem(clubId: string, itemId: string): Promise<void> {
   const { data: item } = await supabaseAdmin
     .from("payment_items")
-    .select("id, club_id, title, due_date, amount_cents, currency, clubs:club_id(name)")
+    .select(
+      "id, club_id, title, due_date, amount_cents, currency, clubs:club_id(name, default_language)",
+    )
     .eq("id", itemId)
     .maybeSingle();
   if (!item) return;
@@ -482,18 +485,27 @@ async function notifyMembersOfNewPaymentItem(clubId: string, itemId: string): Pr
 
   const baseUrl = process.env.SITE_URL || "https://www.clubero.app";
   const clubName = (item as any).clubs?.name ?? "Clubero";
+  const clubLang = ((item as any).clubs?.default_language as string | null) ?? null;
   const dueLabel = frDate(item.due_date);
   const offsetDays = item.due_date
     ? Math.round((Date.now() - new Date(item.due_date + "T00:00:00Z").getTime()) / 86_400_000)
     : 0;
 
   for (const o of obligations) {
-    const recipients = new Set<string>();
+    const recipients: { email: string; userId?: string | null }[] = [];
+    const seen = new Set<string>();
+    const add = (email?: string | null, userId?: string | null) => {
+      if (!email) return;
+      const k = email.toLowerCase();
+      if (seen.has(k)) return;
+      seen.add(k);
+      recipients.push({ email: k, userId: userId ?? null });
+    };
 
     // Payeur (tuteur principal) — récupère l'email via auth.admin.
     if (o.payer_user_id) {
       const { data: u } = await supabaseAdmin.auth.admin.getUserById(o.payer_user_id);
-      if (u?.user?.email) recipients.add(u.user.email.toLowerCase());
+      add(u?.user?.email, o.payer_user_id);
     }
 
     // Email du joueur lui-même + des parents.
@@ -501,28 +513,46 @@ async function notifyMembersOfNewPaymentItem(clubId: string, itemId: string): Pr
     if (o.player_id) {
       const { data: p } = await supabaseAdmin
         .from("players")
-        .select("first_name, last_name, email")
+        .select("first_name, last_name, email, user_id")
         .eq("id", o.player_id)
         .maybeSingle();
       if (p) {
         playerName = `${p.first_name ?? ""} ${p.last_name ?? ""}`.trim() || null;
-        if (p.email) recipients.add(p.email.toLowerCase());
+        add(p.email, p.user_id);
       }
       const { data: parents } = await supabaseAdmin
         .from("player_parents")
-        .select("email")
+        .select("email, parent_user_id")
         .eq("player_id", o.player_id);
       for (const pp of parents ?? []) {
-        if (pp.email) recipients.add(pp.email.toLowerCase());
+        add(pp.email, pp.parent_user_id);
       }
     }
 
-    for (const email of recipients) {
+    const userIds = [
+      ...new Set(recipients.map((r) => r.userId).filter((id): id is string => !!id)),
+    ];
+    const langByUser = new Map<string, string | null>();
+    if (userIds.length > 0) {
+      const { data: profs } = await supabaseAdmin
+        .from("profiles")
+        .select("id, preferred_language")
+        .in("id", userIds);
+      for (const p of profs ?? []) {
+        langByUser.set(
+          (p as { id: string }).id,
+          (p as { preferred_language: string | null }).preferred_language,
+        );
+      }
+    }
+
+    for (const r of recipients) {
       try {
+        const locale = resolveEmailLocale(r.userId ? langByUser.get(r.userId) : null, clubLang);
         await enqueueTransactionalEmailServer({
           templateName: "payment-reminder",
-          recipientEmail: email,
-          idempotencyKey: `pay-init:${o.id}:${email}`,
+          recipientEmail: r.email,
+          idempotencyKey: `pay-init:${o.id}:${r.email}`,
           templateData: {
             kind: "initial",
             clubName,
@@ -533,12 +563,13 @@ async function notifyMembersOfNewPaymentItem(clubId: string, itemId: string): Pr
             dueDateLabel: dueLabel,
             offsetDays,
             payUrl: `${baseUrl}/payments`,
+            locale,
           },
         });
       } catch (e) {
         console.error("[payment-items] enqueue initial notification failed", {
           obligationId: o.id,
-          email,
+          email: r.email,
           error: String(e),
         });
       }

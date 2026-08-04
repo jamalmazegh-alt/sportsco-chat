@@ -104,6 +104,9 @@ function ProfilePage() {
   const { data: playerRecord } = useQuery({
     queryKey: ["profile-player-phone", user?.id],
     enabled: !!user && isPlayerOnly,
+    staleTime: 0,
+    refetchOnMount: "always",
+    refetchOnWindowFocus: true,
     queryFn: async () => {
       const { data } = await supabase
         .from("players")
@@ -146,7 +149,7 @@ function ProfilePage() {
       return;
     }
     refetch();
-    toast.success(t("profile.phoneSaved", { defaultValue: "Phone saved" }));
+    toast.success(t("profile.phoneSaved"));
   }
 
   async function onSaveName() {
@@ -169,7 +172,7 @@ function ProfilePage() {
       return;
     }
     refetch();
-    toast.success(t("profile.nameSaved", { defaultValue: "Name saved" }));
+    toast.success(t("profile.nameSaved"));
   }
 
   async function setLang(lang: string) {
@@ -190,7 +193,7 @@ function ProfilePage() {
   async function onUploadClubLogo(file: File) {
     if (!activeClubId) return;
     if (file.size > MAX_LOGO_SIZE) {
-      toast.error(t("club.logoTooLarge", { defaultValue: "Fichier trop volumineux (max 5 MB)" }));
+      toast.error(t("club.logoTooLarge"));
       return;
     }
     setUploadingLogo(true);
@@ -213,7 +216,7 @@ function ProfilePage() {
       toast.success(t("club.logoUpdated"));
     } catch (error: unknown) {
       const message = error instanceof Error ? error.message : null;
-      toast.error(message ?? t("common.error", { defaultValue: "Erreur" }));
+      toast.error(message ?? t("common.error"));
     } finally {
       setUploadingLogo(false);
     }
@@ -262,7 +265,7 @@ function ProfilePage() {
               <Camera className="h-4 w-4" />
             )}
             {uploadingLogo
-              ? t("common.loading", { defaultValue: "Chargement..." })
+              ? t("common.loading")
               : club.logo_url
                 ? t("club.changeLogo")
                 : t("club.uploadLogo")}
@@ -289,12 +292,8 @@ function ProfilePage() {
             <ShieldCheck className="h-5 w-5" />
           </div>
           <div className="min-w-0 flex-1">
-            <p className="text-sm font-semibold text-foreground">
-              {t("nav.manageClub", { defaultValue: "Gérer le club" })}
-            </p>
-            <p className="text-xs text-muted-foreground truncate">
-              {t("nav.manageClubSubtitle", { defaultValue: "Paramètres, membres, abonnement" })}
-            </p>
+            <p className="text-sm font-semibold text-foreground">{t("nav.manageClub")}</p>
+            <p className="text-xs text-muted-foreground truncate">{t("nav.manageClubSubtitle")}</p>
           </div>
           <ChevronRight className="h-4 w-4 text-primary shrink-0 group-hover:translate-x-0.5 transition-transform" />
         </Link>
@@ -309,7 +308,7 @@ function ProfilePage() {
           </div>
           <div className="min-w-0 flex-1">
             <p className="text-[11px] uppercase tracking-wider text-muted-foreground font-medium">
-              {t("profile.email", { defaultValue: "Adresse email" })}
+              {t("profile.email")}
             </p>
             <a
               href={`mailto:${user.email}`}
@@ -333,24 +332,24 @@ function ProfilePage() {
         </div>
 
         <div className="space-y-1.5">
-          <Label>{t("profile.theme", { defaultValue: "Apparence" })}</Label>
+          <Label>{t("profile.theme")}</Label>
           <div role="radiogroup" className="grid grid-cols-3 gap-2">
             {(
               [
                 {
                   value: "light",
                   icon: Sun,
-                  label: t("profile.themeLight", { defaultValue: "Clair" }),
+                  label: t("profile.themeLight"),
                 },
                 {
                   value: "dark",
                   icon: Moon,
-                  label: t("profile.themeDark", { defaultValue: "Sombre" }),
+                  label: t("profile.themeDark"),
                 },
                 {
                   value: "system",
                   icon: Monitor,
-                  label: t("profile.themeSystem", { defaultValue: "Auto" }),
+                  label: t("profile.themeSystem"),
                 },
               ] as { value: ThemeMode; icon: typeof Sun; label: string }[]
             ).map((opt) => {
@@ -405,7 +404,7 @@ function ProfilePage() {
       <div className="rounded-2xl border border-border bg-card p-5 space-y-3">
         <div className="grid grid-cols-2 gap-3">
           <div className="space-y-1.5">
-            <Label htmlFor="first-name">{t("profile.firstName", { defaultValue: "Prénom" })}</Label>
+            <Label htmlFor="first-name">{t("profile.firstName")}</Label>
             <Input
               id="first-name"
               value={firstName}
@@ -414,7 +413,7 @@ function ProfilePage() {
             />
           </div>
           <div className="space-y-1.5">
-            <Label htmlFor="last-name">{t("profile.lastName", { defaultValue: "Nom" })}</Label>
+            <Label htmlFor="last-name">{t("profile.lastName")}</Label>
             <Input
               id="last-name"
               value={lastName}
@@ -433,11 +432,7 @@ function ProfilePage() {
           }
           onClick={onSaveName}
         >
-          {nameBusy ? (
-            <Loader2 className="h-4 w-4 animate-spin" />
-          ) : (
-            t("common.save", { defaultValue: "Save" })
-          )}
+          {nameBusy ? <Loader2 className="h-4 w-4 animate-spin" /> : t("common.save")}
         </Button>
       </div>
 
@@ -445,11 +440,7 @@ function ProfilePage() {
         <Label>{t("profile.phone")}</Label>
         <PhoneInput value={phone} onChange={setPhone} disabled={isPlayerOnly} />
         {isPlayerOnly ? (
-          <p className="text-xs text-muted-foreground">
-            {t("profile.phoneFromPlayer", {
-              defaultValue: "Ce numéro provient de ta fiche joueur.",
-            })}
-          </p>
+          <p className="text-xs text-muted-foreground">{t("profile.phoneFromPlayer")}</p>
         ) : (
           <Button
             type="button"
@@ -457,11 +448,7 @@ function ProfilePage() {
             disabled={phoneBusy || phone === (profile?.phone ?? "")}
             onClick={onSavePhone}
           >
-            {phoneBusy ? (
-              <Loader2 className="h-4 w-4 animate-spin" />
-            ) : (
-              t("common.save", { defaultValue: "Save" })
-            )}
+            {phoneBusy ? <Loader2 className="h-4 w-4 animate-spin" /> : t("common.save")}
           </Button>
         )}
       </div>
@@ -474,14 +461,8 @@ function ProfilePage() {
           <div className="flex items-center gap-3">
             <Users className="h-5 w-5 text-primary" />
             <div>
-              <div className="text-sm font-medium">
-                {t("following.title", { defaultValue: "Mes abonnements" })}
-              </div>
-              <p className="text-xs text-muted-foreground">
-                {t("following.menuSubtitle", {
-                  defaultValue: "Joueurs, coachs et clubs que tu suis",
-                })}
-              </p>
+              <div className="text-sm font-medium">{t("following.title")}</div>
+              <p className="text-xs text-muted-foreground">{t("following.menuSubtitle")}</p>
             </div>
           </div>
           <ChevronRight className="h-4 w-4 text-muted-foreground" />
@@ -495,14 +476,8 @@ function ProfilePage() {
         <div className="flex items-center gap-3">
           <KeyRound className="h-5 w-5 text-primary" />
           <div>
-            <div className="text-sm font-medium">
-              {t("profile.password.menu", { defaultValue: "Mot de passe" })}
-            </div>
-            <p className="text-xs text-muted-foreground">
-              {t("profile.password.menuSubtitle", {
-                defaultValue: "Modifier votre mot de passe",
-              })}
-            </p>
+            <div className="text-sm font-medium">{t("profile.password.menu")}</div>
+            <p className="text-xs text-muted-foreground">{t("profile.password.menuSubtitle")}</p>
           </div>
         </div>
         <ChevronRight className="h-4 w-4 text-muted-foreground" />
@@ -516,14 +491,8 @@ function ProfilePage() {
           <div className="flex items-center gap-3">
             <CalendarOff className="h-5 w-5 text-primary" />
             <div>
-              <div className="text-sm font-medium">
-                {t("staffAvailability.title", { defaultValue: "Mes indisponibilités" })}
-              </div>
-              <p className="text-xs text-muted-foreground">
-                {t("staffAvailability.menuSubtitle", {
-                  defaultValue: "Déclare tes absences pour toutes tes équipes",
-                })}
-              </p>
+              <div className="text-sm font-medium">{t("staffAvailability.title")}</div>
+              <p className="text-xs text-muted-foreground">{t("staffAvailability.menuSubtitle")}</p>
             </div>
           </div>
           <ChevronRight className="h-4 w-4 text-muted-foreground" />
@@ -551,14 +520,8 @@ function ProfilePage() {
         <div className="flex items-center gap-3">
           <LifeBuoy className="h-5 w-5 text-primary" />
           <div>
-            <div className="text-sm font-medium">
-              {t("support.menu", { defaultValue: "Support" })}
-            </div>
-            <p className="text-xs text-muted-foreground">
-              {t("support.menuSubtitle", {
-                defaultValue: "Signaler un problème ou suivre vos demandes",
-              })}
-            </p>
+            <div className="text-sm font-medium">{t("support.menu")}</div>
+            <p className="text-xs text-muted-foreground">{t("support.menuSubtitle")}</p>
           </div>
         </div>
         <ChevronRight className="h-4 w-4 text-muted-foreground" />

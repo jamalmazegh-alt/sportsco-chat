@@ -144,7 +144,7 @@ function ConsentModal({ items }: { items: Item[] }) {
                       className="mt-1.5 inline-flex items-center gap-1 text-xs text-primary hover:underline"
                     >
                       <FileText className="h-3 w-3" />
-                      {t("privacy.viewDocument", { defaultValue: "Revoir ce document" })}
+                      {t("privacy.viewDocument")}
                     </button>
                   </div>
                 </label>

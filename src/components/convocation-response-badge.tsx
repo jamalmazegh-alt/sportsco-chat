@@ -1,4 +1,5 @@
 import { Clock, CircleCheck, X } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import { cn } from "@/lib/utils";
 
 export type ConvocationResponse = "pending" | "present" | "absent";
@@ -10,11 +11,11 @@ interface ResponseBadgeProps {
 
 const CONFIG: Record<
   ConvocationResponse,
-  { bg: string; fg: string; Icon: typeof Clock; label: string }
+  { bg: string; fg: string; Icon: typeof Clock; labelKey: string }
 > = {
-  pending: { bg: "#FAEEDA", fg: "#854F0B", Icon: Clock, label: "À confirmer" },
-  present: { bg: "#E1F5EE", fg: "#0F6E56", Icon: CircleCheck, label: "Présent" },
-  absent: { bg: "#FCEBEB", fg: "#A32D2D", Icon: X, label: "Absent" },
+  pending: { bg: "#FAEEDA", fg: "#854F0B", Icon: Clock, labelKey: "attendance.toConfirm" },
+  present: { bg: "#E1F5EE", fg: "#0F6E56", Icon: CircleCheck, labelKey: "attendance.present" },
+  absent: { bg: "#FCEBEB", fg: "#A32D2D", Icon: X, labelKey: "attendance.absent" },
 };
 
 /**
@@ -22,6 +23,7 @@ const CONFIG: Record<
  * S'affiche à côté de la date sur les cartes d'événement.
  */
 export function ConvocationResponseBadge({ response, className }: ResponseBadgeProps) {
+  const { t } = useTranslation();
   const cfg = CONFIG[response];
   const { Icon } = cfg;
   return (
@@ -36,7 +38,7 @@ export function ConvocationResponseBadge({ response, className }: ResponseBadgeP
       }}
     >
       <Icon size={12} strokeWidth={2.2} />
-      {cfg.label}
+      {t(cfg.labelKey)}
     </span>
   );
 }

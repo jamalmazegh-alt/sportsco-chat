@@ -90,12 +90,10 @@ export function useAbsenceUrgencies(): UrgencyCollectorResult & { isPending: boo
           title: name
             ? t("urgency.coach.reducedSquadTitleTeam", {
                 team: name,
-                defaultValue: "Effectif réduit — {{team}}",
               })
-            : t("urgency.coach.reducedSquadTitle", { defaultValue: "Effectif réduit" }),
+            : t("urgency.coach.reducedSquadTitle"),
           subtitle: t("urgency.coach.reducedSquadSubtitle", {
             count: players.size,
-            defaultValue: "{{count}} joueurs indisponibles sur 14j",
           }),
           anchorAt,
           primaryAction: { kind: "open-team-availability", teamId },

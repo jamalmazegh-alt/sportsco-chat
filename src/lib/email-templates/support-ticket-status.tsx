@@ -1,6 +1,6 @@
 import * as React from "react";
 import { Heading, Text } from "@react-email/components";
-import { EmailShell } from "./_layout";
+import { EmailShell, pickLocale } from "./_layout";
 import type { TemplateEntry } from "./registry";
 
 interface Props {
@@ -76,9 +76,10 @@ const SupportTicketStatusEmail = ({
   ticketUrl,
   locale,
 }: Props) => {
-  const c = pick(locale);
+  const l = pickLocale(locale);
+  const c = pick(l);
   return (
-    <EmailShell preview={c.preview} locale="fr">
+    <EmailShell preview={c.preview} locale={l}>
       <Heading style={h1}>{c.greet(name)}</Heading>
       <Text style={text}>{c.intro(subject, ticketShortId, c.label(newStatus))}</Text>
       {ticketUrl && (

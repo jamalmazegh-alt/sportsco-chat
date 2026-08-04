@@ -168,7 +168,7 @@
     },
     "currenttool": {
       "title": "Today, you juggle all this with…",
-      "subtitle": "",
+      "subtitle": "WhatsApp, Excel, another tool…",
       "options": {
         "whatsapp": {
           "label": "WhatsApp / SMS",

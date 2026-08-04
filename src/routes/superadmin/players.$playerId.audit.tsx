@@ -1,5 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
+import { useTranslation } from "react-i18next";
 import { getPlayerAudit } from "@/lib/superadmin/observability.functions";
 import { StatusBadge } from "@/lib/superadmin/ui";
 import { Loader2, History } from "lucide-react";
@@ -23,6 +24,7 @@ function fmt(iso: string) {
 }
 
 function PlayerAuditPage() {
+  const { t } = useTranslation();
   const { playerId } = Route.useParams();
   const { data, isLoading } = useQuery({
     queryKey: ["superadmin", "player-audit", playerId],
@@ -34,15 +36,14 @@ function PlayerAuditPage() {
     <div className="p-6 md:p-8 max-w-4xl">
       <header className="mb-5">
         <div className="flex items-center gap-2 text-xs uppercase tracking-wide text-muted-foreground">
-          <History className="h-3.5 w-3.5" /> Historique
+          <History className="h-3.5 w-3.5" /> {t("superadmin.playerAudit.eyebrow")}
         </div>
-        <h1 className="text-xl font-semibold mt-1">Historique du joueur</h1>
+        <h1 className="text-xl font-semibold mt-1">{t("superadmin.playerAudit.title")}</h1>
         <p className="text-sm text-muted-foreground mt-0.5">
-          Toutes les modifications de fiche, convocations, feedback, suspensions, disponibilités et
-          jalons.
+          {t("superadmin.playerAudit.subtitle")}
         </p>
         <Link to="/superadmin/clubs" className="text-xs text-muted-foreground hover:underline">
-          ← Retour aux clubs
+          {t("superadmin.playerAudit.backToClubs")}
         </Link>
       </header>
 
@@ -52,7 +53,7 @@ function PlayerAuditPage() {
         </div>
       ) : rows.length === 0 ? (
         <div className="rounded-lg border border-border p-8 text-center text-sm text-muted-foreground">
-          Aucun événement.
+          {t("superadmin.playerAudit.empty")}
         </div>
       ) : (
         <div className="rounded-lg border border-border divide-y divide-border">
@@ -68,7 +69,8 @@ function PlayerAuditPage() {
                   {r.actor_name && (
                     <>
                       {" "}
-                      · par <span className="font-medium text-foreground">{r.actor_name}</span>
+                      · {t("superadmin.playerAudit.by")}{" "}
+                      <span className="font-medium text-foreground">{r.actor_name}</span>
                     </>
                   )}
                 </div>

@@ -88,12 +88,7 @@ export function FinalStandings({ matches, teams, flights, tournamentName }: Prop
         .map((f) => computePodium(f.id, f.name, matches, teamMap))
         .filter((p): p is Podium => p !== null);
     }
-    const p = computePodium(
-      null,
-      t("finalStandings.overall", { defaultValue: "Classement final" }),
-      matches,
-      teamMap,
-    );
+    const p = computePodium(null, t("finalStandings.overall"), matches, teamMap);
     return p ? [p] : [];
   }, [flights, matches, teamMap, t]);
 
@@ -126,7 +121,7 @@ export function FinalStandings({ matches, teams, flights, tournamentName }: Prop
       if (typeof navigator !== "undefined" && navigator.share) {
         await navigator.share({ title: tournamentName, text: lines });
       } else if (await copyText(lines)) {
-        toast.success(t("finalStandings.copied", { defaultValue: "Classement copié" }));
+        toast.success(t("finalStandings.copied"));
       }
     } catch {
       /* user cancelled */
@@ -173,11 +168,11 @@ export function FinalStandings({ matches, teams, flights, tournamentName }: Prop
           </div>
           <div className="flex-1 min-w-0">
             <h2 className="text-[15px] font-extrabold tracking-tight">
-              {t("finalStandings.title", { defaultValue: "Classement final" })}
+              {t("finalStandings.title")}
             </h2>
             <p className="text-[11px] text-white/80 flex items-center gap-1">
               <Sparkles className="h-3 w-3" />
-              {t("finalStandings.subtitle", { defaultValue: "Tournoi terminé" })}
+              {t("finalStandings.subtitle")}
             </p>
           </div>
           <Button
@@ -186,7 +181,7 @@ export function FinalStandings({ matches, teams, flights, tournamentName }: Prop
             className="h-8 bg-card/15 hover:bg-card/25 text-white ring-1 ring-white/30 backdrop-blur"
           >
             <Share2 className="h-3.5 w-3.5 mr-1.5" />
-            {t("finalStandings.share", { defaultValue: "Partager" })}
+            {t("finalStandings.share")}
           </Button>
         </div>
       </div>

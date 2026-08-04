@@ -162,9 +162,7 @@ export function UpcomingAbsencesWidget({ clubId, teamId, className }: Props) {
             </div>
             <div className="min-w-0">
               <h2 className={cn("text-[15px] font-black leading-tight truncate", headerTextClass)}>
-                {noAbsences
-                  ? t("availability.noneUpcoming", { defaultValue: "Aucune absence à venir" })
-                  : t("availability.upcomingWidget", { defaultValue: "Absences à venir" })}
+                {noAbsences ? t("availability.noneUpcoming") : t("availability.upcomingWidget")}
               </h2>
               {!noAbsences && (
                 <p
@@ -182,8 +180,8 @@ export function UpcomingAbsencesWidget({ clubId, teamId, className }: Props) {
             <button
               type="button"
               onClick={() => setDrawerOpen(true)}
-              aria-label={t("availability.declare", { defaultValue: "Déclarer une absence" })}
-              title={t("availability.declare", { defaultValue: "Déclarer une absence" })}
+              aria-label={t("availability.declare")}
+              title={t("availability.declare")}
               className={cn(
                 "shrink-0 inline-flex items-center justify-center h-9 px-3 gap-2 rounded-full transition-all",
                 declareBtnClass,
@@ -191,7 +189,7 @@ export function UpcomingAbsencesWidget({ clubId, teamId, className }: Props) {
             >
               <Plus className="h-5 w-5" strokeWidth={2.8} />
               <span className="text-[13px] font-bold whitespace-nowrap">
-                {t("availability.declare", { defaultValue: "Déclarer une absence" })}
+                {t("availability.declare")}
               </span>
             </button>
           )}
@@ -247,11 +245,7 @@ export function UpcomingAbsencesWidget({ clubId, teamId, className }: Props) {
             >
               <div className="flex items-center gap-2">
                 <CalendarDays className="h-4 w-4 text-muted-foreground" />
-                <span className="text-[13px] font-bold">
-                  {t("availability.calendar.open", {
-                    defaultValue: "Voir le calendrier des absences",
-                  })}
-                </span>
+                <span className="text-[13px] font-bold">{t("availability.calendar.open")}</span>
               </div>
               <ChevronRight className="h-4 w-4 text-muted-foreground" />
             </Link>

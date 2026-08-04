@@ -110,12 +110,7 @@ function AcceptInvitePage() {
         </div>
       ) : !user ? (
         <div className="space-y-3">
-          <p className="text-sm text-center text-muted-foreground">
-            {t("invite.noAccountPrompt", {
-              defaultValue:
-                "Pour accepter cette invitation, créez votre compte Clubero avec l'email invité ou connectez-vous si vous en avez déjà un.",
-            })}
-          </p>
+          <p className="text-sm text-center text-muted-foreground">{t("invite.noAccountPrompt")}</p>
           <Button asChild className="w-full">
             <Link
               to="/register"
@@ -124,7 +119,7 @@ function AcceptInvitePage() {
                 next: `/tournament-invite/${token}`,
               }}
             >
-              {t("invite.createAccount", { defaultValue: "Créer mon compte" })}
+              {t("invite.createAccount")}
             </Link>
           </Button>
           <Button asChild variant="outline" className="w-full">

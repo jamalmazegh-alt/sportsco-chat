@@ -86,7 +86,7 @@ export function ClubSelector({ className }: { className?: string }) {
             "flex items-center gap-1.5 rounded-lg px-2 py-1.5 text-sm font-medium transition-colors hover:bg-accent focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring",
             className,
           )}
-          aria-label={t("clubSelector.label", { defaultValue: "Changer de club" })}
+          aria-label={t("clubSelector.label")}
         >
           {active?.club?.logo_url ? (
             <img src={active.club.logo_url} alt="" className="h-5 w-5 rounded-sm object-cover" />
@@ -106,7 +106,7 @@ export function ClubSelector({ className }: { className?: string }) {
       {memberships.length > 1 && (
         <DropdownMenuContent align="start" className="min-w-[220px]">
           <div className="px-2 py-1.5 text-xs font-medium text-muted-foreground">
-            {t("clubSelector.title", { defaultValue: "Mes clubs" })}
+            {t("clubSelector.title")}
           </div>
           {memberships.map((m) => {
             const isActive = m.club_id === activeClubId;

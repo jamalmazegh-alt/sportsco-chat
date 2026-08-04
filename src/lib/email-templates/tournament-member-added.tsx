@@ -1,6 +1,6 @@
 import * as React from "react";
 import { Button, Heading, Img, Section, Text } from "@react-email/components";
-import { EmailShell } from "./_layout";
+import { EmailShell, pickLocale } from "./_layout";
 import type { TemplateEntry } from "./registry";
 
 interface Props {
@@ -50,13 +50,15 @@ const TournamentMemberAddedEmail = ({
   tournamentName,
   roleLabel,
   tournamentUrl,
-  locale = "fr",
+  locale,
 }: Props) => {
-  const c = COPY[locale] ?? COPY.fr;
-  const tournament = tournamentName ?? (locale === "fr" ? "un tournoi" : "a tournament");
-  const role = roleLabel ?? (locale === "fr" ? "collaborateur" : "collaborator");
+  const l = pickLocale(locale);
+  const lang = l === "en" ? "en" : "fr";
+  const c = COPY[lang];
+  const tournament = tournamentName ?? (lang === "fr" ? "un tournoi" : "a tournament");
+  const role = roleLabel ?? (lang === "fr" ? "collaborateur" : "collaborator");
   return (
-    <EmailShell preview={`${c.preview(tournament, role)}`} locale={"fr"}>
+    <EmailShell preview={`${c.preview(tournament, role)}`} locale={l}>
       <Section style={header}>
         <Img
           src="https://www.clubero.app/clubero-logo.png"

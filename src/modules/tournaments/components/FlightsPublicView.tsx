@@ -68,9 +68,7 @@ export function FlightsPublicView({ flights, matches, teams }: Props) {
   if (!flights || flights.length === 0) {
     return (
       <div className="rounded-xl border border-dashed border-border p-8 text-center text-sm text-muted-foreground">
-        {t("flights.public.empty", {
-          defaultValue: "Aucun flight n'a encore été configuré pour ce tournoi.",
-        })}
+        {t("flights.public.empty")}
       </div>
     );
   }
@@ -122,10 +120,7 @@ export function FlightsPublicView({ flights, matches, teams }: Props) {
               <div className="p-4">
                 {flightMatches.length === 0 ? (
                   <p className="text-sm text-muted-foreground text-center py-6">
-                    {t("flights.public.noMatches", {
-                      defaultValue:
-                        "Les matchs de ce flight seront générés après la phase de poules.",
-                    })}
+                    {t("flights.public.noMatches")}
                   </p>
                 ) : (
                   <BracketView matches={flightMatches as any} teams={teams as any} />

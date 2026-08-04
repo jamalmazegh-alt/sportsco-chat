@@ -1,6 +1,6 @@
 import * as React from "react";
 import { Button, Heading, Img, Section, Text } from "@react-email/components";
-import { EmailShell } from "./_layout";
+import { EmailShell, pickLocale, type Locale } from "./_layout";
 import type { TemplateEntry } from "./registry";
 
 interface Props {
@@ -12,7 +12,53 @@ interface Props {
   contactPhone?: string;
   manageUrl: string;
   requiresApproval?: boolean;
+  locale?: string;
 }
+
+const T = {
+  fr: {
+    defaultTournament: "votre tournoi",
+    preview: (team: string) => `Nouvelle inscription : ${team}`,
+    brand: "Clubero · Tournois",
+    hello: (n?: string) => (n ? `Bonjour ${n},` : "Bonjour,"),
+    body: (tournament: string) => (
+      <>
+        Une nouvelle équipe vient de s'inscrire à <strong>{tournament}</strong> :
+      </>
+    ),
+    contact: "Contact",
+    email: "Email",
+    phone: "Téléphone",
+    pending: "Cette inscription est en attente de votre validation.",
+    auto: "L'équipe a été automatiquement ajoutée au tournoi.",
+    ctaPending: "Valider l'inscription",
+    ctaAuto: "Voir l'équipe",
+    orLink: "Ou ouvrez ce lien :",
+    subject: (team: string, tournament: string) => `Nouvelle inscription — ${team} (${tournament})`,
+  },
+  en: {
+    defaultTournament: "your tournament",
+    preview: (team: string) => `New registration: ${team}`,
+    brand: "Clubero · Tournaments",
+    hello: (n?: string) => (n ? `Hi ${n},` : "Hi,"),
+    body: (tournament: string) => (
+      <>
+        A new team just registered for <strong>{tournament}</strong>:
+      </>
+    ),
+    contact: "Contact",
+    email: "Email",
+    phone: "Phone",
+    pending: "This registration is waiting for your approval.",
+    auto: "The team was automatically added to the tournament.",
+    ctaPending: "Approve registration",
+    ctaAuto: "View team",
+    orLink: "Or open this link:",
+    subject: (team: string, tournament: string) => `New registration — ${team} (${tournament})`,
+  },
+} as const;
+
+const pick = (l: Locale) => (l === "fr" ? T.fr : T.en);
 
 const TournamentRegistrationReceivedEmail = ({
   organizerName,
@@ -23,10 +69,13 @@ const TournamentRegistrationReceivedEmail = ({
   contactPhone,
   manageUrl,
   requiresApproval = true,
+  locale,
 }: Props) => {
-  const tournament = tournamentName ?? "votre tournoi";
+  const l = pickLocale(locale);
+  const t = pick(l);
+  const tournament = tournamentName ?? t.defaultTournament;
   return (
-    <EmailShell preview={`Nouvelle inscription : ${teamName}`} locale="fr">
+    <EmailShell preview={t.preview(teamName)} locale={l}>
       <Section style={header}>
         <Img
           src="https://www.clubero.app/clubero-logo.png"
@@ -35,28 +84,35 @@ const TournamentRegistrationReceivedEmail = ({
           height="56"
           style={logo}
         />
-        <Text style={brand}>Clubero · Tournois</Text>
+        <Text style={brand}>{t.brand}</Text>
       </Section>
-      <Heading style={h1}>{organizerName ? `Bonjour ${organizerName},` : "Bonjour,"}</Heading>
-      <Text style={text}>
-        Une nouvelle équipe vient de s'inscrire à <strong>{tournament}</strong> :
-      </Text>
+      <Heading style={h1}>{t.hello(organizerName)}</Heading>
+      <Text style={text}>{t.body(tournament)}</Text>
       <Section style={card}>
         <Text style={cardTitle}>{teamName}</Text>
-        {contactName && <Text style={cardLine}>Contact : {contactName}</Text>}
-        {contactEmail && <Text style={cardLine}>Email : {contactEmail}</Text>}
-        {contactPhone && <Text style={cardLine}>Téléphone : {contactPhone}</Text>}
+        {contactName && (
+          <Text style={cardLine}>
+            {t.contact} : {contactName}
+          </Text>
+        )}
+        {contactEmail && (
+          <Text style={cardLine}>
+            {t.email} : {contactEmail}
+          </Text>
+        )}
+        {contactPhone && (
+          <Text style={cardLine}>
+            {t.phone} : {contactPhone}
+          </Text>
+        )}
       </Section>
-      <Text style={text}>
-        {requiresApproval
-          ? "Cette inscription est en attente de votre validation."
-          : "L'équipe a été automatiquement ajoutée au tournoi."}
-      </Text>
+      <Text style={text}>{requiresApproval ? t.pending : t.auto}</Text>
       <Button style={button} href={manageUrl}>
-        {requiresApproval ? "Valider l'inscription" : "Voir l'équipe"}
+        {requiresApproval ? t.ctaPending : t.ctaAuto}
       </Button>
       <Text style={small}>
-        Ou ouvrez ce lien :<br />
+        {t.orLink}
+        <br />
         <span style={{ wordBreak: "break-all", color: "#3b82f6" }}>{manageUrl}</span>
       </Text>
     </EmailShell>
@@ -66,8 +122,9 @@ const TournamentRegistrationReceivedEmail = ({
 export const template = {
   component: TournamentRegistrationReceivedEmail,
   subject: (data) => {
-    const t = data.tournamentName ?? "votre tournoi";
-    return `Nouvelle inscription — ${data.teamName} (${t})`;
+    const t = pick(pickLocale((data as { locale?: string }).locale));
+    const tournament = (data.tournamentName as string | undefined) ?? t.defaultTournament;
+    return t.subject((data.teamName as string | undefined) ?? "", tournament);
   },
   displayName: "Tournament registration received",
   previewData: {
@@ -79,6 +136,7 @@ export const template = {
     contactPhone: "+33 6 12 34 56 78",
     manageUrl: "https://clubero.app/tournaments/sample",
     requiresApproval: true,
+    locale: "fr",
   },
 } satisfies TemplateEntry;
 

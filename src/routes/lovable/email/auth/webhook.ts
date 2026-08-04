@@ -10,15 +10,71 @@ import { MagicLinkEmail } from "@/lib/email-templates/magic-link";
 import { RecoveryEmail } from "@/lib/email-templates/recovery";
 import { EmailChangeEmail } from "@/lib/email-templates/email-change";
 import { ReauthenticationEmail } from "@/lib/email-templates/reauthentication";
+import { pickLocale, type Locale } from "@/lib/email-templates/_layout";
 
-const EMAIL_SUBJECTS: Record<string, string> = {
-  signup: "Confirmez votre adresse e-mail Clubero",
-  invite: "Vous êtes invité sur Clubero",
-  magiclink: "Votre lien de connexion Clubero",
-  recovery: "Réinitialisez votre mot de passe Clubero",
-  email_change: "Confirmez votre changement d’e-mail Clubero",
-  reauthentication: "Votre code de vérification Clubero",
-};
+/** Localized subjects (at least fr+en). Falls back to fr, then "Notification". */
+const EMAIL_SUBJECTS: Record<string, Partial<Record<Locale, string>> & { fr: string; en: string }> =
+  {
+    signup: {
+      fr: "Confirmez votre adresse e-mail Clubero",
+      en: "Confirm your Clubero email",
+    },
+    invite: {
+      fr: "Vous êtes invité sur Clubero",
+      en: "You're invited to Clubero",
+    },
+    magiclink: {
+      fr: "Votre lien de connexion Clubero",
+      en: "Your Clubero login link",
+    },
+    recovery: {
+      fr: "Réinitialisez votre mot de passe Clubero",
+      en: "Reset your Clubero password",
+    },
+    email_change: {
+      fr: "Confirmez votre changement d’e-mail Clubero",
+      en: "Confirm your Clubero email change",
+    },
+    reauthentication: {
+      fr: "Votre code de vérification Clubero",
+      en: "Your Clubero verification code",
+    },
+  };
+
+function subjectFor(emailType: string, locale: Locale): string {
+  const map = EMAIL_SUBJECTS[emailType];
+  if (!map) return "Notification";
+  return map[locale] ?? map.en ?? map.fr;
+}
+
+/**
+ * Resolve recipient locale for auth emails.
+ * Order: user_metadata.preferred_language → preferred_language → locale → Accept-Language → fr.
+ */
+function resolveAuthLocale(payload: { data?: Record<string, unknown> }, request: Request): Locale {
+  const data = payload?.data ?? {};
+  const meta =
+    data.user_metadata && typeof data.user_metadata === "object"
+      ? (data.user_metadata as Record<string, unknown>)
+      : {};
+  const accept = request.headers.get("accept-language") ?? "";
+  const acceptPrimary = accept.split(",")[0]?.trim().split(";")[0]?.trim();
+
+  const candidates: Array<unknown> = [
+    meta.preferred_language,
+    data.preferred_language,
+    data.locale,
+    acceptPrimary,
+  ];
+
+  for (const c of candidates) {
+    if (c == null || c === "") continue;
+    const v = String(c).toLowerCase().slice(0, 2);
+    // pickLocale returns "fr" for unsupported codes; only accept when input matches a supported locale.
+    if (v && pickLocale(v) === v) return v as Locale;
+  }
+  return "fr";
+}
 
 // Template mapping
 const EMAIL_TEMPLATES: Record<string, React.ComponentType<any>> = {
@@ -113,7 +169,10 @@ export const Route = createFileRoute("/lovable/email/auth/webhook")({
           return Response.json({ error: `Unknown email type: ${emailType}` }, { status: 400 });
         }
 
+        const locale = resolveAuthLocale(payload, request);
+
         // Build template props from payload.data (HookData structure)
+        // Auth templates (SignupEmail, InviteEmail, …) accept `locale?: string` via pickLocale.
         const templateProps = {
           siteName: SITE_NAME,
           siteUrl: `https://${ROOT_DOMAIN}`,
@@ -123,6 +182,7 @@ export const Route = createFileRoute("/lovable/email/auth/webhook")({
           email: payload.data.email,
           oldEmail: payload.data.old_email,
           newEmail: payload.data.new_email,
+          locale,
         };
 
         // Render React Email to HTML and plain text
@@ -151,7 +211,7 @@ export const Route = createFileRoute("/lovable/email/auth/webhook")({
             to: payload.data.email,
             from: `${SITE_NAME} <noreply@${FROM_DOMAIN}>`,
             sender_domain: SENDER_DOMAIN,
-            subject: EMAIL_SUBJECTS[emailType] || "Notification",
+            subject: subjectFor(emailType, locale),
             html,
             text,
             purpose: "transactional",
@@ -175,6 +235,7 @@ export const Route = createFileRoute("/lovable/email/auth/webhook")({
         console.log("Auth email enqueued", {
           emailType,
           email_redacted: redactEmail(payload.data.email),
+          locale,
           run_id,
         });
 

@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { useTranslation } from "react-i18next";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { listAllSupportTickets } from "@/lib/support.functions";
@@ -32,6 +33,7 @@ const PRIORITIES = ["all", ...SUPPORT_PRIORITIES] as const;
 const CATEGORIES = ["all", ...SUPPORT_CATEGORIES] as const;
 
 function AdminTicketsPage() {
+  const { t } = useTranslation();
   const [search, setSearch] = useState("");
   const [status, setStatus] = useState<string>("all");
   const [priority, setPriority] = useState<string>("all");
@@ -70,15 +72,13 @@ function AdminTicketsPage() {
       <header className="mb-6 flex items-start justify-between gap-3">
         <div>
           <div className="flex items-center gap-2 text-xs uppercase tracking-wide text-muted-foreground">
-            <LifeBuoy className="h-3.5 w-3.5" /> Support tickets
+            <LifeBuoy className="h-3.5 w-3.5" /> {t("superadmin.tickets.eyebrow")}
           </div>
-          <h1 className="text-xl font-semibold mt-1">Inbox</h1>
-          <p className="text-sm text-muted-foreground mt-1">
-            Tickets utilisateurs · réponses, statuts, priorités.
-          </p>
+          <h1 className="text-xl font-semibold mt-1">{t("superadmin.tickets.title")}</h1>
+          <p className="text-sm text-muted-foreground mt-1">{t("superadmin.tickets.subtitle")}</p>
         </div>
         <Button size="sm" onClick={() => setCreateOpen(true)}>
-          <Plus className="h-4 w-4 mr-1.5" /> Nouveau ticket
+          <Plus className="h-4 w-4 mr-1.5" /> {t("superadmin.tickets.newTicket")}
         </Button>
       </header>
 
@@ -88,7 +88,7 @@ function AdminTicketsPage() {
         <div className="relative sm:col-span-2">
           <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
-            placeholder="Rechercher un sujet…"
+            placeholder={t("superadmin.tickets.searchPlaceholder")}
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             className="pl-8"
@@ -96,46 +96,46 @@ function AdminTicketsPage() {
         </div>
         <Select value={status} onValueChange={setStatus}>
           <SelectTrigger>
-            <SelectValue placeholder="Statut" />
+            <SelectValue placeholder={t("superadmin.tickets.status")} />
           </SelectTrigger>
           <SelectContent>
             {STATUSES.map((s) => (
               <SelectItem key={s} value={s}>
-                {s === "all" ? "Tous statuts" : s}
+                {s === "all" ? t("superadmin.tickets.allStatuses") : s}
               </SelectItem>
             ))}
           </SelectContent>
         </Select>
         <Select value={priority} onValueChange={setPriority}>
           <SelectTrigger>
-            <SelectValue placeholder="Priorité" />
+            <SelectValue placeholder={t("superadmin.tickets.priority")} />
           </SelectTrigger>
           <SelectContent>
             {PRIORITIES.map((p) => (
               <SelectItem key={p} value={p}>
-                {p === "all" ? "Toutes priorités" : p}
+                {p === "all" ? t("superadmin.tickets.allPriorities") : p}
               </SelectItem>
             ))}
           </SelectContent>
         </Select>
         <Select value={category} onValueChange={setCategory}>
           <SelectTrigger>
-            <SelectValue placeholder="Catégorie" />
+            <SelectValue placeholder={t("superadmin.tickets.category")} />
           </SelectTrigger>
           <SelectContent>
             {CATEGORIES.map((c) => (
               <SelectItem key={c} value={c}>
-                {c === "all" ? "Toutes catégories" : c}
+                {c === "all" ? t("superadmin.tickets.allCategories") : c}
               </SelectItem>
             ))}
           </SelectContent>
         </Select>
         <Select value={clubId} onValueChange={setClubId}>
           <SelectTrigger className="sm:col-span-2">
-            <SelectValue placeholder="Club" />
+            <SelectValue placeholder={t("superadmin.tickets.club")} />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">Tous clubs</SelectItem>
+            <SelectItem value="all">{t("superadmin.tickets.allClubs")}</SelectItem>
             {clubOptions.map((c) => (
               <SelectItem key={c.id} value={c.id}>
                 {c.name}
@@ -151,7 +151,7 @@ function AdminTicketsPage() {
         </div>
       ) : !data || data.length === 0 ? (
         <div className="rounded-2xl border border-dashed p-10 text-center text-sm text-muted-foreground">
-          Aucun ticket.
+          {t("superadmin.tickets.empty")}
         </div>
       ) : (
         <ul className="border rounded-lg divide-y bg-card">

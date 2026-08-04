@@ -23,7 +23,7 @@
     "tagline": "La gestione della squadra, semplificata per i club sportivi.",
     "product": "Prodotto",
     "company": "Azienda",
-    "legal": "Note legali",
+    "legal": "Legale",
     "terms": "Termini di servizio",
     "privacy": "Informativa sulla privacy",
     "legalNotice": "Informazioni legali",
@@ -63,7 +63,7 @@
     "ctaButton": "Richiedi una demo",
     "ctaPricing": "Vedi i prezzi",
     "ctaSeason": "Inizia la tua stagione",
-    "heroLive": "Diretta · 2-1",
+    "heroLive": "Live · 2-1",
     "heroAttendance": "Presenze",
     "heroDate": "Sabato · 14:30",
     "heroMatch": "U13 — vs FC Riverside",
@@ -277,7 +277,7 @@
         "audParents": "Genitori",
         "audJoueurs": "Giocatori",
         "mockTitle": "Il tuo club, connesso",
-        "mockLive": "In diretta",
+        "mockLive": "Live",
         "mockBadge": "Tutto il club. Una sola app.",
         "mockLine": "Dal dirigente al giocatore, tutti nello stesso posto."
       },
@@ -349,7 +349,9 @@
         "s2": "I genitori restano informati",
         "s3": "Gli allenatori sono valorizzati",
         "s4": "I club aumentano la loro visibilità",
-        "showcase": "Ogni club ha la sua vetrina pubblica."
+        "showcase": "Ogni club ha la sua vetrina pubblica.",
+        "soonBadge": "Presto",
+        "soonNote": "Le funzionalità social saranno disponibili a breve."
       },
       "forwho": {
         "title": "Per chi?",
@@ -516,7 +518,8 @@
     "mockFeedbackTagStrong": "Visione",
     "mockFeedbackTagWork": "Finalizzazione",
     "mockAiBadge": "Riepilogo AI",
-    "mockAiBody": "Stagione costante, notevoli progressi nella costruzione del gioco. Raccomandazione: esercizi di finalizzazione con il piede debole."
+    "mockAiBody": "Stagione costante, notevoli progressi nella costruzione del gioco. Raccomandazione: esercizi di finalizzazione con il piede debole.",
+    "mockSeasonLabel": "Stagione"
   },
   "coachAssist": {
     "chip": "Per gli Allenatori",
@@ -765,7 +768,8 @@
       "b1": "Banner sponsor rotante sulla home del club",
       "b2": "Tracciamento automatico di impressioni e clic",
       "b3": "Più partner, ordine e loghi gestiti dall'admin",
-      "cta": "Scopri la gestione degli sponsor"
+      "cta": "Scopri la gestione degli sponsor",
+      "demoName": "Il tuo partner"
     },
     "future": {
       "badge": "In arrivo",
@@ -776,14 +780,14 @@
       "i3": "Rete aperta tra club e giocatori"
     },
     "challenges": {
-      "kicker": "Challenges & leaderboards",
-      "title": "Challenges tailored to your sport",
-      "body": "A curated catalog of challenges per sport (football, handball, rugby, volleyball, tennis…), with the right units: counts, accuracy, cumulative totals or personal-best records. Coaches can also build their own. Players watch the leaderboard live, with a badge that highlights every brand-new record.",
-      "b1": "Sport-aware catalog — passes, shots, aces, tackles, controls…",
-      "b2": "Fast stepper input, cumulative score or personal best",
-      "b3": "Live leaderboard with podium and 'New record' badge",
-      "b4": "Custom challenges built by the coach in 30 seconds",
-      "cta": "Explore challenges"
+      "kicker": "Sfide e classifiche",
+      "title": "Sfide su misura per il tuo sport",
+      "body": "Un catalogo curato di sfide per sport (calcio, pallamano, rugby, pallavolo, tennis…), con le unità giuste: conteggi, precisione, totali cumulativi o record personali. Gli allenatori possono anche crearne di proprie. I giocatori seguono la classifica in diretta, con un badge che mette in evidenza ogni nuovo record.",
+      "b1": "Catalogo pensato per ogni sport — passaggi, tiri, ace, placcaggi, controlli…",
+      "b2": "Inserimento rapido, punteggio cumulativo o record personale",
+      "b3": "Classifica live con podio e badge “Nuovo record”",
+      "b4": "Sfide personalizzate create dall'allenatore in 30 secondi",
+      "cta": "Scopri le sfide"
     },
     "modules": {
       "coordination": {
@@ -885,7 +889,7 @@
         ]
       },
       "stages": {
-        "title": "Campi estivi",
+        "title": "Campus",
         "subtitle": "Organizza i tuoi campi estivi da A a Z.",
         "items": [
           {
@@ -1058,7 +1062,10 @@
           }
         ]
       }
-    }
+    },
+    "learnMore": "Scopri di più",
+    "modulesCount": "moduli",
+    "includedV1": "Incluso in V1"
   },
   "faq": {
     "metaTitle": "FAQ — Clubero",
@@ -2055,17 +2062,17 @@
       "cta": "Scopri"
     },
     "challenges": {
-      "badge": "Challenges & leaderboards",
-      "headline": "Turn every session into a friendly competition.",
-      "body": "Passing accuracy, shots on target, aces at serve… create challenges during your training sessions and matches, log scores live and watch a real-time leaderboard climb. Your players get hooked — and get better.",
-      "cta": "See the challenges",
-      "img_alt": "Animated Clubero challenge leaderboard with podium and medals",
+      "badge": "Sfide e classifiche",
+      "headline": "Trasforma ogni seduta in una sfida amichevole.",
+      "body": "Precisione nei passaggi, tiri in porta, ace al servizio… crea sfide durante allenamenti e partite, registra i punteggi live e guarda la classifica aggiornarsi in tempo reale. I tuoi giocatori si appassionano — e migliorano.",
+      "cta": "Vedi le sfide",
+      "img_alt": "Classifica animata delle sfide Clubero con podio e medaglie",
       "live": "Live",
-      "challenge_label": "Challenge",
-      "challenge_name": "Passing accuracy",
-      "players_count": "12 players",
-      "updated_now": "Updated just now",
-      "new_record": "★ New record",
+      "challenge_label": "Sfida",
+      "challenge_name": "Precisione nei passaggi",
+      "players_count": "12 giocatori",
+      "updated_now": "Aggiornato ora",
+      "new_record": "★ Nuovo record",
       "floating_badge": "🏆 +1 record"
     },
     "parentResources": {
@@ -2083,5 +2090,37 @@
         "cta": "Vedi la guida all'installazione"
       }
     }
+  },
+  "mock": {
+    "toDoCount": "3 da fare",
+    "attendance": "Presenza",
+    "u15Training": "Allenamento U15"
+  },
+  "publicPlayers": {
+    "eyebrow": "Elenco pubblico",
+    "title": "I giocatori Clubero",
+    "subtitle": "Sfoglia i profili pubblici condivisi dai giocatori: palmarès, percorso sportivo, club. Riservato ai giocatori maggiorenni che hanno attivato il profilo.",
+    "searchPlaceholder": "Nome del giocatore o del club…",
+    "allSports": "Tutti gli sport",
+    "allClubs": "Tutti i club",
+    "clubFilter": "Club",
+    "search": "Cerca",
+    "reset": "Reimposta",
+    "loading": "Caricamento…",
+    "count": "{{count}} giocatori",
+    "page": "Pagina {{page}} / {{total}}",
+    "error": "Impossibile caricare l'elenco al momento.",
+    "emptyTitle": "Nessun profilo corrispondente",
+    "emptyBody": "Affina i filtri o torna presto: ogni settimana nuovi giocatori condividono il loro profilo.",
+    "prev": "Precedente",
+    "next": "Successivo",
+    "ctaTitle": "Sei un giocatore? Crea il tuo profilo pubblico.",
+    "ctaBody": "Condividi il tuo palmarès, le tue stagioni e il tuo percorso in un solo link. Gratuito, facoltativo, sotto il tuo controllo.",
+    "ctaJoin": "Crea il mio account",
+    "ctaFeatures": "Scopri le funzionalità"
+  },
+  "common": {
+    "stop": "Ferma",
+    "listen": "Ascolta"
   }
 }

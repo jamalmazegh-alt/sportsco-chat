@@ -110,7 +110,7 @@ export function PlayerSuspensions({ playerId, clubId }: Props) {
 
   async function onCreate() {
     if (!teamId) {
-      toast.error("Select a team");
+      toast.error(t("suspension.selectTeam"));
       return;
     }
     const { error } = await supabase.from("player_suspensions").insert({
@@ -184,7 +184,7 @@ export function PlayerSuspensions({ playerId, clubId }: Props) {
             </DialogHeader>
             <div className="space-y-3">
               <div className="space-y-1.5">
-                <Label>{t("teams.title", { defaultValue: "Team" })}</Label>
+                <Label>{t("teams.title")}</Label>
                 <Select value={teamId} onValueChange={setTeamId}>
                   <SelectTrigger>
                     <SelectValue placeholder="—" />
@@ -262,7 +262,7 @@ export function PlayerSuspensions({ playerId, clubId }: Props) {
             </div>
             <DialogFooter>
               <Button variant="ghost" onClick={() => setOpen(false)}>
-                {t("common.cancel", { defaultValue: "Cancel" })}
+                {t("common.cancel")}
               </Button>
               <Button onClick={onCreate}>{t("suspension.save")}</Button>
             </DialogFooter>

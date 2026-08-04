@@ -391,14 +391,16 @@ function BillingPage() {
               <ShieldCheck className="h-5 w-5" />
             </div>
             <div>
-              <h2 className="text-lg font-extrabold text-gray-900">✅ Accès offert</h2>
-              <p className="text-sm text-gray-600 mt-1">
-                Votre club bénéficie d&apos;un accès gratuit à toutes les fonctionnalités Clubero.
-              </p>
+              <h2 className="text-lg font-extrabold text-gray-900">
+                ✅ {t("billing.exemptTitle")}
+              </h2>
+              <p className="text-sm text-gray-600 mt-1">{t("billing.exemptBody")}</p>
               {sub?.exempt_reason && (
                 <p className="text-xs text-gray-500 mt-2">
-                  Raison :{" "}
-                  {EXEMPT_REASON_LABELS[sub.exempt_reason as ExemptReason] ?? sub.exempt_reason}
+                  {t("billing.exemptReason", {
+                    reason:
+                      EXEMPT_REASON_LABELS[sub.exempt_reason as ExemptReason] ?? sub.exempt_reason,
+                  })}
                 </p>
               )}
             </div>

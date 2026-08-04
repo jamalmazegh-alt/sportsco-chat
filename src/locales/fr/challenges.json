@@ -171,7 +171,12 @@
     "custom_name_label": "Nom",
     "custom_name_placeholder": "Ex. Précision passe longue",
     "create": "Créer",
-    "creating": "Création…"
+    "creating": "Création…",
+    "all_added": "Toutes les activités disponibles sont déjà ajoutées à cette équipe.",
+    "popular": "Populaire",
+    "already_in_session": "Déjà dans la séance",
+    "selected": "Sélectionné",
+    "cancel": "Annuler"
   },
   "entry": {
     "title": "Saisie",
@@ -198,7 +203,8 @@
   },
   "errors": {
     "forbidden": "Action réservée au staff.",
-    "generic": "Une erreur est survenue."
+    "generic": "Une erreur est survenue.",
+    "eventNotFound": "Événement introuvable."
   },
   "records": {
     "new": "Nouveau record !"

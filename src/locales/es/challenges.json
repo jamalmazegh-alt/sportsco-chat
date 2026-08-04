@@ -60,96 +60,96 @@
       "description": "Tiempo en 20 m — gana el más rápido."
     },
     "plankHold": {
-      "name": "Plank hold",
-      "description": "Hold a plank — best duration record."
+      "name": "Plancha",
+      "description": "Mantener una plancha: mejor duración registrada."
     },
     "shuttleRun": {
-      "name": "Shuttle run",
-      "description": "Timed back-and-forth run — lowest time wins."
+      "name": "Carrera ida y vuelta",
+      "description": "Carrera cronometrada de ida y vuelta: gana el menor tiempo."
     },
     "slalomBall": {
-      "name": "Ball slalom",
-      "description": "Timed dribbling slalom — lowest time wins."
+      "name": "Slalom con balón",
+      "description": "Slalom cronometrado conduciendo el balón: gana el menor tiempo."
     },
     "freeThrows": {
-      "name": "Free throws",
-      "description": "Free throws made out of a series — record."
+      "name": "Tiros libres",
+      "description": "Tiros libres anotados en una serie: registro."
     },
     "threePointShots": {
-      "name": "Three-point shots",
-      "description": "Three-point shots made out of a series — record."
+      "name": "Tiros de tres puntos",
+      "description": "Tiros de tres puntos anotados en una serie: registro."
     },
     "dribbleCourse": {
-      "name": "Dribble course",
-      "description": "Timed dribbling course — lowest time wins."
+      "name": "Circuito de dribling",
+      "description": "Circuito cronometrado de dribling: gana el menor tiempo."
     },
     "layupSeries": {
-      "name": "Layup series",
-      "description": "Layups made out of a series — record."
+      "name": "Serie de bandejas",
+      "description": "Bandejas anotadas en una serie: registro."
     },
     "handballDribbleSlalom": {
-      "name": "Dribble slalom",
-      "description": "Timed dribbling slalom — lowest time wins."
+      "name": "Slalom de dribling",
+      "description": "Slalom cronometrado con bote: gana el menor tiempo."
     },
     "sprint40m": {
-      "name": "40 m sprint",
-      "description": "Time on 40 m — lowest wins."
+      "name": "Sprint de 40 m",
+      "description": "Tiempo en 40 m: gana el menor."
     },
     "agilityRunRugby": {
-      "name": "Agility run",
-      "description": "Timed evasion course — lowest time wins."
+      "name": "Carrera de agilidad",
+      "description": "Circuito cronometrado de evasión: gana el menor tiempo."
     },
     "successfulPasses": {
-      "name": "Successful passes",
-      "description": "Longest streak of successful passes — record."
+      "name": "Pases acertados",
+      "description": "Racha más larga de pases acertados: registro."
     },
     "rallyConsistency": {
-      "name": "Rally consistency",
-      "description": "Longest error-free rally — record."
+      "name": "Regularidad en el peloteo",
+      "description": "Peloteo más largo sin errores: registro."
     },
     "movementSpeed": {
-      "name": "Movement speed",
-      "description": "Timed movement course — lowest time wins."
+      "name": "Velocidad de desplazamiento",
+      "description": "Circuito cronometrado de desplazamiento: gana el menor tiempo."
     },
     "shotAccuracy": {
-      "name": "Shot accuracy",
-      "description": "Shots on target zones — cumulative score."
+      "name": "Precisión de tiro",
+      "description": "Tiros a zonas objetivo: puntuación acumulada."
     },
     "handballShotAccuracy": {
-      "name": "Shot accuracy",
-      "description": "Shots on target zones — cumulative score."
+      "name": "Precisión de tiro",
+      "description": "Tiros a zonas objetivo: puntuación acumulada."
     },
     "passingAccuracy": {
-      "name": "Passing accuracy",
-      "description": "Passes made on targets — cumulative score."
+      "name": "Precisión de pase",
+      "description": "Pases acertados a objetivos: puntuación acumulada."
     },
     "rugbyPassingAccuracy": {
-      "name": "Passing accuracy",
-      "description": "Passes made on targets — cumulative score."
+      "name": "Precisión de pase",
+      "description": "Pases acertados a objetivos: puntuación acumulada."
     },
     "pushPower": {
-      "name": "Scrum push power",
-      "description": "Measured pushing force — score."
+      "name": "Potencia de empuje en melé",
+      "description": "Fuerza de empuje medida: puntuación."
     },
     "serveAccuracy": {
-      "name": "Serve accuracy",
-      "description": "Serves placed on zones — cumulative score."
+      "name": "Precisión de saque",
+      "description": "Saques colocados en zonas: puntuación acumulada."
     },
     "receptionControl": {
-      "name": "Reception control",
-      "description": "Reception quality rated by staff — score."
+      "name": "Control de recepción",
+      "description": "Calidad de recepción valorada por el staff: puntuación."
     },
     "attackAccuracy": {
-      "name": "Attack accuracy",
-      "description": "Attacks placed on zones — cumulative score."
+      "name": "Precisión de ataque",
+      "description": "Ataques colocados en zonas: puntuación acumulada."
     },
     "tennisServeAccuracy": {
-      "name": "Serve accuracy",
-      "description": "Serves placed on zones — cumulative score."
+      "name": "Precisión de saque",
+      "description": "Saques colocados en zonas: puntuación acumulada."
     },
     "targetShots": {
-      "name": "Target shots",
-      "description": "Balls placed on targets — cumulative score."
+      "name": "Tiros a diana",
+      "description": "Balones colocados en objetivos: puntuación acumulada."
     }
   },
   "list": {
@@ -171,7 +171,12 @@
     "custom_name_label": "Nombre",
     "custom_name_placeholder": "Ej. Precisión de pase largo",
     "create": "Crear",
-    "creating": "Creando…"
+    "creating": "Creando…",
+    "all_added": "Todas las actividades disponibles ya están agregadas a este equipo.",
+    "popular": "Popular",
+    "already_in_session": "Ya en la sesión",
+    "selected": "Seleccionado",
+    "cancel": "Cancelar"
   },
   "entry": {
     "title": "Registro",
@@ -198,7 +203,8 @@
   },
   "errors": {
     "forbidden": "Acción reservada al cuerpo técnico.",
-    "generic": "Se ha producido un error."
+    "generic": "Se ha producido un error.",
+    "eventNotFound": "Evento no encontrado."
   },
   "records": {
     "new": "¡Nuevo récord!"

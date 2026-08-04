@@ -106,7 +106,7 @@ export function CampDocumentsEditor({
 
   async function handleUpload(file: File) {
     if (file.size > MAX_BYTES) {
-      toast.error(t("documents.tooLarge", { defaultValue: "Fichier trop volumineux (max 15 MB)" }));
+      toast.error(t("documents.tooLarge"));
       return;
     }
     setUploading(true);
@@ -127,7 +127,7 @@ export function CampDocumentsEditor({
       await addFn({ data: { campId, path, title, documentType: null } });
       setPendingTitle("");
       invalidate();
-      toast.success(t("documents.uploaded", { defaultValue: "Document ajouté" }));
+      toast.success(t("documents.uploaded"));
     } catch (e) {
       toast.error((e as Error).message);
     } finally {
@@ -139,9 +139,7 @@ export function CampDocumentsEditor({
   return (
     <div className="space-y-3">
       {localOrder.length === 0 ? (
-        <p className="text-sm text-muted-foreground">
-          {t("documents.empty", { defaultValue: "Aucun document fourni pour l'instant." })}
-        </p>
+        <p className="text-sm text-muted-foreground">{t("documents.empty")}</p>
       ) : (
         <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={onDragEnd}>
           <SortableContext
@@ -164,14 +162,12 @@ export function CampDocumentsEditor({
 
       <div className="rounded-lg border border-dashed border-border p-3 space-y-2">
         <Label className="text-xs uppercase tracking-wide text-muted-foreground">
-          {t("documents.addTitle", { defaultValue: "Ajouter un document" })}
+          {t("documents.addTitle")}
         </Label>
         <Input
           value={pendingTitle}
           onChange={(e) => setPendingTitle(e.target.value)}
-          placeholder={t("documents.titlePlaceholder", {
-            defaultValue: "Titre affiché (facultatif — nom du fichier par défaut)",
-          })}
+          placeholder={t("documents.titlePlaceholder")}
           disabled={disabled || uploading}
         />
         <input
@@ -196,13 +192,9 @@ export function CampDocumentsEditor({
             ) : (
               <Upload className="h-4 w-4" />
             )}
-            <span className="ml-1.5">
-              {t("documents.upload", { defaultValue: "Téléverser (PDF, JPG, PNG)" })}
-            </span>
+            <span className="ml-1.5">{t("documents.upload")}</span>
           </Button>
-          <span className="text-[11px] text-muted-foreground">
-            {t("documents.maxHint", { defaultValue: "15 MB max" })}
-          </span>
+          <span className="text-[11px] text-muted-foreground">{t("documents.maxHint")}</span>
         </div>
       </div>
     </div>

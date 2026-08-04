@@ -52,14 +52,7 @@ export const Route = createFileRoute("/_authenticated/admin/payments/dashboard")
   }),
 });
 
-const METHOD_LABELS: Record<string, string> = {
-  stripe: "Stripe",
-  helloasso: "HelloAsso",
-  cash: "Espèces",
-  cheque: "Chèque",
-  bank_transfer: "Virement",
-  manual: "Manuel",
-};
+const METHOD_KEYS = ["stripe", "helloasso", "cash", "cheque", "bank_transfer", "manual"] as const;
 
 const STATUS_VARIANTS: Record<string, "default" | "secondary" | "destructive" | "outline"> = {
   succeeded: "default",
@@ -68,8 +61,8 @@ const STATUS_VARIANTS: Record<string, "default" | "secondary" | "destructive" | 
   refunded: "outline",
 };
 
-function fmtCents(c: number, currency = "eur"): string {
-  return new Intl.NumberFormat("fr-FR", {
+function fmtCents(c: number, currency = "eur", locale = "fr-FR"): string {
+  return new Intl.NumberFormat(locale, {
     style: "currency",
     currency: currency.toUpperCase(),
   }).format((c ?? 0) / 100);
@@ -81,12 +74,15 @@ function downloadCsv(csv: string, filename: string) {
 }
 
 function PaymentsDashboardPage() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { activeClubId } = useAuth();
   const roles = useMyRoles();
   const [seasonId, setSeasonId] = useState<string | "all">("all");
   const [from, setFrom] = useState<string>("");
   const [to, setTo] = useState<string>("");
+
+  const methodLabel = (m: string) =>
+    METHOD_KEYS.includes(m as (typeof METHOD_KEYS)[number]) ? t(`payments.method.${m}`) : m;
 
   const fetchSeasons = useServerFn(listSeasons);
   const fetchDashboard = useServerFn(getPaymentDashboard);
@@ -131,7 +127,7 @@ function PaymentsDashboardPage() {
     try {
       const res = await exportTx({ data: filters });
       downloadCsv(res.csv, res.filename);
-      toast.success("Export CSV téléchargé");
+      toast.success(t("fundraising.exportDownloaded"));
     } catch (e) {
       toast.error((e as Error).message);
     }
@@ -140,7 +136,7 @@ function PaymentsDashboardPage() {
     try {
       const res = await exportItems({ data: filters });
       downloadCsv(res.csv, res.filename);
-      toast.success("Export CSV téléchargé");
+      toast.success(t("fundraising.exportDownloaded"));
     } catch (e) {
       toast.error((e as Error).message);
     }
@@ -154,22 +150,20 @@ function PaymentsDashboardPage() {
           <TrendingUp className="h-6 w-6 text-primary" />
           {t("fundraising.dashboardTitle")}
         </h1>
-        <p className="text-sm text-muted-foreground mt-1">
-          Encaissements, soldes restants et exports comptables
-        </p>
+        <p className="text-sm text-muted-foreground mt-1">{t("fundraising.dashboardSubtitle")}</p>
       </div>
 
       {/* Filters */}
       <Card>
         <CardContent className="pt-4 grid grid-cols-1 sm:grid-cols-3 gap-3">
           <div>
-            <Label className="text-xs">Saison</Label>
+            <Label className="text-xs">{t("fundraising.season")}</Label>
             <Select value={seasonId} onValueChange={(v) => setSeasonId(v as string)}>
               <SelectTrigger>
-                <SelectValue placeholder="Toutes" />
+                <SelectValue placeholder={t("fundraising.allSeasons")} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">Toutes</SelectItem>
+                <SelectItem value="all">{t("fundraising.allSeasons")}</SelectItem>
                 {seasonsQ.data?.seasons.map((s) => (
                   <SelectItem key={s.id} value={s.id}>
                     {s.label}
@@ -179,11 +173,11 @@ function PaymentsDashboardPage() {
             </Select>
           </div>
           <div>
-            <Label className="text-xs">Du</Label>
+            <Label className="text-xs">{t("events.dateFrom")}</Label>
             <Input type="date" value={from} onChange={(e) => setFrom(e.target.value)} />
           </div>
           <div>
-            <Label className="text-xs">Au</Label>
+            <Label className="text-xs">{t("events.dateTo")}</Label>
             <Input type="date" value={to} onChange={(e) => setTo(e.target.value)} />
           </div>
         </CardContent>
@@ -199,32 +193,36 @@ function PaymentsDashboardPage() {
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
             <KpiCard
               icon={<Wallet className="h-5 w-5" />}
-              label="Encaissé"
+              label={t("fundraising.kpiCollected")}
               value={fmtCents(data.kpis.totalCollectedCents, currency)}
-              sub={`${data.kpis.transactionsCount} transactions`}
+              sub={t("fundraising.kpiTxCount", { count: data.kpis.transactionsCount })}
             />
             <KpiCard
               icon={<Receipt className="h-5 w-5" />}
-              label="Net (frais déduits)"
+              label={t("fundraising.kpiNet")}
               value={fmtCents(data.kpis.totalNetCents, currency)}
-              sub={`Frais : ${fmtCents(data.kpis.totalFeesCents, currency)}`}
+              sub={t("fundraising.kpiFees", {
+                amount: fmtCents(data.kpis.totalFeesCents, currency),
+              })}
             />
             <KpiCard
               icon={<Users className="h-5 w-5" />}
-              label="Dû total"
+              label={t("fundraising.kpiDue")}
               value={fmtCents(data.kpis.totalDueCents, currency)}
-              sub={`${data.kpis.obligationsCount} obligations`}
+              sub={t("fundraising.kpiObligations", { count: data.kpis.obligationsCount })}
             />
             <KpiCard
               icon={<TrendingUp className="h-5 w-5" />}
-              label="Taux d'encaissement"
+              label={t("fundraising.kpiRate")}
               value={`${(data.kpis.rate * 100).toFixed(1)} %`}
               sub={
                 data.kpis.totalDueCents > 0
-                  ? `Reste ${fmtCents(
-                      Math.max(0, data.kpis.totalDueCents - data.kpis.totalCollectedCents),
-                      currency,
-                    )}`
+                  ? t("fundraising.kpiRemaining", {
+                      amount: fmtCents(
+                        Math.max(0, data.kpis.totalDueCents - data.kpis.totalCollectedCents),
+                        currency,
+                      ),
+                    })
                   : "—"
               }
             />
@@ -245,7 +243,7 @@ function PaymentsDashboardPage() {
               <TabsTrigger value="items">{t("fundraising.byItem")}</TabsTrigger>
               <TabsTrigger value="methods">{t("fundraising.byMethod")}</TabsTrigger>
               <TabsTrigger value="monthly">{t("fundraising.byMonth")}</TabsTrigger>
-              <TabsTrigger value="tx">Transactions</TabsTrigger>
+              <TabsTrigger value="tx">{t("fundraising.tabTransactions")}</TabsTrigger>
             </TabsList>
 
             <TabsContent value="items" className="space-y-2 mt-4">
@@ -259,8 +257,12 @@ function PaymentsDashboardPage() {
                         <div className="min-w-0">
                           <p className="font-medium truncate">{it.title}</p>
                           <p className="text-xs text-muted-foreground">
-                            {it.total_count} ciblés • {it.paid_count} payés • {it.partial_count}{" "}
-                            partiels • {it.pending_count} en attente
+                            {t("fundraising.itemRollupLine", {
+                              total: it.total_count,
+                              paid: it.paid_count,
+                              partial: it.partial_count,
+                              pending: it.pending_count,
+                            })}
                           </p>
                         </div>
                         <div className="text-right shrink-0">
@@ -292,19 +294,21 @@ function PaymentsDashboardPage() {
 
             <TabsContent value="methods" className="space-y-2 mt-4">
               {Object.entries(data.byMethod).length === 0 ? (
-                <p className="text-sm text-muted-foreground">Aucun encaissement.</p>
+                <p className="text-sm text-muted-foreground">{t("fundraising.emptyMethods")}</p>
               ) : (
                 Object.entries(data.byMethod).map(([m, v]) => (
                   <Card key={m}>
                     <CardContent className="p-4 flex items-center justify-between">
                       <div>
-                        <p className="font-medium">{METHOD_LABELS[m] ?? m}</p>
-                        <p className="text-xs text-muted-foreground">{v.count} transactions</p>
+                        <p className="font-medium">{methodLabel(m)}</p>
+                        <p className="text-xs text-muted-foreground">
+                          {t("fundraising.kpiTxCount", { count: v.count })}
+                        </p>
                       </div>
                       <div className="text-right">
                         <p className="text-sm font-semibold">{fmtCents(v.gross, currency)}</p>
                         <p className="text-xs text-muted-foreground">
-                          Net : {fmtCents(v.net, currency)}
+                          {t("fundraising.netLabel", { amount: fmtCents(v.net, currency) })}
                         </p>
                       </div>
                     </CardContent>
@@ -315,7 +319,7 @@ function PaymentsDashboardPage() {
 
             <TabsContent value="monthly" className="mt-4">
               {data.monthly.length === 0 ? (
-                <p className="text-sm text-muted-foreground">Aucune donnée.</p>
+                <p className="text-sm text-muted-foreground">{t("fundraising.emptyMonthly")}</p>
               ) : (
                 <Card>
                   <CardContent className="p-4 space-y-2">
@@ -347,38 +351,38 @@ function PaymentsDashboardPage() {
                   <Loader2 className="h-5 w-5 animate-spin text-primary" />
                 </div>
               ) : (txQ.data?.transactions ?? []).length === 0 ? (
-                <p className="text-sm text-muted-foreground">Aucune transaction.</p>
+                <p className="text-sm text-muted-foreground">{t("fundraising.noTransactions")}</p>
               ) : (
                 <div className="space-y-2">
-                  {txQ.data!.transactions.map((t) => (
-                    <Card key={t.id}>
+                  {txQ.data!.transactions.map((tx) => (
+                    <Card key={tx.id}>
                       <CardContent className="p-3 flex items-center justify-between gap-3">
                         <div className="min-w-0">
                           <div className="flex items-center gap-2 flex-wrap">
-                            <p className="font-medium text-sm truncate">{t.item_title}</p>
+                            <p className="font-medium text-sm truncate">{tx.item_title}</p>
                             <Badge
-                              variant={STATUS_VARIANTS[t.status] ?? "secondary"}
+                              variant={STATUS_VARIANTS[tx.status] ?? "secondary"}
                               className="text-[10px]"
                             >
-                              {t.status}
+                              {tx.status}
                             </Badge>
                             <Badge variant="outline" className="text-[10px]">
-                              {METHOD_LABELS[t.method] ?? t.method}
+                              {methodLabel(tx.method)}
                             </Badge>
                           </div>
                           <p className="text-xs text-muted-foreground truncate">
-                            {t.player_name ? `${t.player_name} • ` : ""}
-                            {t.payer_name ?? "—"} •{" "}
-                            {new Date(t.created_at).toLocaleDateString("fr-FR")}
+                            {tx.player_name ? `${tx.player_name} • ` : ""}
+                            {tx.payer_name ?? "—"} •{" "}
+                            {new Date(tx.created_at).toLocaleDateString(i18n.language)}
                           </p>
                         </div>
                         <div className="text-right shrink-0">
                           <p className="text-sm font-semibold">
-                            {fmtCents(t.amount_gross_cents, t.currency)}
+                            {fmtCents(tx.amount_gross_cents, tx.currency, i18n.language)}
                           </p>
-                          {t.provider_fee_cents > 0 && (
+                          {tx.provider_fee_cents > 0 && (
                             <p className="text-[10px] text-muted-foreground">
-                              -{fmtCents(t.provider_fee_cents, t.currency)} frais
+                              -{fmtCents(tx.provider_fee_cents, tx.currency, i18n.language)} frais
                             </p>
                           )}
                         </div>

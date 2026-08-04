@@ -198,12 +198,12 @@ export function TournamentRulesEditor({ tournamentId, settings, sport }: Props) 
           {(rules.points.otWin != null || rules.points.otLoss != null) && (
             <div className="grid grid-cols-2 gap-3 pt-2 border-t border-border">
               <NumberField
-                label={t("rules.otWin", { defaultValue: "Victoire en prolongation" })}
+                label={t("rules.otWin")}
                 value={rules.points.otWin ?? rules.points.win}
                 onChange={(v) => setRules({ ...rules, points: { ...rules.points, otWin: v } })}
               />
               <NumberField
-                label={t("rules.otLoss", { defaultValue: "Défaite en prolongation" })}
+                label={t("rules.otLoss")}
                 value={rules.points.otLoss ?? rules.points.loss}
                 onChange={(v) => setRules({ ...rules, points: { ...rules.points, otLoss: v } })}
               />
@@ -362,19 +362,17 @@ export function TournamentRulesEditor({ tournamentId, settings, sport }: Props) 
       {/* Roster / Composition d'équipe */}
       <Card>
         <CardHeader>
-          <CardTitle className="text-base">
-            {t("rules.rosterTitle", { defaultValue: "Composition d'équipe" })}
-          </CardTitle>
+          <CardTitle className="text-base">{t("rules.rosterTitle")}</CardTitle>
         </CardHeader>
         <CardContent className="grid grid-cols-2 gap-3">
           <NumberField
-            label={t("rules.playersPerTeam", { defaultValue: "Joueurs par équipe" })}
+            label={t("rules.playersPerTeam")}
             value={rules.roster.playersPerTeam}
             min={1}
             onChange={(v) => setRules({ ...rules, roster: { ...rules.roster, playersPerTeam: v } })}
           />
           <NumberField
-            label={t("rules.maxSubstitutes", { defaultValue: "Remplaçants max" })}
+            label={t("rules.maxSubstitutes")}
             value={rules.roster.maxSubstitutes}
             min={0}
             onChange={(v) => setRules({ ...rules, roster: { ...rules.roster, maxSubstitutes: v } })}
@@ -495,8 +493,8 @@ export function TournamentRulesEditor({ tournamentId, settings, sport }: Props) 
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="fr">Français</SelectItem>
-                  <SelectItem value="en">English</SelectItem>
+                  <SelectItem value="fr">{t("common:languages.fr")}</SelectItem>
+                  <SelectItem value="en">{t("common:languages.en")}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -618,8 +616,8 @@ export function TournamentRulesEditor({ tournamentId, settings, sport }: Props) 
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="fr">Français</SelectItem>
-                      <SelectItem value="en">English</SelectItem>
+                      <SelectItem value="fr">{t("common:languages.fr")}</SelectItem>
+                      <SelectItem value="en">{t("common:languages.en")}</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>

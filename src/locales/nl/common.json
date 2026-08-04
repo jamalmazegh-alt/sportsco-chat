@@ -23,7 +23,7 @@
     "overlapWarning": "⚠️ Er is al een afwezigheid gemeld voor deze periode. Toch bevestigen?",
     "warningSelected": "Speler is voor deze datum als niet beschikbaar gemeld",
     "until": "tot {{date}}",
-    "drawerHint": "Geef de periode en reden op. De Coach wordt geïnformeerd.",
+    "drawerHint": "Stel de periode en de reden in. Coaches worden op de hoogte gebracht.",
     "absent": "Afwezig",
     "unavailable": "Niet beschikbaar",
     "impactedEvents": "📅 Deze afwezigheid heeft invloed op:",
@@ -44,7 +44,25 @@
     },
     "errors": {
       "missingPlayer": "Selecteer een Speler.",
-      "invalidRange": "Ongeldige datums."
+      "invalidRange": "Ongeldige datums.",
+      "overlap": "Voor deze data is reeds een afwezigheid gedeclareerd. Bewerk in plaats daarvan de bestaande."
+    },
+    "updated": "Afwezigheid bijgewerkt",
+    "forPlayer": "Voor welke speler?",
+    "dates": "Afwezigheidsperiode",
+    "pickRange": "Selecteer een periode",
+    "teamTable": {
+      "title": "Afwezigheid van teams",
+      "empty": "Er zijn geen toekomstige afwezigheden gemeld in dit team."
+    },
+    "calendar": {
+      "open": "Bekijk de afwezigheidskalender",
+      "title": "Afwezigheidskalender",
+      "pickPlayer": "Betrokken speler",
+      "noPlayers": "Geen spelers in dit team.",
+      "legend": "Legende",
+      "prevMonth": "Vorige maand",
+      "nextMonth": "Volgende maand"
     }
   },
   "discipline": {
@@ -130,7 +148,8 @@
     "reason_accumulated_yellow_cards": "Gele kaarten",
     "reason_federation_sanction": "Bondsstraf",
     "reason_club_sanction": "Clubstraf",
-    "reason_other": "Overig"
+    "reason_other": "Overig",
+    "selectTeam": "Selecteer een team"
   },
   "suspensions": {
     "suspendedShort": "Geschorst",
@@ -138,8 +157,13 @@
     "warningTooltip_other": "{{count}} wedstrijden openstaand",
     "remaining_one": "{{count}} wedstrijd openstaand",
     "remaining_other": "{{count}} wedstrijden openstaand",
-    "warningOfficial": "Geschorste Spelers in de Selectie (officiële wedstrijd — schorsing wordt afgetrokken)",
-    "warningNonOfficial": "Geschorste Spelers in de Selectie (geen officiële wedstrijd — schorsing wordt niet afgetrokken)"
+    "warningOfficial": "Geschorste spelers in de selectie (officiële wedstrijd – hun schorsing telt af)",
+    "warningNonOfficial": "Geschorste Spelers in de Selectie (geen officiële wedstrijd — schorsing wordt niet afgetrokken)",
+    "warningInPicker": "Geschorste speler(s) in de selectie",
+    "confirmSendTitle": "Geschorste spelers oproepen?",
+    "confirmSendOfficial": "Deze wedstrijd is officieel. Het oproepen van een geschorste speler kan in strijd zijn met de regels.",
+    "confirmSendNonOfficial": "Sommige geselecteerde spelers hebben een actieve schorsing. Deze wedstrijd telt niet mee voor hun schorsing.",
+    "confirmSendAction": "Toch even bellen"
   },
   "app": {
     "name": "Clubero",
@@ -170,7 +194,10 @@
     "primary": "Hoofdnavigatie",
     "manageClub": "Club beheren",
     "manageClubSubtitle": "Instellingen, leden, abonnement",
-    "viewStats": "Statistieken bekijken"
+    "viewStats": "Statistieken bekijken",
+    "players": "Spelers",
+    "tournament": "Toernooi",
+    "signup": "Registreren"
   },
   "auth": {
     "playerSignupLink": "Ben je een Speler? Maak hier je profiel aan →",
@@ -236,7 +263,25 @@
     "playerAlreadyLinked": "Dit spelersprofiel is al gekoppeld aan een ander account. Neem contact op met de club.",
     "emailFromInvite": "E-mail uit je uitnodiging.",
     "accountAlreadyExistsSignIn": "Er bestaat al een account met dit adres. Log in met je gebruikelijke wachtwoord (of gebruik ‘wachtwoord vergeten’).",
-    "inviteWrongAccount": "Deze uitnodiging is voor een ander e-mailadres. Log uit en log daarna in (of maak een account) met het uitgenodigde e-mailadres."
+    "inviteWrongAccount": "Deze uitnodiging is voor een ander e-mailadres. Log uit en log daarna in (of maak een account) met het uitgenodigde e-mailadres.",
+    "childNameRequired": "Naam van het kind verplicht",
+    "birthDateRequired": "Geboortedatum verplicht",
+    "minorTeamParentOnly": "Deze categorie omvat minderjarigen: het account wordt aangemaakt door de ouder of voogd.",
+    "joinAsPlayer": "Ik ben de speler",
+    "joinAsParent": "Ik schrijf mijn kind in",
+    "childFirstName": "Voornaam van het kind",
+    "childLastName": "Achternaam van het kind",
+    "childBirthDate": "Geboortedatum van het kind",
+    "birthDate": "Geboortedatum",
+    "childPhone": "Telefoon van het kind (optioneel)",
+    "phone": "Telefoon",
+    "licenseNumber": "Licentienummer (optioneel)",
+    "teamJoinHint": "Deze gegevens maken het spelersprofiel aan. De club kan ze later aanvullen.",
+    "parentPhone": "Jouw telefoon (ouder)",
+    "showPassword": "Wachtwoord tonen",
+    "hidePassword": "Wachtwoord verbergen",
+    "inviteExpired": "Deze uitnodiging is verlopen.",
+    "inviteUsed": "Deze uitnodiging is al gebruikt."
   },
   "common": {
     "save": "Opslaan",
@@ -275,7 +320,28 @@
     "unknown": "Geen naam",
     "deselectAll": "Alles deselecteren",
     "actions": "Acties",
-    "add": "Toevoegen"
+    "add": "Toevoegen",
+    "seeAll": "Alles bekijken",
+    "copied": "Link gekopieerd",
+    "open": "Openen",
+    "deleted": "Verwijderd",
+    "hide": "Verbergen",
+    "saving": "Besparing…",
+    "refresh": "Vernieuwen",
+    "dismiss": "Afwijzen",
+    "saveChanges": "Wijzigingen opslaan",
+    "match": "Sport",
+    "confirm": "Bevestigen",
+    "reset": "Resetten",
+    "unauthorized": "Toegang voorbehouden aan touringcars.",
+    "noClubSelected": "Geen club geselecteerd",
+    "fileTooLarge": "Bestand te groot (max. 5 MB)",
+    "invalidImage": "Niet-ondersteund afbeeldingsformaat",
+    "copyFailed": "Kan niet kopiëren",
+    "copy": "Kopiëren",
+    "moreActions": "Meer acties",
+    "noResults": "Geen resultaten",
+    "added": "toegevoegd"
   },
   "notFound": {
     "code": "404",
@@ -316,7 +382,9 @@
     "childrenMediaHint": "Foto's van minderjarigen worden alleen getoond als je toestemming geeft.",
     "mediaStatus": "Status",
     "allow": "Toestaan",
-    "deny": "Weigeren"
+    "deny": "Weigeren",
+    "consentsHint": "De switch beheert uw toestemming. Gebruik “Document lezen” om elke tekst te bekijken.",
+    "readDocument": "Document lezen"
   },
   "onboarding": {
     "title": "Je Club instellen",
@@ -336,11 +404,11 @@
       },
       "players": {
         "label": "Spelers toevoegen",
-        "hint": "Voeg de Selectie van minstens één Team toe."
+        "hint": "Stel de selectie samen van ten minste één team."
       },
       "invites": {
         "label": "Ouders en Coaches uitnodigen",
-        "hint": "Ze reageren op uitnodigingen met één tik."
+        "hint": "Ze reageren met één tik op oproepen."
       },
       "event": {
         "label": "Eerste evenement publiceren",
@@ -420,6 +488,12 @@
       "upcoming7d": "Aankomend (7D)",
       "noData": "—",
       "pendingResponses": "Antwoorden in afwachting"
+    },
+    "campsCard": {
+      "title": "Kampen",
+      "createCta": "Creëer een kamp",
+      "plural": "kampen",
+      "singular": "kamp"
     }
   },
   "payments": {
@@ -472,7 +546,7 @@
       "stripe": "Kaart",
       "helloasso": "HelloAsso",
       "cash": "Contant",
-      "cheque": "Cheque",
+      "cheque": "Rekening",
       "bank_transfer": "Overschrijving",
       "manual": "Handmatig"
     },
@@ -492,7 +566,8 @@
       "recordedByClub": "(geregistreerd door de Club)",
       "refunded": "(terugbet. {{amount}})",
       "noRecordedPayment": "Nog geen betaling geregistreerd."
-    }
+    },
+    "refundedMessage": "Deze inschrijving is terugbetaald."
   },
   "teams": {
     "title": "Teams",
@@ -508,7 +583,7 @@
     "noTeams": "Nog geen Team. Maak de eerste aan om te beginnen.",
     "addPlayer": "Speler toevoegen",
     "players": "Spelers",
-    "coaches": "Coaches",
+    "coaches": "Trainers",
     "viewPlayers": "Spelers bekijken",
     "image": "Teamfoto",
     "uploadImage": "Afbeelding toevoegen",
@@ -521,7 +596,9 @@
       "rugby": "Rugby",
       "futsal": "Futsal",
       "ice_hockey": "IJshockey",
-      "field_hockey": "Veldhockey"
+      "field_hockey": "Veldhockey",
+      "custom": "Andere sporten…",
+      "customPlaceholder": "Sportnaam (bijv. Petanque)"
     },
     "sportsCollective": "Andere teamsporten",
     "coach": "Coach",
@@ -567,7 +644,39 @@
     "showArchived": "Gearchiveerde teams tonen",
     "badgeArchived": "Gearchiveerd",
     "seasonGroupLabel": "Seizoen {{season}}",
-    "cannotCreateEventArchived": "Gearchiveerd team: nieuw evenement niet mogelijk."
+    "cannotCreateEventArchived": "Gearchiveerd team: nieuw evenement niet mogelijk.",
+    "sportsRacket": "Racket",
+    "role": {
+      "assistant_coach": "Assistent-coach",
+      "coach": "Coach"
+    },
+    "selectAgeGroup": "Categorie",
+    "ageGroupNone": "Niet ingesteld",
+    "ageGroupLegacy": "Huidige waarde",
+    "ageGroupYouth": "Jeugd",
+    "ageGroupAdult": "Volwassenen",
+    "payment": {
+      "markedPaid": "Gemarkeerd als betaald",
+      "markedExempt": "Gemarkeerd vrijgesteld",
+      "markedUnpaid": "Gemarkeerd als onbetaald",
+      "paid": "Betaald",
+      "exempt": "Vrijstellen",
+      "unpaid": "Om te verzamelen",
+      "cycleHint": "Klik om de betalingsstatus te wijzigen"
+    },
+    "row": {
+      "noContact": "Geen contact"
+    },
+    "ageGroupRequired": "Kies een leeftijdscategorie uit de lijst.",
+    "player": "Speler",
+    "ageGroupLegacyHint": "Legacy-waarde — kies een officiële categorie (bijvoorbeeld U7). Een reeks zoals U6-U7 kan in de teamnaam blijven.",
+    "staffWall": "Stafmuur",
+    "staffWallHint": "Privéruimte voor de docenten en leiders van het team. Niet zichtbaar voor spelers of ouders.",
+    "myProfile": "Mijn profiel",
+    "myTeammates": "Mijn teamgenoten",
+    "staffWallForbidden": "Deze ruimte is gereserveerd voor de docenten en leiders van het team.",
+    "notFound": "Team niet gevonden",
+    "backToTeam": "Terug naar team"
   },
   "championships": {
     "title": "Competities",
@@ -602,13 +711,15 @@
       "clubMismatch": "Deze competitie hoort niet bij deze club",
       "archived": "Deze competitie is gearchiveerd",
       "notFound": "Competitie niet gevonden"
-    }
+    },
+    "levelPlaceholder": "1e klasse"
   },
   "club": {
     "logo": "Clublogo",
     "uploadLogo": "Logo toevoegen",
     "changeLogo": "Logo wijzigen",
-    "logoUpdated": "Clublogo bijgewerkt"
+    "logoUpdated": "Clublogo bijgewerkt",
+    "logoTooLarge": "Bestand te groot (max. 5 MB)"
   },
   "clubSelector": {
     "title": "Mijn Clubs",
@@ -676,7 +787,7 @@
     "autoInviteParentSent": "Uitnodiging naar Ouder verzonden.",
     "tabProfile": "Profiel",
     "tabFeedback": "Coachfeedback",
-    "photoBlockedMinor": "Voordat een foto van een minderjarige kan worden geüpload, is ouderlijke toestemming voor de afbeelding vereist.",
+    "photoBlockedMinor": "Ouderlijke mediatoestemming is vereist voordat je een foto van een minderjarige uploadt.",
     "photoTooLarge": "Foto te groot (max. 5 MB).",
     "photoInvalidType": "Bestandsformaat niet ondersteund.",
     "photoConsentRequired": "Minderjarige Speler: Voor elke upload is ouderlijke toestemming voor de afbeelding vereist. Huidige status: ",
@@ -705,7 +816,37 @@
       "submit": "Importeren",
       "noneDetected": "Geen speler gedetecteerd in het bestand.",
       "done": "{{inserted}} speler(s) geïmporteerd",
-      "failed": "{{failed}} regel(s) met fouten"
+      "failed": "{{failed}} regel(s) met fouten",
+      "reading": "Bestand lezen...",
+      "ai": "AI-analyse bezig...",
+      "previewing": "Controleren...",
+      "importing": "Bezig met importeren...",
+      "intro2": "Importeer een Excel- (.xlsx) of CSV-bestand. Kolommen worden automatisch gedetecteerd; geboortedatum is verplicht.",
+      "dropOrClick": "Klik om een bestand te kiezen",
+      "rowsTotal": "rijen",
+      "rowsValid": "geldig",
+      "rowsToFix": "te corrigeren",
+      "toFixHintEditable": "Sommige rijen hebben fouten (rode cellen) of ontbrekende velden (oranje cellen). Corrigeer ze direct in de tabel hieronder vóór het importeren.",
+      "actionNew": "nieuw",
+      "actionUpdate": "bijgewerkt",
+      "actionRestore": "gereactiveerd",
+      "noDiffs": "Geen conflicten gedetecteerd. Lege velden van bestaande spelers worden automatisch aangevuld.",
+      "diffsHint": "De bestaande spelers hieronder hebben afwijkende gegevens. Vink alleen de velden aan die je wilt overschrijven. Standaard wordt niets overschreven.",
+      "field": "Veld",
+      "current": "Huidig",
+      "incoming": "Nieuw",
+      "overwrite": "Overschrijven",
+      "empty": "(leeg)",
+      "autoFill": "auto",
+      "doneTitle": "Import voltooid",
+      "created": "Nieuwe spelers",
+      "updated": "Bijgewerkt",
+      "restored": "Gereactiveerd",
+      "linked": "Gekoppeld aan dit team",
+      "errorRows": "rij(en) met fouten",
+      "row": "Rij",
+      "another": "Nieuwe import",
+      "button": "CSV-import"
     },
     "inviteAlreadyActive": "Account al actief — opnieuw versturen niet nodig.",
     "parentActivationPending": "Wacht op activering van ouderaccount",
@@ -715,7 +856,37 @@
     "childConsentDoc": "Lees het document 'Ouderlijke toestemming'",
     "childConsentConfirm": "Toegang activeren",
     "childAccessParentOnly": "Alleen een ouder of wettelijke voogd kan de toegang activeren.",
-    "inviteAccountExists": "Er bestaat al een Clubero-account met dit adres: de persoon moet inloggen (of ‘wachtwoord vergeten’ gebruiken)."
+    "inviteAccountExists": "Er bestaat al een Clubero-account met dit adres: de persoon moet inloggen (of ‘wachtwoord vergeten’ gebruiken).",
+    "publicProfile": {
+      "enabled": "Openbaar profiel ingeschakeld",
+      "disabled": "Openbaar profiel uitgeschakeld",
+      "title": "Openbaar profiel",
+      "help": "Deel een openbare link naar de prestaties, seizoenen en tijdlijn van deze speler. Alleen als openbaar gemarkeerde items worden getoond.",
+      "notFound": "Profiel niet gevonden",
+      "notFoundBody": "Dit spelersprofiel is privé of niet meer beschikbaar.",
+      "goHome": "Naar Clubero"
+    },
+    "suppressionBounce": "permanente bounce (ongeldig adres of mailbox bestaat niet)",
+    "suppressionComplaint": "spamklacht",
+    "suppressionUnsubscribe": "ontvanger uitgeschreven",
+    "suppressionManual": "handmatige blokkering",
+    "suppressionUnknown": "onbekende reden",
+    "inviteAdultHint": "Deze speler heeft nog geen account. Stuur een e-mailuitnodiging zodat hij/zij toegang kan aanmaken.",
+    "invitePlayer": "Nodig de speler uit om een account aan te maken",
+    "inviteMinorHint": "Platformtoegang is ingeschakeld maar de speler heeft nog geen account. Stuur de uitnodigingsmail.",
+    "sendChildInvite": "Uitnodiging naar de speler sturen",
+    "inviteSentHint": "Er is een uitnodigingsmail naar deze ouder gestuurd",
+    "inviteFailedHint": "De uitnodigingsmail kon niet worden bezorgd",
+    "unnamedParent": "Ouder",
+    "parentOnPlatform": "Op het platform",
+    "parentNotOnPlatform": "Nog niet geregistreerd",
+    "parentContactsHidden": "Vertrouwelijke contactgegevens",
+    "inviteWholeTeamHint": "Stuur een uitnodiging naar elke speler/ouder zonder account. Mensen die al geregistreerd of al uitgenodigd zijn, worden overgeslagen.",
+    "inviteFailedLabel": "Verzenden mislukt",
+    "inviteSuppressedSimple": "{{count}} uitnodiging(en) geblokkeerd: adres is onderdrukt (bounce, spam of afmelding). Pas de e-mail aan of neem contact op met support.",
+    "photoUploadFailed": "Foto uploaden mislukt: {{message}}",
+    "inviteFailedReason": "Reden: {{reason}}",
+    "inviteWholeTeam": "Uitnodigen ({{count}})"
   },
   "events": {
     "isOfficial": "Officiële wedstrijd",
@@ -737,7 +908,7 @@
       "imageDownloadedAttach": "Afbeelding gedownload, bericht gekopieerd — voeg de afbeelding toe in WhatsApp",
       "shareReady": "Klaar om te delen — kies WhatsApp",
       "shareImageFailed": "Afbeelding kan niet worden gedeeld",
-      "convocationsCreated": "Uitnodigingen gemaakt — deel nu via WhatsApp hieronder"
+      "convocationsCreated": "Oproepen aangemaakt — deel nu hieronder via WhatsApp"
     },
     "title": "Evenementen",
     "create": "Nieuw evenement",
@@ -831,7 +1002,11 @@
       "createSeries": "Serie aanmaken",
       "created": "{{count}} sessies aangemaakt",
       "noOccurrences": "Geen sessie gegenereerd",
-      "needsTitleAndTeam": "Kies een team en een naam om de serie te configureren."
+      "needsTitleAndTeam": "Kies een team en een naam om de serie te configureren.",
+      "scopeTitle": "Deze sessie maakt deel uit van een serie",
+      "scopeSingle": "Alleen deze sessie",
+      "scopeFuture": "Deze en alle volgende",
+      "scopeAll": "Hele serie"
     },
     "openMeetingInMaps": "Vergadering openen in Maps",
     "cancelEvent": "Evenement annuleren",
@@ -875,7 +1050,9 @@
       "error": "Fout bij opnieuw versturen",
       "updatesBadge": "{{count}} wijz.",
       "lineupNotIncluded": "Niet inbegrepen",
-      "lineupPublished": "Gepubliceerd"
+      "lineupPublished": "Gepubliceerd",
+      "buttonAll": "Stuur de oproep opnieuw naar alle spelers",
+      "buttonWithChangesAll": "Opnieuw sturen naar alle spelers ({{count}} update(s))"
     },
     "fields": {
       "title": "Titel",
@@ -905,7 +1082,47 @@
       "labelTournament": "Spelerslijst",
       "downloading": "Bezig…",
       "failed": "Genereren mislukt"
-    }
+    },
+    "homeVenueRequired": "Kies een locatie voor deze thuiswedstrijd.",
+    "typeTraining": "Training",
+    "typeMatch": "Match",
+    "typeTournament": "Toernooi",
+    "typeMeeting": "Vergadering",
+    "typeOther": "Ander",
+    "filters": "Filters",
+    "filtersDescription": "Verfijn de lijst met weergegeven gebeurtenissen.",
+    "filterConvocations": "Oproepen",
+    "convocAll": "Alle",
+    "convocSent": "Verstuurd",
+    "convocNotSent": "Niet verzonden",
+    "filterType": "Type evenement",
+    "filterVenue": "Locatie",
+    "venueAll": "Alle",
+    "venueHome": "Thuis",
+    "venueAway": "Uit",
+    "filterTeams": "Teams",
+    "filterPeriod": "Periode",
+    "dateFrom": "Van",
+    "dateTo": "Tot",
+    "clearDates": "Duidelijke data",
+    "filterDisplay": "Weergave",
+    "includePast": "Inclusief gebeurtenissen uit het verleden",
+    "includeCancelled": "Inclusief geannuleerd",
+    "hideInternalMeetings": "Verberg interne vergaderingen",
+    "applyFilters": "Toepassen",
+    "addToCalendar": "Voeg toe aan kalender",
+    "addToGoogleCalendar": "Google Agenda",
+    "downloadIcs": "Apple / Outlook (.ics)",
+    "convocsSentTitle": "Voor dit evenement zijn oproepen verzonden",
+    "hideTrainings": "Verberg trainingen",
+    "matchTimeShort": "Match",
+    "scheduleTitle": "Schema",
+    "commCard": {
+      "cancelledHint": "Annuleringslink",
+      "invitePlayersFirstTitle": "Nodig spelers uit",
+      "subtitle": "{{count}} spelers opgeroepen"
+    },
+    "scoreDisabledCancelled": "Evenement geannuleerd: bewerken van scores en wedstrijdgegevens uitgeschakeld."
   },
   "followUps": {
     "title": "Te herinneren",
@@ -972,7 +1189,18 @@
     "remindAllSent_one": "{{count}} herinnering verzonden",
     "remindAllSent_other": "{{count}} herinneringen verzonden",
     "errorPastEventLocked": "Dit evenement is voorbij — antwoorden kunnen niet meer worden gewijzigd.",
-    "responseChanged": "antwoord gewijzigd"
+    "responseChanged": "antwoord gewijzigd",
+    "convokedHeader": "Opgebeld",
+    "responseHeader": "Reactie",
+    "locked": "Vergrendeld",
+    "responsesClosedPast": "Reacties voor dit afgelopen evenement kunnen niet meer worden bewerkt.",
+    "lastSendHint": "Laatst verzonden oproep",
+    "response": "Reactie",
+    "showLess": "Laat minder zien",
+    "toConfirm": "Te bevestigen",
+    "calledUp": "Opgeroepen",
+    "pendingShort": "{{count}} in afwachting",
+    "showAll": "Alle {{count}} spelers tonen"
   },
   "stats": {
     "title": "Statistieken",
@@ -1008,7 +1236,34 @@
     "resultLoss": "V",
     "played": "Gespeeld",
     "goalsFor": "Doelpunten voor",
-    "goalsAgainst": "Doelpunten tegen"
+    "goalsAgainst": "Doelpunten tegen",
+    "noPlayerLinked": "Er is geen speler aan uw account voor deze club gekoppeld.",
+    "player": "Speler",
+    "child": "kind",
+    "matchesPlayed": "Wedstrijden gespeeld",
+    "noTeam": "Geen team beschikbaar.",
+    "team": "Team",
+    "tabOverview": "Overzicht",
+    "tabPlayers": "Spelers",
+    "tabAttendance": "Aanwezigheid",
+    "pointsFor": "Punten voor",
+    "pointsAgainst": "Punten tegen",
+    "setsFor": "Setjes gewonnen",
+    "setsAgainst": "Sets verloren",
+    "matchesWithResult": "Wedstrijden",
+    "diff": "Verschil",
+    "winRate": "% Overwinningen",
+    "currentSeason": "Huidig ​​seizoen",
+    "wins": "wint",
+    "noPlayersInTeam": "Geen spelers in dit team.",
+    "col": {
+      "player": "Speler",
+      "matches": "Wedstrijden",
+      "attendance": "% Aanwezig"
+    },
+    "noStatKindsForSport": "Er zijn geen individuele statistieken geconfigureerd voor deze sport.",
+    "score": "Score",
+    "teamStatsHint": "Aanwezigheid, doelen, uitdagingen"
   },
   "match": {
     "result": "Wedstrijdresultaat",
@@ -1037,7 +1292,7 @@
       "own_goal": "Eigen doelpunt",
       "penalty": "Strafschop",
       "assist": "Assist",
-      "try": "Try",
+      "try": "Poging",
       "point": "Punt",
       "yellow_card": "Gele kaart",
       "red_card": "Rode kaart",
@@ -1049,7 +1304,16 @@
     "ownGoal": "Eigen doelpunt",
     "win": "Overwinning",
     "loss": "Verlies",
-    "draw": "Gelijkspel"
+    "draw": "Gelijkspel",
+    "outcomeWin": "Winnen",
+    "outcomeLoss": "Verlies",
+    "outcomeDraw": "Tekenen",
+    "pillToEnter": "binnengaan",
+    "pillUpcoming": "aanstaande",
+    "notPlayedYet": "De wedstrijd is nog niet gespeeld; de score kan na het laatste fluitsignaal worden ingevoerd.",
+    "finishedTitle": "De wedstrijd is afgelopen.",
+    "finishedHint": "Bewaar de score en match feiten.",
+    "enterResult": "Resultaat invoeren"
   },
   "channels": {
     "in_app": "in-app",
@@ -1059,7 +1323,7 @@
     "push": "push"
   },
   "inbox": {
-    "title": "Inbox",
+    "title": "Postvak IN",
     "tabNotifications": "Meldingen",
     "noNotifications": "Niets nieuws. Alles in orde."
   },
@@ -1147,7 +1411,8 @@
       "sameAsCurrent": "Het nieuwe wachtwoord moet afwijken van het huidige wachtwoord.",
       "wrongCurrent": "Huidig wachtwoord is onjuist.",
       "updated": "Wachtwoord bijgewerkt."
-    }
+    },
+    "phoneFromPlayer": "Dit nummer komt uit je spelersprofiel."
   },
   "admin": {
     "title": "Clubinstellingen",
@@ -1239,7 +1504,7 @@
     "inviteEmailFailed": "Uitnodiging aangemaakt, maar e-mail kon niet worden verzonden.",
     "inviteSent": "Uitnodiging verzonden",
     "sendInvite": "Uitnodiging verzenden",
-    "hubBranding": "Branding",
+    "hubBranding": "Huisstijl",
     "hubBrandingHint": "Hoofdkleur van de app voor jouw Club",
     "hubPayments": "Betalingen",
     "hubPaymentsHint": "Toernooikosten innen via Stripe",
@@ -1273,12 +1538,51 @@
       "pendingStatus": "In afwachting",
       "free": "Gratis",
       "totalCollected": "Totaal geïnd",
-      "totalPending": "Totaal in afwachting"
+      "totalPending": "Totaal in afwachting",
+      "tabSeasons": "Seizoenen",
+      "tabReminders": "Herinneringen",
+      "tabGeneral": "Algemeen",
+      "helloassoHint": "Innen zonder commissie via HelloAsso (vrijwillige fooi aan de donor).",
+      "helloassoSaved": "HelloAsso-instellingen opgeslagen",
+      "urlMembership": "Lidmaatschappen / licenties",
+      "urlFundraising": "Inzamelingen / potjes",
+      "urlShop": "Winkel",
+      "urlTournament": "Toernooien / evenementen",
+      "newSeason": "Nieuw seizoen",
+      "seasonLabel": "Label",
+      "seasonStart": "Start",
+      "seasonEnd": "Einde",
+      "setAsCurrent": "Instellen als huidig seizoen",
+      "existingSeasons": "Bestaande seizoenen",
+      "noSeasons": "Nog geen seizoen.",
+      "seasonCurrent": "lopend",
+      "setCurrent": "Instellen",
+      "seasonCreated": "Seizoen aangemaakt",
+      "seasonCurrentUpdated": "Huidig seizoen bijgewerkt",
+      "seasonDeleted": "Seizoen verwijderd",
+      "currency": "Valuta (ISO 4217)",
+      "minPartial": "Minimumbedrag voor gedeeltelijke betaling",
+      "minPartialHint": "Onder dit bedrag moeten ouders het volledige saldo betalen.",
+      "remindersTitle": "Automatische betalingsherinneringen",
+      "remindersHint": "Elke ochtend per e-mail verzonden naar gezinnen met openstaande verplichtingen, op basis van de vervaldatum van elk item.",
+      "preset": "Voorinstelling",
+      "presetStandard": "Standaard (D-7, D-1, D+3, D+7)",
+      "presetStrict": "Strikt (D-14, D-3, D+1, D+7, D+14)",
+      "presetLight": "Licht (D-3, D+7)",
+      "presetDueLate": "Verval + te laat (D0, D+3, D+7)",
+      "selectedMilestones": "Geselecteerde mijlpalen",
+      "noReminders": "Er wordt geen herinnering verzonden.",
+      "offsetDayOf": "Op de vervaldag",
+      "offsetBefore": "{{n}} d. ervoor",
+      "offsetAfter": "{{n}} d. erna",
+      "remindersSaved": "Herinneringen opgeslagen",
+      "remindersNote": "Opmerking: herinneringen gaan naar gekoppelde betalers, spelers en ouders/voogden. Elk gezin ontvangt slechts één e-mail per mijlpaal.",
+      "remindersNoteManual": "U kunt ook handmatig een herinnering sturen vanaf de pagina Betalingsitems via de knop « Herinneren »."
     },
     "branding": {
       "saved": "Clubkleur bijgewerkt",
       "saveError": "Niet mogelijk om op te slaan",
-      "title": "Branding",
+      "title": "Huisstijl",
       "subtitle": "Kies de hoofdkleur van de app. Dit geldt overal, ook op de aanmeldpagina.",
       "previewTitle": "Voorbeeld",
       "previewPrimary": "Hoofdknop",
@@ -1289,7 +1593,11 @@
     "hubSponsors": "Sponsors",
     "hubSponsorsHint": "Toon je partners bovenaan het startscherm",
     "hubVenues": "Locaties en velden",
-    "hubVenuesHint": "Clublocaties en velden vooraf ingevuld bij het aanmaken"
+    "hubVenuesHint": "Clublocaties en velden vooraf ingevuld bij het aanmaken",
+    "hubCamps": "Kampen",
+    "hubCampsHint": "Creëer, publiceer en beheer kampen die door uw club worden aangeboden",
+    "emailLanguage": "Communicatie e-mailtaal",
+    "emailLanguageHint": "Taal die wordt gebruikt voor e-mails die door de club worden verzonden naar ontvangers die geen voorkeurstaal hebben ingesteld."
   },
   "attachments": {
     "add": "Bestand toevoegen",
@@ -1303,11 +1611,11 @@
   "mutes": {
     "action": "Deze persoon verbergen",
     "confirmTitle": "Inhoud van {{name}} verbergen?",
-    "confirmBody": "Je ziet hun berichten, reacties en chatberichten niet meer. Officiële communicatie (oproepen, evenementen, meldingen) blijft zichtbaar. Je kunt dit altijd ongedaan maken via Profiel → Privacy.",
+    "confirmBody": "Je ziet hun posts, reacties, likes en berichten niet meer. Officiële communicatie (oproepen, evenementen, meldingen) blijft zichtbaar. Je kunt ze op elk moment weer tonen via Profiel → Privacy.",
     "confirm": "Verbergen",
     "muted": "Inhoud van {{name}} is nu verborgen.",
     "sectionTitle": "Verborgen personen",
-    "sectionHint": "Je ziet geen prikbord- en chatinhoud meer van deze personen. Officiële communicatie blijft zichtbaar.",
+    "sectionHint": "Je ziet geen muur- en chatinhoud meer die door deze mensen is geplaatst. Officiële communicatie blijft zichtbaar.",
     "empty": "Je hebt niemand verborgen.",
     "unmute": "Weer tonen",
     "unmuted": "Inhoud weer zichtbaar."
@@ -1316,7 +1624,7 @@
     "action": "Deze persoon melden",
     "also": "{{name}} ook melden",
     "title": "{{name}} melden",
-    "subtitle": "Je melding wordt naar de clubverantwoordelijken gestuurd. De persoon wordt niet geïnformeerd.",
+    "subtitle": "Uw rapport wordt verzonden naar de clubmanagers. De persoon wordt niet geïnformeerd.",
     "already": "Je hebt deze persoon al gemeld.",
     "tabContent": "Inhoud",
     "tabMembers": "Leden",
@@ -1342,7 +1650,12 @@
       "allClub": "Hele club",
       "restricted": "Beperkt publiek",
       "restrictedTitle": "Alle gerichte teams zijn verwijderd — alleen zichtbaar voor admins.",
-      "plusOthers": "{{first}} + {{n}} andere"
+      "plusOthers": "{{first}} + {{n}} andere",
+      "teamsBlock": "Teams (spelers + ouders)",
+      "staffTeamsBlock": "Teamstaff",
+      "staffTeamsHint": "Alleen coaches en leidinggevenden",
+      "group": "Groep",
+      "groupTooltip": "Doelgroep: aangepaste groep"
     },
     "audienceTo": "Aan:",
     "audienceRequired": "Kies minstens één team.",
@@ -1424,7 +1737,34 @@
       "excludedBadge": "Verwijderd",
       "showExcluded": "Verwijderde documenten tonen",
       "excludeUnavailable": "Deze actie is nog niet beschikbaar op deze server. Neem contact op met support."
-    }
+    },
+    "staff": {
+      "pickTeamRequired": "Kies minstens één team om de staff te bereiken.",
+      "placeholder": "Privébericht aan de staff van dit team…",
+      "audienceLocked": "Alleen zichtbaar voor teamstaff en clubadmins.",
+      "badgeTitle": "Privébericht aan teamstaff",
+      "badge": "Teamstaff",
+      "badgeWithTeam": "Staf {{team}}"
+    },
+    "errorNoSession": "Je sessie is verlopen. Log opnieuw in en probeer het nog eens.",
+    "errorNotMember": "Je bent geen lid meer van deze club. Wissel van actieve club en probeer opnieuw.",
+    "errorNoPermission": "Je hebt geen rechten om hier te publiceren. Controleer je actieve club en geselecteerde team.",
+    "newAttachment": "Nieuwe bijlage",
+    "reactions": {
+      "error": "Reageren mislukt",
+      "add": "Reageren",
+      "tapToRemove": "Tik om te verwijderen",
+      "count": "{{count}} reactie(s)"
+    },
+    "postDeleted": "Bericht verwijderd",
+    "emptyHint": "Nog geen aankondigingen. Coaches en admins kunnen hier publiceren.",
+    "unpin": "Losmaken",
+    "pin": "Vastzetten",
+    "pinned": "Vastgezet",
+    "commentDeleted": "Reactie verwijderd",
+    "newPostTitle": "{{name}} heeft op de muur geplaatst",
+    "viewOn": "Bekijk op {{network}}",
+    "readBy": "Gelezen door {{n}}/{{total}}"
   },
   "chat": {
     "title": "Evenementchat",
@@ -1446,7 +1786,9 @@
     "error": "Er is een fout opgetreden.",
     "open": "Assistent openen",
     "close": "Assistent sluiten",
-    "noPlayerLinked": "Er is geen Speler gekoppeld aan je account. De Aanwezigheidstatistieken zijn alleen van toepassing op Spelers (en hun Ouders)."
+    "noPlayerLinked": "Er is geen Speler gekoppeld aan je account. De Aanwezigheidstatistieken zijn alleen van toepassing op Spelers (en hun Ouders).",
+    "toolError": "Een actie is mislukt.",
+    "searching": "Zoeken..."
   },
   "cookie": {
     "title": "Cookie-instellingen",
@@ -1558,7 +1900,14 @@
     "storeManagedElsewhere": {
       "title": "Abonnement beheerd op het web",
       "body": "Vanwege de regels van de appstores wordt het Clubero-abonnement afgesloten en beheerd via een browser, op de Clubero-website. Uw status en facturen blijven hier zichtbaar."
-    }
+    },
+    "updateCardTitle": "Bankkaart wijzigen",
+    "updateCardDescription": "Je nieuwe kaart vervangt de huidige voor toekomstige afschrijvingen.",
+    "errorCardSetup": "Kan de kaartupdate niet voorbereiden",
+    "errorSaveCard": "Fout bij het opslaan van de kaart",
+    "exemptTitle": "Gratis toegang",
+    "exemptBody": "Jouw club heeft gratis toegang tot alle Clubero-functies.",
+    "exemptReason": "Reden: {{reason}}"
   },
   "feedback": {
     "coachTab": "Coachfeedback",
@@ -1627,14 +1976,14 @@
       "tackling": "Tackelen",
       "rucking": "Rucken",
       "kicking": "Trappen",
-      "line_out": "Line-out",
-      "scrum": "Scrum",
+      "line_out": "Lijn-uit",
+      "scrum": "Scrummen",
       "skating": "Schaatsen",
       "puck_handling": "Puckbehandeling",
       "effort": "Inzet",
       "mentality": "Mentaliteit",
       "leadership": "Leiderschap",
-      "teamwork": "Teamwork",
+      "teamwork": "Teamwerk",
       "discipline": "Discipline",
       "communication": "Communicatie",
       "attitude": "Attitude",
@@ -1643,7 +1992,7 @@
       "technical": "Techniek"
     },
     "allSaved": "Alles is up-to-date",
-    "bulkHint": "Snelle notitie voor alle Spelers. Alles wordt in één keer opgeslagen.",
+    "bulkHint": "Korte opmerking voor elke speler. Alles wordt in één keer opgeslagen.",
     "bulkPartial": "{{ok}} opgeslagen, {{ko}} mislukt.",
     "bulkSaved": "{{count}} feedback opgeslagen.",
     "creditsExhausted": "AI-credits opgebruikt.",
@@ -1710,12 +2059,13 @@
       "empty": "Plaats eerst Spelers op het veld of de bank.",
       "title": "Selectie maken vanuit deze opstelling"
     },
-    "noPlayersForConvoc": "Voeg eerst Spelers toe aan de opstelling."
+    "noPlayersForConvoc": "Voeg eerst Spelers toe aan de opstelling.",
+    "shareUnavailable": "Opstelling niet beschikbaar"
   },
   "permissions": {
     "clubRoles": "Rollen in de Club",
     "clubRolesHint": "Een gebruiker kan meerdere rollen hebben.",
-    "atLeastOneRole": "Minimaal één rol is vereist"
+    "atLeastOneRole": "Er is minimaal één rol vereist"
   },
   "tournamentMembers": {
     "title": "Toernooileden",
@@ -1730,11 +2080,16 @@
     "empty": "Nog geen leden.",
     "pending": "In afwachting",
     "assignMatches": "Wedstrijden toewijzen",
-    "copyLink": "Link kopiëren",
+    "copyLink": "Kopieer link",
     "linkCopied": "Link gekopieerd",
     "confirmRemoveTitle": "Dit lid verwijderen?",
     "confirmRemoveDesc": "Deze persoon heeft geen toegang meer tot het toernooi. Je kunt diegene later opnieuw uitnodigen.",
-    "confirmRemoveAction": "Verwijderen"
+    "confirmRemoveAction": "Verwijderen",
+    "offlineAdded": "Toegevoegd (geen account)",
+    "emailHint": "Laat leeg om toe te voegen zonder account. Je kunt ze later uitnodigen.",
+    "offline": "Geen rekening",
+    "inviteOffline": "Uitnodigen per e-mail",
+    "convertDesc": "Stuur {{name}} een e-mailuitnodiging zodat hij/zij kan inloggen en wedstrijden kan valideren."
   },
   "insights": {
     "title": "Inzichten",
@@ -1788,11 +2143,11 @@
       "description": "Spelerprofiel, Aanwezigheid en Coach-feedback."
     },
     "teams": {
-      "title": "Teams — Clubero",
+      "title": "Teams - Clubero",
       "description": "Je Teams en hun opstelling."
     },
     "team": {
-      "title": "Team — Clubero",
+      "title": "Team-Clubero",
       "description": "Teamdetails en Spelers."
     },
     "admin": {
@@ -1820,7 +2175,7 @@
       "description": "Je wachtwoord wijzigen."
     },
     "privacy": {
-      "title": "Privacy — Clubero",
+      "title": "Privacy - Clubero",
       "description": "Beheer je toestemmingen en gegevens."
     },
     "inbox": {
@@ -1936,6 +2291,14 @@
       "title": "Oudergids — aan de slag met Clubero",
       "description": "Stapsgewijze tutorials voor ouders: reageren op een oproep, een afwezigheid melden, toestemming geven, meldingen instellen en de gezinskalender volgen.",
       "ogDescription": "Oproepen, afwezigheden, meldingen: de oudergids om te starten met Clubero."
+    },
+    "adminNotifications": {
+      "title": "Notifications — Clubero",
+      "description": "Kies de pushmeldingen die naar leden van uw club worden verzonden."
+    },
+    "adminSponsors": {
+      "title": "Sponsors – Clubero",
+      "description": "Beheer de partners die worden weergegeven in de app van uw club."
     }
   },
   "trial": {
@@ -1953,7 +2316,36 @@
   "errors": {
     "generic": "Er is een fout opgetreden.",
     "clubCreateFailed": "Club kon niet worden aangemaakt.",
-    "membershipsUnavailable": "Uw clubs konden niet worden geladen. Controleer uw verbinding en probeer het opnieuw."
+    "membershipsUnavailable": "Uw clubs konden niet worden geladen. Controleer uw verbinding en probeer het opnieuw.",
+    "notAllowed": "U heeft geen toestemming om deze actie uit te voeren.",
+    "invalidCredentials": "Onjuist e-mailadres of wachtwoord.",
+    "emailNotConfirmed": "Bevestig uw e-mailadres voordat u zich aanmeldt.",
+    "emailAlreadyUsed": "Dit e-mailadres is al in gebruik.",
+    "passwordTooShort": "Wachtwoord is te kort.",
+    "rateLimited": "Te veel pogingen. Probeer het zo nog eens opnieuw.",
+    "duplicate": "Dit artikel bestaat al.",
+    "foreignKey": "Naar deze gegevens wordt nog steeds elders verwezen.",
+    "missingField": "Er ontbreekt een verplicht veld.",
+    "invalidValue": "Een ingevoerde waarde is niet geldig.",
+    "inviteExpired": "Deze uitnodiging is verlopen.",
+    "inviteUsed": "Deze uitnodiging is al gebruikt.",
+    "inviteInvalid": "Ongeldige uitnodiging.",
+    "network": "Kan geen verbinding maken. Controleer uw netwerk en probeer het opnieuw.",
+    "timeout": "De operatie duurde te lang.",
+    "notFound": "Artikel niet gevonden.",
+    "fileTooLarge": "Het bestand is te groot.",
+    "datesInvalid": "De einddatum moet na de startdatum liggen.",
+    "publishDeadlineAfterStart": "De deadline voor inschrijving moet vóór de startdatum liggen.",
+    "slugInvalid": "Ongeldige slak",
+    "slugTaken": "Deze slak is al meegenomen.",
+    "slugLocked": "De naaktslak kan na publicatie niet meer veranderen.",
+    "notDraft": "Het kamp is niet langer een tocht.",
+    "deleteNotDraft": "Alleen een concept kan worden verwijderd. Archiveer het in plaats daarvan.",
+    "publishTitleRequired": "Titel vereist om te publiceren.",
+    "publishDatesRequired": "Begin- en einddatum vereist.",
+    "publishDatesOrder": "De einddatum moet na de startdatum liggen.",
+    "publishCapacityRequired": "Er is een positief vermogen vereist.",
+    "publishAgeGroupRequired": "Voeg ten minste één leeftijdscategorie toe voordat u deze publiceert."
   },
   "respond": {
     "eyebrow": "Uitnodiging",
@@ -2013,7 +2405,9 @@
     "needsTitle": "Vervoersaanvragen",
     "cancelNeed": "Mijn aanvraag intrekken",
     "noNeeds": "Geen vervoersaanvragen.",
-    "notifyFailed": "Aanvraag opgeslagen maar de e-mail naar de staf kon niet worden verzonden."
+    "notifyFailed": "Aanvraag opgeslagen maar de e-mail naar de staf kon niet worden verzonden.",
+    "alreadyBookedElsewhere": "Je hebt al een plaats gereserveerd in een ander voertuig voor dit evenement.",
+    "driverCannotBookOwn": "Jij bent de bestuurder van dit voertuig."
   },
   "journey": {
     "tab": {
@@ -2030,7 +2424,7 @@
       "reject": "Afwijzen",
       "type": {
         "champion": "Kampioen",
-        "runner_up": "Runner-up",
+        "runner_up": "Tweede plaats",
         "tournament_winner": "Toernooiwinnaar",
         "tournament_finalist": "Toernooifinalist",
         "semi_finalist": "Halvefinalist",
@@ -2069,7 +2463,7 @@
       "noneHint": "Seizoenen verschijnen zodra er wedstrijden zijn gespeeld.",
       "matches": "{{n}} wedstrijden",
       "goals": "{{n}} doelpunten",
-      "assists": "{{n}} assists",
+      "assists": "{{n}} assisteert",
       "attendance": "{{n}}% aanwezigheid",
       "coachSummary": "Opmerking van de coach",
       "coachSummaryPlaceholder": "Samenvatting van het seizoen…",
@@ -2094,7 +2488,7 @@
         "achievement": "Prestatie",
         "tournament_participation": "Deelname aan Toernooi",
         "season_completed": "Seizoen voltooid",
-        "transfer": "Transfer",
+        "transfer": "Overdracht",
         "selection": "Selectie",
         "other": "Moment"
       }
@@ -2114,7 +2508,7 @@
     "menuSubtitle": "Spelers, coaches en clubs die je volgt",
     "summary": "Je volgt {{p}} Speler, {{c}} Coach, {{cl}} Club(s)",
     "players": "Spelers",
-    "coaches": "Coaches",
+    "coaches": "Trainers",
     "clubs": "Clubs",
     "emptyPlayers": "Je volgt nog geen Speler.",
     "emptyCoaches": "Je volgt nog geen Coach.",
@@ -2165,7 +2559,60 @@
     "exportTransactions": "Transacties exporteren (CSV)",
     "emptyDashboard": "Geen inzameling.",
     "menuTitle": "Inzamelingen",
-    "menuHint": "Contributies, licenties, materiaal, verplaatsingen"
+    "menuHint": "Contributies, licenties, materiaal, verplaatsingen",
+    "exportDownloaded": "CSV-export gedownload",
+    "kpiCollected": "Ontvangen",
+    "kpiNet": "Netto (kosten afgetrokken)",
+    "kpiDue": "Totaal verschuldigd",
+    "kpiRate": "Incassopercentage",
+    "kpiFees": "Kosten: {{amount}}",
+    "kpiRemaining": "Nog {{amount}}",
+    "kpiTxCount": "{{count}} transacties",
+    "kpiObligations": "{{count}} verplichtingen",
+    "emptyMethods": "Nog geen incasso's.",
+    "emptyMonthly": "Geen gegevens.",
+    "tabTransactions": "Transacties",
+    "netLabel": "Netto: {{amount}}",
+    "itemRollupLine": "{{total}} toegewezen • {{paid}} betaald • {{partial}} deels • {{pending}} openstaand",
+    "form": {
+      "defaultProvider": "Standaard betaalmethode",
+      "title": "Titel",
+      "description": "Beschrijving (optioneel)",
+      "descriptionPlaceholder": "Details of voorwaarden",
+      "amount": "Bedrag (EUR)",
+      "dueDate": "Vervaldatum (optioneel)",
+      "partial": "Gedeeltelijke betaling",
+      "partialAllowed": "Toegestaan",
+      "assignTo": "Toewijzen aan",
+      "wholeClub": "Hele club",
+      "teams": "Teams",
+      "players": "Spelers",
+      "noTeams": "Geen teams.",
+      "type": "Type",
+      "noPlayers": "Geen spelers.",
+      "createAndAssign": "Aanmaken en toewijzen",
+      "clubAssignHint": "Er wordt een verplichting aangemaakt voor elke actieve speler van de club."
+    },
+    "season": "Seizoen",
+    "allSeasons": "Alle",
+    "noTransactions": "Geen transacties.",
+    "itemTypes": {
+      "membership": "Lidmaatschap",
+      "license": "Licentie",
+      "equipment": "Uitrusting",
+      "trip": "Verplaatsing",
+      "tournament": "Toernooi",
+      "fundraising": "Inzameling",
+      "other": "Overig"
+    },
+    "providers": {
+      "cash": "Contant",
+      "cheque": "Cheque",
+      "bank_transfer": "Overschrijving",
+      "manual": "Handmatig",
+      "stripe": "Stripe",
+      "helloasso": "HelloAsso"
+    }
   },
   "tournamentToClub": {
     "title": "Beheer uw club het hele jaar",
@@ -2184,17 +2631,20 @@
       "Carpooling en reisplanning",
       "Disciplinetracking en spelersgeschiedenis",
       "Gecentraliseerde communicatie met ouders"
-    ]
+    ],
+    "successTitle": "Betaling bevestigd",
+    "metaTitle": "Toernooifacturering — Clubero",
+    "metaDesc": "Kies je plan om een ​​toernooi te organiseren met Clubero — €39 per evenement of €149/jaar onbeperkt."
   },
   "eventCreateChooser": {
-    "title": "New event",
-    "subtitle": "How do you want to create this event?",
-    "assistant": "Create with assistant",
-    "assistantHint": "Guided, question by question",
-    "repeatTraining": "Repeat last training",
-    "repeatMatch": "Repeat last match",
-    "classic": "Classic form",
-    "classicHint": "The full form at once"
+    "title": "Nieuw evenement",
+    "subtitle": "Hoe wil je dit evenement creëren?",
+    "assistant": "Creëer met assistent",
+    "assistantHint": "Begeleid, vraag voor vraag",
+    "repeatTraining": "Herhaal de laatste training",
+    "repeatMatch": "Herhaal de laatste wedstrijd",
+    "classic": "Klassieke vorm",
+    "classicHint": "Het volledige formulier in één keer"
   },
   "eventWizard": {
     "title": "Nieuw evenement",
@@ -2235,7 +2685,9 @@
       "gameformat": "Hoeveel spelers op het veld?",
       "halves": "Formaat van de speeltijd.",
       "meetingtime": "Hoe laat moeten de spelers aanwezig zijn?",
-      "places": "Verzamelpunt en wedstrijdlocatie."
+      "places": "Verzamelpunt en wedstrijdlocatie.",
+      "name": "Geef dit evenement een naam.",
+      "audience": "Wie moet je uitnodigen voor deze bijeenkomst? (optioneel)"
     },
     "q": {
       "type": "Wat voor soort evenement?",
@@ -2255,7 +2707,11 @@
       "halves": "Wedstrijdformaat?",
       "meetingtime": "Verzameltijd?",
       "matchLocation": "Wedstrijdlocatie?",
-      "places": "Verzamelpunt en wedstrijdlocatie"
+      "places": "Verzamelpunt en wedstrijdlocatie",
+      "name": "Naam evenement?",
+      "whenRange": "Van … tot …?",
+      "seriesOther": "Enkele datum of meerdere dagen?",
+      "audience": "Wie doet mee? (optioneel)"
     },
     "chip": {
       "tonight": "Vanavond",
@@ -2273,7 +2729,8 @@
       "preview_one": "{{count}} training aanmaken",
       "preview_other": "{{count}} trainingen aanmaken",
       "dayOfWeek": "Dag van de week",
-      "time": "Tijd"
+      "time": "Tijd",
+      "multiDay": "Over meerdere dagen (bijv. kamp)"
     },
     "meeting": {
       "stadium": "Gebruikelijk stadion",
@@ -2286,7 +2743,10 @@
     "convoc": {
       "all": "Heel het team",
       "selection": "Spelers kiezen",
-      "none": "Niet nu"
+      "none": "Niet nu",
+      "allSubtitle": "Iedereen krijgt een bericht",
+      "selectionSubtitle": "Handmatige selectie",
+      "noneSubtitle": "Concept — later versturen"
     },
     "weekdayShort": {
       "0": "Z",
@@ -2329,7 +2789,9 @@
       "carpool": "Carpoolen",
       "comment": "Een bericht",
       "summary": "Alles klaar",
-      "places": "Locaties"
+      "places": "Locaties",
+      "name": "Naam evenement",
+      "audience": "Wie doet mee"
     },
     "skip": "Overslaan",
     "summary": {
@@ -2340,7 +2802,53 @@
     "places": {
       "meetingSection": "Verzamelpunt",
       "matchSection": "Wedstrijdlocatie"
-    }
+    },
+    "backToAssistant": "Terug naar assistent",
+    "confirmCloseTitle": "Vertrekken zonder te sparen?",
+    "expertAbandonConfirm": "Uw wijzigingen gaan verloren.",
+    "meetingInternal": {
+      "label": "Interne clubvergadering (geen team)",
+      "subtitle": "Bestuur, commissie, docenten… zichtbaar voor beheerders en genodigden"
+    },
+    "namePlaceholder": "Bijvoorbeeld Winterkamp, ​​recreatief toernooi…",
+    "range": {
+      "dates": "Data van het kamp",
+      "pickEnd": "einddatum",
+      "pickBoth": "Selecteer begin en einde",
+      "startTime": "Begintijd",
+      "endTime": "Eindtijd",
+      "defaultsHint": "Standaard 10:00 → 16:00. Pas het aan voor uw kamp.",
+      "sameHoursTitle": "Elke dag dezelfde uren",
+      "sameHoursHint": "Schakel uit om van dag tot dag aan te passen"
+    },
+    "awayAddressPlaceholder": "Adres (Google automatisch aanvullen)",
+    "meetingPreview": {
+      "loading": "Berekenen…",
+      "reviewOnSummary": "Gedetailleerd voorbeeld van de laatste stap",
+      "notice": "Bij het aanmaken van de vergadering worden er automatisch uitnodigingen verzonden (notificatie, push en e-mail) naar de opgeroepen personen.",
+      "countShort": "{{count}} persoon/personen geselecteerd"
+    },
+    "meetingSummary": {
+      "subtitle": "Mensen die de uitnodiging zullen ontvangen",
+      "empty": "Geen overeenkomende mensen gevonden.",
+      "title": "Opgeroepen · {{count}}",
+      "andOthers": "… en nog {{count}}"
+    },
+    "homeSubtitle": "Thuiswedstrijd",
+    "awaySubtitle": "Uitwedstrijd",
+    "typeSubtitle": {
+      "training": "Reguliere training",
+      "match": "Officiële of vriendschappelijke wedstrijd",
+      "meeting": "Club- of teamvergadering",
+      "other": "Kamp, toernooi, evenement…"
+    },
+    "halvesPlaceholder": "3x30",
+    "gameformatPlaceholder": "6v6",
+    "opponentPlaceholder": "FC Buren",
+    "officialNoSubtitle": "Zonder officieel belang",
+    "officialChampionshipSubtitle": "Telt mee in het klassement",
+    "officialCupSubtitle": "Knock-outwedstrijd",
+    "carpoolSubtitle": "Gezinnen regelen het vervoer"
   },
   "urgency": {
     "empty": {
@@ -2355,12 +2863,15 @@
     },
     "partialError": "Sommige bronnen zijn niet beschikbaar, de lijst kan onvolledig zijn.",
     "deck": {
-      "showMore_one": "+ {{count}} more item",
-      "showMore_other": "+ {{count}} more items"
+      "showMore_one": "+ {{count}} meer artikel",
+      "showMore_other": "+ {{count}} meer artikelen",
+      "title": "Insights",
+      "hint": "Veeg om door te gaan"
     },
     "cta": {
       "respond": "Reageren",
-      "open": "Openen"
+      "open": "Openen",
+      "openCalendar": "Bekijk kalender"
     },
     "coach": {
       "convocationSilence_one": "{{count}} zonder reactie",
@@ -2370,11 +2881,13 @@
       "reducedSquadSubtitle_other": "{{count}} spelers niet beschikbaar in 14d",
       "staffUncovered": "Geen coach beschikbaar",
       "staffUncoveredTeam": "Geen coach beschikbaar — {{team}}",
-      "staffUncoveredFallback": "Evenement"
+      "staffUncoveredFallback": "Evenement",
+      "reducedSquadTitleTeam": "Verminderde selectie — {{team}}"
     },
     "self": {
       "convocationSilence": "Je hebt niet geantwoord"
-    }
+    },
+    "dismissed": "Kaart 24 uur verborgen"
   },
   "share": {
     "linkCopied": "Link gekopieerd",
@@ -2429,7 +2942,9 @@
       "logoSizeDefault": "Standaard",
       "logoSizeLarge": "Groot",
       "logoSizePercent": "{{percent}} %",
-      "logoSizeHint": "Pas de grootte aan zoals deze aan leden wordt weergegeven."
+      "logoSizeHint": "Pas de grootte aan zoals deze aan leden wordt weergegeven.",
+      "noUrl": "Geen koppeling",
+      "targetUrlOptional": "Website-URL (optioneel)"
     }
   },
   "venues": {
@@ -2462,8 +2977,10 @@
       "sitePlaceholder": "Kies een locatie",
       "facilityLabel": "Veld / accommodatie",
       "facilityPlaceholder": "Kies een veld",
-      "noFacilitiesHint": "Geen veld geconfigureerd."
-    }
+      "noFacilitiesHint": "Geen veld geconfigureerd.",
+      "noFacilityOption": "Geen rechtbank"
+    },
+    "surfacePlaceholder": "Gras, kunstgras, parket…"
   },
   "callUpList": {
     "masked": "Lijst verborgen",
@@ -2480,32 +2997,32 @@
     "saved": "Instelling opgeslagen"
   },
   "groups": {
-    "title": "Club groups",
-    "subtitle": "Create custom groups (board, volunteers…) to target your communications.",
-    "empty": "No groups yet.",
-    "create": "Create group",
-    "edit": "Edit",
-    "delete": "Delete",
-    "deleteConfirm": "Delete this group? Associated members will be removed.",
-    "name": "Name",
-    "namePlaceholder": "E.g. Board, Volunteers",
-    "description": "Description",
-    "descriptionPlaceholder": "Optional",
-    "active": "Active",
-    "inactive": "Inactive",
-    "membersCount_one": "{{count}} member",
-    "membersCount_other": "{{count}} members",
-    "manageMembers": "Manage members",
-    "addMember": "Add member",
-    "remove": "Remove",
-    "searchMembers": "Search a member…",
-    "noMembers": "No members in this group.",
-    "saved": "Group saved",
-    "deleted": "Group deleted",
-    "memberAdded": "Member added",
-    "memberRemoved": "Member removed",
-    "backToList": "Back to groups",
-    "openGroups": "Groups",
+    "title": "Clubgroepen",
+    "subtitle": "Creëer aangepaste groepen (bestuur, vrijwilligers…) om uw communicatie doelgericht te maken.",
+    "empty": "Nog geen groepen.",
+    "create": "Groep aanmaken",
+    "edit": "Bewerken",
+    "delete": "Verwijderen",
+    "deleteConfirm": "Deze groep verwijderen? Geassocieerde leden worden verwijderd.",
+    "name": "Naam",
+    "namePlaceholder": "Bijvoorbeeld Bestuur, vrijwilligers",
+    "description": "Beschrijving",
+    "descriptionPlaceholder": "Optioneel",
+    "active": "Actief",
+    "inactive": "Inactief",
+    "membersCount_one": "{{count}} lid",
+    "membersCount_other": "{{count}} leden",
+    "manageMembers": "Leden beheren",
+    "addMember": "Lid toevoegen",
+    "remove": "Verwijderen",
+    "searchMembers": "Zoek een lid…",
+    "noMembers": "Geen leden in deze groep.",
+    "saved": "Groep opgeslagen",
+    "deleted": "Groep verwijderd",
+    "memberAdded": "Lid toegevoegd",
+    "memberRemoved": "Lid verwijderd",
+    "backToList": "Terug naar groepen",
+    "openGroups": "Groepen",
     "errors": {
       "nameTaken": "Er bestaat al een groep met deze naam."
     },
@@ -2554,7 +3071,8 @@
       "category_educators": "Trainers van een categorie"
     },
     "bulkPickKind": "Kies een type…",
-    "bulkPickParam": "Kies…"
+    "bulkPickParam": "Kies…",
+    "regenFinalsConfirm": "De finalefase heeft al resultaat. Door opnieuw te genereren WISSEN al deze resultaten. Doorgaan?"
   },
   "install": {
     "meta": {
@@ -2600,7 +3118,24 @@
     "androidStep1": "Open het menu ⋮ rechtsboven in Chrome.",
     "androidStep2": "Kies «App installeren» (of «Toevoegen aan startscherm»).",
     "androidStep3": "Bevestig: het Clubero-pictogram verschijnt op je startscherm.",
-    "ctaHint": "Op Android start deze knop de installatie meteen. Op iPhone volg je de Safari-stappen hieronder."
+    "ctaHint": "Op Android start deze knop de installatie meteen. Op iPhone volg je de Safari-stappen hieronder.",
+    "bannerTitle": "Clubero installeren",
+    "bannerDescIos": "Installeer de app om meldingen in te schakelen",
+    "bannerDescAndroid": "Ontvang oproepen in realtime",
+    "bannerInstall": "Installeren",
+    "bannerAlready": "Al geïnstalleerd",
+    "iosGuideTitle": "Installeren op iPhone",
+    "iosGuideSubtitle": "3 stappen in Safari",
+    "gotIt": "Begrepen",
+    "buttonLabel": "App installeren",
+    "iosGuideTitleFull": "Installeren op iPhone / iPad",
+    "iosGuideShareBefore": "Tik op",
+    "iosGuideShareAfter": "onderaan in Safari",
+    "iosGuideAddConfirm": "Tik op «Voeg toe»",
+    "androidGuideBefore": "Open het menu van je browser (⋮ rechtsboven) en kies",
+    "androidGuideInstall": "App installeren",
+    "androidGuideOr": "of",
+    "androidGuideAddHome": "Toevoegen aan beginscherm"
   },
   "person": {
     "playerSubline": "Speler · {{category}}",
@@ -2616,5 +3151,1758 @@
       "unassigned": "Geen coach toegewezen",
       "uncovered": "Geen coach beschikbaar"
     }
+  },
+  "heatmap": {
+    "title": "Aanwezigheidskaart",
+    "noEvent": "Geen evenement",
+    "lastWeeks": "Laatste {{n}} weken"
+  },
+  "eventType": {
+    "match": "Match",
+    "training": "Training",
+    "tournament": "Toernooi",
+    "meeting": "Vergadering",
+    "other": "Evenement"
+  },
+  "search": {
+    "open": "Zoeken",
+    "placeholder": "Zoek spelers, teams, evenementen…",
+    "empty": "Geen resultaten."
+  },
+  "position": {
+    "placeholder": "Positie",
+    "search": "Zoek of typ…",
+    "empty": "Geen suggesties",
+    "suggested": "Suggesties",
+    "custom": "Aangepast",
+    "use": "Gebruik"
+  },
+  "fab": "Support",
+  "voice": {
+    "permissionDenied": "Microfoon geweigerd",
+    "error": "Fout bij spraakdictatie",
+    "stop": "Stop met dicteren",
+    "start": "Dicteren"
+  },
+  "staffAssignment": {
+    "title": "Personeel",
+    "readOnlyHint": "Personeel toegewezen aan dit evenement.",
+    "assigned": "Coach toegewezen",
+    "notAssignableStaff": "Opdracht geweigerd: deze persoon heeft geen staffunctie (coach, assistent, admin of leider) in de club.",
+    "removed": "Coach verwijderd",
+    "reinforcement": "Versterking",
+    "remove": "Verwijderen",
+    "hint": "Wijs teamstaf of een clubversterking aan voor dit evenement.",
+    "noneAssigned": "Er is geen coach toegewezen voor dit evenement.",
+    "noCoachInClub": "Geen coach bij deze club",
+    "allAssigned": "Alle coaches zijn toegewezen",
+    "addCoach": "Wijs een coach aan",
+    "searchPlaceholder": "Zoek een coach…",
+    "noResults": "Geen coach gevonden.",
+    "conflict": {
+      "title": "Beschikbaarheidsconflict",
+      "body": "Deze coach heeft een conflict op dit slot. Doorgaan?"
+    },
+    "assignNow": "Wijs een coach aan",
+    "absentOn": "Afwezig op {{d}}",
+    "absentRange": "Afwezig van {{s}} tot {{e}}"
+  },
+  "support": {
+    "fab": "Support",
+    "menu": "Support",
+    "menuSubtitle": "Meld een probleem of volg je verzoeken"
+  },
+  "staffAvailability": {
+    "eventTitle": "Staffbeschikbaarheid",
+    "eventHint": "Status van de teamcoaches voor dit tijdslot (zichtbaar voor staff/admins).",
+    "noCoaches": "Geen coach gekoppeld aan dit team.",
+    "status": {
+      "available": "Beschikbaar",
+      "tentative": "Onzeker",
+      "unavailable": "Niet beschikbaar"
+    },
+    "teamTitle": "Staffbeschikbaarheden",
+    "masked": "Niet beschikbaar",
+    "errors": {
+      "noClub": "Geen actieve club — opslaan niet mogelijk."
+    },
+    "updated": "Onbeschikbaarheid bijgewerkt",
+    "saved": "Onbeschikbaarheid opgeslagen",
+    "edit": "Onbeschikbaarheid bewerken",
+    "declare": "Onbeschikbaarheid melden",
+    "drawerHint": "Geldt voor al je teams in de actieve club. De staff wordt geïnformeerd.",
+    "certainty": {
+      "confirmed": "Bevestigd",
+      "tentative": "Mogelijk"
+    },
+    "visibility": "Zichtbaarheid",
+    "commentHint": "Reden en opmerking zijn alleen zichtbaar voor admins (of voor alle staff afhankelijk van de gekozen zichtbaarheid).",
+    "title": "Mijn onbeschikbaarheden",
+    "menuSubtitle": "Meld je afwezigheden voor al je teams",
+    "pageTitle": "Mijn onbeschikbaarheden — Clubero",
+    "pageDescription": "Meld je onbeschikbaarheidsperiodes voor al je teams in de actieve club.",
+    "cancelConfirm": "Deze onbeschikbaarheid verwijderen?",
+    "cancelled": "Onbeschikbaarheid verwijderd",
+    "subtitle": "Perioden waarin je niet beschikbaar bent om je teams te begeleiden.",
+    "declareCta": "Onbeschikbaarheid melden",
+    "empty": "Geen aankomende onbeschikbaarheid gemeld.",
+    "certaintyLabel": "Zekerheid",
+    "visibilityStaff": "Clubstaf",
+    "visibilityAdminsOnly": "Alleen beheerders"
+  },
+  "registrations": {
+    "csv": {
+      "participantFirstName": "Deelnemer - Voornaam",
+      "participantLastName": "Deelnemer - Achternaam",
+      "birthDate": "Geboortedatum",
+      "age": "Leeftijd",
+      "gender": "Geslacht",
+      "clubName": "Huidige club",
+      "guardianFirstName": "Bewaker - Voornaam",
+      "guardianLastName": "Voogd - Achternaam",
+      "email": "E-mail",
+      "phone": "Telefoon",
+      "registrationStatus": "Registratiestatus",
+      "paymentStatus": "Betalingsstatus",
+      "dossierStatus": "Bestandsstatus",
+      "amountPaid": "Bedrag betaald",
+      "requestedAt": "Datum van aanvraag",
+      "hint": "Exporteert registraties zichtbaar met huidige filters. Bevat geen documenten.",
+      "cta": "CSV exporteren",
+      "done": "CSV-export gedownload ({{count}} rijen)."
+    },
+    "detail": {
+      "statusChanged": "Status bijgewerkt",
+      "reasonRequired": "Voor afwijzing is een reden nodig.",
+      "docApproved": "Document goedgekeurd",
+      "docRejected": "Document afgewezen",
+      "docReset": "Beslissing opnieuw ingesteld",
+      "paymentUpdated": "Betaling bijgewerkt",
+      "title": "Registratiegegevens",
+      "subtitle": "Controleer de informatie, bekijk documenten en wijzig de status.",
+      "notes": "Familie notities",
+      "rejectTitle": "Deze registratie afwijzen?",
+      "rejectHelp": "De reden wordt in de afwijzingsmail naar de familie gestuurd. Wees duidelijk en vriendelijk.",
+      "rejectPlaceholder": "Bijvoorbeeld Voor deze leeftijdsgroep is het kamp vol.",
+      "confirmReject": "Weigeren",
+      "capacityFullTitle": "Kamp vol",
+      "capacityFullHelp": "De kampcapaciteit is bereikt. Wilt u dit gezin op de wachtlijst plaatsen?",
+      "placeOnWaitlist": "Plaats op wachtlijst",
+      "docRejectTitle": "Dit document afwijzen?",
+      "docRejectHelp": "De familie ontvangt de reden en kan een nieuwe versie uploaden vanaf hun trackingpagina.",
+      "docRejectPlaceholder": "Bijvoorbeeld Document onleesbaar, stuur een duidelijke scan mee.",
+      "confirmDocReject": "Document afwijzen",
+      "currentReason": "Reden van afwijzing",
+      "trackingLink": "Familie link",
+      "participant": "Deelnemer",
+      "firstName": "Voornaam",
+      "lastName": "Achternaam",
+      "birthDate": "Geboortedatum",
+      "gender": "Geslacht",
+      "clubName": "Thuisclub",
+      "guardian": "Wettelijke voogd",
+      "email": "E-mail",
+      "phone": "Telefoon",
+      "documents": "Geüploade documenten",
+      "coachSensitiveNote": "Gevoelige documenten zijn voorbehouden aan clubleiders.",
+      "noDocs": "Geen documenten geüpload.",
+      "sensitive": "Gevoelig",
+      "reasonLabel": "Reden",
+      "notAllowed": "Gevoelig document — toegang voorbehouden aan clubleiders.",
+      "openDoc": "Openen",
+      "approve": "Goedkeuren",
+      "reject": "Weigeren",
+      "reset": "Resetten",
+      "decision": "Beslissing",
+      "capacityWarn": "Het kamp is vol. Bij goedkeuring wordt de inschrijving op de wachtlijst geplaatst.",
+      "markUnderReview": "Wacht 72 uur (wordt beoordeeld)",
+      "waitlist": "Wachtlijst",
+      "cancel": "Annuleer registratie",
+      "emailsHint": "Automatische e-mails naar gezinnen worden in de volgende stap toegevoegd (Fase 3, stap 3).",
+      "paymentSection": "Betaling",
+      "paymentNotRequired": "Voor dit kamp is geen betaling vereist.",
+      "markPaid": "Markeer als betaald",
+      "markUnpaid": "Markeer als onbetaald",
+      "markRefunded": "Markeer als terugbetaald",
+      "markPartialTitle": "Registreer een gedeeltelijke betaling",
+      "markPartial": "Markeer als gedeeltelijk",
+      "capacityLine": "Capaciteit: {{approved}}/{{capacity}} bevestigd · {{remaining}} plaatsen over",
+      "createdAt": "Ontvangen op {{date}}",
+      "partialRemainingPreview": "Nog te betalen: {{amount}} {{currency}}",
+      "paymentReceived": "Ontvangen: {{amount}} {{currency}}",
+      "paymentRemaining": "Nog te betalen: {{amount}} {{currency}}",
+      "reservedUntil": "Plaats gereserveerd tot {{date}}"
+    },
+    "dossier": {
+      "complete": "Compleet",
+      "paymentMissing": "Betaling ontbreekt",
+      "documentsPending": "In afwachting van beoordeling",
+      "documentsMissing": "Ontbrekende documenten"
+    },
+    "extend": {
+      "done": "Reservering verlengd met 72u."
+    },
+    "stats": {
+      "capacity": "Capaciteit",
+      "approved": "Goedgekeurd",
+      "reserved": "Gereserveerd (72u)",
+      "remaining": "Resterende plekken",
+      "pending": "In behandeling zijnde verzoeken",
+      "expiredHint": "{{count}} 72u-reservering(en) verlopen — gebruik « Verlengen » om de plaats te behouden."
+    },
+    "searchPlaceholder": "Zoeken (naam, e-mail…)",
+    "filters": {
+      "allReg": "Alle registraties",
+      "allPay": "Alle betalingen",
+      "allDossier": "Alle bestanden"
+    },
+    "col": {
+      "participant": "Deelnemer",
+      "guardian": "Voogd",
+      "requested": "Verzoek",
+      "regStatus": "Registratie",
+      "payment": "Betaling",
+      "dossier": "Dossier",
+      "actions": ""
+    },
+    "empty": "Er zijn geen registraties om weer te geven.",
+    "reservationExpired": "Reservering verlopen",
+    "noRequiredDocs": "Geen vereiste documenten",
+    "rejected": "afgewezen",
+    "extendCta": "Verleng 72 uur",
+    "payments": {
+      "linkSentEmail": "Betaallink per e-mail verzonden",
+      "linkSendFailed": "Kan de betalingslink niet verzenden"
+    },
+    "invite": {
+      "success": "Uitnodiging per e-mail verzonden",
+      "button": "Nodig een team uit",
+      "title": "Nodig een team uit om te betalen",
+      "description": "Het team ontvangt een gepersonaliseerde e-mail met hun beveiligde betalingslink.",
+      "teamName": "Teamnaam",
+      "contactName": "Naam contactpersoon",
+      "email": "Email",
+      "phone": "Telefoon (optioneel)",
+      "send": "Uitnodiging versturen"
+    },
+    "stripeNotConnected": {
+      "title": "Betaalrekening niet gekoppeld",
+      "description": "Voor dit toernooi is online betaling vereist, maar je club heeft geen Stripe-account. Teams kunnen pas betalen als het account is ingesteld.",
+      "cta": "Koppel een Stripe-account"
+    },
+    "loadError": "Fout bij het laden van registraties",
+    "disabledBanner": {
+      "title": "Online registraties zijn uitgeschakeld",
+      "body": "Er verschijnt geen knop “Registreren” op de openbare pagina. Schakel registraties in om aanvragen te ontvangen."
+    },
+    "draftHint": "Inschrijvingen verschijnen hier nadat het kamp is gepubliceerd.",
+    "docsSummary": "{{ok}}/{{total}} documenten"
+  },
+  "features": {
+    "learnMore": "Meer informatie",
+    "modulesCount": "functies",
+    "includedV1": "Inbegrepen vanaf V1"
+  },
+  "home": {
+    "v2": {
+      "social": {
+        "soonBadge": "Binnenkort",
+        "soonNote": "Beschikbaar na de bèta. Tijdens de bèta: clubmuur en Facebook-nieuws blijven inbegrepen."
+      }
+    },
+    "hero": {
+      "kicker": "Gebouwd door en voor amateurclubs",
+      "headline1": "Wij begrepen wat je nodig had",
+      "headline2": "om tijd te besparen",
+      "headline3": "en zich weer op de sport concentreren.",
+      "sub": "We hebben alles gedigitaliseerd wat uw avonden opslokt: oproepen, betalingen, toernooien, communicatie. Jij coacht, wij doen de rest.",
+      "cta": "Probeer gratis",
+      "ctaSecondary": "Zie kenmerken",
+      "trust1": "Gratis proefperiode",
+      "trust2": "Geen creditcard",
+      "trust3": "Gegevens gehost in Europa"
+    },
+    "digit": {
+      "f1Title": "Oproepen in 12 seconden",
+      "f1Body": "Verzenden, opvolgen en volgen van reacties. Zonder iedereen individueel te sms'en.",
+      "f2Title": "Online betalingen",
+      "f2Body": "Kosten, uitrusting, kampen. Stripe ingebouwd, automatische ontvangstbewijzen, follow-ups inbegrepen.",
+      "f3Title": "Gecentraliseerde communicatie",
+      "f3Body": "Clubmuur, evenementenchat, meertalige e-mails. Geen overvolle WhatsApp-groepen meer.",
+      "f4Title": "Statistieken en spelertracking",
+      "f4Body": "Aanwezigheid, feedback van de coach, voortgang. Een echt carrièrepad voor je spelers.",
+      "f5Title": "Discipline en schorsingen",
+      "f5Body": "Kaarten, schorsingen en blessures worden automatisch bijgehouden per team en seizoen.",
+      "f6Title": "Opstellingen en wedstrijdformulieren",
+      "f6Body": "Bereid de opstelling voor, deel deze, exporteer het blad. De coach heeft alles op zijn telefoon.",
+      "kicker": "Wij hebben het voor u gedigitaliseerd",
+      "title": "Alles waar je uren over deed, nu in een paar klikken.",
+      "sub": "Elke functie lost een echt vrijwilligersprobleem op: minder spreadsheets, minder berichten, meer tijd op het veld."
+    },
+    "ai": {
+      "b1": "Geeft een samenvatting van uw wedstrijden en stelt de volgende opstelling voor",
+      "b2": "Stelt uw communicatie op in één klik, in 7 talen",
+      "b3": "Detecteert automatisch de voortgang en spelerwaarschuwingen",
+      "b4": "Ingebouwde assistent: stel een vraag over uw club",
+      "kicker": "Ingebouwde kunstmatige intelligentie",
+      "title": "AI ondersteunt u elke dag.",
+      "sub": "Geen gimmick. Echte hulp die repetitieve taken afhandelt, zodat vrijwilligers zich op de spelers kunnen concentreren.",
+      "cta": "Ontdek de assistent",
+      "assistantName": "Clubero-assistent",
+      "online": "Online",
+      "q1": "Wie heeft zijn lidmaatschapsbijdrage nog niet betaald?",
+      "a1": "3 spelers: Lucas M., Sarah B. en Tom D. Zal ik een vervolgmail sturen?",
+      "q2": "Ja, in het Engels."
+    },
+    "tourn": {
+      "b1": "Online registratie, geïntegreerde betaling",
+      "b2": "Tabellen, groepen, beugels, live scores",
+      "b3": "Openbare tv-pagina voor uw toeschouwers",
+      "b4": "Oproepen en wedstrijdformulieren inbegrepen",
+      "kicker": "Toernooimodule — volledige app",
+      "title": "Een echte app voor toernooibeheer, binnen Clubero.",
+      "sub": "Geen gimmickmodule: een professionele tool die door tientallen clubs en onafhankelijke organisatoren wordt gebruikt. Van vriendschappelijke toernooien tot regionale competities.",
+      "cta": "Begin een toernooi",
+      "pricing": "Zie prijzen",
+      "included": "Inbegrepen in het clubabonnement",
+      "includedDesc": "Onbeperkte toernooien, geen kosten per evenement",
+      "includedBody": "Als je een Clubero-abonnement hebt, kun je zonder extra kosten zoveel toernooien organiseren als je wilt.",
+      "standalone": "Zonder abonnement — per evenement",
+      "standaloneDesc": "Betaal € 40 per toernooi, dat is alles",
+      "standaloneBody": "Eenmalig een toernooi organiseren zonder club? Gebruik Clubero op aanvraag, zonder enige verplichting."
+    },
+    "social": {
+      "kicker": "Het sociale netwerk voor amateursport",
+      "title": "Beyond management: we bouwden het netwerk voor spelers en coaches.",
+      "sub": "Elke speler heeft een echt openbaar profiel: statistieken, carrière, media. Elke coach heeft een pagina. Iedereen kan volgen, ontdekken en verbinden.",
+      "c1Title": "Openbaar spelersprofiel",
+      "c1Body": "Statistieken, carrière, media: deelbaar, gecertificeerd door uw clubs.",
+      "c2Title": "Coachpagina",
+      "c2Body": "Zichtbaarheid, tracking, rekrutering. Coaches zijn niet langer onzichtbaar.",
+      "c3Title": "Volgers & volgen",
+      "c3Body": "Volg je favoriete clubs, je kinderen, je vrienden. Als een echt netwerk.",
+      "cta": "Maak mijn spelersprofiel aan"
+    },
+    "finalCta": {
+      "title": "Krijg uw tijd terug voor sport.",
+      "sub": "Gratis proefperiode. Geen creditcard. Gegevens gehost in Europa.",
+      "club": "Creëer mijn club",
+      "player": "Maak mijn spelersprofiel aan"
+    }
+  },
+  "register": {
+    "payNotFound": "Link niet gevonden",
+    "securePayment": "Veilig betalen via Stripe.",
+    "success": {
+      "settling": "Betaling ontvangen — finalisatie van uw inschrijving..."
+    },
+    "addPlayer": "Toevoegen"
+  },
+  "invite": {
+    "noAccountPrompt": "Om deze uitnodiging te accepteren, maakt u uw Clubero-account aan met het uitgenodigde e-mailadres of logt u in als u er al een heeft.",
+    "createAccount": "Maak mijn account aan"
+  },
+  "public": {
+    "tabs": {
+      "flights": "Flights",
+      "standings": "Format"
+    },
+    "downloadRules": "Regels downloaden (PDF)",
+    "match": {
+      "aet": "n.v.",
+      "pen": "PEN"
+    },
+    "standings": {
+      "qualifiedTag": "Gekwalificeerd"
+    }
+  },
+  "create": {
+    "numTeams": "Maximale teams"
+  },
+  "roster": {
+    "metaTitle": "Samenstelling van het rooster",
+    "invalidTitle": "Ongeldige link",
+    "invalidBody": "Deze roosterlink is ongeldig of verlopen.",
+    "saved": "Rooster opgeslagen",
+    "import": {
+      "empty": "Er zijn geen spelers gedetecteerd in het bestand.",
+      "button": "CSV importeren",
+      "title": "Spelers importeren",
+      "desc": "CSV-formaat: voornaam, achternaam, truinummer, positie, is_aanvoerder. Afscheiders , ; of tabblad geaccepteerd.",
+      "file": "Kies een bestand",
+      "template": "Sjabloon",
+      "orPaste": "Of plak CSV-inhoud:",
+      "append": "Toevoegen aan rooster",
+      "replace": "Rooster vervangen",
+      "confirm": "Importeren",
+      "blocked": "Import geblokkeerd: {{total}} spelers overschrijden de limiet van {{max}}. Verklein het bestand of kies « Vervangen ».",
+      "ok": "{{n}} speler(s) geïmporteerd"
+    },
+    "logo": {
+      "none": "Geen embleem",
+      "title": "Teamlogo",
+      "help": "PNG, JPG, WEBP of SVG · Maximaal 4 MB",
+      "change": "Wijziging",
+      "upload": "Voeg een logo toe",
+      "removed": "Logo verwijderd",
+      "tooLarge": "Bestand te groot (max. 4 MB)",
+      "uploaded": "Logo opgeslagen"
+    },
+    "pendingTitle": "Aanvraag wordt beoordeeld",
+    "pendingBody": "Zodra de organisatie uw registratie heeft goedgekeurd, kunt u via dezelfde link spelers toevoegen of bewerken.",
+    "empty": "Nog geen spelers. Klik op CSV toevoegen of importeren.",
+    "captain": "Kapitein",
+    "setCaptain": "Kapitein instellen",
+    "save": "Opslaan",
+    "tooMany": "Selectie beperkt tot {{max}} spelers."
+  },
+  "finalStandings": {
+    "title": "Eindstand",
+    "overall": "Eindstand",
+    "copied": "Stand gekopieerd",
+    "subtitle": "Toernooi afgelopen",
+    "share": "Deel"
+  },
+  "chooser": {
+    "title": "Nieuw kamp",
+    "subtitle": "Hoe wil je dit kamp creëren?",
+    "assistant": "Creëer met assistent",
+    "assistantHint": "Begeleid, stap voor stap",
+    "classic": "Snel creëren",
+    "classicHint": "Titel, data, capaciteit"
+  },
+  "wizard": {
+    "title": "Creatie assistent",
+    "back": "Terug",
+    "eyebrow": {
+      "title": "Stap 1",
+      "dates": "Stap 2",
+      "capacity": "Stap 3",
+      "venue": "Stap 4",
+      "ageGroups": "Stap 5",
+      "summary": "Samenvatting"
+    },
+    "step": {
+      "title": {
+        "title": "Naam van het kamp",
+        "hint": "Wat gezinnen zullen zien"
+      },
+      "dates": {
+        "title": "Wanneer?",
+        "hint": "Start, einde en uiterste inschrijfdatum"
+      },
+      "capacity": {
+        "title": "Plekken en prijs",
+        "hint": "Hoeveel deelnemers, tegen welke prijs"
+      },
+      "venue": {
+        "title": "Waar is het kamp?",
+        "hint": "Optioneel – later bewerkbaar"
+      },
+      "ageGroups": {
+        "title": "Leeftijdscategorieën",
+        "hint": "Vereist om te publiceren: selecteer minimaal één categorie"
+      },
+      "summary": {
+        "title": "Klaar om te creëren",
+        "hint": "Concept gemaakt — publiceer op het volgende scherm"
+      }
+    },
+    "deadlineHint": "Optioneel: moet vóór de startdatum zijn.",
+    "optional": "optioneel",
+    "venueHint": "U kunt deze stap overslaan en deze later toevoegen.",
+    "ageGroupsEmpty": "Er is ten minste één categorie vereist om te publiceren. Je kunt later meer toevoegen.",
+    "summary": {
+      "deadline": "deadline",
+      "places": "vlekken",
+      "venueSet": "Locatie ingesteld",
+      "ageGroups": "Categorieën",
+      "next": "Het kamp wordt als concept gemaakt. U kunt een beschrijving, afbeelding, programma en documenten toevoegen voordat u deze publiceert."
+    },
+    "footerReady": "Alles is klaar",
+    "create": "Kamp creëren",
+    "next": "Volgende",
+    "footerProgress": "Stap {{current}} van {{total}}"
+  },
+  "list": {
+    "newTitle": "Nieuw kamp",
+    "create": "Ontwerp maken",
+    "title": "Clubkampen",
+    "subtitle": "Creëer en publiceer kampen die door uw club worden aangeboden.",
+    "new": "Nieuw kamp",
+    "empty": "Nog geen kampen.",
+    "hasVenue": "Locatie ingesteld",
+    "active_only": "Actief",
+    "show_all": "Alles bekijken",
+    "no_active": "Er is nog geen activiteit gebruikt voor deze sessie.",
+    "show_all_hint": "Toont alle teamactiviteiten, zodat u er één kunt kiezen.",
+    "empty_hint": "Voeg een uitdaging of test toe aan deze sessie."
+  },
+  "form": {
+    "title": "Titel",
+    "titlePlaceholder": "Paaskamp U9-U11",
+    "startDate": "Start",
+    "endDate": "Einde",
+    "capacity": "Capaciteit",
+    "deadline": "Deadline voor registratie",
+    "price": "Indicatieve prijs",
+    "venueModeHome": "Clublocaties",
+    "venueModeHomeHint": "Veld, gymzaal, hal…",
+    "venueModeExternal": "Extern adres",
+    "venueModeExternalHint": "Een andere locatie, buiten de club",
+    "venue": "Locatie",
+    "venuePlaceholder": "Kies een locatie",
+    "venueNone": "— Geen —",
+    "facility": "Rechtbank / faciliteit",
+    "facilityPlaceholder": "Optioneel",
+    "facilityNone": "— Geen —",
+    "externalAddress": "Adres",
+    "externalAddressPlaceholder": "Bijvoorbeeld 12 Stadium Street, 75001 Parijs",
+    "externalAddressHint": "Adres in vrije vorm: getoond aan registranten en klikbaar naar Google Maps.",
+    "saved": "Wijzigingen opgeslagen",
+    "sectionInfo": "Informatie",
+    "slug": "Slug (URL)",
+    "slugLocked": "De slak wordt na publicatie vergrendeld.",
+    "slugHint": "Letters, cijfers en koppeltekens. Bewerkbaar terwijl het kamp een concept is.",
+    "description": "Beschrijving",
+    "cover": "Omslagafbeelding",
+    "currency": "Munteenheid",
+    "paymentInstructions": "Betalingsinstructies",
+    "paymentInstructionsPlaceholder": "Bijvoorbeeld betaling bij inschrijving per pin, cheque of contant ter plaatse.",
+    "retention": "Documentbewaring (maanden)",
+    "sectionVenue": "Locatie",
+    "sectionAgeGroups": "Leeftijdscategorieën",
+    "sectionProgram": "Programma",
+    "sectionProgramHint": "Geef het kampschema gedetailleerd weer. Slepen en neerzetten om de volgorde te wijzigen.",
+    "sectionDocuments": "Aangeleverde documenten",
+    "sectionDocumentsHint": "Documenten die de club ter beschikking stelt (regels, pdf-schema, toegangskaart…). Geaccepteerde formaten: PDF, JPG, PNG.",
+    "sectionRequired": "Documenten die moeten worden verstrekt",
+    "sectionRequiredHint": "Lijst met documenten die registranten moeten uploaden (medische verklaring, ouderlijke toestemming…). Medische documenten worden automatisch gemarkeerd als ‘gevoelig’.",
+    "save": "Opslaan"
+  },
+  "ageGroups": {
+    "selectAll": "Selecteer de relevante categorieën",
+    "customs": "Aangepaste categorieën",
+    "labelPlaceholder": "Label (bijv. Recreatief)",
+    "yearMin": "Min. jaar",
+    "yearMax": "Maximaal jaar",
+    "addCustom": "+ Voeg een aangepaste categorie toe",
+    "addTitle": "Nieuwe categorie"
+  },
+  "cover": {
+    "tooLarge": "Afbeelding te groot (max. 5 MB)",
+    "uploaded": "Afbeelding bijgewerkt",
+    "empty": "Geen omslagfoto",
+    "replace": "Vervangen",
+    "add": "Voeg een afbeelding toe",
+    "unsupported": "Niet-ondersteund formaat (JPG, PNG, WEBP)."
+  },
+  "documents": {
+    "tooLarge": "Bestand te groot (max. 15 MB)",
+    "uploaded": "Document toegevoegd",
+    "empty": "Er zijn nog geen documenten verstrekt.",
+    "addTitle": "Voeg een document toe",
+    "titlePlaceholder": "Weergavetitel (optioneel – standaard bestandsnaam)",
+    "upload": "Uploaden (PDF, JPG, PNG)",
+    "maxHint": "max. 15 MB"
+  },
+  "program": {
+    "empty": "Nog geen programma-items.",
+    "editTitle": "Artikel bewerken",
+    "addTitle": "Nieuw artikel",
+    "titlePlaceholder": "Bijvoorbeeld Technische opleiding",
+    "startsAt": "Start",
+    "endsAt": "Einde",
+    "descPlaceholder": "Beschrijving (optioneel)",
+    "add": "Voeg een artikel toe"
+  },
+  "required": {
+    "empty": "Er zijn nog geen vereiste documenten gedefinieerd.",
+    "editTitle": "Document bewerken",
+    "addTitle": "Nieuw vereist document",
+    "titlePlaceholder": "Bijvoorbeeld Medisch attest minder dan 3 maanden oud",
+    "type": "Type",
+    "mandatory": "Verplicht",
+    "sensitive": "Gevoelige gegevens",
+    "sensitiveForced": "Gedwongen voor medische documenten: encryptie en beperkte retentie.",
+    "sensitiveHint": "Schakel dit in als het document gevoelige persoonlijke gegevens bevat.",
+    "add": "Voeg een document toe",
+    "mandatoryTag": "Verplicht",
+    "optionalTag": "Optioneel",
+    "sensitiveTag": "Gevoelig"
+  },
+  "footer": {
+    "childSafety": "Veiligheid van kinderen"
+  },
+  "waitlist": {
+    "badge": "Binnenkort",
+    "title": "Aankomende functies",
+    "subtitle": "Laat uw e-mailadres achter om op de hoogte te worden gesteld wanneer een functie beschikbaar komt. Geen verplichting, geen betaling.",
+    "success": "Bedankt! We schrijven u zodra het klaar is.",
+    "emailLabel": "Uw e-mail",
+    "featuresLabel": "Functies waarin u geïnteresseerd bent",
+    "roleLabel": "Jouw rol",
+    "rolePlaceholder": "— Kiezen —",
+    "consent": "Ik ga ermee akkoord om Clubero-updates over aankomende functies te ontvangen. Met één klik uitschrijven.",
+    "submitting": "Verzenden…",
+    "submit": "Breng mij op de hoogte",
+    "error": "Er is een fout opgetreden. Probeer het zo nog eens."
+  },
+  "cockpit": {
+    "alerts": {
+      "heading": "Meldingen",
+      "finalsNotGenerated": "Eindfase niet gegenereerd — poulefase is afgerond",
+      "missingReferee": "Scheidsrechter ontbreekt (start over {{minutes}} min)",
+      "title": "{{count}} ding om te regelen"
+    },
+    "next": "Volgende",
+    "estimatedEnd": "Verwacht einde"
+  },
+  "controlCenter": {
+    "nextAction": "Volgende actie",
+    "byCourts": "Via de rechtbank",
+    "liveBadge": "LIVE",
+    "liveCourts": "Live",
+    "nextMatches": "Volgende wedstrijden",
+    "settings": {
+      "title": "Instellingen"
+    },
+    "progress": "Voortgang",
+    "counters": {
+      "done": "Klaar",
+      "live": "Live",
+      "upcoming": "Aankomend"
+    },
+    "flightsReady": "Groepsfasen zijn afgerond. Maak vluchten aan om de 3 haakjes te genereren (Champions / Europa / Conference)."
+  },
+  "draw": {
+    "relaunchFromFooterHint": "Trekking voltooid. Gebruik “Opnieuw starten” onderaan het dialoogvenster om een ​​nieuwe te genereren (huidige resultaten gaan verloren)."
+  },
+  "fields": {
+    "streamUrlPlaceholder": "Streaming-URL (YouTube, Twitch…)"
+  },
+  "flights": {
+    "savedToast": "Vluchten opgeslagen",
+    "fallback": {
+      "empty": "Er is geen beugel gegenereerd: de structuur kwalificeert niet genoeg teams per vlucht. Pas de verdeling aan, gebruik een fallback-template (Troost/Medailles) of configureer vluchten handmatig.",
+      "error": "Generatie onmogelijk voor deze structuur. Probeer een andere sjabloon of handmatige modus.",
+      "title": "Dit formaat staat het automatisch genereren van de 3 vluchten niet toe",
+      "body": "De groepsstructuur (ongelijke of te kleine maten) is niet netjes opgesplitst in Champions / Europa / Conference. Kies een Consolation / Medals / Cup-Plate-sjabloon of pas vluchten handmatig aan."
+    },
+    "regenConfirm": "Finalewedstrijden hebben al uitslag. Het opnieuw genereren van haakjes zal al deze resultaten WISSEN. Doorgaan?",
+    "noGroups": "Creëer eerst de groepsfase. Vluchten worden achteraf gegenereerd.",
+    "title": "Vluchten / finales",
+    "intro": "Meerdere trofeeën per toernooi: Kampioenen/Europa, Beker/Plaat, Goud/Zilver/Brons of aangepast.",
+    "reconfigure": "Opnieuw configureren",
+    "advancedDanger": "Geavanceerde opties (gevaarlijk)",
+    "regenWarn": "Als u de haakjes opnieuw genereert, worden alle reeds ingevoerde finaleresultaten gewist.",
+    "regenerate": "Herstel haakjes",
+    "generate": "Genereer haakjes",
+    "waitGroups": "Voltooi alle groepswedstrijden om haakjes te genereren.",
+    "preset": {
+      "consolation": "Troostvoorinstelling (1 klik)",
+      "consolationDesc": "Creëert 2 vluchten: Main (groepswinnaars) en Consolation (verliezers). Configuratie klaar om op te slaan."
+    },
+    "wizard": {
+      "template": "Naam sjabloon",
+      "notEnough": "Minimaal 4 teams nodig.",
+      "clean": "Schone beugels",
+      "customize": "Pas aan",
+      "back": "Terug",
+      "save": "Bespaar vluchten",
+      "distribution": "Verdeling ({{n}} teams)"
+    },
+    "rulesCount": "regels",
+    "thirdPlace": "3e plaats",
+    "fifthPlaceDisabled": "Schakel eerst de 3e plaats in",
+    "fifthPlace": "5e plaats",
+    "seventhPlaceDisabled": "Schakel eerst de 5e plaats in",
+    "seventhPlace": "7e plaats",
+    "public": {
+      "empty": "Er is nog geen vlucht geconfigureerd voor dit toernooi.",
+      "noMatches": "Wedstrijden voor deze vlucht worden na de groepsfase gegenereerd."
+    },
+    "draftRulesSummary": "{{n}} kwalificatieregel(s) geconfigureerd",
+    "generatedToast": "{{n}} wedstrijden aangemaakt"
+  },
+  "matches": {
+    "allMatches": "Alle wedstrijden",
+    "myMatches": "Mijn wedstrijden",
+    "assignRefereeAction": "Wijs een scheidsrechter aan",
+    "refereeOffline": "(geen account)",
+    "lockedTitle": "Wedstrijd gevalideerd",
+    "lockedHelper": "Om de score te bewerken, moet u eerst de wedstrijd ongeldig maken.",
+    "nextMatch": "Volgende wedstrijd",
+    "unvalidateToEdit": "Maak de validering ongedaan om te bewerken",
+    "allMatchesEntered": "Alle wedstrijden zijn ingevoerd."
+  },
+  "registrationSettings": {
+    "linkCopied": "Link gekopieerd",
+    "title": "Online registraties",
+    "enableLabel": "Open inschrijvingen voor het publiek",
+    "enableHint": "Schakelt een knop 'Registreren' in op de openbare pagina van het toernooi.",
+    "publicLink": "Openbare registratielink"
+  },
+  "aiAssistant": {
+    "errors": {
+      "invalidPause": "Ongeldige pauze (0–60 min)"
+    },
+    "opts": {
+      "pauseLabel": "Pauze tussen wedstrijden (min)",
+      "customPausePlaceholder": "Ander…",
+      "lunchLabel": "Lunchpauze",
+      "lunch0": "Geen",
+      "lunchAdd": "+ Voeg een lunchpauze toe",
+      "lunchStart": "Start",
+      "lunchEnd": "Einde",
+      "priceCustom": "Of een ander bedrag:",
+      "none": "Geen"
+    },
+    "summary": {
+      "matchDuration": "Wedstrijdduur",
+      "pause": "Pauze tussen wedstrijden",
+      "terrains": "Rechtbanken"
+    }
+  },
+  "createChooser": {
+    "abandonConfirm": "De assistent verlaten? Uw antwoorden worden gewist. Je kunt ook sluiten om ze de volgende keer weer te vinden."
+  },
+  "pass": {
+    "quantityLabel": "Aantal passen"
+  },
+  "rules": {
+    "otWin": "OT overwinning",
+    "otLoss": "OT-verlies",
+    "rosterTitle": "Teamsamenstelling",
+    "playersPerTeam": "Spelers per team",
+    "maxSubstitutes": "Maximaal vervangers"
+  },
+  "detail": {
+    "viewPublic": "Bekijk openbare pagina",
+    "logoUpdated": "Logo bijgewerkt",
+    "changeLogo": "Wijzig logo",
+    "addLogo": "Voeg een logo toe",
+    "teams": "ploegen",
+    "linkCopiedOpenBrowser": "Link gekopieerd – open deze in uw browser (Safari/Chrome).",
+    "openPublic": "Openbare pagina",
+    "openTv": "TV-scherm",
+    "autoScheduleCta": {
+      "title": "Automatisch wedstrijden plannen",
+      "subtitle": "Nog geen rechtbank of schema toegewezen. Voer automatische planning uit."
+    }
+  },
+  "sections": {
+    "openTv": "Live-scherm openen (TV)",
+    "flights": "Flights"
+  },
+  "simulator": {
+    "startTime": "Start",
+    "finalAt": "Finale",
+    "phasePools": "Groepen",
+    "phaseSemi": "Halve finales",
+    "phaseFinal": "Finale"
+  },
+  "actions": {
+    "resolved_toast": "Ticket gemarkeerd als opgelost",
+    "reopened_toast": "Kaartje heropend",
+    "reopen": "Kaartje opnieuw openen",
+    "mark_resolved": "Markeer als opgelost"
+  },
+  "tabs": {
+    "matches": "Wedstrijden",
+    "standings": "Standen",
+    "bracket": "Finales",
+    "teams": "Teams",
+    "registrations": "Registraties",
+    "edit": "Bewerken"
+  },
+  "lifecycle": {
+    "published": "Kamp gepubliceerd",
+    "closed": "Inschrijvingen gesloten",
+    "archived": "Kamp gearchiveerd",
+    "openPublic": "Bekijk openbare pagina",
+    "publish": "Publiceren",
+    "close": "Sluit inschrijvingen",
+    "archive": "Archiveren",
+    "publicUrlCopied": "Link gekopieerd",
+    "publicUrl": "Openbare link"
+  },
+  "duplicate": {
+    "done": "Kamp gedupliceerd",
+    "hint": "Maak een conceptkopie (zonder registraties).",
+    "action": "Duplicaat"
+  },
+  "delete": {
+    "title": "Dit concept verwijderen?",
+    "desc": "Deze actie is permanent."
+  },
+  "filters": {
+    "searchPlaceholder": "Zoekopdracht…",
+    "status": {
+      "all": "Alle statussen"
+    },
+    "sort": {
+      "startDesc": "Startdatum ↓",
+      "startAsc": "Startdatum ↑",
+      "titleAsc": "Titel A → Z",
+      "createdDesc": "Onlangs gemaakt"
+    },
+    "noResults": "Er zijn geen kampen die overeenkomen met deze filters."
+  },
+  "status": {
+    "draft": "Voorlopige versie",
+    "published": "Gepubliceerd",
+    "closed": "Gesloten",
+    "archived": "Gearchiveerd"
+  },
+  "add": {
+    "all_added": "Alle beschikbare activiteiten zijn al aan dit team toegevoegd.",
+    "popular": "Populair",
+    "already_in_session": "Al in de sessie",
+    "selected": "Gekozen",
+    "cancel": "Annuleren"
+  },
+  "push": {
+    "deviceSection": "Dit apparaat",
+    "enabledTitle": "Meldingen ingeschakeld",
+    "enabledDesc": "Je ontvangt Clubero-pushmeldingen op dit apparaat.",
+    "enableTitle": "Meldingen inschakelen",
+    "enableDesc": "Ontvang oproepen, herinneringen en clubnieuws in realtime.",
+    "enableCta": "Meldingen inschakelen",
+    "enabling": "Bezig met inschakelen…",
+    "disabledTitle": "Meldingen uitgeschakeld",
+    "disabledDesc": "Opnieuw inschakelen: iOS/Android-instellingen → Clubero → Meldingen → Sta toe.",
+    "blockedTitle": "Meldingen geblokkeerd",
+    "blockedDesc": "Je browser blokkeert meldingen voor Clubero. Klik op het slot links in de adresbalk → Meldingen → Sta toe en herlaad de pagina.",
+    "iosInstallTitle": "Installeer Clubero op iPhone",
+    "iosInstallDesc": "Op iOS werken meldingen alleen via de geïnstalleerde app. In Safari: Deel → Zet op beginscherm, open Clubero daarna via het icoon.",
+    "unsupportedTitle": "Meldingen niet beschikbaar",
+    "unsupportedDesc": "Deze browser ondersteunt geen pushmeldingen.",
+    "toastEnabled": "Meldingen ingeschakeld",
+    "toastDenied": "Meldingen geweigerd",
+    "toastDeniedBrowser": "Meldingen geweigerd door de browser",
+    "toastImpossible": "Inschakelen nu niet mogelijk",
+    "toastImpossibleShort": "Inschakelen niet mogelijk",
+    "toastError": "Fout bij inschakelen",
+    "bannerTitle": "Schakel meldingen in",
+    "bannerDesc": "Ontvang oproepen en herinneringen in realtime",
+    "bannerEnable": "Inschakelen",
+    "bannerLater": "Later",
+    "close": "Sluiten"
+  },
+  "offline": {
+    "metaTitle": "Offline - Clubero",
+    "metaDescription": "Je bent offline.",
+    "title": "Je bent offline",
+    "description": "Maak opnieuw verbinding met internet om Clubero te gebruiken."
+  },
+  "convertClub": {
+    "title": "Je gebruikt Clubero in vrije organisatormodus",
+    "description": "Zet deze organisatie om in een echte Clubero-club om je team uit te nodigen, spelers te beheren en te abonneren.",
+    "nameLabel": "Clubnaam",
+    "namePlaceholder": "bijv. AS Saint-Étienne U15",
+    "confirm": "Conversie bevestigen",
+    "cta": "Omzetten naar echte club",
+    "successToast": "Organisatie omgezet naar een echte Clubero-club"
+  },
+  "registerPlayer": {
+    "metaTitle": "Maak je spelersprofiel — Clubero",
+    "metaDescription": "Word lid van Clubero als onafhankelijke speler. Maak in enkele minuten je sportprofiel.",
+    "title": "Maak je spelersprofiel",
+    "step": "Stap {{step}} van 3",
+    "mainSport": "Hoofdsport",
+    "sportPlaceholder": "Kies je sport",
+    "preferredPosition": "Voorkeurspositie",
+    "city": "Stad",
+    "country": "Land",
+    "countryPlaceholder": "Kiezen…",
+    "countryOther": "Anders",
+    "privacyHint": "Je profiel is standaard privé. Je kunt het later openbaar maken via je instellingen.",
+    "minorHint": "Je bent minderjarig: een ouder/voogd moet de publicatie van een openbaar profiel goedkeuren.",
+    "parentalConsent": "Mijn ouder/voogd keurt het aanmaken van mijn openbare profiel goed.",
+    "lookingForClub": "Ik zoek een club",
+    "submit": "Mijn profiel maken",
+    "parentalRequired": "Een ouder moet het openbare profiel goedkeuren.",
+    "successToast": "Profiel aangemaakt!",
+    "countries": {
+      "france": "Frankrijk",
+      "belgium": "België",
+      "switzerland": "Zwitserland",
+      "canada": "Canada",
+      "luxembourg": "Luxemburg",
+      "morocco": "Marokko",
+      "tunisia": "Tunesië",
+      "algeria": "Algerije",
+      "coteIvoire": "Ivoorkust",
+      "senegal": "Senegal",
+      "reunion": "Réunion",
+      "guadeloupe": "Guadeloupe",
+      "martinique": "Martinique",
+      "frenchPolynesia": "Frans-Polynesië",
+      "newCaledonia": "Nieuw-Caledonië"
+    }
+  },
+  "destructiveConfirm": {
+    "typeToUnlock": "Typ {{word}} om te ontgrendelen"
+  },
+  "unsupportedWebview": {
+    "title": "Update vereist",
+    "body": "Clubero heeft een nieuwere versie van de Android System WebView-component nodig om correct weer te geven.",
+    "versionDetected": "Gedetecteerde versie: {{version}}. Minimumversie: {{min}}.",
+    "versionMinOnly": "Minimaal vereiste versie: {{min}}.",
+    "freeUpdate": "Dit is een gratis update — je hebt geen nieuwe telefoon nodig.",
+    "updateCta": "Android System WebView bijwerken",
+    "retryCta": "Ik heb bijgewerkt — opnieuw proberen",
+    "betaHint": "Als de update niet wordt aangeboden, installeer Android System WebView Beta via de Play Store en selecteer die in Ontwikkelaarsopties → WebView-implementatie."
+  },
+  "scoreStepper": {
+    "decrease": "Verlagen",
+    "increase": "Verhogen"
+  },
+  "adminPayments": {
+    "collectTitle": "Opvolging & inning — {{title}}",
+    "loadError": "Opvolging kon niet worden geladen: {{message}}",
+    "unknownError": "onbekende fout",
+    "emptyObligations": "Nog geen speler heeft een verplichting voor dit item. Controleer of het doel (club / teams / spelers) spelers bevat.",
+    "payer": "Betaler: {{name}}",
+    "payerUnlinked": "Geen betaler gekoppeld",
+    "remaining": "nog {{amount}} {{currency}}",
+    "collect": "Innen",
+    "reopen": "Heropenen",
+    "exempt": "Vrijstellen",
+    "refundEllipsis": "Terugbetalen…",
+    "cancelBlocked": "Annuleren onmogelijk — er zijn al betalingen",
+    "reopened": "Verplichting heropend",
+    "exemptTitle": "Deze verplichting vrijstellen",
+    "cancelTitle": "Deze verplichting annuleren",
+    "exemptDescription": "De speler wordt vrijgesteld van deze betaling. Geef de reden op (beurs, gezinssituatie, enz.).",
+    "cancelDescription": "De verplichting wordt geannuleerd en kan niet meer worden betaald. Geef de reden op.",
+    "cancelConfirm": "Verplichting annuleren",
+    "exempted": "Verplichting vrijgesteld",
+    "cancelled": "Verplichting geannuleerd",
+    "reason": "Reden",
+    "reasonPlaceholder": "Interne motivering (zichtbaar in audits)",
+    "refundTitle": "Een betaling terugbetalen",
+    "noRefundable": "Geen terugbetaalbare transactie.",
+    "refundTransaction": "Terug te betalen transactie",
+    "refundAmount": "Terug te betalen bedrag ({{currency}})",
+    "maximum": "Maximaal: {{amount}} {{currency}}",
+    "reasonOptional": "Reden (optioneel)",
+    "refundStripe": "Automatische Stripe-terugbetaling",
+    "refundManual": "Handmatige boeking (geen bankbeweging)",
+    "refunded": "Terugbetaling geregistreerd",
+    "manualCollectTitle": "Een betaling innen",
+    "mode": "Methode",
+    "amount": "Bedrag ({{currency}})",
+    "remainingToCollect": "Nog te innen: {{amount}} {{currency}}",
+    "reference": "Referentie (cheque nr., overschrijving…)",
+    "comment": "Opmerking",
+    "receiptAuto": "Er wordt automatisch een ontvangstbewijs aangemaakt",
+    "paymentRecorded": "Betaling geregistreerd, ontvangstbewijs gegenereerd",
+    "methodOther": "Overig (handmatig)"
+  },
+  "adminNotifications": {
+    "title": "Pushmeldingen",
+    "subtitle": "Kies welke meldingen op de mobiele app worden verzonden. E-mails worden niet beïnvloed.",
+    "sectionConvocations": "Oproepen",
+    "sectionEvents": "Evenementen",
+    "sectionWall": "Clubmuur",
+    "sectionTournaments": "Toernooien",
+    "convocationOnCreate": "Push bij aanmaken",
+    "convocationOnCreateHint": "Stelt spelers en ouders op de hoogte zodra een oproep wordt aangemaakt.",
+    "convocationReminder": "Automatische herinneringen",
+    "convocationReminderHint": "Herinneringspush naast de e-mail vóór het evenement.",
+    "convocationCoachEach": "Coach bij elk antwoord informeren",
+    "convocationCoachEachHint": "Een melding naar de coach zodra een speler antwoordt.",
+    "convocationCoachComplete": "Coach informeren wanneer 100% heeft geantwoord",
+    "convocationCoachCompleteHint": "Overzicht aanwezig / afwezig / onzeker.",
+    "eventReschedule": "Melding bij verzetting",
+    "eventRescheduleHint": "Push wanneer een evenement van datum verandert.",
+    "eventCancel": "Melding bij annulering",
+    "eventCancelHint": "Push wanneer een evenement wordt geannuleerd.",
+    "scoreResult": "Wedstrijdresultaat gemeld aan het team",
+    "scoreResultHint": "Push naar spelers en coaches wanneer een score wordt ingevoerd.",
+    "eventChat": "Nieuw bericht in de chat van een evenement",
+    "eventChatHint": "Push naar opgeroepen spelers, hun ouders en de staf (exclusief auteur; gegroepeerd bij meerdere berichten).",
+    "wallNewPost": "Push voor nieuw bericht",
+    "wallNewPostHint": "Alle leden ontvangen een melding.",
+    "tournamentMatchReminder": "Herinnering 30 min vóór een wedstrijd",
+    "tournamentMatchReminderHint": "Push naar spelers en ouders vóór elke toernooiwedstrijd.",
+    "tournamentDraw": "Melding loting",
+    "tournamentDrawHint": "Push naar ingeschreven teams bij publicatie van de poules."
+  },
+  "superadmin": {
+    "brand": "Super Admin",
+    "brandInternal": "Clubero • Intern",
+    "signOut": "Uitloggen",
+    "backToApp": "← Terug naar club-app",
+    "backToAppShort": "← App",
+    "nav": {
+      "dashboard": "Dashboard",
+      "clubs": "Clubs",
+      "users": "Gebruikers",
+      "importData": "Gegevensimporteren",
+      "billing": "Facturatie",
+      "activityLogs": "Activiteitslogboeken",
+      "emailSending": "E-mailverzending",
+      "inviteBatches": "Uitnodigingsbatches",
+      "notifications": "Meldingen",
+      "supportHub": "Support-hub",
+      "tickets": "Tickets",
+      "marketingCampaign": "Marketingcampagne",
+      "settings": "Instellingen"
+    },
+    "common": {
+      "loading": "Laden…",
+      "failed": "Mislukt",
+      "actionFailed": "Actie mislukt",
+      "error": "Fout",
+      "updated": "Bijgewerkt",
+      "yes": "Ja",
+      "no": "nee",
+      "status": "Status",
+      "plan": "Plan",
+      "club": "Club",
+      "user": "Gebruiker",
+      "actions": "Acties",
+      "date": "Datum",
+      "type": "Type",
+      "errorCol": "Fout",
+      "template": "Template",
+      "recipient": "Ontvanger",
+      "search": "Zoeken",
+      "retry": "Opnieuw",
+      "all": "Alle",
+      "none": "—",
+      "by": "door",
+      "viewClub": "Club bekijken →",
+      "generatedAt": "Gegenereerd op {{date}}"
+    },
+    "dashboard": {
+      "title": "Platformoverzicht",
+      "subtitle": "Live momentopname van operaties en omzet bij Clubero.",
+      "failedToLoad": "Laden mislukt",
+      "businessFinance": "Business & financiën",
+      "allSubscriptions": "Alle abonnementen →",
+      "loadingRevenue": "Omzet laden...",
+      "mrr": "Maandelijks terugkerende omzet",
+      "arr": "ARR {{amount}}",
+      "payingClubs": "Betalende clubs",
+      "arpu": "ARPU {{amount}}",
+      "trialConversion": "Conversie uit proefperiode (30d-cohort)",
+      "newAndTrials": "{{new}} nieuw · {{trials}} actieve proefperiodes",
+      "newSubs": "Nieuwe abonnementen (30d)",
+      "churned": "Opgezegd (30d)",
+      "churnRate": "{{rate}}% opzeggingspercentage",
+      "pastDue": "Achterstallig",
+      "trialsEnding": "{{count}} proefperiodes eindigen binnen 7 d",
+      "operations": "Operaties",
+      "loadingMetrics": "Statistieken laden...",
+      "clubs": "Clubs",
+      "activeClubs": "Actieve clubs",
+      "withActiveSub": "Met actief abonnement",
+      "users": "Gebruikers",
+      "activeSubsDb": "Actieve abonnementen (db)",
+      "trials": "Proefperiodes",
+      "expiring7d": "Verloopt binnen 7 dagen",
+      "events30d": "Evenementen (30d)",
+      "callups30d": "Oproepen (30d)",
+      "supportTickets": "Supporttickets",
+      "allTickets": "Alle tickets →",
+      "loadingSupport": "Supportstatistieken laden...",
+      "openTickets": "Kaartjes openen",
+      "unreadCount": "{{count}} ongelezen",
+      "urgentTickets": "Urgente tickets",
+      "urgentHint": "Vereist onmiddellijke aandacht",
+      "totalUnread": "Totaal ongelezen",
+      "staffUnread": "Ongelezen door staf",
+      "activityWatch": "Activiteit & watchlist",
+      "productFeed": "Productactiviteitsfeed"
+    },
+    "billing": {
+      "title": "Facturatie & abonnementen",
+      "subtitle": "Alle Stripe-abonnementen op het hele platform.",
+      "trialEnd": "Einde proef",
+      "periodEnd": "Einde periode",
+      "cancel": "Annuleren?",
+      "empty": "Geen abonnementen."
+    },
+    "logs": {
+      "eyebrow": "Activiteit",
+      "title": "Activiteitslogboeken",
+      "subtitle": "Elke gevoelige superadminactie wordt hier vastgelegd met actor, doel en ernst.",
+      "searchPlaceholder": "Zoek op actie, acteur of doelwit…",
+      "empty": "Geen activiteit komt overeen met de filters.",
+      "high": "hoog",
+      "categories": {
+        "All": "Alles",
+        "View": "Weergave",
+        "Impersonation": "Impersonation",
+        "Auth": "Auth",
+        "Account": "Account",
+        "Club": "Club",
+        "Onboarding": "Onboarding",
+        "Billing": "Facturatie",
+        "Other": "Overig"
+      }
+    },
+    "settings": {
+      "title": "Platforminstellingen",
+      "subtitle": "Superadmin-tools - diagnostiek en tests.",
+      "pushTitle": "Pushmelding testen",
+      "pushHint": "Stuurt meteen een testmelding naar al je geregistreerde Web Push-abonnementen (deze gebruiker).",
+      "sending": "Versturen…",
+      "sendTest": "Testpush versturen",
+      "clientSide": "Clientzijde",
+      "serverError": "Serverfout",
+      "serverSide": "Serverzijde",
+      "sentTo": "✓ Verstuurd naar {{count}} abonnement(en)",
+      "noSubscriptions": "⚠ Geen pushabonnement geregistreerd voor je account - schakel eerst meldingen in de app in.",
+      "sendFailed": "✗ Mislukt - 0 succesvolle verzending(en) van {{count}} abonnement(en)",
+      "pruned": "· {{count}} verlopen verwijderd",
+      "unknownError": "Onbekende fout",
+      "notifApiUnavailable": "Notification API niet beschikbaar",
+      "swActive": "SW actief (scope {{scope}})",
+      "noSw": "Geen service worker geregistreerd",
+      "pushManagerUnavailable": "PushManager niet beschikbaar (iOS: installeer de app op het beginscherm om meldingen in te schakelen)",
+      "localPushOk": "Lokaal pushabonnement ✓",
+      "noLocalPush": "Geen lokaal pushabonnement",
+      "swError": "SW-fout: {{message}}",
+      "swUnavailable": "serviceWorker niet beschikbaar"
+    },
+    "users": {
+      "title": "Gebruikers",
+      "subtitle": "Zoek, inspecteer en onderneem actie tegen elke platformgebruiker.",
+      "searchPlaceholder": "Naam, e-mail of telefoon…",
+      "filterInPage": "Op pagina",
+      "filterActive": "Actief",
+      "filterDormant": "Slapend 60d+",
+      "filterDisabled": "Uitgeschakeld",
+      "colUser": "Gebruiker",
+      "colPlan": "Plan",
+      "colLastSeen": "Laatst gezien",
+      "colStatus": "Status",
+      "noClub": "Geen club",
+      "neverSignedIn": "nooit ingelogd",
+      "quickActions": "Snelle acties",
+      "actionDone": "{{label}} ✓",
+      "empty": "Geen gebruikers.",
+      "colClubsRoles": "Clubs & rollen",
+      "never": "nooit",
+      "disabled": "uitgeschakeld",
+      "dormant": "slapend",
+      "active": "actief",
+      "unverified": "niet geverifieerd",
+      "viewProfile": "Profiel bekijken",
+      "openClub": "Club openen",
+      "sendResetEmail": "Resetmail versturen",
+      "resendOnboarding": "Onboarding opnieuw versturen",
+      "reactivate": "Opnieuw activeren",
+      "disableAccount": "Account uitschakelen",
+      "page": "Page {{page}}",
+      "confirmAction": "{{label}} - weet je het zeker?",
+      "passwordResetEmail": "Wachtwoordresetmail",
+      "onboardingEmailResent": "Onboardingmail opnieuw verstuurd",
+      "reactivateLabel": "Opnieuw activeren",
+      "disableLabel": "Uitschakelen"
+    },
+    "userDetail": {
+      "actions": "Actions",
+      "recoveryLinkGenerated": "Herstellink gegenereerd",
+      "impersonationLinkGenerated": "Impersonatielink gegenereerd",
+      "userOnboarding": "Gebruikersonboarding",
+      "account": "Account",
+      "relations": "Relations",
+      "noClubMemberships": "Geen clublidmaatschappen.",
+      "noInvites": "Geen uitnodigingen komen overeen met het e-mailadres van deze gebruiker.",
+      "noTeamAssignments": "Geen directe teamtoewijzingen.",
+      "noPlayerProfile": "Geen spelersprofiel gekoppeld aan deze gebruiker.",
+      "noTeam": "Geen team.",
+      "noParentLinked": "Geen ouder gekoppeld.",
+      "canRespond": "kan antwoorden",
+      "notLinkedAsParent": "Niet als ouder gekoppeld aan een speler.",
+      "recentConvocations": "Recente oproepen",
+      "noConvocations": "Geen oproepen.",
+      "recentAdminActions": "Recente adminacties voor deze gebruiker",
+      "noPriorActions": "Geen eerdere adminacties.",
+      "impersonateTitle": "Gebruiker impersoneren",
+      "impersonateReasonPlaceholder": "bijv. Ticket #421 - gebruiker meldt ontbrekende evenementen",
+      "orphanHint": "Geen clublidmaatschap, spelersprofiel of ouderlink.",
+      "loading": "Laden..."
+    },
+    "clubs": {
+      "title": "Clubs",
+      "searchPlaceholder": "Zoek een club…",
+      "colClub": "Club",
+      "colContact": "Contact",
+      "colMembers": "Leden",
+      "colActivity": "Activiteit",
+      "colBilling": "Facturatie",
+      "colCreated": "Aangemaakt",
+      "empty": "Geen club gevonden.",
+      "noActivity": "Geen activiteit",
+      "noSubscription": "Geen abonnement",
+      "exempt": "Vrijgesteld",
+      "trial": "Proefperiode",
+      "active": "Actief",
+      "pastDue": "Achterstallig",
+      "incomplete": "Onvolledig",
+      "inactive": "Inactief",
+      "otherStatus": "{{status}}"
+    },
+    "clubDetail": {
+      "notFound": "Club niet gevonden.",
+      "archived": "Gearchiveerd",
+      "members": "Leden",
+      "teams": "Teams",
+      "recentEvents": "Recente evenementen",
+      "whatsappTeams": "WhatsApp-teams",
+      "clubOnboarding": "Clubonboarding",
+      "noStripeCustomer": "Geen Stripe-klant",
+      "lifetimePaid": "Levenslang betaald",
+      "invoices": "Facturen",
+      "nextCharge": "Volgende afschrijving",
+      "card": "Kaart",
+      "number": "Nummer",
+      "amount": "Bedrag",
+      "noInvoices": "Nog geen facturen.",
+      "subscription": "Abonnement",
+      "trialEnd": "Einde proefperiode",
+      "periodEnd": "Einde periode",
+      "cancelAtPeriodEnd": "Opzeggen aan het einde van de periode",
+      "stripeCustomer": "Stripe-klant",
+      "responseRate": "Reactiegraad (recent)",
+      "noSubscriptionRecord": "Geen abonnementsrecord.",
+      "noTeams": "Geen teams.",
+      "rosterRecap": "Selectieoverzicht - per team",
+      "team": "Team",
+      "coaches": "Trainers",
+      "parents": "Parents",
+      "players": "Spelers",
+      "other": "Overig",
+      "total": "Total",
+      "noEvents": "Geen evenementen.",
+      "actionDone": "{{label}} voltooid",
+      "hintNoTeam": "Nog geen actief team.",
+      "hintNoInvite": "Er is nog geen ouder-/traineruitnodiging verstuurd.",
+      "hintNoEvent": "Nog geen gepubliceerd evenement - probeer een training of wedstrijd.",
+      "hintNoPlan": "Geen actief abonnement gevonden.",
+      "allClubs": "Alle clubs",
+      "restore": "Herstellen",
+      "archive": "Archiveren",
+      "archiveClub": "Club archiveren",
+      "restoreClub": "Club herstellen",
+      "financials": "Financiën",
+      "loadingInvoices": "Facturen laden...",
+      "viewInviteStatus": "Uitnodigingsstatus bekijken",
+      "loading": "Laden..."
+    },
+    "roster": {
+      "title": "Teams · Spelers · Ouders",
+      "searchPlaceholder": "Speler / ouder zoeken",
+      "childAccess": "kindtoegang",
+      "activeAccount": "actief account",
+      "neverLoggedIn": "nooit ingelogd",
+      "noAccount": "geen account",
+      "eyebrow": "Roster",
+      "subtitle": "Accountactivatiestatus voor elke speler en elke ouder.",
+      "backToClub": "← Terug naar club",
+      "empty": "Geen resultaten.",
+      "invited": "uitgenodigd",
+      "invitedAt": "uitgenodigd {{date}}"
+    },
+    "invites": {
+      "title": "Invitations",
+      "accepted": "Geaccepteerd",
+      "emailSent": "E-mail verstuurd",
+      "emailFailed": "E-mail mislukt",
+      "noEmailTrace": "Geen e-mailspoor",
+      "searchPlaceholder": "Zoeken (e-mail, naam, speler)...",
+      "emailStatus": "E-mailstatus",
+      "allEmailStatuses": "Alle e-mailstatussen",
+      "sent": "Verstuurd",
+      "pending": "In behandeling",
+      "failed": "Mislukt",
+      "dlq": "DLQ",
+      "blocked": "Geblokkeerd",
+      "bounce": "Bounce",
+      "complaint": "Klacht",
+      "noTrace": "Geen spoor",
+      "inviteStatus": "Uitnodigingsstatus",
+      "allInvites": "Alle uitnodigingen",
+      "activeAccount": "Actief account",
+      "acceptedStatus": "Geaccepteerd",
+      "expired": "Verlopen",
+      "recipient": "Ontvanger",
+      "role": "Rol",
+      "invitation": "Invitation",
+      "email": "Email",
+      "created": "Aangemaakt",
+      "subtitle": "E-mailbezorgstatus voor elke uitnodiging die in deze club is aangemaakt.",
+      "backToClub": "← Terug naar club",
+      "empty": "Geen uitnodiging komt overeen met de filters.",
+      "loading": "Laden..."
+    },
+    "notifications": {
+      "title": "Alle meldingen",
+      "emailSearch": "E-mail zoeken",
+      "allStatuses": "Alle statussen",
+      "date": "Date",
+      "template": "Template",
+      "recipient": "Ontvanger",
+      "status": "Status",
+      "error": "Fout",
+      "messageId": "message_id:",
+      "attempts": "pogingen:",
+      "metadata": "metadata:",
+      "noEmail": "Geen e-mails.",
+      "typePlaceholder": "Type (bijv. oproep, wall_post)",
+      "type": "Type",
+      "ref": "Ref.",
+      "targets": "Doelen",
+      "sent": "Verstuurd",
+      "opened": "Geopend",
+      "noPush": "Geen push.",
+      "eyebrow": "Verstuurde meldingen",
+      "subtitle": "Geünificeerde stroom van e-mails (gededupliceerd per bericht) en pushmeldingen.",
+      "emails": "Emails",
+      "push": "Push",
+      "loadError": "Laadfout: {{message}}",
+      "firstOpened": "1e geopend"
+    },
+    "support": {
+      "title": "Support-hub",
+      "subtitle": "Live operationele waarschuwingen en direct opzoeken. Elke zoekopdracht wordt gecontroleerd.",
+      "searchFailed": "Zoeken mislukt",
+      "trialsEnding": "Proefperiodes die binnen 7 dagen eindigen",
+      "trialsSafe": "Alle proefperiodes zijn in orde.",
+      "pastDueBilling": "Achterstallige / onvolledige facturatie",
+      "noPaymentIssues": "Geen betalingsproblemen.",
+      "staleInvites": "Verouderde uitnodigingen (>30 dagen)",
+      "noStaleInvites": "Geen verouderde uitnodigingen.",
+      "emailFailures": "Recente e-mailfouten",
+      "allEmailsDelivered": "Alle e-mails bezorgd.",
+      "directLookup": "Directe zoekopdracht",
+      "searchUserPlaceholder": "Zoeken op naam of telefoon...",
+      "searchClubPlaceholder": "Clubs zoeken op naam...",
+      "noMatches": "Geen resultaten.",
+      "noClubMemberships": "Geen clublidmaatschappen.",
+      "noAdmins": "Geen admins.",
+      "modeUser": "Gebruiker",
+      "modeClub": "Club",
+      "eyebrow": "Support",
+      "liveAlerts": "Live meldingen",
+      "summary": "Samenvatting",
+      "manage": "Beheren",
+      "clubsCount": "Clubs ({{count}})",
+      "archived": "(gearchiveerd)",
+      "openFullUser": "Volledige gebruikerspagina openen →",
+      "admins": "Admins",
+      "openFullClub": "Volledige clubpagina openen →"
+    },
+    "tickets": {
+      "eyebrow": "Supporttickets",
+      "title": "Inbox",
+      "subtitle": "Gebruikerstickets · antwoorden, statussen, prioriteiten.",
+      "newTicket": "Nieuw ticket",
+      "searchPlaceholder": "Zoek een onderwerp...",
+      "status": "Status",
+      "priority": "Prioriteit",
+      "category": "Categorie",
+      "club": "Club",
+      "allStatuses": "Alle statussen",
+      "allPriorities": "Alle prioriteiten",
+      "allCategories": "Alle categorieën",
+      "allClubs": "Alle clubs",
+      "empty": "Geen tickets.",
+      "updated": "Bijgewerkt",
+      "error": "Fout",
+      "inbox": "Inbox",
+      "user": "Gebruiker",
+      "context": "Context",
+      "history": "Geschiedenis",
+      "noActions": "Geen acties vastgelegd.",
+      "viewClub": "Club bekijken →",
+      "locale": "Taal",
+      "intent": "Intentie",
+      "created": "Aangemaakt",
+      "support": "Support",
+      "assigned": "toegewezen",
+      "unassigned": "niet toegewezen",
+      "actionCreated": "Ticket aangemaakt",
+      "actionStatus": "Status",
+      "actionPriority": "Prioriteit",
+      "actionAssigned": "Toewijzing",
+      "actionReply": "Antwoord",
+      "actionNote": "Interne notitie"
+    },
+    "emailDispatches": {
+      "title": "Bulkverzendingen",
+      "filterPlaceholder": "Filter op template, evenement, club, team, auteur...",
+      "empty": "Geen verzending komt overeen met de filters.",
+      "finalized": "Afgerond",
+      "noLog": "Geen log",
+      "inProgress": "Bezig",
+      "noValidUuid": "Geen geldige event-UUID gevonden.",
+      "campaignFinalized": "Campagne afgerond",
+      "recipients": "Ontvangers",
+      "sent": "Verstuurd",
+      "pending": "In behandeling",
+      "failures": "Mislukkingen",
+      "filterRecipient": "Filter op e-mail of foutmelding...",
+      "recipient": "Ontvanger",
+      "status": "Status",
+      "type": "Type",
+      "attempts": "Pogingen",
+      "lastEvent": "Laatste event",
+      "error": "Fout",
+      "action": "Action",
+      "requeueHint": "Mislukte/DLQ-verzendingen opnieuw in de wachtrij zetten zonder al bezorgde berichten te dupliceren",
+      "actionError": "{{label}}: {{reason}}",
+      "actionSuccess": "{{label}} — {{parts}}",
+      "errorFallback": "fout",
+      "eyebrow": "Emails",
+      "subtitle": "Elke campagne (oproep, uitnodiging...) met samengevoegde status tot de eindstatus. Vernieuwt elke 20 s.",
+      "refresh": "Vernieuwen",
+      "filterAll": "Alles",
+      "filterInProgress": "Bezig",
+      "filterSettled": "Afgehandeld",
+      "filterFailures": "Met fouten",
+      "loading": "Laden...",
+      "resend": "Opnieuw versturen",
+      "replayDlq": "DLQ opnieuw afspelen",
+      "initial": "Initial",
+      "byAuthor": "door {{name}}",
+      "backToList": "Terug naar verzendingen",
+      "detailEyebrow": "Bulkverzending",
+      "batch": "Batch",
+      "send": "Versturen",
+      "replayed": "{{count}} opnieuw in de wachtrij",
+      "skippedDelivered": "{{count}} al bezorgd",
+      "skippedInFlight": "{{count}} bezig",
+      "skippedNotRetryable": "{{count}} niet opnieuw te proberen",
+      "errorsCount": "{{count}} fout(en)",
+      "statusSent": "Verstuurd",
+      "statusDelivered": "Bezorgd",
+      "statusPending": "In behandeling",
+      "statusSuppressed": "Onderdrukt",
+      "statusFailed": "Mislukt",
+      "statusDlq": "DLQ",
+      "statusBounced": "Gebounced",
+      "statusComplained": "Klacht",
+      "matchOn": "wedstrijd op {{date}}",
+      "template": "template",
+      "retryFailures_one": "Fout opnieuw proberen ({{count}})",
+      "retryFailures_other": "Fouten opnieuw proberen ({{count}})",
+      "autoRefreshInProgress": "Bezig — automatische vernieuwing elke 5 s",
+      "suppressedCount_one": "{{count}} onderdrukt",
+      "suppressedCount_other": "{{count}} onderdrukt",
+      "noRecipientsMatch": "Geen ontvanger komt overeen met de filters.",
+      "mismatch": "mismatch {{count}}",
+      "retry": "Opnieuw proberen"
+    },
+    "inviteBatches": {
+      "eyebrow": "Invitations",
+      "title": "Uitnodigingsbatches",
+      "subtitle": "Gegroepeerd op club + template + venster van 2 minuten.",
+      "filterPlaceholder": "Filter template (bijv. player-invite)",
+      "empty": "Geen batch gevonden.",
+      "total": "{{count}} total",
+      "sent": "{{count}} verstuurd",
+      "pending": "{{count}} bezig",
+      "failed": "{{count}} mislukt",
+      "blocked": "{{count}} geblokkeerd",
+      "loadError": "Laadfout: {{message}}",
+      "unknownFailure": "onbekende fout",
+      "retry": "Opnieuw proberen",
+      "noRows": "Geen rijen gevonden voor deze batch.",
+      "attempts": "pogingen: {{count}}"
+    },
+    "playerAudit": {
+      "eyebrow": "Geschiedenis",
+      "title": "Spelerhistorie",
+      "subtitle": "Alle profielwijzigingen, oproepen, feedback, schorsingen, beschikbaarheid en mijlpalen.",
+      "backToClubs": "← Terug naar clubs",
+      "empty": "Geen gebeurtenissen.",
+      "by": "door"
+    },
+    "onboardingImport": {
+      "title": "Gegevensimport — Club-onboarding",
+      "selectClub": "Selecteer de club",
+      "searchClub": "Zoek een club...",
+      "chooseType": "Kies het importtype",
+      "dropFile": "Sleep het bestand hierheen of klik (xlsx/xls/csv, max. 5 MB)",
+      "unsupportedFormat": "Niet-ondersteund formaat (alleen xlsx/xls/csv)",
+      "fileTooLarge": "Bestand te groot (max. 5 MB)",
+      "typeDetected": "Type automatisch gedetecteerd: {{type}}",
+      "notStandardModel": "Dit bestand komt niet overeen met het standaardmodel.",
+      "aiAnalyzed": "✨ geanalyseerd door AI",
+      "toUpdate": "bij te werken",
+      "toReactivate": "opnieuw te activeren",
+      "teamResolution": "Teamoplossing",
+      "choose": "— kiezen —",
+      "createTeam": "➕ Dit team maken",
+      "differences": "Verschillen gedetecteerd",
+      "backToDashboard": "Terug naar dashboard"
+    },
+    "activityTypes": {
+      "event_created": "Evenement aangemaakt",
+      "event_updated": "Evenement bijgewerkt",
+      "event_cancelled": "Evenement geannuleerd",
+      "convocation_sent": "Oproep verstuurd",
+      "convocation_email_backfill": "Oproep - superadmin e-mailbackfill",
+      "convocation_responded": "Reactie op oproep",
+      "team_created": "Team aangemaakt",
+      "team_updated": "Team bijgewerkt",
+      "camp_created": "Kamp aangemaakt",
+      "camp_published": "Kamp gepubliceerd",
+      "camp_registration_received": "Kampinschrijving",
+      "tournament_created": "Toernooi aangemaakt",
+      "social_connected": "Netwerk gekoppeld",
+      "social_disconnected": "Netwerk losgekoppeld",
+      "social_sync_succeeded": "Netwerksync OK",
+      "social_sync_failed": "Netwerksync mislukt",
+      "wall_post_published": "Bericht gepubliceerd",
+      "invite_club_sent": "Clubuitnodiging",
+      "invite_club_accepted": "Clubuitnodiging geaccepteerd",
+      "invite_member_sent": "Liduitnodiging",
+      "invite_member_accepted": "Liduitnodiging geaccepteerd",
+      "import_started": "Import gestart",
+      "import_succeeded": "Import geslaagd",
+      "import_partial": "Gedeeltelijke import",
+      "import_failed": "Import mislukt",
+      "support_ticket_opened": "Supportticket",
+      "impersonation_started": "Impersonation"
+    },
+    "clubOnboarding": {
+      "logo": "Clublogo geüpload",
+      "logoHint": "Wordt getoond in de app, uitnodigingen en e-mails.",
+      "branding": "Merkkleur gekozen",
+      "brandingHint": "Eigen thema niet ingesteld - standaardpalet wordt gebruikt.",
+      "team": "Minstens één team aangemaakt",
+      "players": "Spelers toegevoegd",
+      "playersHint": "Selectie is leeg.",
+      "invites": "Leden uitgenodigd",
+      "event": "Eerste evenement gepubliceerd",
+      "sponsor": "Sponsor toegevoegd",
+      "sponsorHint": "Optioneel - zichtbaar op de clubmuur.",
+      "payments": "Betaalinstellingen geconfigureerd",
+      "paymentsHint": "Vereist om bijdragen / ontvangsten te innen.",
+      "subscription": "Actief abonnement / proefperiode"
+    },
+    "userOnboarding": {
+      "emailConfirmed": "E-mail geverifieerd",
+      "emailConfirmedHint": "Gebruiker moet op de bevestigingslink klikken die per e-mail is ontvangen.",
+      "firstSignin": "Minstens één keer ingelogd",
+      "firstSigninHint": "Gebruiker heeft de app nog nooit geopend.",
+      "name": "Naam ingesteld",
+      "nameHint": "Voor-/achternaam in profiel ontbreekt.",
+      "avatar": "Avatar geüpload",
+      "avatarHint": "Optioneel, maar maakt herkennen makkelijker.",
+      "phone": "Telefoonnummer toegevoegd",
+      "phoneHint": "Gebruikt voor SMS-/WhatsApp-meldingen.",
+      "language": "Voorkeurstaal gekozen",
+      "languageHint": "Standaard browsertaal totdat dit is ingesteld.",
+      "clubLink": "Gekoppeld aan een club"
+    },
+    "components": {
+      "ticketCreated": "Ticket aangemaakt",
+      "categoriesRecomputed": "Categorieën opnieuw berekend (seizoen {{season}})",
+      "exportRestarted": "Export opnieuw gestart",
+      "requestProcessed": "Aanvraag verwerkt",
+      "rejected": "Afgewezen",
+      "exemptionGranted": "Vrijstelling toegekend",
+      "exemptionRemoved": "Vrijstelling verwijderd",
+      "exemptionUpdated": "Vrijstelling bijgewerkt",
+      "failed": "Mislukt",
+      "createFailed": "Aanmaken mislukt",
+      "channelPhone": "Telefoon",
+      "channelEmail": "Email",
+      "channelInPerson": "Persoonlijk",
+      "channelOther": "Overig",
+      "statusWarning": "waarschuwing",
+      "statusOk": "ok",
+      "recomputeFailed": "Herberekening mislukt",
+      "recomputeTitle": "FFF-categorieën herberekenen",
+      "recomputeBody": "Herkent de leeftijdscategorieën (U6 → Senior) van de spelers van de club voor het gekozen seizoen. Standaard worden alleen rijen zonder categorie ingevuld (niet-destructief).",
+      "seasonOptional": "Seizoen (optioneel)",
+      "seasonPlaceholder": "Huidig seizoen standaard (bijv. 2024-2025)",
+      "overwriteLabel": "Reeds ingevoerde categorieën <strong>overschrijven</strong>, <danger>inclusief handmatige opwaarderingen</danger>.",
+      "recomputeRunning": "Herberekenen…",
+      "recomputeAction": "Herberekenen",
+      "recomputeResult": "Resultaat — seizoen {{season}}",
+      "statTotal": "Total",
+      "statUpdated": "Bijgewerkt",
+      "statSkipped": "Overgeslagen",
+      "statMissingDob": "Zonder geboortedatum",
+      "overwriteConfirmTitle": "Bestaande categorieën overschrijven?",
+      "overwriteConfirmDesc": "Alle reeds ingevoerde categorieën voor het geselecteerde seizoen worden <strong>vervangen</strong> door de automatische FFF-berekening.",
+      "overwriteConsequence": "Handmatige <strong>opwaarderingen</strong> (bijv. een U14 in U15) gaan verloren.",
+      "overwriteConfirmAction": "Overschrijven en herberekenen"
+    },
+    "createTicket": {
+      "title": "Nieuw ticket namens een gebruiker",
+      "description": "Gebruikt om een verzoek te loggen dat telefonisch, per e-mail of persoonlijk is ontvangen.",
+      "user": "Gebruiker",
+      "changeUser": "Wijzigen",
+      "searchPlaceholder": "Zoeken op naam of telefoon…",
+      "searching": "Zoeken…",
+      "noResults": "Geen resultaten",
+      "subject": "Onderwerp",
+      "subjectPlaceholder": "Samenvatting van het verzoek",
+      "descriptionLabel": "Beschrijving",
+      "descriptionPlaceholder": "Wat de gebruiker heeft gemeld…",
+      "category": "Categorie",
+      "priority": "Prioriteit",
+      "channel": "Kanaal",
+      "notifyUser": "Gebruiker per e-mail informeren",
+      "cancel": "Annuleren",
+      "create": "Ticket maken"
+    },
+    "watchlist": {
+      "socialFailuresTitle": "Mislukte social syncs",
+      "socialFailuresEmpty": "Alle social verbindingen zijn OK.",
+      "lastAttempt": "laatste poging {{date}}",
+      "importFailuresTitle": "Mislukte of gedeeltelijke imports",
+      "importFailuresEmpty": "Geen mislukte imports.",
+      "importRows": "{{status}} — {{imported}}/{{total}} rijen · {{date}}",
+      "stalledOnboardingTitle": "Mogelijk geblokkeerde onboarding",
+      "stalledOnboardingHint": "Wrijvingssignalen — interpreteer ze, het zijn geen zekere fouten. Wordt op aanvraag geladen.",
+      "signals": {
+        "clubNoTeam": "Club zonder team",
+        "teamNoPlayer": "Team zonder speler",
+        "playersNoEvent": "Spelers maar geen event",
+        "eventNoConvocation": "Event zonder oproep",
+        "inviteNotAccepted": "Uitnodiging niet geaccepteerd"
+      },
+      "nothingToReport": "Niets te melden.",
+      "since": "sinds {{time}}",
+      "extraItems_one": "+ {{count}} andere",
+      "extraItems_other": "+ {{count}} andere"
+    },
+    "observability": {
+      "title": "Activiteit & gezondheid",
+      "recentErrors": "Recente fouten",
+      "recentErrorsEmpty": "Geen fouten geregistreerd.",
+      "errorCode": "code: {{code}}",
+      "byActor": "door {{actor}}",
+      "activeUsers": "Actieve gebruikers (30 d)",
+      "activeUsersEmpty": "Geen gebruikersactiviteit in de laatste 30 dagen.",
+      "lastActionAgo": "{{action}} · {{time}} geleden",
+      "featuresUsed": "Gebruikte functies (30 d)",
+      "featuresUsedEmpty": "Geen gemeten activiteit.",
+      "socialConnections": "Social verbindingen",
+      "socialConnectionsEmpty": "Geen social verbinding.",
+      "active": "actief",
+      "inactive": "inactief",
+      "syncedAt": "sync {{date}}",
+      "imports": "Imports",
+      "importsEmpty": "Geen import.",
+      "importRows": "{{imported}}/{{total}} rijen · {{date}}",
+      "invitations": "Uitnodigingen",
+      "invitationsEmpty": "Geen uitnodiging.",
+      "supportTickets": "Supporttickets",
+      "supportTicketsEmpty": "Geen supportticket.",
+      "fullActivityFeed": "Volledige activiteitenfeed"
+    },
+    "billingExemption": {
+      "actionGranted": "Vrijstelling toegekend",
+      "actionUpdated": "Vrijstelling gewijzigd",
+      "actionRevoked": "Vrijstelling ingetrokken",
+      "reasons": {
+        "betaClub": "Betaclub",
+        "partner": "Partner",
+        "internal": "Intern Clubero",
+        "other": "Overig"
+      },
+      "formats": {
+        "date": "d MMM yyyy",
+        "dateTime": "d MMM yyyy 'om' HH:mm",
+        "shortDateTime": "d MMM, HH:mm"
+      },
+      "title": "Factureringsvrijstelling",
+      "clubExempt": "Club vrijgesteld",
+      "noActiveExemption": "Geen actieve vrijstelling",
+      "exemptBadge": "Vrijgesteld",
+      "intro": "Geef deze club gratis toegang voor de betafase, een partnership of interne test. De club krijgt toegang tot alle functies zonder Stripe.",
+      "grant": "Vrijstelling toekennen",
+      "reason": "Reden",
+      "endDate": "Einddatum",
+      "noLimit": "Geen limiet",
+      "grantedAt": "Toegekend op",
+      "grantedBy": "Toegekend door",
+      "edit": "Vrijstelling bewerken",
+      "revoke": "Vrijstelling intrekken",
+      "auditTitle": "Vrijstellingsgeschiedenis",
+      "auditEmpty": "Geen actie geregistreerd.",
+      "byActor": "door {{actor}}",
+      "untilDate": "tot {{date}}",
+      "dialogDescription": "Deze club krijgt toegang tot alle functies zonder Stripe-abonnement.",
+      "reasonPlaceholder": "Selecteer een reden",
+      "endDateOptional": "Einddatum vrijstelling (optioneel)",
+      "clearDate": "Datum wissen",
+      "expiryHint": "Indien ingesteld verloopt de vrijstelling automatisch op deze datum.",
+      "summaryUntil": "<strong>{{clubName}}</strong> krijgt gratis toegang tot {{date}}.",
+      "summaryNoLimit": "<strong>{{clubName}}</strong> krijgt gratis toegang zonder tijdslimiet.",
+      "cancel": "Annuleren",
+      "save": "Opslaan",
+      "confirm": "Vrijstelling bevestigen",
+      "revokeTitle": "Vrijstelling intrekken?",
+      "revokeDescription": "De club <strong>{{clubName}}</strong> verliest gratis toegang. Als er geen actief Stripe-abonnement is, wordt de club bij de volgende login doorgestuurd naar de abonnementsflow."
+    },
+    "privacyRequests": {
+      "loading": "Privacyverzoeken laden…",
+      "confirmHardDelete": "HARDE verwijdering bevestigen? Deze actie is onomkeerbaar.",
+      "confirmAnonymize": "Dit account anonimiseren?",
+      "confirmRejectDeletion": "Dit verwijderverzoek afwijzen?",
+      "title": "Privacy / AVG ({{count}} in behandeling)",
+      "refresh": "Vernieuwen",
+      "empty": "Geen verzoek.",
+      "link": "Link",
+      "process": "Verwerken",
+      "deletions": "Accountverwijderingen ({{count}})",
+      "deadline": "deadline {{date}}",
+      "anonymize": "Anonimiseren",
+      "hardDelete": "Hard verwijderen"
+    }
+  },
+  "supportView": {
+    "defaultLabel": "Bekijken als",
+    "title": "Supportweergave starten",
+    "subtitle": "Je ziet de app van {{name}} alleen-lezen{{club}}. De sessie wordt geaudit en verloopt automatisch.",
+    "theUser": "de gebruiker",
+    "inClub": " in {{club}}",
+    "persona": "Persona",
+    "personaHint": "Moet overeenkomen met een echte rol die de gebruiker in deze club heeft.",
+    "reason": "Reden (geaudit)",
+    "reasonPlaceholder": "bijv. Ticket #123 - betaalstatus controleren",
+    "duration": "Duur (min, max 60)",
+    "cancel": "Annuleren",
+    "startView": "Weergave starten",
+    "reasonRequired": "Beschrijf waarom je deze weergave nodig hebt (min. 3 tekens).",
+    "startFailed": "Sessie starten mislukt",
+    "sessionUnavailable": "Supportsessie niet beschikbaar",
+    "unknownError": "Onbekende fout",
+    "backToHub": "← Terug naar support-hub",
+    "bannerTitle": "Supportweergave",
+    "viewingAs": "Bekijken als {{persona}}",
+    "endSession": "Sessie beëindigen",
+    "expiresIn": "Verloopt over {{time}}",
+    "bannerAs": "als {{name}} · {{club}} · {{persona}}",
+    "userFallback": "gebruiker",
+    "clubFallback": "club"
+  },
+  "coach": {
+    "unavailableTitle": "Profiel niet beschikbaar",
+    "unavailableBody": "Dit coachprofiel is privé of bestaat niet."
+  },
+  "languages": {
+    "fr": "Frans",
+    "en": "Engels",
+    "de": "Duits",
+    "es": "Spaans",
+    "it": "Italiaans",
+    "nl": "Nederlands",
+    "pt": "Portugees"
   }
 }

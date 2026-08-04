@@ -297,10 +297,8 @@ function NamedAttachmentList({
                 value={a.label ?? ""}
                 onChange={(e) => onLabelChange(a, e.target.value)}
                 maxLength={ATTACHMENT_LABEL_MAX}
-                aria-label={t("attachments.documentName", { defaultValue: "Nom du document" })}
-                placeholder={t("attachments.documentNamePlaceholder", {
-                  defaultValue: "Nom du document (ex. Programme de reprise)",
-                })}
+                aria-label={t("attachments.documentName")}
+                placeholder={t("attachments.documentNamePlaceholder")}
                 className={cn(
                   "w-full rounded-md border bg-background px-2 py-1.5 text-sm",
                   missing ? "border-destructive/60" : "border-border",
@@ -312,7 +310,7 @@ function NamedAttachmentList({
               type="button"
               onClick={() => onRemove(a)}
               className="h-6 w-6 rounded-full bg-muted text-muted-foreground hover:bg-destructive hover:text-destructive-foreground flex items-center justify-center shrink-0"
-              aria-label={t("attachments.remove", { defaultValue: "Retirer" })}
+              aria-label={t("attachments.remove")}
             >
               <X className="h-3 w-3" />
             </button>

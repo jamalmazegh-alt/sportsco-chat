@@ -83,9 +83,7 @@ export function PlayerFeedbackForm({
     <div className="space-y-3">
       {/* Rating */}
       <div className="space-y-1.5">
-        <Label className="text-xs text-muted-foreground">
-          {t("feedback.ratingLabel", { defaultValue: "Évaluation (optionnel)" })}
-        </Label>
+        <Label className="text-xs text-muted-foreground">{t("feedback.ratingLabel")}</Label>
         <div className="flex items-center gap-1">
           {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((n) => {
             const active = (value.rating ?? 0) >= n;
@@ -146,9 +144,7 @@ export function PlayerFeedbackForm({
           value={value.strengths}
           onChange={(e) => set("strengths", e.target.value)}
           rows={2}
-          placeholder={t("feedback.strengthsPlaceholder", {
-            defaultValue: "Ce qui a bien fonctionné…",
-          })}
+          placeholder={t("feedback.strengthsPlaceholder")}
         />
       </div>
 
@@ -159,9 +155,7 @@ export function PlayerFeedbackForm({
           value={value.improvements}
           onChange={(e) => set("improvements", e.target.value)}
           rows={2}
-          placeholder={t("feedback.improvementsPlaceholder", {
-            defaultValue: "À développer…",
-          })}
+          placeholder={t("feedback.improvementsPlaceholder")}
         />
       </div>
 
@@ -172,7 +166,7 @@ export function PlayerFeedbackForm({
           className="text-xs text-muted-foreground underline underline-offset-2"
           onClick={() => setAdvanced(true)}
         >
-          {t("feedback.showMore", { defaultValue: "Notes & commentaire détaillé" })}
+          {t("feedback.showMore")}
         </button>
       ) : (
         <>
@@ -182,9 +176,7 @@ export function PlayerFeedbackForm({
               value={value.comment}
               onChange={(e) => set("comment", e.target.value)}
               rows={2}
-              placeholder={t("feedback.commentPlaceholder", {
-                defaultValue: "Commentaire général…",
-              })}
+              placeholder={t("feedback.commentPlaceholder")}
             />
           </div>
           <div className="space-y-1.5">
@@ -193,9 +185,7 @@ export function PlayerFeedbackForm({
               value={value.devNotes}
               onChange={(e) => set("devNotes", e.target.value)}
               rows={2}
-              placeholder={t("feedback.devNotesPlaceholder", {
-                defaultValue: "Notes de développement à long terme…",
-              })}
+              placeholder={t("feedback.devNotesPlaceholder")}
             />
           </div>
         </>

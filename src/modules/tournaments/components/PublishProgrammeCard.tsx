@@ -159,9 +159,7 @@ export function PublishProgrammeCard({
             <AlertDialogDescription>{t("tournament.publishConfirmBody")}</AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel disabled={m.isPending}>
-              {t("common.cancel", { defaultValue: "Annuler" })}
-            </AlertDialogCancel>
+            <AlertDialogCancel disabled={m.isPending}>{t("common.cancel")}</AlertDialogCancel>
             <AlertDialogAction
               disabled={m.isPending}
               onClick={(e) => {

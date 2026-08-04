@@ -34,16 +34,11 @@ export const Route = createFileRoute("/_authenticated/profile/availabilities")({
   head: () => ({
     meta: [
       {
-        title: i18n.t("staffAvailability.pageTitle", {
-          defaultValue: "Mes indisponibilités — Clubero",
-        }),
+        title: i18n.t("staffAvailability.pageTitle"),
       },
       {
         name: "description",
-        content: i18n.t("staffAvailability.pageDescription", {
-          defaultValue:
-            "Déclarez vos périodes d'indisponibilité pour toutes vos équipes dans le club actif.",
-        }),
+        content: i18n.t("staffAvailability.pageDescription"),
       },
     ],
   }),
@@ -99,11 +94,7 @@ function StaffAvailabilitiesPage() {
   });
 
   async function cancel(id: string) {
-    const ok = window.confirm(
-      t("staffAvailability.cancelConfirm", {
-        defaultValue: "Supprimer cette indisponibilité ?",
-      }),
-    );
+    const ok = window.confirm(t("staffAvailability.cancelConfirm"));
     if (!ok) return;
     const { error } = await supabase
       .from("staff_availabilities")
@@ -113,7 +104,7 @@ function StaffAvailabilitiesPage() {
       toast.error(error.message);
       return;
     }
-    toast.success(t("staffAvailability.cancelled", { defaultValue: "Indisponibilité supprimée" }));
+    toast.success(t("staffAvailability.cancelled"));
     qc.invalidateQueries({ queryKey: ["my-staff-availabilities"] });
     qc.invalidateQueries({ queryKey: ["staff-availabilities"] });
   }
@@ -130,18 +121,14 @@ function StaffAvailabilitiesPage() {
           className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground"
         >
           <ChevronLeft className="h-4 w-4" />
-          {t("common.back", { defaultValue: "Retour" })}
+          {t("common.back")}
         </Link>
       </div>
 
       <div>
-        <h1 className="text-2xl font-semibold">
-          {t("staffAvailability.title", { defaultValue: "Mes indisponibilités" })}
-        </h1>
+        <h1 className="text-2xl font-semibold">{t("staffAvailability.title")}</h1>
         <p className="mt-1 text-sm text-muted-foreground">
-          {t("staffAvailability.subtitle", {
-            defaultValue: "Périodes où tu ne seras pas disponible pour encadrer tes équipes.",
-          })}
+          {t("staffAvailability.subtitle")}
           {club?.name ? (
             <>
               {" "}
@@ -159,21 +146,15 @@ function StaffAvailabilitiesPage() {
         }}
       >
         <Plus className="h-4 w-4" />
-        {t("staffAvailability.declareCta", { defaultValue: "Déclarer une indisponibilité" })}
+        {t("staffAvailability.declareCta")}
       </Button>
 
       {isLoading ? (
-        <div className="text-sm text-muted-foreground">
-          {t("common.loading", { defaultValue: "Chargement..." })}
-        </div>
+        <div className="text-sm text-muted-foreground">{t("common.loading")}</div>
       ) : rows.length === 0 ? (
         <div className="rounded-2xl border border-dashed border-border bg-card p-8 text-center">
           <CalendarOff className="mx-auto h-8 w-8 text-muted-foreground" />
-          <p className="mt-2 text-sm text-muted-foreground">
-            {t("staffAvailability.empty", {
-              defaultValue: "Aucune indisponibilité déclarée à venir.",
-            })}
-          </p>
+          <p className="mt-2 text-sm text-muted-foreground">{t("staffAvailability.empty")}</p>
         </div>
       ) : (
         <ul className="space-y-2">
@@ -196,25 +177,19 @@ function StaffAvailabilitiesPage() {
                     {r.certainty === "tentative" && (
                       <span className="inline-flex items-center gap-1 rounded-full bg-amber-500/15 px-2 py-0.5 text-[10px] font-medium text-amber-700 dark:text-amber-400">
                         <CircleDashed className="h-3 w-3" />
-                        {t("staffAvailability.certainty.tentative", {
-                          defaultValue: "Possible",
-                        })}
+                        {t("staffAvailability.certainty.tentative")}
                       </span>
                     )}
                     {r.certainty === "confirmed" && (
                       <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/15 px-2 py-0.5 text-[10px] font-medium text-emerald-700 dark:text-emerald-400">
                         <CheckCircle2 className="h-3 w-3" />
-                        {t("staffAvailability.certainty.confirmed", {
-                          defaultValue: "Confirmée",
-                        })}
+                        {t("staffAvailability.certainty.confirmed")}
                       </span>
                     )}
                     {r.visibility === "admins_only" && (
                       <span className="inline-flex items-center gap-1 rounded-full bg-muted px-2 py-0.5 text-[10px] font-medium text-muted-foreground">
                         <EyeOff className="h-3 w-3" />
-                        {t("staffAvailability.visibility.admins_only", {
-                          defaultValue: "Admins uniquement",
-                        })}
+                        {t("staffAvailability.visibilityAdminsOnly")}
                       </span>
                     )}
                   </div>
@@ -241,7 +216,7 @@ function StaffAvailabilitiesPage() {
                       setDrawerOpen(true);
                     }}
                     className="p-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
-                    aria-label={t("common.edit", { defaultValue: "Modifier" })}
+                    aria-label={t("common.edit")}
                   >
                     <Pencil className="h-4 w-4" />
                   </button>
@@ -249,7 +224,7 @@ function StaffAvailabilitiesPage() {
                     type="button"
                     onClick={() => cancel(r.id)}
                     className="p-2 rounded-lg text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors"
-                    aria-label={t("common.delete", { defaultValue: "Supprimer" })}
+                    aria-label={t("common.delete")}
                   >
                     <Trash2 className="h-4 w-4" />
                   </button>

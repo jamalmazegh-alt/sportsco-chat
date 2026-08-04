@@ -167,9 +167,10 @@ function pickLocale(l?: string): Locale {
 }
 
 const MeetingRemovedEmail = ({ displayName, meetingTitle, clubName, eventUrl, locale }: Props) => {
-  const c = COPY[pickLocale(locale)];
+  const l = pickLocale(locale);
+  const c = COPY[l];
   return (
-    <EmailShell preview={c.preview(meetingTitle)} locale={locale}>
+    <EmailShell preview={c.preview(meetingTitle)} locale={l}>
       <Heading style={h1}>{c.hello(displayName)}</Heading>
       <Heading style={h2}>{c.title}</Heading>
       <Text style={text}>{c.body(meetingTitle, clubName)}</Text>

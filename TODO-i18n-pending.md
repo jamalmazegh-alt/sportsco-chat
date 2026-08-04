@@ -1,65 +1,17 @@
 # Pending translations
 
-## `needs.json` — Phase B UI extension (DE/ES/IT/NL/PT)
+## Status (2026-08-04)
 
-The Phase B UI for "Coups de main" added ~30 UI keys under `needs.json`:
-`section.*` (title, add, emptyStaff, created, createDesc, coverageAll,
-coverageMissing_one, coverageMissing_other), `field.*` (template, label,
-capacity, mode, description), `publish.*` (title, desc, audienceHeader,
-chooseGroup, chooseTeam, chooseCategory, categoryPlaceholder, preview_one,
-preview_other, previewNone, previewLoading, success, successIdempotent),
-`publishedBadge.*` (at_one, at_other, unpublished), `audiences.*`
-(club_group, team_players, team_parents, team_educators, category_educators
+Bulk native pass applied for DE / ES / IT / NL / PT across all 9 namespaces
+(`common`, `needs`, `publications`, `camps`, `challenges`, `tournaments`,
+`marketing`, `support`, `buildClubero`).
 
-- the 7 existing scalars), `staff.*` (title, empty, minorPending, license),
-  `pendingApplications_one`, `pendingApplications_other`, `confirmCancel`.
+EN-clone occurrences (string equal to EN while FR differs) went from **~2845 → ~361**.
+Remaining matches are mostly intentional cognates / shared UI tokens
+(`Team`, `Status`, `Email`, `Beta`, `Live`, `optional`, `Volleyball`, brand titles
+like `Publications`, placeholder-only strings).
 
-FR and EN are reviewed and final. DE/ES/IT/NL/PT are **clones of EN** for
-parity — they must be replaced by native translations. Also `seats.remaining`
-was migrated to i18next v4 plural convention (`remaining_one` /
-`remaining_other`) — the 5 non-FR/EN locales inherited the EN plural fallback
-and need native review too.
-
-# Challenge templates — pending translations & skipped templates
-
-## Pending DE/ES/IT/NL/PT translations
-
-The following challenge template keys were added under `templates` in each
-of `src/locales/{de,es,it,nl,pt}/challenges.json` with the **English** copy
-as a structural placeholder only, to keep `scripts/check-i18n-parity.mjs`
-green. They are **not final translations** — they must be replaced through
-the same master → QA workflow used for the rest of the app.
-
-Keys awaiting real translation in DE / ES / IT / NL / PT:
-
-- `units.score`
-- `templates.plankHold`
-- `templates.shuttleRun`
-- `templates.slalomBall`
-- `templates.freeThrows`
-- `templates.threePointShots`
-- `templates.dribbleCourse`
-- `templates.layupSeries`
-- `templates.handballDribbleSlalom`
-- `templates.sprint40m`
-- `templates.agilityRunRugby`
-- `templates.successfulPasses`
-- `templates.rallyConsistency`
-- `templates.movementSpeed`
-- `templates.shotAccuracy`
-- `templates.handballShotAccuracy`
-- `templates.passingAccuracy`
-- `templates.rugbyPassingAccuracy`
-- `templates.pushPower`
-- `templates.serveAccuracy`
-- `templates.receptionControl`
-- `templates.attackAccuracy`
-- `templates.tennisServeAccuracy`
-- `templates.targetShots`
-
-FR and EN already contain the reviewed, locked wording from the product prompt.
-
-## Skipped templates (require value-system extension)
+## Challenge templates — skipped (require value-system extension)
 
 The following templates from the sport catalogue are **still not
 implemented** because their result type has no safe mapping onto the current
@@ -86,99 +38,9 @@ Once the value-system extension lands, register the template in
 `src/lib/challenges/templates.ts` with the correct `sport` scope and remove
 the corresponding row from this file.
 
-## needs.json — Phase 2 UI (Coups de main v2)
+## QA note
 
-Clones EN → DE/ES/IT/NL/PT pour les namespaces ajoutés :
-`card`, `badge`, `wizard`, `audiencePicker`, `publishStep`, `applications`, `memberCard`, `unavailable`, `editDialog`, `deleteDraft`, `closeDialog2`, `cancelDialog2`, `menu`, `assignNotification`.
-
-→ Traductions natives DE/ES/IT/NL/PT à fournir.
-
-## common.json — urgency.deck (Lot 0)
-
-Clones EN → DE/ES/IT/NL/PT pour :
-`urgency.deck.showMore_one`, `urgency.deck.showMore_other`.
-
-→ Traductions natives DE/ES/IT/NL/PT à fournir.
-
-## `needs.json` — Modifier destinataires vs Relancer (DE/ES/IT/NL/PT)
-
-Added the following keys to distinguish two staff intents on a published need:
-
-- `actions.resend`, `actions.notifyNew`
-- `menu.editAudience`
-- `resend.title`, `resend.success_one`, `resend.success_other`
-- `editAudience.title`, `editAudience.desc`, `editAudience.deltaHint`,
-  `editAudience.success_one`, `editAudience.success_other`,
-  `editAudience.successNoDelta`
-
-FR and EN are final. DE/ES/IT/NL/PT are **clones of EN** and need native
-translations.
-
-## `common.json` — groups defaultValue removal (DE/ES/IT/NL/PT)
-
-Added `common.actions` scalar. All groups.\* keys referenced in
-`src/routes/_authenticated/admin/groups.tsx` (parentOf, emailOnly,
-individualMembers, addIndividual, errors.nameTaken, common.cancel/save)
-already existed with native translations. `common.actions` was added
-natively (Aktionen/Acciones/Azioni/Acties/Ações) — no clone tracking needed.
-
-Removed dead keys from every locale (FR + EN + DE/ES/IT/NL/PT):
-`groups.dynamicRules`, `groups.noRules`, `groups.resolvedTotal` (leftover
-from the rules → subgroups rename).
-
-## `needs.json` — Audience picker v4 (DE/ES/IT/NL/PT)
-
-Sélection d'audience mise en avant (dialog « Qui prévenir ? »). Nouvelles clés
-sous `audiences.*` :
-
-- `customGroups`, `eventRelevant`, `otherAudiences`, `pickKind`, `pickParam`, `noGroups`
-- `selected.title`, `selected.empty`, `selected.emptyConvocation`,
-  `selected.loading`, `selected.count_one`, `selected.count_other`,
-  `selected.removeAria`, `selected.takenAria`
-
-FR et EN sont finaux. DE/ES/IT/NL/PT sont des **clones EN** — à remplacer par
-des traductions natives.
-
-## `needs.json` — Voir les destinataires d'un besoin (DE/ES/IT/NL/PT)
-
-Nouvelles clés `menu.viewRecipients` et bloc `recipients.*` (title, desc,
-empty, count_one/other). FR et EN sont finaux. DE/ES/IT/NL/PT sont des
-**clones EN** — à remplacer par des traductions natives.
-
-## needs.myFeed._ + needs.withdrawDialog._ (2026-07-19)
-
-Clones EN → DE/ES/IT/NL/PT pour :
-
-- needs.myFeed.engagementsCount_one/other
-- needs.myFeed.nextLabel
-- needs.myFeed.plusOthers_one/other
-- needs.withdrawDialog.title/description/confirm/abort
-
-## publications.json — Communications & sondages de groupe (2026-07-19)
-
-Nouveau namespace `publications` (Phase A backend). FR et EN sont finaux et
-soignés. DE/ES/IT/NL/PT sont des **clones EN** — à remplacer par des
-traductions natives lors de Phase B.
-
-Blocs concernés :
-
-- `type.*`, `delivery.*`, `actions.*`, `poll.*`, `state.*`
-- `confirm.close/delete/resend/refresh.*`, `confirm.confirm/cancel`
-- `audience.*` (dont `audience.types.*` pour les 10 audiences)
-- `form.*`, `email.*`, `push.*`, `errors.*`
-
-## `publications.json` — Phase B UI (DE/ES/IT/NL/PT)
-
-Phase B added `list.*`, `new.*`, and `detail.*` sections to publications.json.
-FR and EN are final. DE/ES/IT/NL/PT are clones of EN pending native translation.
-
-## publications.detail.votingAs\*, votingForChild, player (2026-07-20)
-
-- FR: traduit
-- EN: traduit
-- DE/ES/IT/NL/PT: clone EN, à traduire
-
-## publications.new.pickCategory/pickEvent/pickMembers/searchPlaceholder/addPlayersBtn/addParentsBtn + publications.audience.recipientsCount/recipientsBreakdown/none/previewError (2026-07-20 wizard audiences)
-
-- FR/EN: traduit
-- DE/ES/IT/NL/PT: traductions natives fournies pour ces clés (bloc wizard categories/convocations/manual + compteur preview)
+Native EU strings were produced via bulk localization patches (not
+human-linguist QA). A focused linguistic review of high-traffic surfaces
+(needs, publications, camps, tournaments, auth/onboarding in `common`) is
+still recommended before considering the EU pack “locked”.

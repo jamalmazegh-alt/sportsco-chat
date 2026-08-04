@@ -12,7 +12,7 @@
     "error": "Error",
     "networkError": "Error de red",
     "required": "Obligatorio",
-    "optional": "Opcional",
+    "optional": "opcional",
     "team": "Equipo",
     "teams": "Equipos",
     "match": "Partido",
@@ -25,7 +25,11 @@
     "aet": "Prórroga",
     "pen": "Penaltis",
     "mvp": "MVP",
-    "field": "Campo"
+    "field": "Campo",
+    "remove": "Quitar",
+    "retry": "Reintentar",
+    "fileTooLarge": "Archivo demasiado grande (máximo 5 MB)",
+    "invalidImage": "Formato de imagen no admitido"
   },
   "public": {
     "metaTitle": "{{name}} — Partido de {{sport}} · Clubero",
@@ -49,7 +53,7 @@
       "flights": "Flights"
     },
     "sections": {
-      "live": "En vivo",
+      "live": "En directo",
       "nowPlaying": "En juego",
       "upcoming": "Próximos partidos",
       "recent": "Resultados recientes",
@@ -105,6 +109,10 @@
       "hint": "Elige una cancha para ver la transmisión en vivo.",
       "unsupported": "Plataforma no reconocida. Abre el enlace en una nueva pestaña.",
       "openExternal": "Abrir stream"
+    },
+    "match": {
+      "aet": "prórroga",
+      "pen": "PEN"
     }
   },
   "register": {
@@ -138,9 +146,12 @@
     "success": {
       "metaTitle": "Registro confirmado — {{slug}} · Clubero",
       "title": "¡Pago recibido, registro confirmado!",
-      "body": "Se te ha enviado un correo electrónico de confirmación. ¡Nos vemos pronto en el campo!"
+      "body": "Se te ha enviado un correo electrónico de confirmación. ¡Nos vemos pronto en el campo!",
+      "settling": "Pago recibido — finalizando su registro…"
     },
-    "payMetaTitle": "Pago — {{slug}} · Clubero"
+    "payMetaTitle": "Pago — {{slug}} · Clubero",
+    "payNotFound": "Enlace no encontrado",
+    "securePayment": "Pago seguro a través de Stripe."
   },
   "tv": {
     "metaTitle": "Presentación — {{slug}} · Clubero",
@@ -191,7 +202,10 @@
     "loginPrompt": "Inicia sesión para aceptar esta invitación.",
     "signIn": "Iniciar sesión",
     "accept": "Aceptar invitación",
-    "accepted": "Invitación aceptada"
+    "accepted": "Invitación aceptada",
+    "noAccountPrompt": "Para aceptar esta invitación, crea tu cuenta Clubero con el correo electrónico de invitación o inicia sesión si ya tienes una.",
+    "createAccount": "crear mi cuenta",
+    "useExactEmail": "Usa el email {{email}} para que se reconozca la invitación."
   },
   "passSuccess": {
     "metaTitle": "Pase de Torneo confirmado — Clubero",
@@ -284,7 +298,8 @@
     "noneAssigned": "Ningún partido asignado.",
     "unassigned": "No asignado",
     "unassignedSection": "No asignado",
-    "assignPlaceholder": "Asignar"
+    "assignPlaceholder": "Asignar",
+    "streamUrlPlaceholder": "URL de transmisión (YouTube, Twitch…)"
   },
   "collab": {
     "title": "Equipo de organización",
@@ -330,7 +345,7 @@
       "main": "Patrocinador principal",
       "gold": "Oro",
       "silver": "Plata",
-      "partner": "Socio"
+      "partner": "Colaborador"
     }
   },
   "registrations": {
@@ -389,8 +404,26 @@
       "linkSentOn": "Enlace enviado el {{date}}",
       "linkExpired": "Enlace caducado",
       "requestPayment": "Solicitar pago",
-      "whatsappTemplate": "Hola {{teamName}} 👋\nAquí tienes el enlace de pago para tu inscripción en {{tournamentName}} ({{amount}}):\n{{paymentLink}}\nEste enlace es válido por 7 días."
-    }
+      "whatsappTemplate": "Hola {{teamName}} 👋\nAquí tienes el enlace de pago para tu inscripción en {{tournamentName}} ({{amount}}):\n{{paymentLink}}\nEste enlace es válido por 7 días.",
+      "linkSendFailed": "No se pudo enviar el enlace de pago"
+    },
+    "invite": {
+      "success": "Invitación enviada por correo electrónico",
+      "button": "invitar a un equipo",
+      "title": "Invitar a un equipo a pagar",
+      "description": "El equipo recibirá un correo electrónico personalizado con su enlace de pago seguro.",
+      "teamName": "Nombre del equipo",
+      "contactName": "Nombre de contacto",
+      "email": "Email",
+      "phone": "Teléfono (opcional)",
+      "send": "Enviar invitación"
+    },
+    "stripeNotConnected": {
+      "title": "Cuenta de pago no conectada",
+      "description": "Este torneo requiere pago en línea pero tu club no ha conectado una cuenta Stripe. Los equipos no podrán pagar hasta que se configure la cuenta.",
+      "cta": "Conectar una cuenta de Stripe"
+    },
+    "loadError": "Error al cargar registros"
   },
   "teams": {
     "count_one": "{{count}}{{limit}} equipo",
@@ -441,7 +474,8 @@
       "external": " · Externo",
       "players": "Jugadores",
       "edit": "Editar",
-      "delete": "Eliminar"
+      "delete": "Eliminar",
+      "noContact": "Sin contacto"
     },
     "deleteConfirm": {
       "title": "¿Eliminar {{name}}?",
@@ -449,11 +483,33 @@
       "consequences": "Se perderán los jugadores, la clasificación y el historial de este equipo en el torneo. Los partidos ya jugados pueden verse afectados.",
       "confirm": "Eliminar equipo",
       "cancel": "Cancelar"
+    },
+    "payment": {
+      "markedPaid": "Marcado como pagado",
+      "markedExempt": "Marcado exento",
+      "markedUnpaid": "marcado como no pagado",
+      "paid": "Pagado",
+      "exempt": "Eximir",
+      "unpaid": "para recoger",
+      "cycleHint": "Haga clic para cambiar el estado de pago"
     }
   },
   "roster": {
     "title": "Jugadores · {{team}}",
-    "import": "Importar",
+    "import": {
+      "empty": "No se detectaron jugadores en el archivo.",
+      "blocked": "Importación bloqueada: {{total}} jugadores superan el límite de {{max}}. Reduce el archivo o elige “Reemplazar”.",
+      "ok": "{{n}} jugador(es) importado(s)",
+      "button": "Importar CSV",
+      "title": "Importar jugadores",
+      "desc": "Formato CSV: nombre, apellido, número de camiseta, posición, es_capitán. Separadores , ; o pestaña aceptada.",
+      "file": "Elige un archivo",
+      "template": "Plantilla",
+      "orPaste": "O pegue el contenido CSV:",
+      "append": "Agregar a la lista",
+      "replace": "Reemplazar lista",
+      "confirm": "Importar"
+    },
     "add": "Añadir",
     "empty": "No hay jugadores. Añade jugadores o importa una lista.",
     "edit": "Editar",
@@ -486,7 +542,31 @@
       "imported_one": "{{count}} jugador importado",
       "imported_other": "{{count}} jugadores importados",
       "noneDetected": "No se detectó ningún jugador"
-    }
+    },
+    "metaTitle": "Composición de la lista",
+    "invalidTitle": "Enlace no válido",
+    "invalidBody": "Este enlace de lista no es válido o ha caducado.",
+    "tooMany": "Convocatoria limitada a {{max}} jugadores.",
+    "saved": "Lista guardada",
+    "heading": "Convocatoria — {{team}}",
+    "logo": {
+      "none": "Sin logotipo",
+      "title": "Logotipo del equipo",
+      "help": "PNG, JPG, WEBP o SVG · 4 MB máx.",
+      "change": "Cambiar",
+      "upload": "Añadir un logotipo",
+      "removed": "Logotipo eliminado",
+      "tooLarge": "Archivo demasiado grande (4 MB máx.)",
+      "uploaded": "Logotipo guardado"
+    },
+    "pendingTitle": "Solicitud bajo revisión",
+    "pendingBody": "Una vez que la organización haya aprobado tu inscripción, podrás agregar o editar jugadores desde este mismo enlace.",
+    "playersLabelMax": "Jugadores ({{count}} / {{max}})",
+    "remaining": "{{n}} plaza(s) disponibles",
+    "captain": "Capitán",
+    "setCaptain": "Capitán del set",
+    "lastSaved": "Último guardado: {{date}}",
+    "save": "Guardar"
   },
   "wizard": {
     "title": "Nuevo Torneo",
@@ -534,10 +614,14 @@
     "formatSwissDesc": "Emparejamientos por clasificación en cada ronda, número de rondas fijo",
     "swissRounds": "Número de rondas",
     "swissRoundsHint": "Recomendado: techo(log₂(equipos)) — 8 ≈ 3, 16 ≈ 4, 32 ≈ 5.",
-    "formatFlightedFinals": "Finales por Flights",
+    "formatFlightedFinals": "Finales por cuadros",
     "formatFlightedFinalsDesc": "Fase de grupos seguida de varios cuadros finales paralelos (Champions, Europa…)",
     "formatConsolation": "Consolación",
-    "formatConsolationDesc": "Cuadro principal + cuadro de consolación para los eliminados pronto"
+    "formatConsolationDesc": "Cuadro principal + cuadro de consolación para los eliminados pronto",
+    "stepEyebrow": "Paso 1 / 4",
+    "stepEyebrow2": "Paso 2 / 4",
+    "stepEyebrow3": "Paso 3 / 4",
+    "stepEyebrow4": "Paso 4 / 4"
   },
   "groups": {
     "drawTitle": "Sorteo",
@@ -615,7 +699,8 @@
     "minRestSubtitle": "Por Equipo · 0 = desactivado",
     "lunchBreakSubtitle": "No hay partidos en esta franja horaria",
     "addFieldShort": "+ Añadir campo",
-    "fieldAddedToast": "Campo {{name}} añadido"
+    "fieldAddedToast": "Campo {{name}} añadido",
+    "regenFinalsConfirm": "La fase final ya tiene resultados. La regeneración BORRARÁ todos esos resultados. ¿Continuar?"
   },
   "draw": {
     "title": "Sorteo",
@@ -631,8 +716,8 @@
     "slotsGroups_one": "{{count}} grupo",
     "slotsGroups_other": "{{count}} grupos",
     "slotsKnockout": "{{count}} posiciones",
-    "byes_one": "{{count}} pase directo",
-    "byes_other": "{{count}} pases directos",
+    "byes_one": "{{count}} exento",
+    "byes_other": "{{count}} exentos",
     "tabAuto": "Automático",
     "tabProgressive": "Progresivo",
     "tabManual": "Manual",
@@ -658,7 +743,8 @@
     "overwriteDescStarted": "El torneo ya ha comenzado. Esta acción eliminará la estructura actual (grupos/cuadro) y los resultados de los partidos afectados. Los equipos inscritos se mantendrán.",
     "overwriteDesc": "Esta acción eliminará la composición actual (grupos/cuadro) y los partidos asociados. Los equipos inscritos se mantendrán.",
     "cancel": "Cancelar",
-    "confirmRelaunch": "Confirmar y reiniciar"
+    "confirmRelaunch": "Confirmar y reiniciar",
+    "relaunchFromFooterHint": "Sorteo completado. Utilice \"Reiniciar\" en la parte inferior del cuadro de diálogo para generar uno nuevo (los resultados actuales se perderán)."
   },
   "rules": {
     "savedToast": "Reglas guardadas",
@@ -729,7 +815,9 @@
     "regulationsUploadedToast": "Reglamento subido.",
     "regulationsCurrentFile": "Reglamento actual",
     "save": "Guardar",
-    "reset": "Restablecer"
+    "reset": "Restablecer",
+    "otWin": "victoria extra",
+    "otLoss": "pérdida de tiempo extra"
   },
   "matches": {
     "title": "Introducir resultado",
@@ -777,8 +865,8 @@
     "dispute": "Disputa",
     "statusLabels": {
       "cancelled": "Cancelado",
-      "forfeit_a": "Forfait A",
-      "forfeit_b": "Forfait B",
+      "forfeit_a": "Abandono A",
+      "forfeit_b": "Abandono B",
       "no_show_a": "A no se presentó",
       "no_show_b": "B no se presentó",
       "abandoned": "Abandonado"
@@ -787,15 +875,15 @@
       "scheduled": "Programado",
       "live": "En curso",
       "completed": "Finalizado",
-      "forfeit_a": "Forfait equipo A",
-      "forfeit_b": "Forfait equipo B",
+      "forfeit_a": "Abandono equipo A",
+      "forfeit_b": "Abandono equipo B",
       "no_show_a": "Equipo A no se presentó",
       "no_show_b": "Equipo B no se presentó",
       "abandoned": "Abandonado",
       "cancelled": "Cancelado"
     },
     "statusAria": "Estado del partido",
-    "liveScore": "Resultado en vivo",
+    "liveScore": "Marcador en directo",
     "fullEntry": "Entrada completa",
     "finishMatch": "Finalizar partido",
     "tbd": "Por definir",
@@ -854,15 +942,15 @@
     "changeStatusAction": "Cambiar estado",
     "vs": "VS",
     "matchDetails": {
-      "title": "Détails du match (buteurs, passeurs, cartons)",
-      "addGoal": "Ajouter un but",
-      "addCard": "Ajouter un carton",
-      "scorer": "Buteur (opt.)",
-      "assist": "Passeur (opt.)",
-      "addGoalBtn": "Ajouter le but",
-      "addCardBtn": "Ajouter le carton",
-      "pending": "en attente",
-      "goal": "But"
+      "title": "Detalles del partido (goleadores, asistencias, tarjetas)",
+      "addGoal": "Añadir un gol",
+      "addCard": "Añadir una tarjeta",
+      "scorer": "Goleador (opc.)",
+      "assist": "Asistencia (opc.)",
+      "addGoalBtn": "Añadir gol",
+      "addCardBtn": "Añadir tarjeta",
+      "pending": "pendiente",
+      "goal": "Gol"
     }
   },
   "list": {
@@ -876,7 +964,16 @@
     "emptyTitle": "Ningún torneo",
     "emptyDescManage": "Crea tu primer torneo para organizar una competición.",
     "emptyDescView": "Actualmente no hay ningún torneo en este club.",
-    "create": "Crear torneo"
+    "create": "Crear torneo",
+    "ctaEyebrow": "Organizador",
+    "ctaTitle": "Crea tu torneo en 30 s con la IA",
+    "ctaAnnualActive": "Pase Anual activo — creación ilimitada.",
+    "ctaCredits_one": "{{count}} crédito de torneo disponible.",
+    "ctaCredits_other": "{{count}} créditos de torneo disponibles.",
+    "ctaChoosePlan": "Elige un plan — desde 39 €.",
+    "ctaCreateNow": "Crear ahora",
+    "viewPlans": "Ver planes",
+    "buyCredit": "Comprar un crédito de torneo"
   },
   "detail": {
     "back": "Torneos",
@@ -885,7 +982,18 @@
     "close": "Cerrar",
     "viewPublic": "Ver página pública",
     "formatAdminOnly": "Solo los administradores y responsables pueden configurar el formato.",
-    "statusUpdated": "Estado actualizado"
+    "statusUpdated": "Estado actualizado",
+    "logoUpdated": "Logotipo actualizado",
+    "changeLogo": "Cambiar logotipo",
+    "addLogo": "Añadir un logotipo",
+    "teams": "equipos",
+    "linkCopiedOpenBrowser": "Enlace copiado: ábrelo en tu navegador (Safari/Chrome).",
+    "openPublic": "pagina publica",
+    "openTv": "pantalla de televisión",
+    "autoScheduleCta": {
+      "title": "Programar partidos automáticamente",
+      "subtitle": "Aún no hay cancha ni horario asignado. Ejecute la programación automática."
+    }
   },
   "publishFlow": {
     "stepDraft": "Borrador",
@@ -1034,7 +1142,15 @@
     "formatMixed": "Grupos + Eliminación directa",
     "numTeams": "Número de equipos",
     "consumeHint": "Tu pase se consumirá al crear el torneo. Te dará acceso completo a la gestión del torneo (equipos, grupos, resultados, compartir públicamente).",
-    "submit": "Crear torneo"
+    "submit": "Crear torneo",
+    "noCreditTitle": "Ningún crédito de torneo disponible",
+    "noCreditBody": "Elige un plan para iniciar tu torneo en 30 segundos con la IA.",
+    "viewPlans": "Ver planes",
+    "newTitle": "Nuevo torneo",
+    "annualActive": "Pase Anual activo — creación ilimitada",
+    "creditsLeft_one": "{{count}} crédito de torneo disponible",
+    "creditsLeft_other": "{{count}} créditos de torneo disponibles",
+    "consumeOneCredit": "Este torneo consumirá 1 de tus créditos."
   },
   "tournament": {
     "publishProgramme": "Publicar programa",
@@ -1050,7 +1166,7 @@
     "tabConfigure": "Configurar",
     "tabManage": "Gestionar",
     "tabPlay": "Jugar",
-    "liveNow": "🔴 EN VIVO",
+    "liveNow": "🔴 EN DIRECTO",
     "teamsRegistered": "{{count}} equipos inscritos de {{total}}",
     "teamsRegisteredNoMax": "{{count}} equipos inscritos",
     "beFirst": "¡Sé el primer equipo en inscribirte!",
@@ -1072,7 +1188,8 @@
     "tournamentInfo": "Información",
     "rules": "Reglamento",
     "finalStandings": "Clasificación final",
-    "allResults": "Todos los resultados"
+    "allResults": "Todos los resultados",
+    "registrationOpensAt": "La inscripción abre el {{date}}"
   },
   "flights": {
     "title": "Flights / fases finales",
@@ -1101,7 +1218,7 @@
       "consolation": "Principal / Consolación"
     },
     "dist": {
-      "twoFlights": "2 Flights (top + resto)",
+      "twoFlights": "2 grupos (mejores + resto)",
       "twoFlightsBalanced": "2 Flights equilibrados",
       "threeFlights": "3 Flights (élite + 2 niveles)",
       "threeEqual": "3 Flights iguales",
@@ -1121,7 +1238,7 @@
       "consolationDesc": "Crea 2 flights: Principal (ganadores de grupo) y Consolación (perdedores). Listo para guardar."
     },
     "public": {
-      "empty": "No flights configured yet.",
+      "empty": "Todavía no hay grupos configurados.",
       "noMatches": "Matches will be generated after group stage."
     },
     "templatesDesc": {
@@ -1129,7 +1246,13 @@
       "cup_plate": "Cuadro principal (Copa) para los ganadores + cuadro secundario (Plato) para los perdedores de la 1ª ronda. Nadie queda eliminado pronto.",
       "medals": "Eliminación directa con podio Oro / Plata / Bronce para los 3 primeros equipos. Formato corto y clásico.",
       "consolation": "2 cuadros: Principal (ganadores de grupo) y Consolación (perdedores). Solución simple para que todos sigan jugando."
-    }
+    },
+    "regenConfirm": "Los partidos de las finales ya tienen resultados. La regeneración de brackets BORRARÁ todos esos resultados. ¿Continuar?",
+    "advancedDanger": "Opciones avanzadas (peligrosas)",
+    "regenWarn": "La regeneración de brackets borra todos los resultados finales ya ingresados.",
+    "regenerate": "Regenerar brackets",
+    "fifthPlaceDisabled": "Habilitar el 3er lugar primero",
+    "seventhPlaceDisabled": "Habilitar el quinto lugar primero"
   },
   "controlCenter": {
     "nextAction": "Próxima acción",
@@ -1157,7 +1280,7 @@
     },
     "counters": {
       "done": "Terminados",
-      "live": "En curso",
+      "live": "En directo",
       "upcoming": "Próximos"
     },
     "settings": {
@@ -1168,32 +1291,35 @@
       "payments": "Pago",
       "fields": "Campos",
       "share": "Compartir"
-    }
+    },
+    "byCourts": "Por corte",
+    "progress": "Progreso"
   },
   "cockpit": {
-    "tvMode": "Mode TV",
-    "exitTv": "Quitter le mode TV",
-    "next": "Prochain",
-    "estimatedEnd": "Fin prévue",
-    "averageDelay": "Retard moyen {{minutes}} min",
+    "tvMode": "Modo TV",
+    "exitTv": "Salir del modo TV",
+    "next": "Siguiente",
+    "estimatedEnd": "Fin prevista",
+    "averageDelay": "Retraso medio {{minutes}} min",
     "alerts": {
-      "title": "{{count}} chose(s) à régler",
-      "heading": "Alertes",
-      "lateMatch": "Match en retard de {{minutes}} min",
-      "missingReferee": "Arbitre manquant (démarrage dans {{minutes}} min)",
-      "finalsNotGenerated": "Phase finale non générée — les poules sont terminées"
+      "title": "{{count}} asunto(s) por resolver",
+      "heading": "Alertas",
+      "lateMatch": "Partido con {{minutes}} min de retraso",
+      "missingReferee": "Árbitro ausente (empieza en {{minutes}} min)",
+      "finalsNotGenerated": "Fase final no generada — los grupos han terminado"
     }
   },
   "createChooser": {
-    "title": "Créer un tournoi",
-    "subtitle": "Deux portes, zéro jargon. Choisis ton flow.",
-    "aiTitle": "Créer avec l'IA",
+    "title": "Crear un torneo",
+    "subtitle": "Dos puertas, cero jerga. Elige tu flujo.",
+    "aiTitle": "Crear con IA",
     "aiHint": "Paso a paso — torneo totalmente configurado.",
-    "aiBadge": "Nouveau",
-    "quickTitle": "Mode rapide",
-    "quickHint": "5 écrans, gros boutons, aucune surprise.",
-    "simulatorLink": "Simuler un format avant de créer",
-    "back": "Retour"
+    "aiBadge": "Nuevo",
+    "quickTitle": "Modo rápido",
+    "quickHint": "5 pantallas, botones grandes, sin sorpresas.",
+    "simulatorLink": "Simular un formato antes de crear",
+    "back": "Volver",
+    "abandonConfirm": "¿Dejar al asistente? Tus respuestas se borrarán. También puedes cerrar para encontrarlos nuevamente la próxima vez."
   },
   "aiAssistant": {
     "intro": "Hola 👋 Configuremos tu torneo paso a paso.",
@@ -1267,11 +1393,14 @@
       "simTotal": "Partidos totales",
       "simSlot": "Franja (duración + pausa)",
       "simLunch": "Pausa comida",
-      "simLunchNone": "Aucune",
-      "simLunchDuration": "Durée pause déjeuner",
+      "simLunchNone": "Ninguna",
+      "simLunchDuration": "Duración de la pausa para comer",
       "simLunchMin": "{{min}} min",
-      "simLunchStart": "Heure de début",
-      "simTerrains": "Pistas"
+      "simLunchStart": "Hora de inicio",
+      "simTerrains": "Pistas",
+      "matchDuration": "Duración del partido",
+      "pause": "Pausa entre partidos",
+      "terrains": "Tribunales"
     },
     "footerSub": {
       "question": "El asistente sigue aquí — ajusta sin perder nada",
@@ -1302,7 +1431,7 @@
       "playersPerTeam": "{{count}} jugadores",
       "customTeamsPlaceholder": "Otro número…",
       "customDurationPlaceholder": "Otra duración (min)…",
-      "customPausePlaceholder": "Autre pause (min)…",
+      "customPausePlaceholder": "Otra pausa (min)…",
       "durationMin": "{{min}} min",
       "poolsFinalsHint": "Lo más habitual",
       "roundRobinHint": "Todos contra todos",
@@ -1340,11 +1469,12 @@
       "lunch0": "Sin pausa",
       "lunch30": "30 min",
       "lunch45": "45 min",
-      "lunch60": "1 heure",
+      "lunch60": "1 hora",
       "publicRegistrationYes": "Sí, abrir la página pública",
       "publicRegistrationYesHint": "Los equipos podrán inscribirse en línea",
       "publicRegistrationNo": "No, gestiono las inscripciones a mano",
-      "publicRegistrationNoHint": "Invitas a los equipos tú mismo"
+      "publicRegistrationNoHint": "Invitas a los equipos tú mismo",
+      "none": "Ninguno"
     },
     "cta": {
       "create": "Crear torneo",
@@ -1378,7 +1508,8 @@
       "invalidName": "El nombre debe tener al menos 2 caracteres.",
       "invalidDate": "Elige una fecha de inicio.",
       "invalidLocation": "Indica un lugar.",
-      "incomplete": "Configuración incompleta."
+      "incomplete": "Configuración incompleta.",
+      "invalidPause": "Descanso no válido (0–60 min)"
     },
     "formats": {
       "poolsFinals": "Grupos + fase final",
@@ -1416,50 +1547,119 @@
       "registration": "Inscripción y pago",
       "registrationHint": "En línea, precio, validación",
       "fairPlay": "Fair-play",
-      "fairPlayHint": "Activer le bonus/malus cartons",
+      "fairPlayHint": "Activar bonus/malus de tarjetas",
       "openExpert": "Abrir editor experto",
       "close": "Volver al asistente"
     }
   },
   "simulator": {
-    "title": "Simulateur de tournoi",
-    "subtitle": "Ajuste les paramètres, vois l'impact en direct.",
-    "teams": "Équipes",
-    "terrains": "Terrains",
-    "duration": "Durée d'un match",
-    "flights": "Plusieurs trophées",
+    "title": "Simulador de torneo",
+    "subtitle": "Ajusta los parámetros y ve el impacto en directo.",
+    "teams": "Equipos",
+    "terrains": "Campos",
+    "duration": "Duración de un partido",
+    "flights": "Varios trofeos",
     "flightsHint": "Champions · Europa · Conference",
-    "estimatedEnd": "Heure de fin estimée",
-    "matches": "Matchs",
-    "rounds": "Tours",
-    "margin": "Marge avant 18h",
-    "addTerrain": "+ 1 terrain → gain ~{{gain}} min",
-    "verdictOk": "✓ Tient largement la journée",
-    "verdictWarn": "⚠ Ça passe juste",
-    "verdictBad": "✗ Trop serré, ajoute un terrain",
-    "breakdown": "{{pools}} poules × {{perPool}} → {{poolMatches}} matchs de poule + {{finalMatches}} finales",
-    "estimateDisclaimer": "Estimation indicative (pauses, retards non inclus).",
-    "lunch": "Pause déjeuner",
-    "lunchNone": "Aucune",
+    "estimatedEnd": "Hora de fin estimada",
+    "matches": "Partidos",
+    "rounds": "Rondas",
+    "margin": "Margen antes de las 18:00",
+    "addTerrain": "+ 1 campo → ganas ~{{gain}} min",
+    "verdictOk": "✓ Cabe holgadamente en el día",
+    "verdictWarn": "⚠ Pasa justo",
+    "verdictBad": "✗ Demasiado justo, añade un campo",
+    "breakdown": "{{pools}} grupos × {{perPool}} → {{poolMatches}} partidos de grupo + {{finalMatches}} finales",
+    "estimateDisclaimer": "Estimación orientativa (pausas y retrasos no incluidos).",
+    "lunch": "Pausa para comer",
+    "lunchNone": "Ninguna",
     "lunchMin": "{{min}} min",
-    "lunchStart": "Début"
+    "lunchStart": "Inicio",
+    "startTime": "Inicio",
+    "finalAt": "Final",
+    "phasePools": "Grupos",
+    "phaseSemi": "Semifinales",
+    "phaseFinal": "Final"
   },
   "rulesAi": {
-    "generate": "Générer un règlement avec lIA",
-    "modalTitle": "Règlement proposé",
-    "modalDescription": "Prévisualise, puis insère ou régénère.",
-    "insert": "Insérer dans le règlement",
-    "regenerate": "Regénérer",
-    "close": "Fermer",
-    "loading": "Génération en cours…",
-    "rateLimited": "Limite quotidienne atteinte. Voici un modèle de base.",
-    "error": "Génération indisponible. Voici un modèle de base."
+    "generate": "Generar reglamento con IA",
+    "modalTitle": "Reglamento propuesto",
+    "modalDescription": "Previsualiza, luego inserta o regenera. Podrás editarlo después.",
+    "insert": "Insertar en el reglamento",
+    "regenerate": "Regenerar",
+    "close": "Cerrar",
+    "loading": "Generando…",
+    "rateLimited": "Límite diario alcanzado (5 generaciones / día). Aquí tienes un modelo básico.",
+    "error": "Generación no disponible. Aquí tienes un modelo básico."
   },
   "coachInsightsAi": {
-    "refresh": "Actualiser",
-    "refreshing": "Actualisation…",
-    "refreshDone": "Insights mis à jour",
-    "refreshLimited": "Tu as déjà actualisé aujourdhui. Réessaie demain.",
-    "refreshError": "Impossible dactualiser pour le moment."
+    "refresh": "Actualizar",
+    "refreshing": "Actualizando…",
+    "refreshDone": "Insights actualizados",
+    "refreshLimited": "Ya has actualizado hoy. Inténtalo de nuevo mañana.",
+    "refreshError": "No se puede actualizar en este momento."
+  },
+  "pricing": {
+    "metaTitle": "Facturación de torneos — Clubero",
+    "metaDesc": "Elige tu plan para organizar un torneo con Clubero — 39 € por evento o 149 €/año ilimitado.",
+    "backToTournaments": "Volver a los torneos",
+    "eyebrow": "Facturación de torneos",
+    "title": "Lanza tu torneo en 30 segundos",
+    "subtitle": "Nuestro asistente de IA configura tu torneo en pocas preguntas — grupos, eliminatorias, calendario. Elige tu plan abajo.",
+    "canceled": "Pago cancelado. Puedes intentarlo de nuevo cuando quieras.",
+    "annualActive": "Ya tienes un Pase Anual activo — creación ilimitada hasta el {{date}}.",
+    "checkoutError": "No se pudo iniciar el pago",
+    "securePayment": "Pago seguro con Stripe · Factura automática · IVA según tu país",
+    "back": "← Volver",
+    "singleName": "Torneo único",
+    "singlePer": "sin IVA, pago único",
+    "singleTagline": "Para organizar un torneo puntual",
+    "singleF1": "1 torneo a organizar",
+    "singleF2": "Creación en 30 s con la IA",
+    "singleF3": "Grupos, eliminatorias, clasificaciones",
+    "singleF4": "Inscripciones en línea y TV pública",
+    "singleF5": "Sin caducidad",
+    "singleCta": "Crear mi torneo — 39 €",
+    "annualName": "Pase Anual",
+    "annualPer": "sin IVA / año, sin compromiso",
+    "annualTagline": "Torneos ilimitados durante 12 meses",
+    "annualF1": "Torneos ilimitados",
+    "annualF2": "Renovación automática anual",
+    "annualF3": "Todas las funciones Pro",
+    "annualF4": "Ahorra desde el 4.º torneo",
+    "annualF5": "Soporte prioritario",
+    "annualBadge": "MEJOR VALOR",
+    "annualCta": "Obtener el Pase — 149 €/año",
+    "annualActiveCta": "Pase activo",
+    "annualFootnote": "Ahorro desde 4 torneos (149 € en lugar de 156 €)",
+    "successTitle": "Pago confirmado",
+    "successPendingTitle": "Confirmación en curso…",
+    "successAnnualBody": "Tu Pase Anual está activo. Crea tantos torneos como quieras.",
+    "successSingleBody": "Tu crédito de torneo está activado. ¡Lanza tu torneo!",
+    "successValidatingBody": "Estamos validando tu pago con Stripe — solo tarda unos segundos.",
+    "successCreateCta": "Crear mi torneo",
+    "successViewTournaments": "Ver mis torneos"
+  },
+  "create": {
+    "numTeams": "Equipos máximos"
+  },
+  "finalStandings": {
+    "title": "Clasificación final",
+    "overall": "Clasificación final",
+    "copied": "Clasificación copiada",
+    "subtitle": "Torneo terminado",
+    "share": "Compartir"
+  },
+  "roles": {
+    "referee": "Árbitro"
+  },
+  "poolEditor": {
+    "openButton": "Editar los grupos manualmente",
+    "savedToast": "Grupos actualizados",
+    "title": "Editar grupos",
+    "subtitle": "Reasigna los equipos antes de que empiecen los partidos. El calendario se regenerará.",
+    "locked": "Los partidos de grupo ya han comenzado: no se puede editar.",
+    "teamsShort": "eq.",
+    "empty": "Sin equipos",
+    "save": "Guardar y regenerar"
   }
 }

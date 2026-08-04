@@ -191,9 +191,7 @@ export function HomeQuickCards({ clubId, teams }: Props) {
                 {canCreateTournament && (
                   <p className="text-[10px] font-bold text-foreground mt-1.5 inline-flex items-center gap-0.5">
                     <Plus className="h-3 w-3" strokeWidth={2.6} />
-                    {t("dashboard.tournamentsCard.createCta", {
-                      defaultValue: "Créer un tournoi",
-                    })}
+                    {t("dashboard.tournamentsCard.createCta")}
                   </p>
                 )}
               </>
@@ -213,9 +211,7 @@ export function HomeQuickCards({ clubId, teams }: Props) {
                   {isLoading ? "…" : count}
                 </p>
                 <p className="text-[10px] text-muted-foreground mt-1 uppercase tracking-[0.1em] font-bold">
-                  {count > 1
-                    ? t("nav.tournaments")
-                    : t("nav.tournament", { defaultValue: "Tournoi" })}
+                  {count > 1 ? t("nav.tournaments") : t("nav.tournament")}
                 </p>
                 <StateBadge state={state} startsOn={highlight?.starts_on ?? null} />
               </>
@@ -245,20 +241,18 @@ export function HomeQuickCards({ clubId, teams }: Props) {
             <Tent className="h-5 w-5" strokeWidth={2.4} style={{ color: "#4d7c0f" }} />
           </div>
           <div className="min-w-0 flex-1">
-            <p className="text-[13px] font-bold leading-tight">
-              {t("dashboard.campsCard.title", { defaultValue: "Stages" })}
-            </p>
+            <p className="text-[13px] font-bold leading-tight">{t("dashboard.campsCard.title")}</p>
             {campsCount === 0 ? (
               <p className="text-[11px] text-muted-foreground mt-0.5 inline-flex items-center gap-0.5 font-medium">
                 <Plus className="h-3 w-3" strokeWidth={2.6} />
-                {t("dashboard.campsCard.createCta", { defaultValue: "Créer un stage" })}
+                {t("dashboard.campsCard.createCta")}
               </p>
             ) : (
               <p className="text-[11px] text-muted-foreground mt-0.5 truncate">
                 {campsCount}{" "}
                 {campsCount > 1
-                  ? t("dashboard.campsCard.plural", { defaultValue: "stages" })
-                  : t("dashboard.campsCard.singular", { defaultValue: "stage" })}
+                  ? t("dashboard.campsCard.plural")
+                  : t("dashboard.campsCard.singular")}
                 {nextCamp?.start_date ? ` · ${fmt(new Date(nextCamp.start_date), "d MMM")}` : ""}
               </p>
             )}
@@ -285,14 +279,14 @@ function StateBadge({ state, startsOn }: { state: TournamentState; startsOn: str
           <span className="absolute inset-0 rounded-full bg-card/70 animate-ping" />
           <span className="relative h-1.5 w-1.5 rounded-full bg-card" />
         </span>
-        {t("dashboard.tournamentsCard.live", { defaultValue: "En cours" })}
+        {t("dashboard.tournamentsCard.live")}
       </span>
     );
   }
   if (state === "planned") {
     const label = startsOn
       ? fmt(new Date(startsOn), "d MMM")
-      : t("dashboard.tournamentsCard.upcoming", { defaultValue: "À venir" });
+      : t("dashboard.tournamentsCard.upcoming");
     return (
       <span className="mt-1.5 inline-flex items-center gap-1 rounded-full bg-[#fef3c7] px-2 py-0.5 text-[9px] font-bold text-[#92400e]">
         <CalendarDays className="h-2.5 w-2.5" strokeWidth={2.6} />
@@ -303,7 +297,7 @@ function StateBadge({ state, startsOn }: { state: TournamentState; startsOn: str
   return (
     <span className="mt-1.5 inline-flex items-center gap-1 rounded-full bg-muted px-2 py-0.5 text-[9px] font-bold text-muted-foreground">
       <Check className="h-2.5 w-2.5" strokeWidth={2.6} />
-      {t("dashboard.tournamentsCard.done", { defaultValue: "Terminé" })}
+      {t("dashboard.tournamentsCard.done")}
     </span>
   );
 }

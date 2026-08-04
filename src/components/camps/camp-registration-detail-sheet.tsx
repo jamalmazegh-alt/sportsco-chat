@@ -113,11 +113,7 @@ export function CampRegistrationDetailSheet({ campId, registrationId, open, onOp
         data: { registrationId: registrationId!, status: input.status, reason: input.reason },
       }),
     onSuccess: (_, vars) => {
-      toast.success(
-        t("registrations.detail.statusChanged", {
-          defaultValue: "Statut mis à jour",
-        }),
-      );
+      toast.success(t("registrations.detail.statusChanged"));
       if (vars.status === "rejected") setRejectOpen(false);
       if (vars.status === "waitlist") setWaitlistOpen(false);
       setRejectReason("");
@@ -129,11 +125,7 @@ export function CampRegistrationDetailSheet({ campId, registrationId, open, onOp
         return;
       }
       if (e.message === "REASON_REQUIRED") {
-        toast.error(
-          t("registrations.detail.reasonRequired", {
-            defaultValue: "Un motif est obligatoire pour refuser.",
-          }),
-        );
+        toast.error(t("registrations.detail.reasonRequired"));
         return;
       }
       toast.error(e.message);
@@ -149,21 +141,17 @@ export function CampRegistrationDetailSheet({ campId, registrationId, open, onOp
     onSuccess: (_, vars) => {
       toast.success(
         vars.status === "approved"
-          ? t("registrations.detail.docApproved", { defaultValue: "Pièce validée" })
+          ? t("registrations.detail.docApproved")
           : vars.status === "rejected"
-            ? t("registrations.detail.docRejected", { defaultValue: "Pièce refusée" })
-            : t("registrations.detail.docReset", { defaultValue: "Décision réinitialisée" }),
+            ? t("registrations.detail.docRejected")
+            : t("registrations.detail.docReset"),
       );
       setDocReject({ doc: null, reason: "" });
       invalidate();
     },
     onError: (e: Error) => {
       if (e.message === "REASON_REQUIRED") {
-        toast.error(
-          t("registrations.detail.reasonRequired", {
-            defaultValue: "Un motif est obligatoire pour refuser.",
-          }),
-        );
+        toast.error(t("registrations.detail.reasonRequired"));
         return;
       }
       toast.error(e.message);
@@ -174,9 +162,7 @@ export function CampRegistrationDetailSheet({ campId, registrationId, open, onOp
     mutationFn: (input: { status: PaymentStatus; amount?: number }) =>
       setPaymentFn({ data: { registrationId: registrationId!, ...input } }),
     onSuccess: () => {
-      toast.success(
-        t("registrations.detail.paymentUpdated", { defaultValue: "Paiement mis à jour" }),
-      );
+      toast.success(t("registrations.detail.paymentUpdated"));
       invalidate();
     },
     onError: (e: Error) => toast.error(e.message),
@@ -199,15 +185,8 @@ export function CampRegistrationDetailSheet({ campId, registrationId, open, onOp
       <Sheet open={open} onOpenChange={onOpenChange}>
         <SheetContent side="right" className="w-full sm:max-w-2xl overflow-y-auto">
           <SheetHeader>
-            <SheetTitle>
-              {t("registrations.detail.title", { defaultValue: "Fiche d'inscription" })}
-            </SheetTitle>
-            <SheetDescription>
-              {t("registrations.detail.subtitle", {
-                defaultValue:
-                  "Vérifiez les informations, examinez les pièces et changez le statut.",
-              })}
-            </SheetDescription>
+            <SheetTitle>{t("registrations.detail.title")}</SheetTitle>
+            <SheetDescription>{t("registrations.detail.subtitle")}</SheetDescription>
           </SheetHeader>
 
           {detailQ.isLoading || !detail ? (
@@ -229,7 +208,7 @@ export function CampRegistrationDetailSheet({ campId, registrationId, open, onOp
                   <Separator />
                   <div className="space-y-1">
                     <div className="text-xs font-semibold uppercase text-muted-foreground">
-                      {t("registrations.detail.notes", { defaultValue: "Notes de la famille" })}
+                      {t("registrations.detail.notes")}
                     </div>
                     <p className="text-sm whitespace-pre-wrap">{detail.notes}</p>
                   </div>
@@ -280,34 +259,23 @@ export function CampRegistrationDetailSheet({ campId, registrationId, open, onOp
       <AlertDialog open={rejectOpen} onOpenChange={setRejectOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>
-              {t("registrations.detail.rejectTitle", {
-                defaultValue: "Refuser cette inscription ?",
-              })}
-            </AlertDialogTitle>
-            <AlertDialogDescription>
-              {t("registrations.detail.rejectHelp", {
-                defaultValue:
-                  "Le motif sera envoyé à la famille dans l'e-mail de refus. Soyez clair et bienveillant.",
-              })}
-            </AlertDialogDescription>
+            <AlertDialogTitle>{t("registrations.detail.rejectTitle")}</AlertDialogTitle>
+            <AlertDialogDescription>{t("registrations.detail.rejectHelp")}</AlertDialogDescription>
           </AlertDialogHeader>
           <Textarea
             value={rejectReason}
             onChange={(e) => setRejectReason(e.target.value)}
             rows={4}
-            placeholder={t("registrations.detail.rejectPlaceholder", {
-              defaultValue: "Ex. Le stage est complet pour cette tranche d'âge.",
-            })}
+            placeholder={t("registrations.detail.rejectPlaceholder")}
           />
           <AlertDialogFooter>
-            <AlertDialogCancel>{t("common.cancel", { defaultValue: "Annuler" })}</AlertDialogCancel>
+            <AlertDialogCancel>{t("common.cancel")}</AlertDialogCancel>
             <AlertDialogAction
               disabled={statusMut.isPending || rejectReason.trim().length === 0}
               onClick={() => statusMut.mutate({ status: "rejected", reason: rejectReason.trim() })}
             >
               {statusMut.isPending && <Loader2 className="h-4 w-4 mr-1.5 animate-spin" />}
-              {t("registrations.detail.confirmReject", { defaultValue: "Refuser" })}
+              {t("registrations.detail.confirmReject")}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
@@ -317,26 +285,19 @@ export function CampRegistrationDetailSheet({ campId, registrationId, open, onOp
       <AlertDialog open={waitlistOpen} onOpenChange={setWaitlistOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>
-              {t("registrations.detail.capacityFullTitle", { defaultValue: "Stage complet" })}
-            </AlertDialogTitle>
+            <AlertDialogTitle>{t("registrations.detail.capacityFullTitle")}</AlertDialogTitle>
             <AlertDialogDescription>
-              {t("registrations.detail.capacityFullHelp", {
-                defaultValue:
-                  "La capacité du stage est atteinte. Voulez-vous placer cette famille sur la liste d'attente ?",
-              })}
+              {t("registrations.detail.capacityFullHelp")}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>{t("common.cancel", { defaultValue: "Annuler" })}</AlertDialogCancel>
+            <AlertDialogCancel>{t("common.cancel")}</AlertDialogCancel>
             <AlertDialogAction
               disabled={statusMut.isPending}
               onClick={() => statusMut.mutate({ status: "waitlist" })}
             >
               {statusMut.isPending && <Loader2 className="h-4 w-4 mr-1.5 animate-spin" />}
-              {t("registrations.detail.placeOnWaitlist", {
-                defaultValue: "Placer en liste d'attente",
-              })}
+              {t("registrations.detail.placeOnWaitlist")}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
@@ -349,28 +310,19 @@ export function CampRegistrationDetailSheet({ campId, registrationId, open, onOp
       >
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>
-              {t("registrations.detail.docRejectTitle", {
-                defaultValue: "Refuser cette pièce ?",
-              })}
-            </AlertDialogTitle>
+            <AlertDialogTitle>{t("registrations.detail.docRejectTitle")}</AlertDialogTitle>
             <AlertDialogDescription>
-              {t("registrations.detail.docRejectHelp", {
-                defaultValue:
-                  "La famille recevra le motif et pourra déposer une nouvelle version depuis sa page de suivi.",
-              })}
+              {t("registrations.detail.docRejectHelp")}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <Textarea
             value={docReject.reason}
             onChange={(e) => setDocReject((s) => ({ ...s, reason: e.target.value }))}
             rows={3}
-            placeholder={t("registrations.detail.docRejectPlaceholder", {
-              defaultValue: "Ex. Document illisible, merci de renvoyer un scan net.",
-            })}
+            placeholder={t("registrations.detail.docRejectPlaceholder")}
           />
           <AlertDialogFooter>
-            <AlertDialogCancel>{t("common.cancel", { defaultValue: "Annuler" })}</AlertDialogCancel>
+            <AlertDialogCancel>{t("common.cancel")}</AlertDialogCancel>
             <AlertDialogAction
               disabled={reviewDocMut.isPending || docReject.reason.trim().length === 0}
               onClick={() =>
@@ -383,7 +335,7 @@ export function CampRegistrationDetailSheet({ campId, registrationId, open, onOp
               }
             >
               {reviewDocMut.isPending && <Loader2 className="h-4 w-4 mr-1.5 animate-spin" />}
-              {t("registrations.detail.confirmDocReject", { defaultValue: "Refuser la pièce" })}
+              {t("registrations.detail.confirmDocReject")}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
@@ -408,7 +360,6 @@ function Header({ detail, t }: { detail: RegistrationDetail; t: any }) {
         <StatusPill status={detail.registration_status} t={t} />
         <span className="text-xs text-muted-foreground">
           {t("registrations.detail.createdAt", {
-            defaultValue: "Reçue le {{date}}",
             date: new Date(detail.created_at).toLocaleString(),
           })}
         </span>
@@ -417,28 +368,25 @@ function Header({ detail, t }: { detail: RegistrationDetail; t: any }) {
         <div className="text-xs text-blue-800">
           <Clock className="inline h-3 w-3 mr-1" />
           {t("registrations.detail.reservedUntil", {
-            defaultValue: "Place réservée jusqu'au {{date}}",
             date: new Date(detail.reserved_until).toLocaleString(),
           })}
         </div>
       )}
       {detail.registration_status === "rejected" && detail.rejection_reason && (
         <div className="rounded-md border border-red-500/30 bg-red-500/5 p-2 text-xs text-red-800">
-          <div className="font-semibold">
-            {t("registrations.detail.currentReason", { defaultValue: "Motif du refus" })}
-          </div>
+          <div className="font-semibold">{t("registrations.detail.currentReason")}</div>
           <p className="whitespace-pre-wrap">{detail.rejection_reason}</p>
         </div>
       )}
       <div className="flex items-center gap-2 text-xs text-muted-foreground">
-        <span>{t("registrations.detail.trackingLink", { defaultValue: "Lien famille" })}</span>
+        <span>{t("registrations.detail.trackingLink")}</span>
         <code className="truncate text-[11px] bg-muted px-1.5 py-0.5 rounded">{trackingUrl}</code>
         <Button
           variant="ghost"
           size="sm"
           onClick={() => {
             void copyText(trackingUrl);
-            toast.success(t("common.copied", { defaultValue: "Copié" }));
+            toast.success(t("common.copied"));
           }}
         >
           <Copy className="h-3 w-3" />
@@ -446,8 +394,6 @@ function Header({ detail, t }: { detail: RegistrationDetail; t: any }) {
       </div>
       <div className="text-[11px] text-muted-foreground">
         {t("registrations.detail.capacityLine", {
-          defaultValue:
-            "Capacité : {{approved}}/{{capacity}} confirmées · {{remaining}} places restantes",
           approved: detail.stats.approved,
           capacity: detail.stats.capacity,
           remaining: detail.stats.remaining,
@@ -471,16 +417,12 @@ function ParticipantSection({ detail, t }: { detail: RegistrationDetail; t: any 
   return (
     <section className="space-y-2">
       <h3 className="text-sm font-semibold uppercase text-muted-foreground">
-        {t("registrations.detail.participant", { defaultValue: "Participant" })}
+        {t("registrations.detail.participant")}
       </h3>
       <div className="grid grid-cols-2 gap-3 text-sm">
-        <Field label={t("registrations.detail.firstName", { defaultValue: "Prénom" })}>
-          {detail.participant_first_name}
-        </Field>
-        <Field label={t("registrations.detail.lastName", { defaultValue: "Nom" })}>
-          {detail.participant_last_name}
-        </Field>
-        <Field label={t("registrations.detail.birthDate", { defaultValue: "Naissance" })}>
+        <Field label={t("registrations.detail.firstName")}>{detail.participant_first_name}</Field>
+        <Field label={t("registrations.detail.lastName")}>{detail.participant_last_name}</Field>
+        <Field label={t("registrations.detail.birthDate")}>
           {new Date(detail.birth_date).toLocaleDateString()}
           {age != null && (
             <span className="ml-2 text-xs text-muted-foreground">
@@ -488,12 +430,8 @@ function ParticipantSection({ detail, t }: { detail: RegistrationDetail; t: any 
             </span>
           )}
         </Field>
-        <Field label={t("registrations.detail.gender", { defaultValue: "Genre" })}>
-          {detail.gender ?? "—"}
-        </Field>
-        <Field label={t("registrations.detail.clubName", { defaultValue: "Club d'origine" })}>
-          {detail.club_name ?? "—"}
-        </Field>
+        <Field label={t("registrations.detail.gender")}>{detail.gender ?? "—"}</Field>
+        <Field label={t("registrations.detail.clubName")}>{detail.club_name ?? "—"}</Field>
       </div>
     </section>
   );
@@ -503,23 +441,17 @@ function GuardianSection({ detail, t }: { detail: RegistrationDetail; t: any }) 
   return (
     <section className="space-y-2">
       <h3 className="text-sm font-semibold uppercase text-muted-foreground">
-        {t("registrations.detail.guardian", { defaultValue: "Responsable légal" })}
+        {t("registrations.detail.guardian")}
       </h3>
       <div className="grid grid-cols-2 gap-3 text-sm">
-        <Field label={t("registrations.detail.firstName", { defaultValue: "Prénom" })}>
-          {detail.guardian_first_name}
-        </Field>
-        <Field label={t("registrations.detail.lastName", { defaultValue: "Nom" })}>
-          {detail.guardian_last_name}
-        </Field>
-        <Field label={t("registrations.detail.email", { defaultValue: "E-mail" })}>
+        <Field label={t("registrations.detail.firstName")}>{detail.guardian_first_name}</Field>
+        <Field label={t("registrations.detail.lastName")}>{detail.guardian_last_name}</Field>
+        <Field label={t("registrations.detail.email")}>
           <a className="text-primary underline" href={`mailto:${detail.guardian_email}`}>
             {detail.guardian_email}
           </a>
         </Field>
-        <Field label={t("registrations.detail.phone", { defaultValue: "Téléphone" })}>
-          {detail.guardian_phone ?? "—"}
-        </Field>
+        <Field label={t("registrations.detail.phone")}>{detail.guardian_phone ?? "—"}</Field>
       </div>
     </section>
   );
@@ -555,21 +487,17 @@ function DocumentsSection({
     <section className="space-y-2">
       <div className="flex items-center justify-between">
         <h3 className="text-sm font-semibold uppercase text-muted-foreground">
-          {t("registrations.detail.documents", { defaultValue: "Pièces déposées" })}
+          {t("registrations.detail.documents")}
         </h3>
         {detail.viewer_role === "coach" && (
           <span className="text-[11px] text-muted-foreground flex items-center gap-1">
             <ShieldAlert className="h-3 w-3" />
-            {t("registrations.detail.coachSensitiveNote", {
-              defaultValue: "Les pièces sensibles sont réservées aux dirigeants.",
-            })}
+            {t("registrations.detail.coachSensitiveNote")}
           </span>
         )}
       </div>
       {detail.documents.length === 0 ? (
-        <p className="text-sm text-muted-foreground">
-          {t("registrations.detail.noDocs", { defaultValue: "Aucune pièce déposée." })}
-        </p>
+        <p className="text-sm text-muted-foreground">{t("registrations.detail.noDocs")}</p>
       ) : (
         <ul className="space-y-2">
           {detail.documents.map((d) => (
@@ -584,7 +512,7 @@ function DocumentsSection({
                         className="text-[10px] bg-amber-500/10 text-amber-800 border-amber-500/30"
                       >
                         <Lock className="h-3 w-3 mr-1" />
-                        {t("registrations.detail.sensitive", { defaultValue: "Sensible" })}
+                        {t("registrations.detail.sensitive")}
                       </Badge>
                     )}
                     <DocStatusBadge status={d.review_status} t={t} />
@@ -595,7 +523,7 @@ function DocumentsSection({
                   {d.review_status === "rejected" && d.rejection_reason && (
                     <div className="mt-1 text-xs text-red-800">
                       <span className="font-semibold">
-                        {t("registrations.detail.reasonLabel", { defaultValue: "Motif" })} :
+                        {t("registrations.detail.reasonLabel")} :
                       </span>{" "}
                       {d.rejection_reason}
                     </div>
@@ -607,16 +535,10 @@ function DocumentsSection({
                     variant="outline"
                     disabled={!d.viewer_can_view}
                     onClick={() => onOpen(d)}
-                    title={
-                      d.viewer_can_view
-                        ? undefined
-                        : t("registrations.detail.notAllowed", {
-                            defaultValue: "Pièce sensible — accès réservé aux dirigeants.",
-                          })
-                    }
+                    title={d.viewer_can_view ? undefined : t("registrations.detail.notAllowed")}
                   >
                     <Download className="h-3 w-3 mr-1" />
-                    {t("registrations.detail.openDoc", { defaultValue: "Ouvrir" })}
+                    {t("registrations.detail.openDoc")}
                   </Button>
                 </div>
               </div>
@@ -629,7 +551,7 @@ function DocumentsSection({
                   onClick={() => onApprove(d)}
                 >
                   <CheckCircle2 className="h-3 w-3 mr-1" />
-                  {t("registrations.detail.approve", { defaultValue: "Valider" })}
+                  {t("registrations.detail.approve")}
                 </Button>
                 <Button
                   size="sm"
@@ -638,7 +560,7 @@ function DocumentsSection({
                   onClick={() => onAskReject(d)}
                 >
                   <XCircle className="h-3 w-3 mr-1" />
-                  {t("registrations.detail.reject", { defaultValue: "Refuser" })}
+                  {t("registrations.detail.reject")}
                 </Button>
                 {d.review_status !== "pending" && (
                   <Button
@@ -647,7 +569,7 @@ function DocumentsSection({
                     disabled={pendingId === d.id}
                     onClick={() => onReset(d)}
                   >
-                    {t("registrations.detail.reset", { defaultValue: "Réinitialiser" })}
+                    {t("registrations.detail.reset")}
                   </Button>
                 )}
               </div>
@@ -697,37 +619,28 @@ function StatusActions({
   return (
     <section className="space-y-3">
       <h3 className="text-sm font-semibold uppercase text-muted-foreground">
-        {t("registrations.detail.decision", { defaultValue: "Décision" })}
+        {t("registrations.detail.decision")}
       </h3>
       {full && (
         <div className="rounded-md border border-amber-500/30 bg-amber-500/5 p-2 text-xs text-amber-900 flex items-center gap-2">
           <AlertTriangle className="h-3 w-3" />
-          {t("registrations.detail.capacityWarn", {
-            defaultValue:
-              "Le stage est complet. Une validation basculera l'inscription en liste d'attente.",
-          })}
+          {t("registrations.detail.capacityWarn")}
         </div>
       )}
       <div className="flex flex-wrap gap-2">
         {btn(
           "under_review",
-          t("registrations.detail.markUnderReview", {
-            defaultValue: "Réserver 72 h (en examen)",
-          }),
+          t("registrations.detail.markUnderReview"),
           "outline",
           <Clock className="h-3 w-3 mr-1" />,
         )}
         {btn(
           "approved",
-          t("registrations.detail.approve", { defaultValue: "Valider" }),
+          t("registrations.detail.approve"),
           "default",
           <CheckCircle2 className="h-3 w-3 mr-1" />,
         )}
-        {btn(
-          "waitlist",
-          t("registrations.detail.waitlist", { defaultValue: "Liste d'attente" }),
-          "outline",
-        )}
+        {btn("waitlist", t("registrations.detail.waitlist"), "outline")}
         <Button
           variant="destructive"
           size="sm"
@@ -735,20 +648,11 @@ function StatusActions({
           onClick={onAskReject}
         >
           <XCircle className="h-3 w-3 mr-1" />
-          {t("registrations.detail.reject", { defaultValue: "Refuser" })}
+          {t("registrations.detail.reject")}
         </Button>
-        {btn(
-          "cancelled",
-          t("registrations.detail.cancel", { defaultValue: "Annuler l'inscription" }),
-          "ghost",
-        )}
+        {btn("cancelled", t("registrations.detail.cancel"), "ghost")}
       </div>
-      <p className="text-[11px] text-muted-foreground">
-        {t("registrations.detail.emailsHint", {
-          defaultValue:
-            "Les e-mails automatiques aux familles seront ajoutés à l'étape suivante (Phase 3, étape 3).",
-        })}
-      </p>
+      <p className="text-[11px] text-muted-foreground">{t("registrations.detail.emailsHint")}</p>
     </section>
   );
 }
@@ -816,15 +720,13 @@ function PaymentSection({
     <section className="space-y-3">
       <div className="flex items-center justify-between">
         <h3 className="text-sm font-semibold uppercase text-muted-foreground">
-          {t("registrations.detail.paymentSection", { defaultValue: "Paiement" })}
+          {t("registrations.detail.paymentSection")}
         </h3>
         <PaymentPill status={status} t={t} />
       </div>
       <div className="text-sm text-muted-foreground">
         {notRequired ? (
-          t("registrations.detail.paymentNotRequired", {
-            defaultValue: "Aucun paiement requis pour ce stage.",
-          })
+          t("registrations.detail.paymentNotRequired")
         ) : (
           <>
             {t("registrations.detail.paymentPrice", {
@@ -836,7 +738,6 @@ function PaymentSection({
               <span className="ml-2">
                 ·{" "}
                 {t("registrations.detail.paymentReceived", {
-                  defaultValue: "Reçu : {{amount}} {{currency}}",
                   amount: detail.amount_paid.toFixed(2),
                   currency,
                 })}
@@ -846,7 +747,6 @@ function PaymentSection({
               <span className="ml-2 text-amber-700">
                 ·{" "}
                 {t("registrations.detail.paymentRemaining", {
-                  defaultValue: "Reste dû : {{amount}} {{currency}}",
                   amount: remaining.toFixed(2),
                   currency,
                 })}
@@ -862,7 +762,7 @@ function PaymentSection({
               <Button size="sm" disabled={pending} onClick={() => onSet("paid", price)}>
                 {pending && <Loader2 className="h-3 w-3 mr-1.5 animate-spin" />}
                 <CheckCircle2 className="h-3.5 w-3.5 mr-1" />
-                {t("registrations.detail.markPaid", { defaultValue: "Marquer comme payé" })}
+                {t("registrations.detail.markPaid")}
               </Button>
             )}
             {isPaid && (
@@ -873,7 +773,7 @@ function PaymentSection({
                 onClick={() => onSet("pending", 0)}
               >
                 {pending && <Loader2 className="h-3 w-3 mr-1.5 animate-spin" />}
-                {t("registrations.detail.markUnpaid", { defaultValue: "Marquer non payé" })}
+                {t("registrations.detail.markUnpaid")}
               </Button>
             )}
             {isPaid && (
@@ -883,16 +783,14 @@ function PaymentSection({
                 disabled={pending}
                 onClick={() => onSet("refunded")}
               >
-                {t("registrations.detail.markRefunded", { defaultValue: "Marquer remboursé" })}
+                {t("registrations.detail.markRefunded")}
               </Button>
             )}
           </div>
 
           <div className="rounded-md border border-border bg-muted/30 p-3 space-y-2">
             <div className="text-xs font-semibold text-foreground">
-              {t("registrations.detail.markPartialTitle", {
-                defaultValue: "Enregistrer un paiement partiel",
-              })}
+              {t("registrations.detail.markPartialTitle")}
             </div>
             <div className="flex flex-wrap items-center gap-2">
               <div className="relative">
@@ -917,14 +815,11 @@ function PaymentSection({
                 onClick={() => onSet("partial", partialValue)}
               >
                 {pending && <Loader2 className="h-3 w-3 mr-1.5 animate-spin" />}
-                {t("registrations.detail.markPartial", {
-                  defaultValue: "Marquer comme partiel",
-                })}
+                {t("registrations.detail.markPartial")}
               </Button>
               {partialValid && (
                 <span className="text-xs text-muted-foreground">
                   {t("registrations.detail.partialRemainingPreview", {
-                    defaultValue: "Reste dû : {{amount}} {{currency}}",
                     amount: (price - partialValue).toFixed(2),
                     currency,
                   })}

@@ -44,9 +44,9 @@ export function VoiceInputButton({ textareaRef, disabled, className }: VoiceInpu
     },
     onError: (err) => {
       if (err === "not-allowed") {
-        toast.error(t("voice.permissionDenied", { defaultValue: "Microphone refusé" }));
+        toast.error(t("voice.permissionDenied"));
       } else if (err !== "aborted") {
-        toast.error(t("voice.error", { defaultValue: "Erreur dictée vocale" }));
+        toast.error(t("voice.error"));
       }
     },
   });
@@ -69,16 +69,8 @@ export function VoiceInputButton({ textareaRef, disabled, className }: VoiceInpu
       size="icon-sm"
       onClick={handleClick}
       disabled={disabled}
-      aria-label={
-        isListening
-          ? t("voice.stop", { defaultValue: "Arrêter la dictée" })
-          : t("voice.start", { defaultValue: "Dicter" })
-      }
-      title={
-        isListening
-          ? t("voice.stop", { defaultValue: "Arrêter la dictée" })
-          : t("voice.start", { defaultValue: "Dicter" })
-      }
+      aria-label={isListening ? t("voice.stop") : t("voice.start")}
+      title={isListening ? t("voice.stop") : t("voice.start")}
       className={cn(isListening && "animate-pulse", className)}
     >
       {isListening ? <MicOff className="h-4 w-4" /> : <Mic className="h-4 w-4" />}

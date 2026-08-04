@@ -1,9 +1,9 @@
 import * as React from "react";
 import { Heading, Section, Text } from "@react-email/components";
-import { EmailShell } from "./_layout";
+import { EmailShell, pickLocale, type Locale } from "./_layout";
 import type { TemplateEntry } from "./registry";
 
-type Kind = "new_ticket" | "user_reply";
+type Kind = "new_ticket" | "user_reply" | "user_reopened" | "user_resolved";
 
 interface Props {
   kind: Kind;
@@ -15,43 +15,80 @@ interface Props {
   authorEmail?: string | null;
   bodyPreview?: string;
   ticketUrl?: string;
+  locale?: string;
 }
 
-const LABELS: Record<Kind, string> = {
-  new_ticket: "Nouveau ticket support",
-  user_reply: "Nouvelle réponse utilisateur",
-};
+const T = {
+  fr: {
+    labels: {
+      new_ticket: "Nouveau ticket support",
+      user_reply: "Nouvelle réponse utilisateur",
+      user_reopened: "Ticket rouvert par l'utilisateur",
+      user_resolved: "Ticket résolu par l'utilisateur",
+    } as Record<Kind, string>,
+    fallback: "Support",
+    subjectLabel: "Sujet",
+    category: "Catégorie",
+    priority: "Priorité",
+    author: "Auteur",
+    email: "E-mail",
+    message: "Message",
+    open: "Ouvrir le ticket :",
+    subject: (label: string, id: string, subj: string) => `[Clubero] ${label}${id}${subj}`,
+  },
+  en: {
+    labels: {
+      new_ticket: "New support ticket",
+      user_reply: "New user reply",
+      user_reopened: "Ticket reopened by user",
+      user_resolved: "Ticket resolved by user",
+    } as Record<Kind, string>,
+    fallback: "Support",
+    subjectLabel: "Subject",
+    category: "Category",
+    priority: "Priority",
+    author: "Author",
+    email: "Email",
+    message: "Message",
+    open: "Open ticket:",
+    subject: (label: string, id: string, subj: string) => `[Clubero] ${label}${id}${subj}`,
+  },
+} as const;
+
+const pick = (l: Locale) => (l === "fr" ? T.fr : T.en);
 
 const SupportTicketInternalEmail = (props: Props) => {
+  const l = pickLocale(props.locale);
+  const t = pick(l);
   const kind: Kind = (props.kind as Kind) ?? "new_ticket";
-  const label = LABELS[kind];
+  const label = t.labels[kind] ?? t.fallback;
   return (
     <EmailShell
       preview={`${label}${props.ticketShortId ? ` #${props.ticketShortId}` : ""}`}
-      locale="fr"
+      locale={l}
     >
       <Heading style={h1}>
         {label}
         {props.ticketShortId ? ` #${props.ticketShortId}` : ""}
       </Heading>
       <Section style={card}>
-        {props.subject && <Row k="Sujet" v={props.subject} />}
-        {props.category && <Row k="Catégorie" v={props.category} />}
-        {props.priority && <Row k="Priorité" v={props.priority} />}
-        {props.authorName && <Row k="Auteur" v={props.authorName} />}
-        {props.authorEmail && <Row k="E-mail" v={props.authorEmail} />}
+        {props.subject && <Row k={t.subjectLabel} v={props.subject} />}
+        {props.category && <Row k={t.category} v={props.category} />}
+        {props.priority && <Row k={t.priority} v={props.priority} />}
+        {props.authorName && <Row k={t.author} v={props.authorName} />}
+        {props.authorEmail && <Row k={t.email} v={props.authorEmail} />}
       </Section>
       {props.bodyPreview && (
         <>
           <Heading as="h2" style={h2}>
-            Message
+            {t.message}
           </Heading>
           <Text style={msg}>{props.bodyPreview}</Text>
         </>
       )}
       {props.ticketUrl && (
         <Text style={text}>
-          Ouvrir le ticket :{" "}
+          {t.open}{" "}
           <a href={props.ticketUrl} style={link}>
             {props.ticketUrl}
           </a>
@@ -73,11 +110,12 @@ export const template = {
   component: SupportTicketInternalEmail,
   to: "hello@clubero.app",
   subject: (data: Record<string, any>) => {
+    const t = pick(pickLocale(data.locale));
     const kind: Kind = (data.kind as Kind) ?? "new_ticket";
-    const label = LABELS[kind] ?? "Support";
+    const label = t.labels[kind] ?? t.fallback;
     const id = data.ticketShortId ? ` #${data.ticketShortId}` : "";
     const subj = data.subject ? ` — ${data.subject}` : "";
-    return `[Clubero] ${label}${id}${subj}`;
+    return t.subject(label, id, subj);
   },
   displayName: "Support — Notification interne (hello@)",
   previewData: {
@@ -90,6 +128,7 @@ export const template = {
     authorEmail: "jane@example.com",
     bodyPreview: "Je n'arrive plus à me connecter depuis ce matin…",
     ticketUrl: "https://www.clubero.app/superadmin/support-tickets/abc",
+    locale: "fr",
   },
 } satisfies TemplateEntry;
 

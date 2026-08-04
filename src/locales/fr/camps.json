@@ -5,7 +5,10 @@
     "cancel": "Annuler",
     "delete": "Supprimer",
     "save": "Enregistrer",
-    "copied": "Copié"
+    "copied": "Copié",
+    "refresh": "Actualiser",
+    "copyFailed": "Impossible de copier",
+    "copy": "Copier"
   },
   "chooser": {
     "title": "Nouveau stage",
@@ -139,7 +142,14 @@
     "facilityPlaceholder": "Optionnel",
     "facilityNone": "— Aucun —",
     "save": "Enregistrer",
-    "saved": "Modifications enregistrées"
+    "saved": "Modifications enregistrées",
+    "venueModeHome": "Lieux du club",
+    "venueModeHomeHint": "Terrain, gymnase, salle…",
+    "venueModeExternal": "Adresse externe",
+    "venueModeExternalHint": "Autre lieu, hors club",
+    "externalAddress": "Adresse",
+    "externalAddressPlaceholder": "Ex. 12 rue du Stade, 75001 Paris",
+    "externalAddressHint": "Adresse libre — sera affichée aux inscrits et cliquable vers Google Maps."
   },
   "ageGroups": {
     "empty": "Aucune catégorie pour l'instant.",
@@ -150,7 +160,9 @@
     "quickAdd": "Ajout rapide",
     "pickPreset": "Choisir U6 – U19",
     "allAdded": "Toutes ajoutées",
-    "addCustom": "+ Catégorie personnalisée"
+    "addCustom": "+ Catégorie personnalisée",
+    "selectAll": "Sélectionne les catégories concernées",
+    "customs": "Catégories personnalisées"
   },
   "cover": {
     "empty": "Aucune image de couverture",
@@ -168,7 +180,9 @@
     "archive": "Archiver",
     "archived": "Stage archivé",
     "publicUrl": "Lien public",
-    "publicUrlSoon": "page publique bientôt disponible"
+    "publicUrlSoon": "page publique bientôt disponible",
+    "openPublic": "Voir la page publique",
+    "publicUrlCopied": "Lien copié"
   },
   "duplicate": {
     "action": "Dupliquer",
@@ -279,11 +293,49 @@
       "ageMismatch": "L'âge de l'enfant ne correspond pas à la catégorie choisie.",
       "generic": "Une erreur est survenue. Réessayez.",
       "network": "Erreur réseau. Vérifiez votre connexion.",
-      "duplicate": "Cet enfant est déjà inscrit à ce stage. Consultez l'email reçu pour suivre le dossier."
+      "duplicate": "Cet enfant est déjà inscrit à ce stage. Consultez l'email reçu pour suivre le dossier.",
+      "loadFailed": "Impossible de charger ce stage.",
+      "notFound": "Stage introuvable",
+      "notFoundBody": "Ce stage n'est pas disponible ou n'a pas encore été publié.",
+      "formLoadFailed": "Impossible de charger le formulaire."
     },
     "full": "Complet — inscription possible en liste d'attente",
     "lastSpots": "Dernières places ({{count}} restantes)",
-    "registerWaitlistCta": "Rejoindre la liste d'attente"
+    "registerWaitlistCta": "Rejoindre la liste d'attente",
+    "tracking": {
+      "invalidTitle": "Lien invalide ou expiré",
+      "invalidBody": "Ce lien de suivi n'est pas valide. Vérifiez le lien reçu par email.",
+      "title": "Suivi de l'inscription",
+      "participant": "Participant",
+      "bornOn": "Né(e) le {{date}}",
+      "campDates": "Dates du stage : {{dates}}",
+      "reason": "Motif : {{reason}}",
+      "noDocs": "Aucune pièce demandée.",
+      "personalLink": "Lien personnel — ne le partagez pas. Il donne accès à votre dossier et à vos pièces.",
+      "status": {
+        "pending": "En attente de validation",
+        "under_review": "En cours d'examen",
+        "approved": "Validée",
+        "rejected": "Refusée",
+        "cancelled": "Annulée",
+        "waitlisted": "Liste d'attente"
+      },
+      "docMissing": "Pièce à fournir",
+      "docPending": "En attente d'examen",
+      "docApproved": "Validée",
+      "docRejected": "Refusée",
+      "download": "Télécharger",
+      "upload": "Envoyer",
+      "replace": "Remplacer",
+      "errors": {
+        "downloadUnavailable": "Téléchargement indisponible.",
+        "fileTooLarge": "Fichier trop volumineux (15 Mo max).",
+        "invalidMime": "Format non supporté (PDF, JPG, PNG).",
+        "rateLimited": "Trop de tentatives.",
+        "uploadFailed": "Envoi impossible."
+      },
+      "uploadSuccess": "Pièce envoyée. Statut : en attente."
+    }
   },
   "registrations": {
     "status": {
@@ -367,7 +419,19 @@
       "capacityFullTitle": "Stage complet",
       "capacityFullHelp": "La capacité du stage est atteinte. Voulez-vous placer cette famille sur la liste d'attente ?",
       "placeOnWaitlist": "Placer en liste d'attente",
-      "emailsHint": "Les e-mails automatiques aux familles seront ajoutés à l'étape suivante (Phase 3, étape 3)."
+      "emailsHint": "Les e-mails automatiques aux familles seront ajoutés à l'étape suivante (Phase 3, étape 3).",
+      "paymentUpdated": "Paiement mis à jour",
+      "paymentSection": "Paiement",
+      "paymentNotRequired": "Aucun paiement requis pour ce stage.",
+      "paymentPrice": "Prix du stage : {{price}} {{currency}}",
+      "paymentReceived": "Reçu : {{amount}} {{currency}}",
+      "paymentRemaining": "Reste dû : {{amount}} {{currency}}",
+      "markPaid": "Marquer comme payé",
+      "markUnpaid": "Marquer non payé",
+      "markRefunded": "Marquer remboursé",
+      "markPartialTitle": "Enregistrer un paiement partiel",
+      "markPartial": "Marquer comme partiel",
+      "partialRemainingPreview": "Reste dû : {{amount}} {{currency}}"
     },
     "csv": {
       "cta": "Exporter CSV",
@@ -388,6 +452,40 @@
       "dossierStatus": "Statut dossier",
       "amountPaid": "Montant payé",
       "requestedAt": "Date de demande"
-    }
+    },
+    "age": "{{age}} ans",
+    "extend": {
+      "done": "Réservation prolongée de 72 h."
+    },
+    "stats": {
+      "capacity": "Capacité",
+      "approved": "Validées",
+      "reserved": "Réservées (72h)",
+      "remaining": "Places restantes",
+      "pending": "Demandes en attente",
+      "expiredHint": "{{count}} réservation(s) 72 h expirée(s) — utilisez « Prolonger » pour retenir la place."
+    },
+    "searchPlaceholder": "Rechercher (nom, email…)",
+    "col": {
+      "participant": "Participant",
+      "guardian": "Responsable",
+      "requested": "Demande",
+      "regStatus": "Inscription",
+      "payment": "Paiement",
+      "dossier": "Dossier",
+      "actions": ""
+    },
+    "empty": "Aucune inscription à afficher.",
+    "reservationExpired": "Réservation expirée",
+    "reservationUntil": "Jusqu'au {{date}}",
+    "docsSummary": "{{ok}}/{{total}} pièces",
+    "noRequiredDocs": "Aucune pièce requise",
+    "rejected": "refusée(s)",
+    "extendCta": "Prolonger 72 h",
+    "draftHint": "Les inscriptions apparaîtront ici après publication du stage."
+  },
+  "tabs": {
+    "edit": "Édition",
+    "registrations": "Inscriptions"
   }
 }

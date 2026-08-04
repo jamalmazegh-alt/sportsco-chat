@@ -68,7 +68,7 @@ export function WallReactions({ reactions, currentUserId, onToggle }: Props) {
         <PopoverTrigger asChild>
           <button
             type="button"
-            aria-label={t("wall.reactions.add", { defaultValue: "Réagir" })}
+            aria-label={t("wall.reactions.add")}
             className="inline-flex h-7 items-center gap-1 rounded-full border border-border bg-muted/40 px-2 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
           >
             <SmilePlus className="h-3.5 w-3.5" />
@@ -143,7 +143,6 @@ export function WallReactions({ reactions, currentUserId, onToggle }: Props) {
             <div className="mx-auto mb-3 h-1.5 w-10 rounded-full bg-muted-foreground/30" />
             <SheetTitle className="text-center text-base">
               {t("wall.reactions.count", {
-                defaultValue: "{{count}} réaction(s)",
                 count: reactions.length,
               })}
             </SheetTitle>
@@ -186,14 +185,10 @@ export function WallReactions({ reactions, currentUserId, onToggle }: Props) {
                             )}
                           >
                             <span className="text-base leading-none">{emoji}</span>
-                            <span className="truncate">
-                              {r.name ?? t("common.unknown", { defaultValue: "Inconnu" })}
-                            </span>
+                            <span className="truncate">{r.name ?? t("common.unknown")}</span>
                             {isMine && (
                               <span className="ml-auto shrink-0 text-xs text-muted-foreground">
-                                {t("wall.reactions.tapToRemove", {
-                                  defaultValue: "Appuyez pour supprimer",
-                                })}
+                                {t("wall.reactions.tapToRemove")}
                               </span>
                             )}
                           </button>

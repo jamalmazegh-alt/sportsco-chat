@@ -35,7 +35,7 @@ export function CampCoverUpload({
 
   async function upload(file: File) {
     if (file.size > MAX_BYTES) {
-      toast.error(t("cover.tooLarge", { defaultValue: "Image trop volumineuse (max 5 MB)" }));
+      toast.error(t("cover.tooLarge"));
       return;
     }
     setBusy(true);
@@ -54,7 +54,7 @@ export function CampCoverUpload({
       if (error) throw error;
       const { coverUrl: nextUrl } = await setCoverFn({ data: { campId, path } });
       onChange(nextUrl);
-      toast.success(t("cover.uploaded", { defaultValue: "Image mise à jour" }));
+      toast.success(t("cover.uploaded"));
     } catch (e) {
       toast.error((e as Error).message);
     } finally {
@@ -94,7 +94,7 @@ export function CampCoverUpload({
         </div>
       ) : (
         <div className="flex h-40 w-full max-w-md items-center justify-center rounded-lg border border-dashed border-border text-sm text-muted-foreground">
-          {t("cover.empty", { defaultValue: "Aucune image de couverture" })}
+          {t("cover.empty")}
         </div>
       )}
       <input
@@ -115,11 +115,7 @@ export function CampCoverUpload({
         disabled={disabled || busy}
       >
         {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : <ImagePlus className="h-4 w-4" />}
-        <span className="ml-1.5">
-          {coverUrl
-            ? t("cover.replace", { defaultValue: "Remplacer" })
-            : t("cover.add", { defaultValue: "Ajouter une image" })}
-        </span>
+        <span className="ml-1.5">{coverUrl ? t("cover.replace") : t("cover.add")}</span>
       </Button>
     </div>
   );

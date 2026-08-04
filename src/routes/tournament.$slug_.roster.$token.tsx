@@ -38,7 +38,6 @@ export const Route = createFileRoute("/tournament/$slug_/roster/$token")({
       {
         title: i18n.t("roster.metaTitle", {
           ns: "tournaments",
-          defaultValue: "Composition de l'effectif",
           slug: params.slug,
         }),
       },
@@ -205,14 +204,8 @@ function RosterPage() {
       <div className="min-h-screen flex items-center justify-center p-6">
         <div className="text-center space-y-2 max-w-md">
           <ShieldAlert className="h-10 w-10 mx-auto text-muted-foreground" />
-          <p className="text-lg font-medium">
-            {t("roster.invalidTitle", { defaultValue: "Lien invalide" })}
-          </p>
-          <p className="text-sm text-muted-foreground">
-            {t("roster.invalidBody", {
-              defaultValue: "Ce lien d'effectif est invalide ou a expiré.",
-            })}
-          </p>
+          <p className="text-lg font-medium">{t("roster.invalidTitle")}</p>
+          <p className="text-sm text-muted-foreground">{t("roster.invalidBody")}</p>
         </div>
       </div>
     );
@@ -230,7 +223,6 @@ function RosterPage() {
     if (overLimit) {
       toast.error(
         t("roster.tooMany", {
-          defaultValue: "Effectif limité à {{max}} joueurs.",
           max: maxPlayers,
         }),
       );
@@ -256,10 +248,10 @@ function RosterPage() {
       });
       const data = await res.json();
       if (!res.ok) {
-        toast.error(data?.error ?? t("common.error", { defaultValue: "Erreur" }));
+        toast.error(data?.error ?? t("common.error"));
         return;
       }
-      toast.success(t("roster.saved", { defaultValue: "Effectif enregistré" }));
+      toast.success(t("roster.saved"));
       q.refetch();
     } finally {
       setSaving(false);
@@ -269,9 +261,7 @@ function RosterPage() {
   function handleImportText(text: string) {
     const parsed = parseCSV(text);
     if (parsed.length === 0) {
-      toast.error(
-        t("roster.import.empty", { defaultValue: "Aucun joueur détecté dans le fichier." }),
-      );
+      toast.error(t("roster.import.empty"));
       return;
     }
     const base = importMode === "replace" ? [] : players;
@@ -279,8 +269,6 @@ function RosterPage() {
     if (merged.length > maxPlayers) {
       toast.error(
         t("roster.import.blocked", {
-          defaultValue:
-            "Import bloqué : {{total}} joueurs dépassent la limite de {{max}}. Réduisez le fichier ou choisissez « Remplacer ».",
           total: merged.length,
           max: maxPlayers,
         }),
@@ -302,7 +290,6 @@ function RosterPage() {
     setImportText("");
     toast.success(
       t("roster.import.ok", {
-        defaultValue: "{{n}} joueur(s) importé(s)",
         n: parsed.length,
       }),
     );
@@ -339,20 +326,12 @@ function RosterPage() {
             {reg.logo_url ? (
               <img src={reg.logo_url} alt={reg.team_name} className="h-full w-full object-cover" />
             ) : (
-              <span className="text-xs text-muted-foreground">
-                {t("roster.logo.none", { defaultValue: "Pas de logo" })}
-              </span>
+              <span className="text-xs text-muted-foreground">{t("roster.logo.none")}</span>
             )}
           </div>
           <div className="flex-1 min-w-0">
-            <p className="text-sm font-medium">
-              {t("roster.logo.title", { defaultValue: "Logo de l'équipe" })}
-            </p>
-            <p className="text-xs text-muted-foreground">
-              {t("roster.logo.help", {
-                defaultValue: "PNG, JPG, WEBP ou SVG · 4 Mo max",
-              })}
-            </p>
+            <p className="text-sm font-medium">{t("roster.logo.title")}</p>
+            <p className="text-xs text-muted-foreground">{t("roster.logo.help")}</p>
             <div className="mt-2 flex gap-2 flex-wrap">
               <Button
                 type="button"
@@ -366,9 +345,7 @@ function RosterPage() {
                 ) : (
                   <Upload className="h-4 w-4" />
                 )}
-                {reg.logo_url
-                  ? t("roster.logo.change", { defaultValue: "Changer" })
-                  : t("roster.logo.upload", { defaultValue: "Ajouter un logo" })}
+                {reg.logo_url ? t("roster.logo.change") : t("roster.logo.upload")}
               </Button>
               {reg.logo_url && (
                 <Button
@@ -388,7 +365,7 @@ function RosterPage() {
                         toast.error(data?.error ?? "Erreur");
                         return;
                       }
-                      toast.success(t("roster.logo.removed", { defaultValue: "Logo supprimé" }));
+                      toast.success(t("roster.logo.removed"));
                       q.refetch();
                     } finally {
                       setUploadingLogo(false);
@@ -396,7 +373,7 @@ function RosterPage() {
                   }}
                 >
                   <Trash2 className="h-4 w-4" />
-                  {t("common.remove", { defaultValue: "Supprimer" })}
+                  {t("common.remove")}
                 </Button>
               )}
               <input
@@ -409,11 +386,7 @@ function RosterPage() {
                   e.target.value = "";
                   if (!f) return;
                   if (f.size > 4 * 1024 * 1024) {
-                    toast.error(
-                      t("roster.logo.tooLarge", {
-                        defaultValue: "Fichier trop volumineux (4 Mo max)",
-                      }),
-                    );
+                    toast.error(t("roster.logo.tooLarge"));
                     return;
                   }
                   setUploadingLogo(true);
@@ -430,7 +403,7 @@ function RosterPage() {
                       toast.error(data?.error ?? "Erreur");
                       return;
                     }
-                    toast.success(t("roster.logo.uploaded", { defaultValue: "Logo enregistré" }));
+                    toast.success(t("roster.logo.uploaded"));
                     q.refetch();
                   } finally {
                     setUploadingLogo(false);
@@ -444,15 +417,8 @@ function RosterPage() {
 
       {!approved ? (
         <div className="rounded-md border bg-muted/40 p-4 text-sm">
-          <p className="font-medium mb-1">
-            {t("roster.pendingTitle", { defaultValue: "Candidature en cours de validation" })}
-          </p>
-          <p className="text-muted-foreground">
-            {t("roster.pendingBody", {
-              defaultValue:
-                "Dès que l'organisation aura validé votre inscription, vous pourrez ajouter ou modifier vos joueurs depuis ce même lien.",
-            })}
-          </p>
+          <p className="font-medium mb-1">{t("roster.pendingTitle")}</p>
+          <p className="text-muted-foreground">{t("roster.pendingBody")}</p>
         </div>
       ) : (
         <form onSubmit={onSave} className="space-y-4">
@@ -469,20 +435,13 @@ function RosterPage() {
                 <DialogTrigger asChild>
                   <Button type="button" size="sm" variant="outline">
                     <Upload className="h-4 w-4" />
-                    {t("roster.import.button", { defaultValue: "Importer CSV" })}
+                    {t("roster.import.button")}
                   </Button>
                 </DialogTrigger>
                 <DialogContent className="max-w-lg">
                   <DialogHeader>
-                    <DialogTitle>
-                      {t("roster.import.title", { defaultValue: "Importer des joueurs" })}
-                    </DialogTitle>
-                    <DialogDescription>
-                      {t("roster.import.desc", {
-                        defaultValue:
-                          "Format CSV : first_name, last_name, jersey_number, position, is_captain. Séparateurs , ; ou tab acceptés.",
-                      })}
-                    </DialogDescription>
+                    <DialogTitle>{t("roster.import.title")}</DialogTitle>
+                    <DialogDescription>{t("roster.import.desc")}</DialogDescription>
                   </DialogHeader>
                   <div className="space-y-3">
                     <div className="flex gap-2 flex-wrap">
@@ -493,7 +452,7 @@ function RosterPage() {
                         onClick={() => fileInputRef.current?.click()}
                       >
                         <Upload className="h-4 w-4" />
-                        {t("roster.import.file", { defaultValue: "Choisir un fichier" })}
+                        {t("roster.import.file")}
                       </Button>
                       <input
                         ref={fileInputRef}
@@ -508,11 +467,11 @@ function RosterPage() {
                       />
                       <Button type="button" size="sm" variant="ghost" onClick={downloadTemplate}>
                         <FileDown className="h-4 w-4" />
-                        {t("roster.import.template", { defaultValue: "Modèle" })}
+                        {t("roster.import.template")}
                       </Button>
                     </div>
                     <div className="text-xs text-muted-foreground">
-                      {t("roster.import.orPaste", { defaultValue: "Ou collez le contenu CSV :" })}
+                      {t("roster.import.orPaste")}
                     </div>
                     <Textarea
                       rows={6}
@@ -527,7 +486,7 @@ function RosterPage() {
                           checked={importMode === "append"}
                           onChange={() => setImportMode("append")}
                         />
-                        {t("roster.import.append", { defaultValue: "Ajouter à l'effectif" })}
+                        {t("roster.import.append")}
                       </label>
                       <label className="inline-flex items-center gap-1">
                         <input
@@ -535,20 +494,20 @@ function RosterPage() {
                           checked={importMode === "replace"}
                           onChange={() => setImportMode("replace")}
                         />
-                        {t("roster.import.replace", { defaultValue: "Remplacer l'effectif" })}
+                        {t("roster.import.replace")}
                       </label>
                     </div>
                   </div>
                   <DialogFooter>
                     <Button type="button" variant="ghost" onClick={() => setImportOpen(false)}>
-                      {t("common.cancel", { defaultValue: "Annuler" })}
+                      {t("common.cancel")}
                     </Button>
                     <Button
                       type="button"
                       disabled={!importText.trim()}
                       onClick={() => handleImportText(importText)}
                     >
-                      {t("roster.import.confirm", { defaultValue: "Importer" })}
+                      {t("roster.import.confirm")}
                     </Button>
                   </DialogFooter>
                 </DialogContent>
@@ -573,7 +532,7 @@ function RosterPage() {
                 }
               >
                 <Plus className="h-4 w-4" />
-                {t("register.addPlayer", { defaultValue: "Ajouter" })}
+                {t("register.addPlayer")}
               </Button>
             </div>
           </div>
@@ -581,7 +540,6 @@ function RosterPage() {
           {overLimit ? (
             <div className="rounded-md border border-destructive/40 bg-destructive/10 p-2 text-xs text-destructive">
               {t("roster.tooMany", {
-                defaultValue: "Effectif limité à {{max}} joueurs.",
                 max: maxPlayers,
               })}
             </div>
@@ -595,11 +553,7 @@ function RosterPage() {
           )}
 
           {players.length === 0 && (
-            <p className="text-sm text-muted-foreground italic">
-              {t("roster.empty", {
-                defaultValue: "Aucun joueur pour le moment. Cliquez sur Ajouter ou Importer CSV.",
-              })}
-            </p>
+            <p className="text-sm text-muted-foreground italic">{t("roster.empty")}</p>
           )}
 
           <div className="space-y-2">
@@ -661,9 +615,7 @@ function RosterPage() {
                     }}
                   >
                     <Star className="h-3.5 w-3.5" />
-                    {p.is_captain
-                      ? t("roster.captain", { defaultValue: "Capitaine" })
-                      : t("roster.setCaptain", { defaultValue: "Définir capitaine" })}
+                    {p.is_captain ? t("roster.captain") : t("roster.setCaptain")}
                   </Button>
                   <Button
                     type="button"
@@ -690,11 +642,7 @@ function RosterPage() {
               </p>
             )}
             <Button type="submit" disabled={saving || overLimit} className="ml-auto">
-              {saving ? (
-                <Loader2 className="h-4 w-4 animate-spin" />
-              ) : (
-                t("roster.save", { defaultValue: "Enregistrer" })
-              )}
+              {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : t("roster.save")}
             </Button>
           </div>
         </form>

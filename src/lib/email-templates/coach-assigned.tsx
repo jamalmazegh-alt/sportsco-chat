@@ -134,11 +134,12 @@ function pickLocale(l?: string): Locale {
 }
 
 const CoachAssignedEmail = ({ displayName, teamName, clubName, teamUrl, locale }: Props) => {
-  const c = COPY[pickLocale(locale)];
+  const l = pickLocale(locale);
+  const c = COPY[l];
   const team = teamName ?? "";
   const club = clubName ?? "";
   return (
-    <EmailShell preview={c.preview(team, club)} locale={locale}>
+    <EmailShell preview={c.preview(team, club)} locale={l}>
       <Heading style={h1}>{c.hello(displayName)}</Heading>
       <Heading style={h2}>{c.title}</Heading>
       <Text style={text}>{c.body(team, club)}</Text>

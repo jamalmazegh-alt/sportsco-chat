@@ -35,18 +35,14 @@ export function PublicProfileCard({
       toast.error(error.message);
       return;
     }
-    toast.success(
-      next
-        ? t("players.publicProfile.enabled", { defaultValue: "Public profile enabled" })
-        : t("players.publicProfile.disabled", { defaultValue: "Public profile disabled" }),
-    );
+    toast.success(next ? t("players.publicProfile.enabled") : t("players.publicProfile.disabled"));
     onChanged();
   }
 
   async function copy() {
     if (!publicUrl) return;
     await copyText(publicUrl);
-    toast.success(t("common.copied", { defaultValue: "Link copied" }));
+    toast.success(t("common.copied"));
   }
 
   return (
@@ -57,14 +53,9 @@ export function PublicProfileCard({
             <Globe className="h-5 w-5 text-primary" />
           </div>
           <div className="min-w-0">
-            <h3 className="font-semibold text-sm">
-              {t("players.publicProfile.title", { defaultValue: "Public profile" })}
-            </h3>
+            <h3 className="font-semibold text-sm">{t("players.publicProfile.title")}</h3>
             <p className="text-xs text-muted-foreground mt-0.5">
-              {t("players.publicProfile.help", {
-                defaultValue:
-                  "Share a public link to this player's achievements, seasons and timeline. Only public-tagged items are shown.",
-              })}
+              {t("players.publicProfile.help")}
             </p>
           </div>
         </div>
@@ -83,7 +74,7 @@ export function PublicProfileCard({
             rel="noreferrer"
             className="text-xs font-medium text-primary hover:underline"
           >
-            {t("common.open", { defaultValue: "Open" })}
+            {t("common.open")}
           </a>
         </div>
       )}

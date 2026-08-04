@@ -56,19 +56,32 @@ export const sendPlayerInvitations = createServerFn({ method: "POST" })
     if (staffError || !staffOk) throw new Error("Forbidden");
 
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const [{ data: player }, { data: parents }, { data: club }] = await Promise.all([
-      supabaseAdmin
-        .from("players")
-        .select("id, club_id, first_name, email, phone, user_id, birth_date, child_platform_access")
-        .eq("id", data.playerId)
-        .eq("club_id", team.club_id)
-        .maybeSingle(),
-      supabaseAdmin
-        .from("player_parents")
-        .select("id, full_name, email, phone, parent_user_id")
-        .eq("player_id", data.playerId),
-      supabaseAdmin.from("clubs").select("name, logo_url").eq("id", team.club_id).maybeSingle(),
-    ]);
+    const { resolveEmailLocale } = await import("@/lib/email/locale");
+    const [{ data: player }, { data: parents }, { data: club }, { data: inviter }] =
+      await Promise.all([
+        supabaseAdmin
+          .from("players")
+          .select(
+            "id, club_id, first_name, email, phone, user_id, birth_date, child_platform_access",
+          )
+          .eq("id", data.playerId)
+          .eq("club_id", team.club_id)
+          .maybeSingle(),
+        supabaseAdmin
+          .from("player_parents")
+          .select("id, full_name, email, phone, parent_user_id")
+          .eq("player_id", data.playerId),
+        supabaseAdmin
+          .from("clubs")
+          .select("name, logo_url, default_language")
+          .eq("id", team.club_id)
+          .maybeSingle(),
+        supabaseAdmin.from("profiles").select("preferred_language").eq("id", userId).maybeSingle(),
+      ]);
+    const inviteLocale = resolveEmailLocale(
+      (club as { default_language?: string | null } | null)?.default_language,
+      (inviter as { preferred_language?: string | null } | null)?.preferred_language,
+    );
 
     if (!player) return { sent: 0, failed: 0, skipped: 1, reason: "no_contact" };
 
@@ -304,6 +317,7 @@ export const sendPlayerInvitations = createServerFn({ method: "POST" })
             inviteUrl,
             roleLabel: target.role === "parent" ? "parent" : "joueur",
             playerFirstName: target.playerFirstName,
+            locale: inviteLocale,
           },
         });
 

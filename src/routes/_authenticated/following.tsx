@@ -19,7 +19,7 @@ export const Route = createFileRoute("/_authenticated/following")({
   component: FollowingPage,
   head: () => ({
     meta: [
-      { title: i18n.t("following.title", { defaultValue: "Mes abonnements", ns: "common" }) },
+      { title: i18n.t("following.title", { ns: "common" }) },
       { name: "robots", content: "noindex" },
     ],
   }),
@@ -146,7 +146,7 @@ function FollowingPage() {
     },
     onError: (_e, _v, ctx) => {
       if (ctx?.prev) qc.setQueryData(queryKey, ctx.prev);
-      toast.error(t("follow.error", { defaultValue: "Something went wrong, try again" }));
+      toast.error(t("follow.error"));
     },
   });
 
@@ -171,15 +171,12 @@ function FollowingPage() {
   return (
     <div className="mx-auto max-w-2xl px-4 py-6 space-y-6 pb-24">
       <header>
-        <h1 className="text-2xl font-bold">
-          {t("following.title", { defaultValue: "Mes abonnements" })}
-        </h1>
+        <h1 className="text-2xl font-bold">{t("following.title")}</h1>
         <p className="text-sm text-muted-foreground mt-1">
           {t("following.summary", {
             p: players.length,
             c: coaches.length,
             cl: clubs.length,
-            defaultValue: "Tu suis {{p}} joueur(s), {{c}} coach(s), {{cl}} club(s)",
           })}
         </p>
       </header>
@@ -187,17 +184,13 @@ function FollowingPage() {
       {/* Players */}
       <section>
         <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground mb-2">
-          {t("following.players", { defaultValue: "Joueurs" })}
+          {t("following.players")}
         </h2>
         {players.length === 0 ? (
           <div className="rounded-2xl border border-border bg-card p-5 text-center space-y-3">
-            <p className="text-sm text-muted-foreground">
-              {t("following.emptyPlayers", { defaultValue: "Tu ne suis aucun joueur." })}
-            </p>
+            <p className="text-sm text-muted-foreground">{t("following.emptyPlayers")}</p>
             <Button asChild variant="outline" size="sm">
-              <Link to="/players">
-                {t("following.discoverPlayers", { defaultValue: "Découvrir des joueurs" })}
-              </Link>
+              <Link to="/players">{t("following.discoverPlayers")}</Link>
             </Button>
           </div>
         ) : (
@@ -234,7 +227,7 @@ function FollowingPage() {
                     onClick={() => rowId && unfollow.mutate({ rowId })}
                   >
                     <UserCheck className="h-4 w-4" />
-                    {t("follow.unfollow", { defaultValue: "Ne plus suivre" })}
+                    {t("follow.unfollow")}
                   </Button>
                 </li>
               );
@@ -246,11 +239,11 @@ function FollowingPage() {
       {/* Coaches */}
       <section>
         <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground mb-2">
-          {t("following.coaches", { defaultValue: "Coachs" })}
+          {t("following.coaches")}
         </h2>
         {coaches.length === 0 ? (
           <p className="rounded-2xl border border-border bg-card p-5 text-center text-sm text-muted-foreground">
-            {t("following.emptyCoaches", { defaultValue: "Tu ne suis aucun coach." })}
+            {t("following.emptyCoaches")}
           </p>
         ) : (
           <ul className="space-y-2">
@@ -291,7 +284,7 @@ function FollowingPage() {
                     onClick={() => rowId && unfollow.mutate({ rowId })}
                   >
                     <UserCheck className="h-4 w-4" />
-                    {t("follow.unfollow", { defaultValue: "Ne plus suivre" })}
+                    {t("follow.unfollow")}
                   </Button>
                 </li>
               );
@@ -303,11 +296,11 @@ function FollowingPage() {
       {/* Clubs */}
       <section>
         <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground mb-2">
-          {t("following.clubs", { defaultValue: "Clubs" })}
+          {t("following.clubs")}
         </h2>
         {clubs.length === 0 ? (
           <p className="rounded-2xl border border-border bg-card p-5 text-center text-sm text-muted-foreground">
-            {t("following.emptyClubs", { defaultValue: "Tu ne suis aucun club." })}
+            {t("following.emptyClubs")}
           </p>
         ) : (
           <ul className="space-y-2">
@@ -339,7 +332,7 @@ function FollowingPage() {
                     onClick={() => rowId && unfollow.mutate({ rowId })}
                   >
                     <UserCheck className="h-4 w-4" />
-                    {t("follow.unfollow", { defaultValue: "Ne plus suivre" })}
+                    {t("follow.unfollow")}
                   </Button>
                 </li>
               );

@@ -79,20 +79,16 @@ export function TeamAbsencesTable({ teamId, players }: Props) {
       <CardHeader className="pb-2">
         <CardTitle className="flex items-center gap-2 text-sm font-semibold uppercase tracking-wider text-muted-foreground">
           <CalendarX2 className="h-4 w-4" />
-          {t("availability.teamTable.title", { defaultValue: "Absences de l'équipe" })}
+          {t("availability.teamTable.title")}
         </CardTitle>
       </CardHeader>
       <CardContent className="p-0">
         {isLoading && (
-          <div className="p-4 text-center text-sm text-muted-foreground">
-            {t("common.loading", { defaultValue: "Chargement..." })}
-          </div>
+          <div className="p-4 text-center text-sm text-muted-foreground">{t("common.loading")}</div>
         )}
         {!isLoading && playersWithAbsences.length === 0 && (
           <div className="p-4 text-center text-sm text-muted-foreground">
-            {t("availability.teamTable.empty", {
-              defaultValue: "Aucune absence déclarée à venir dans cette équipe.",
-            })}
+            {t("availability.teamTable.empty")}
           </div>
         )}
         {playersWithAbsences.length > 0 && (

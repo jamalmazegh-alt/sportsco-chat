@@ -349,7 +349,9 @@
         "s2": "Les parents restent informés",
         "s3": "Les éducateurs valorisent leur travail",
         "s4": "Les clubs gagnent en visibilité",
-        "showcase": "Chaque club dispose de sa propre vitrine publique."
+        "showcase": "Chaque club dispose de sa propre vitrine publique.",
+        "soonBadge": "Bientôt",
+        "soonNote": "Fonctionnalités sociales en cours de déploiement."
       },
       "forwho": {
         "title": "Pour qui ?",
@@ -516,7 +518,8 @@
     "mockFeedbackTagStrong": "Vision",
     "mockFeedbackTagWork": "Finition",
     "mockAiBadge": "Synthèse IA",
-    "mockAiBody": "Saison régulière, progrès marqué sur la création. Recommandation : exercices de finition pied faible."
+    "mockAiBody": "Saison régulière, progrès marqué sur la création. Recommandation : exercices de finition pied faible.",
+    "mockSeasonLabel": "Saison"
   },
   "coachAssist": {
     "chip": "Côté coach",
@@ -765,7 +768,8 @@
       "b1": "Bandeau sponsor rotatif sur la page d'accueil du club",
       "b2": "Suivi automatique des impressions et clics",
       "b3": "Plusieurs partenaires, ordre et logos gérés depuis l'admin",
-      "cta": "Découvrir la gestion des sponsors"
+      "cta": "Découvrir la gestion des sponsors",
+      "demoName": "Votre partenaire"
     },
     "future": {
       "badge": "Bientôt",
@@ -1058,7 +1062,10 @@
           }
         ]
       }
-    }
+    },
+    "learnMore": "En savoir plus",
+    "modulesCount": "modules",
+    "includedV1": "Inclus dans V1"
   },
   "faq": {
     "metaTitle": "FAQ — Clubero",
@@ -2083,5 +2090,37 @@
         "cta": "Voir le guide d'installation"
       }
     }
+  },
+  "mock": {
+    "toDoCount": "3 à faire",
+    "attendance": "Présence",
+    "u15Training": "U15 Entraînement"
+  },
+  "publicPlayers": {
+    "eyebrow": "Annuaire public",
+    "title": "Les joueurs Clubero",
+    "subtitle": "Parcourez les profils publics partagés par les joueurs : palmarès, parcours sportif, club. Réservé aux joueurs majeurs ayant activé leur profil.",
+    "searchPlaceholder": "Nom du joueur ou du club…",
+    "allSports": "Tous les sports",
+    "allClubs": "Tous les clubs",
+    "clubFilter": "Club",
+    "search": "Rechercher",
+    "reset": "Réinitialiser",
+    "loading": "Chargement…",
+    "count": "{{count}} joueurs",
+    "page": "Page {{page}} / {{total}}",
+    "error": "Impossible de charger l'annuaire pour le moment.",
+    "emptyTitle": "Aucun profil ne correspond",
+    "emptyBody": "Affinez vos filtres ou revenez bientôt : de nouveaux joueurs partagent leur profil chaque semaine.",
+    "prev": "Précédent",
+    "next": "Suivant",
+    "ctaTitle": "Vous êtes joueur ? Créez votre profil public.",
+    "ctaBody": "Partagez votre palmarès, vos saisons et votre parcours en un lien. Gratuit, opt-in, sous votre contrôle.",
+    "ctaJoin": "Créer mon compte",
+    "ctaFeatures": "Voir les fonctionnalités"
+  },
+  "common": {
+    "stop": "Arrêter",
+    "listen": "Écouter"
   }
 }

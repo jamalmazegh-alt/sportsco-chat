@@ -3,6 +3,7 @@ import { createClient } from "@supabase/supabase-js";
 import { z } from "zod";
 import { checkRateLimit, getClientIp } from "@/lib/rate-limit.server";
 import { enqueueTransactionalEmailServer } from "@/lib/email/send.server";
+import { resolveEmailLocale } from "@/lib/email/locale";
 
 const CAMP_UPLOAD_MAX_BYTES = 15 * 1024 * 1024;
 const ALLOWED_MIME = new Set(["application/pdf", "image/jpeg", "image/png"]);
@@ -112,7 +113,7 @@ export const Route = createFileRoute("/api/public/submit-camp-registration")({
         // Resolve club + camp
         const { data: club, error: clubErr } = await supabase
           .from("clubs")
-          .select("id, name, slug")
+          .select("id, name, slug, default_language")
           .eq("slug", fields.club_slug)
           .maybeSingle();
         if (clubErr || !club) {
@@ -289,6 +290,11 @@ export const Route = createFileRoute("/api/public/submit-camp-registration")({
 
         // Family confirmation email (with tracking link + full-notice)
         try {
+          const acceptLang = request.headers.get("accept-language") ?? "";
+          const familyLocale = resolveEmailLocale(
+            acceptLang,
+            (club as { default_language?: string | null }).default_language,
+          );
           await enqueueTransactionalEmailServer({
             templateName: "camp-registration-received",
             recipientEmail: fields.guardian_email,
@@ -302,6 +308,7 @@ export const Route = createFileRoute("/api/public/submit-camp-registration")({
               referenceId: reg.id.slice(0, 8).toUpperCase(),
               trackingUrl,
               isFull,
+              locale: familyLocale,
             },
             idempotencyKey: `camp-reg-received:${reg.id}`,
           });
@@ -312,9 +319,21 @@ export const Route = createFileRoute("/api/public/submit-camp-registration")({
         try {
           const createdBy = camp.created_by;
           if (createdBy) {
-            const { data: organizer } = await supabase.auth.admin.getUserById(createdBy);
+            const [{ data: organizer }, { data: organizerProfile }] = await Promise.all([
+              supabase.auth.admin.getUserById(createdBy),
+              supabase
+                .from("profiles")
+                .select("preferred_language")
+                .eq("id", createdBy)
+                .maybeSingle(),
+            ]);
             const organizerEmail = organizer?.user?.email;
             if (organizerEmail) {
+              const organizerLocale = resolveEmailLocale(
+                (organizerProfile as { preferred_language?: string | null } | null)
+                  ?.preferred_language,
+                (club as { default_language?: string | null }).default_language,
+              );
               await enqueueTransactionalEmailServer({
                 templateName: "camp-new-registration",
                 recipientEmail: organizerEmail,
@@ -326,6 +345,7 @@ export const Route = createFileRoute("/api/public/submit-camp-registration")({
                   guardianEmail: fields.guardian_email,
                   guardianPhone: fields.guardian_phone ?? undefined,
                   manageUrl,
+                  locale: organizerLocale,
                 },
                 idempotencyKey: `camp-new-reg:${reg.id}`,
               });

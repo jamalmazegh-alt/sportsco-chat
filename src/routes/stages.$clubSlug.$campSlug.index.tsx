@@ -5,6 +5,7 @@ import { useTranslation } from "react-i18next";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import type { PublicCampBundle } from "@/lib/public-camps.types";
+import i18n from "@/lib/i18n";
 
 const SITE_URL = "https://clubero.app";
 const DEFAULT_OG_IMAGE = `${SITE_URL}/og-default.jpg`;
@@ -60,17 +61,19 @@ export const Route = createFileRoute("/stages/$clubSlug/$campSlug/")({
   errorComponent: () => (
     <div className="min-h-screen flex items-center justify-center bg-background">
       <div className="text-center px-6">
-        <h1 className="text-2xl font-bold">Une erreur est survenue</h1>
-        <p className="mt-2 text-muted-foreground">Impossible de charger ce stage.</p>
+        <h1 className="text-2xl font-bold">{i18n.t("common.error")}</h1>
+        <p className="mt-2 text-muted-foreground">
+          {i18n.t("public.errors.loadFailed", { ns: "camps" })}
+        </p>
       </div>
     </div>
   ),
   notFoundComponent: () => (
     <div className="min-h-screen flex items-center justify-center bg-background">
       <div className="text-center px-6">
-        <h1 className="text-2xl font-bold">Stage introuvable</h1>
+        <h1 className="text-2xl font-bold">{i18n.t("public.errors.notFound", { ns: "camps" })}</h1>
         <p className="mt-2 text-muted-foreground">
-          Ce stage n'est pas disponible ou n'a pas encore été publié.
+          {i18n.t("public.errors.notFoundBody", { ns: "camps" })}
         </p>
       </div>
     </div>

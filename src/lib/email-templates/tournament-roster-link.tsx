@@ -1,6 +1,6 @@
 import * as React from "react";
 import { Button, Heading, Img, Section, Text } from "@react-email/components";
-import { EmailShell } from "./_layout";
+import { EmailShell, pickLocale, type Locale } from "./_layout";
 import type { TemplateEntry } from "./registry";
 
 interface Props {
@@ -9,7 +9,59 @@ interface Props {
   teamName?: string;
   rosterUrl: string;
   status?: "approved" | "pending";
+  locale?: string;
 }
+
+const T = {
+  fr: {
+    defaultTournament: "votre tournoi",
+    defaultTeam: "votre équipe",
+    preview: (team: string) => `Composez l'effectif de ${team}`,
+    brand: "Clubero · Tournois",
+    hello: (n?: string) => (n ? `Bonjour ${n},` : "Bonjour,"),
+    approved: (team: string, tournament: string) => (
+      <>
+        Bonne nouvelle ! La candidature de <strong>{team}</strong> pour{" "}
+        <strong>{tournament}</strong> a été validée.
+      </>
+    ),
+    pending: (team: string, tournament: string) => (
+      <>
+        Votre inscription de <strong>{team}</strong> pour <strong>{tournament}</strong> est bien
+        enregistrée.
+      </>
+    ),
+    body: "Vous pouvez désormais composer l'effectif de votre équipe en quelques clics. Ce lien est personnel — conservez-le précieusement, il vous permettra de modifier la liste à tout moment.",
+    cta: "Composer l'effectif",
+    orLink: "Ou copiez ce lien dans votre navigateur :",
+    subject: (tournament: string) => `Composez l'effectif de votre équipe — ${tournament}`,
+  },
+  en: {
+    defaultTournament: "your tournament",
+    defaultTeam: "your team",
+    preview: (team: string) => `Build the roster for ${team}`,
+    brand: "Clubero · Tournaments",
+    hello: (n?: string) => (n ? `Hi ${n},` : "Hi,"),
+    approved: (team: string, tournament: string) => (
+      <>
+        Great news! The application for <strong>{team}</strong> to <strong>{tournament}</strong> has
+        been approved.
+      </>
+    ),
+    pending: (team: string, tournament: string) => (
+      <>
+        Your registration for <strong>{team}</strong> at <strong>{tournament}</strong> has been
+        recorded.
+      </>
+    ),
+    body: "You can now build your team roster in a few clicks. This link is personal — keep it safe; it lets you update the list anytime.",
+    cta: "Build roster",
+    orLink: "Or copy this link into your browser:",
+    subject: (tournament: string) => `Build your team roster — ${tournament}`,
+  },
+} as const;
+
+const pick = (l: Locale) => (l === "fr" ? T.fr : T.en);
 
 const TournamentRosterLinkEmail = ({
   contactName,
@@ -17,11 +69,15 @@ const TournamentRosterLinkEmail = ({
   teamName,
   rosterUrl,
   status = "approved",
+  locale,
 }: Props) => {
-  const tournament = tournamentName ?? "votre tournoi";
-  const team = teamName ?? "votre équipe";
+  const l = pickLocale(locale);
+  const t = pick(l);
+  const tournament = tournamentName ?? t.defaultTournament;
+  const team = teamName ?? t.defaultTeam;
+
   return (
-    <EmailShell preview={`Composez l'effectif de ${team}`} locale="fr">
+    <EmailShell preview={t.preview(team)} locale={l}>
       <Section style={header}>
         <Img
           src="https://www.clubero.app/clubero-logo.png"
@@ -30,30 +86,19 @@ const TournamentRosterLinkEmail = ({
           height="56"
           style={logo}
         />
-        <Text style={brand}>Clubero · Tournois</Text>
+        <Text style={brand}>{t.brand}</Text>
       </Section>
-      <Heading style={h1}>{contactName ? `Bonjour ${contactName},` : "Bonjour,"}</Heading>
-      {status === "approved" ? (
-        <Text style={text}>
-          Bonne nouvelle ! La candidature de <strong>{team}</strong> pour{" "}
-          <strong>{tournament}</strong> a été validée.
-        </Text>
-      ) : (
-        <Text style={text}>
-          Votre inscription de <strong>{team}</strong> pour <strong>{tournament}</strong> est bien
-          enregistrée.
-        </Text>
-      )}
+      <Heading style={h1}>{t.hello(contactName)}</Heading>
       <Text style={text}>
-        Vous pouvez désormais composer l'effectif de votre équipe en quelques clics. Ce lien est
-        personnel — conservez-le précieusement, il vous permettra de modifier la liste à tout
-        moment.
+        {status === "approved" ? t.approved(team, tournament) : t.pending(team, tournament)}
       </Text>
+      <Text style={text}>{t.body}</Text>
       <Button style={button} href={rosterUrl}>
-        Composer l'effectif
+        {t.cta}
       </Button>
       <Text style={small}>
-        Ou copiez ce lien dans votre navigateur :<br />
+        {t.orLink}
+        <br />
         <span style={{ wordBreak: "break-all", color: "#3b82f6" }}>{rosterUrl}</span>
       </Text>
     </EmailShell>
@@ -63,8 +108,10 @@ const TournamentRosterLinkEmail = ({
 export const template = {
   component: TournamentRosterLinkEmail,
   subject: (data) => {
-    const t = data.tournamentName ?? "votre tournoi";
-    return `Composez l'effectif de votre équipe — ${t}`;
+    const l = pickLocale((data as { locale?: string }).locale);
+    const t = pick(l);
+    const tournament = (data.tournamentName as string | undefined) ?? t.defaultTournament;
+    return t.subject(tournament);
   },
   displayName: "Tournament roster link",
   previewData: {
@@ -73,6 +120,7 @@ export const template = {
     teamName: "Les Lions",
     rosterUrl: "https://clubero.app/tournament/coupe/roster/sample-token",
     status: "approved" as const,
+    locale: "fr",
   },
 } satisfies TemplateEntry;
 

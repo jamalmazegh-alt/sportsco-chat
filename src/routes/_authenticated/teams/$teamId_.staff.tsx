@@ -10,9 +10,11 @@ import { WallFeed } from "@/components/wall-feed";
 import { WallDocuments } from "@/components/wall-documents";
 import { scrollToWallPost } from "@/lib/wall/scroll-to-post";
 import { useAuth } from "@/lib/auth-context";
+import i18n from "@/lib/i18n";
 
 function ErrorBoundary({ error, reset }: { error: Error; reset: () => void }) {
   const router = useRouter();
+  const { t } = useTranslation();
   return (
     <div className="p-6 space-y-3">
       <p className="text-sm text-destructive">{String(error?.message ?? error)}</p>
@@ -23,7 +25,7 @@ function ErrorBoundary({ error, reset }: { error: Error; reset: () => void }) {
         }}
         size="sm"
       >
-        Réessayer
+        {t("common.retry")}
       </Button>
     </div>
   );
@@ -49,7 +51,7 @@ export const Route = createFileRoute("/_authenticated/teams/$teamId_/staff")({
     ],
   }),
   errorComponent: ErrorBoundary,
-  notFoundComponent: () => <div className="p-6 text-sm">Équipe introuvable</div>,
+  notFoundComponent: () => <div className="p-6 text-sm">{i18n.t("teams.notFound")}</div>,
 });
 
 function TeamStaffWallPage() {
@@ -90,23 +92,19 @@ function TeamStaffWallPage() {
     roles.has("assistant_coach");
 
   if (isLoading) {
-    return <div className="p-6 text-sm text-muted-foreground">Chargement…</div>;
+    return <div className="p-6 text-sm text-muted-foreground">{t("common.loading")}</div>;
   }
   if (!team) {
-    return <div className="p-6 text-sm">Équipe introuvable</div>;
+    return <div className="p-6 text-sm">{t("teams.notFound")}</div>;
   }
   if (!isStaff) {
     return (
       <div className="p-6 space-y-3">
-        <p className="text-sm text-muted-foreground">
-          {t("teams.staffWallForbidden", {
-            defaultValue: "Cet espace est réservé aux éducateurs et dirigeants de l'équipe.",
-          })}
-        </p>
+        <p className="text-sm text-muted-foreground">{t("teams.staffWallForbidden")}</p>
         <Button asChild size="sm" variant="outline">
           <Link to="/teams/$teamId" params={{ teamId }}>
             <ArrowLeft className="h-4 w-4 mr-1.5" />
-            {t("common.back", { defaultValue: "Retour" })}
+            {t("common.back")}
           </Link>
         </Button>
       </div>
@@ -117,7 +115,7 @@ function TeamStaffWallPage() {
     <div className="p-4 space-y-4 max-w-3xl mx-auto">
       <div className="flex items-center gap-2">
         <Button asChild size="icon" variant="ghost">
-          <Link to="/teams/$teamId" params={{ teamId }} aria-label="Retour à l'équipe">
+          <Link to="/teams/$teamId" params={{ teamId }} aria-label={t("teams.backToTeam")}>
             <ArrowLeft className="h-4 w-4" />
           </Link>
         </Button>
@@ -125,25 +123,18 @@ function TeamStaffWallPage() {
           <div className="flex items-center gap-2">
             <Lock className="h-4 w-4 text-violet-500 shrink-0" />
             <h1 className="text-lg font-semibold truncate">
-              {t("teams.staffWall", { defaultValue: "Mur Staff" })} · {team.name}
+              {t("teams.staffWall")} · {team.name}
             </h1>
           </div>
-          <p className="text-xs text-muted-foreground">
-            {t("teams.staffWallHint", {
-              defaultValue:
-                "Espace privé des éducateurs et dirigeants de l'équipe. Non visible par les joueurs ni les parents.",
-            })}
-          </p>
+          <p className="text-xs text-muted-foreground">{t("teams.staffWallHint")}</p>
         </div>
       </div>
 
       {team.club_id && (
         <Tabs value={tab} onValueChange={(next) => setTab(next as "wall" | "documents")}>
           <TabsList className="mb-4">
-            <TabsTrigger value="wall">{t("wall.tabs.wall", { defaultValue: "Mur" })}</TabsTrigger>
-            <TabsTrigger value="documents">
-              {t("wall.tabs.documents", { defaultValue: "Documents" })}
-            </TabsTrigger>
+            <TabsTrigger value="wall">{t("wall.tabs.wall")}</TabsTrigger>
+            <TabsTrigger value="documents">{t("wall.tabs.documents")}</TabsTrigger>
           </TabsList>
           <TabsContent value="wall">
             <WallFeed

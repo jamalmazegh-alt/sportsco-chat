@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { useTranslation } from "react-i18next";
 import { useEffect, useMemo, useState } from "react";
 import {
   listAllUsers,
@@ -39,6 +40,7 @@ export const Route = createFileRoute("/superadmin/users")({
 type UserRow = Awaited<ReturnType<typeof listAllUsers>>["items"][number];
 
 function SuperAdminUsers() {
+  const { t } = useTranslation();
   const [search, setSearch] = useState("");
   const [items, setItems] = useState<UserRow[]>([]);
   const [page, setPage] = useState(1);
@@ -50,7 +52,7 @@ function SuperAdminUsers() {
     const t = setTimeout(() => {
       listAllUsers({ data: { search: search || undefined, limit: 50, page } })
         .then((r) => setItems(r.items))
-        .catch((e) => toast.error(e instanceof Error ? e.message : "Failed"))
+        .catch((e) => toast.error(e instanceof Error ? e.message : t("superadmin.common.failed")))
         .finally(() => setLoading(false));
     }, 250);
     return () => clearTimeout(t);
@@ -66,14 +68,14 @@ function SuperAdminUsers() {
     setBusyId(id);
     try {
       await fn();
-      toast.success(`${label} ✓`);
+      toast.success(t("superadmin.users.actionDone", { label }));
       // refresh row
       const r = await listAllUsers({
         data: { search: search || undefined, limit: 50, page },
       });
       setItems(r.items);
     } catch (e) {
-      toast.error(e instanceof Error ? e.message : "Action failed");
+      toast.error(e instanceof Error ? e.message : t("superadmin.common.actionFailed"));
     } finally {
       setBusyId(null);
     }
@@ -96,9 +98,7 @@ function SuperAdminUsers() {
       <header className="mb-5 flex items-end justify-between gap-4 flex-wrap">
         <div>
           <h1 className="text-xl font-semibold">Users</h1>
-          <p className="text-sm text-muted-foreground mt-0.5">
-            Search, inspect, and act on any platform user.
-          </p>
+          <p className="text-sm text-muted-foreground mt-0.5">{t("superadmin.users.subtitle")}</p>
         </div>
         <div className="relative w-full sm:w-96">
           <Search className="h-4 w-4 absolute left-2.5 top-2.5 text-muted-foreground" />
@@ -108,30 +108,34 @@ function SuperAdminUsers() {
               setPage(1);
               setSearch(e.target.value);
             }}
-            placeholder="Name, email, or phone…"
+            placeholder={t("superadmin.users.searchPlaceholder")}
             className="pl-9 h-9"
           />
         </div>
       </header>
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-5">
-        <Mini label="In page" value={stats.total} />
-        <Mini label="Active" value={stats.active} tone="success" />
-        <Mini label="Dormant 60d+" value={stats.dormant} tone="warn" />
-        <Mini label="Disabled" value={stats.banned} tone="danger" />
+        <Mini label={t("superadmin.users.filterInPage")} value={stats.total} />
+        <Mini label={t("superadmin.users.filterActive")} value={stats.active} tone="success" />
+        <Mini label={t("superadmin.users.filterDormant")} value={stats.dormant} tone="warn" />
+        <Mini label={t("superadmin.users.filterDisabled")} value={stats.banned} tone="danger" />
       </div>
 
       <div className="rounded-lg border border-border overflow-hidden bg-card">
         <table className="w-full text-sm">
           <thead className="bg-muted/40 text-xs text-muted-foreground">
             <tr>
-              <th className="text-left font-medium px-3 py-2">User</th>
+              <th className="text-left font-medium px-3 py-2">{t("superadmin.users.colUser")}</th>
               <th className="text-left font-medium px-3 py-2 hidden lg:table-cell">
-                Clubs & roles
+                {t("superadmin.users.colClubsRoles")}
               </th>
-              <th className="text-left font-medium px-3 py-2 hidden md:table-cell">Plan</th>
-              <th className="text-left font-medium px-3 py-2 hidden md:table-cell">Last seen</th>
-              <th className="text-left font-medium px-3 py-2">Status</th>
+              <th className="text-left font-medium px-3 py-2 hidden md:table-cell">
+                {t("superadmin.users.colPlan")}
+              </th>
+              <th className="text-left font-medium px-3 py-2 hidden md:table-cell">
+                {t("superadmin.users.colLastSeen")}
+              </th>
+              <th className="text-left font-medium px-3 py-2">{t("superadmin.users.colStatus")}</th>
               <th className="w-10" />
             </tr>
           </thead>
@@ -140,14 +144,14 @@ function SuperAdminUsers() {
               <tr>
                 <td colSpan={6} className="px-3 py-10 text-center text-muted-foreground">
                   <Loader2 className="h-4 w-4 inline animate-spin mr-2" />
-                  Loading…
+                  {t("superadmin.common.loading")}
                 </td>
               </tr>
             )}
             {!loading && items.length === 0 && (
               <tr>
                 <td colSpan={6} className="px-3 py-10 text-center text-muted-foreground">
-                  No users.
+                  {t("superadmin.users.empty")}
                 </td>
               </tr>
             )}
@@ -181,7 +185,9 @@ function SuperAdminUsers() {
                     </td>
                     <td className="px-3 py-2.5 hidden lg:table-cell">
                       {u.clubs.length === 0 ? (
-                        <span className="text-xs text-muted-foreground">No club</span>
+                        <span className="text-xs text-muted-foreground">
+                          {t("superadmin.users.noClub")}
+                        </span>
                       ) : (
                         <div className="flex flex-wrap gap-1.5 max-w-md">
                           {u.clubs.slice(0, 3).map((c) => (
@@ -206,12 +212,12 @@ function SuperAdminUsers() {
                     <td className="px-3 py-2.5 hidden md:table-cell">
                       {u.clubs[0] ? (
                         (() => {
-                          const t = subTone({
+                          const subMeta = subTone({
                             status: u.clubs[0].subscription_status,
                             exempt_from_billing: u.clubs[0].subscription_exempt_from_billing,
                             exempt_until: u.clubs[0].subscription_exempt_until,
                           });
-                          return <StatusBadge tone={t.tone}>{t.label}</StatusBadge>;
+                          return <StatusBadge tone={subMeta.tone}>{subMeta.label}</StatusBadge>;
                         })()
                       ) : (
                         <span className="text-xs text-muted-foreground">—</span>
@@ -220,24 +226,28 @@ function SuperAdminUsers() {
                     <td className="px-3 py-2.5 hidden md:table-cell text-xs text-muted-foreground">
                       {u.last_sign_in_at
                         ? new Date(u.last_sign_in_at).toLocaleDateString()
-                        : "never"}
+                        : t("superadmin.users.never")}
                     </td>
                     <td className="px-3 py-2.5">
                       <div className="flex flex-wrap gap-1">
                         {u.is_banned ? (
                           <StatusBadge tone="danger">
-                            <ShieldOff className="h-3 w-3" /> disabled
+                            <ShieldOff className="h-3 w-3" /> {t("superadmin.users.disabled")}
                           </StatusBadge>
                         ) : never ? (
-                          <StatusBadge tone="warn">never signed in</StatusBadge>
+                          <StatusBadge tone="warn">
+                            {t("superadmin.users.neverSignedIn")}
+                          </StatusBadge>
                         ) : dormant ? (
-                          <StatusBadge tone="warn">dormant</StatusBadge>
+                          <StatusBadge tone="warn">{t("superadmin.users.dormant")}</StatusBadge>
                         ) : (
                           <StatusBadge tone="success">
-                            <ShieldCheck className="h-3 w-3" /> active
+                            <ShieldCheck className="h-3 w-3" /> {t("superadmin.users.active")}
                           </StatusBadge>
                         )}
-                        {!onboardingOk && <StatusBadge tone="warn">unverified</StatusBadge>}
+                        {!onboardingOk && (
+                          <StatusBadge tone="warn">{t("superadmin.users.unverified")}</StatusBadge>
+                        )}
                       </div>
                     </td>
                     <td className="px-2 py-2.5">
@@ -252,10 +262,13 @@ function SuperAdminUsers() {
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end" className="w-56">
-                          <DropdownMenuLabel className="text-xs">Quick actions</DropdownMenuLabel>
+                          <DropdownMenuLabel className="text-xs">
+                            {t("superadmin.users.quickActions")}
+                          </DropdownMenuLabel>
                           <DropdownMenuItem asChild>
                             <Link to="/superadmin/users/$userId" params={{ userId: u.id }}>
-                              <ExternalLink className="h-4 w-4 mr-2" /> View profile
+                              <ExternalLink className="h-4 w-4 mr-2" />{" "}
+                              {t("superadmin.users.viewProfile")}
                             </Link>
                           </DropdownMenuItem>
                           {u.clubs[0] && (
@@ -264,7 +277,8 @@ function SuperAdminUsers() {
                                 to="/superadmin/clubs/$clubId"
                                 params={{ clubId: u.clubs[0].club_id }}
                               >
-                                <ExternalLink className="h-4 w-4 mr-2" /> Open club
+                                <ExternalLink className="h-4 w-4 mr-2" />{" "}
+                                {t("superadmin.users.openClub")}
                               </Link>
                             </DropdownMenuItem>
                           )}
@@ -272,26 +286,28 @@ function SuperAdminUsers() {
                           <DropdownMenuItem
                             disabled={!u.email}
                             onClick={() =>
-                              runAction(u.id, "Password reset email", () =>
+                              runAction(u.id, t("superadmin.users.passwordResetEmail"), () =>
                                 sendPasswordResetEmail({
                                   data: { user_id: u.id },
                                 }),
                               )
                             }
                           >
-                            <KeyRound className="h-4 w-4 mr-2" /> Send reset email
+                            <KeyRound className="h-4 w-4 mr-2" />{" "}
+                            {t("superadmin.users.sendResetEmail")}
                           </DropdownMenuItem>
                           <DropdownMenuItem
                             disabled={!u.email}
                             onClick={() =>
-                              runAction(u.id, "Onboarding email resent", () =>
+                              runAction(u.id, t("superadmin.users.onboardingEmailResent"), () =>
                                 resendOnboardingEmail({
                                   data: { user_id: u.id },
                                 }),
                               )
                             }
                           >
-                            <Mail className="h-4 w-4 mr-2" /> Resend onboarding
+                            <Mail className="h-4 w-4 mr-2" />{" "}
+                            {t("superadmin.users.resendOnboarding")}
                           </DropdownMenuItem>
                           <DropdownMenuSeparator />
                           {u.is_banned ? (
@@ -299,7 +315,7 @@ function SuperAdminUsers() {
                               onClick={() =>
                                 runAction(
                                   u.id,
-                                  "Reactivate",
+                                  t("superadmin.users.reactivateLabel"),
                                   () =>
                                     reactivateUser({
                                       data: { user_id: u.id },
@@ -308,7 +324,8 @@ function SuperAdminUsers() {
                                 )
                               }
                             >
-                              <ShieldCheck className="h-4 w-4 mr-2" /> Reactivate
+                              <ShieldCheck className="h-4 w-4 mr-2" />{" "}
+                              {t("superadmin.users.reactivate")}
                             </DropdownMenuItem>
                           ) : (
                             <DropdownMenuItem
@@ -316,13 +333,14 @@ function SuperAdminUsers() {
                               onClick={() =>
                                 runAction(
                                   u.id,
-                                  "Disable",
+                                  t("superadmin.users.disableLabel"),
                                   () => disableUser({ data: { user_id: u.id } }),
                                   true,
                                 )
                               }
                             >
-                              <ShieldOff className="h-4 w-4 mr-2" /> Disable account
+                              <ShieldOff className="h-4 w-4 mr-2" />{" "}
+                              {t("superadmin.users.disableAccount")}
                             </DropdownMenuItem>
                           )}
                         </DropdownMenuContent>
@@ -344,7 +362,9 @@ function SuperAdminUsers() {
         >
           <ChevronLeft className="h-4 w-4" />
         </Button>
-        <span className="text-xs text-muted-foreground">Page {page}</span>
+        <span className="text-xs text-muted-foreground">
+          {t("superadmin.users.page", { page })}
+        </span>
         <Button
           size="sm"
           variant="outline"

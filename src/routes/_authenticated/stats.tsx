@@ -59,9 +59,7 @@ function StatsPage() {
       </header>
 
       {!activeClubId ? (
-        <p className="text-sm text-muted-foreground">
-          {t("common.noClubSelected", { defaultValue: "Aucun club sélectionné" })}
-        </p>
+        <p className="text-sm text-muted-foreground">{t("common.noClubSelected")}</p>
       ) : isStaff ? (
         <StaffStats
           clubId={activeClubId}
@@ -178,9 +176,7 @@ function PlayerOrParentStats({ clubId, userId }: { clubId: string; userId: strin
   if (!players || players.length === 0) {
     return (
       <div className="rounded-xl border border-dashed bg-card p-6 text-sm text-muted-foreground">
-        {t("stats.noPlayerLinked", {
-          defaultValue: "Aucun joueur n'est lié à votre compte pour ce club.",
-        })}
+        {t("stats.noPlayerLinked")}
       </div>
     );
   }
@@ -191,9 +187,7 @@ function PlayerOrParentStats({ clubId, userId }: { clubId: string; userId: strin
     <div className="space-y-4">
       {players.length > 1 && (
         <div className="flex items-center gap-2">
-          <span className="text-sm text-muted-foreground">
-            {t("stats.player", { defaultValue: "Joueur" })}
-          </span>
+          <span className="text-sm text-muted-foreground">{t("stats.player")}</span>
           <Select value={selectedId ?? undefined} onValueChange={setSelectedId}>
             <SelectTrigger className="h-9 w-[240px]">
               <SelectValue />
@@ -202,7 +196,7 @@ function PlayerOrParentStats({ clubId, userId }: { clubId: string; userId: strin
               {players.map((p) => (
                 <SelectItem key={p.id} value={p.id}>
                   {p.name}
-                  {p.isOwn ? "" : ` · ${t("stats.child", { defaultValue: "enfant" })}`}
+                  {p.isOwn ? "" : ` · ${t("stats.child")}`}
                 </SelectItem>
               ))}
             </SelectContent>
@@ -259,7 +253,7 @@ function PlayerScoringSummary({ playerId }: { playerId: string }) {
   const cfg = getSportConfig(data?.sport);
   const tiles: Array<{ label: string; value: number; negative?: boolean }> = [
     {
-      label: t("stats.matchesPlayed", { defaultValue: "Matchs joués" }),
+      label: t("stats.matchesPlayed"),
       value: data?.matchesPlayed ?? 0,
     },
   ];
@@ -274,12 +268,12 @@ function PlayerScoringSummary({ playerId }: { playerId: string }) {
   });
   if (cfg.assistsEnabled && cfg.statKinds.includes("assist")) {
     tiles.push({
-      label: t("match.kinds.assist", { defaultValue: "Passes" }),
+      label: t("match.kinds.assist"),
       value: data?.assists ?? 0,
     });
   } else if (cfg.assistsEnabled) {
     tiles.push({
-      label: t("match.kinds.assist", { defaultValue: "Passes" }),
+      label: t("match.kinds.assist"),
       value: data?.assists ?? 0,
     });
   }
@@ -351,7 +345,7 @@ function StaffStats({
   if (!teams || teams.length === 0) {
     return (
       <div className="rounded-xl border border-dashed bg-card p-6 text-sm text-muted-foreground">
-        {t("stats.noTeam", { defaultValue: "Aucune équipe disponible." })}
+        {t("stats.noTeam")}
       </div>
     );
   }
@@ -359,9 +353,7 @@ function StaffStats({
   return (
     <div className="space-y-4">
       <div className="flex items-center gap-2">
-        <span className="text-sm text-muted-foreground">
-          {t("stats.team", { defaultValue: "Équipe" })}
-        </span>
+        <span className="text-sm text-muted-foreground">{t("stats.team")}</span>
         <Select value={teamId ?? undefined} onValueChange={setTeamId}>
           <SelectTrigger className="h-9 w-[240px]">
             <SelectValue />
@@ -379,15 +371,9 @@ function StaffStats({
       {teamId && (
         <Tabs defaultValue="overview">
           <TabsList>
-            <TabsTrigger value="overview">
-              {t("stats.tabOverview", { defaultValue: "Vue d'ensemble" })}
-            </TabsTrigger>
-            <TabsTrigger value="players">
-              {t("stats.tabPlayers", { defaultValue: "Joueurs" })}
-            </TabsTrigger>
-            <TabsTrigger value="attendance">
-              {t("stats.tabAttendance", { defaultValue: "Présences" })}
-            </TabsTrigger>
+            <TabsTrigger value="overview">{t("stats.tabOverview")}</TabsTrigger>
+            <TabsTrigger value="players">{t("stats.tabPlayers")}</TabsTrigger>
+            <TabsTrigger value="attendance">{t("stats.tabAttendance")}</TabsTrigger>
           </TabsList>
           <TabsContent value="overview" className="mt-4">
             <TeamMatchRecord teamId={teamId} sport={selectedSport} />
@@ -420,16 +406,16 @@ function TeamMatchRecord({ teamId, sport }: { teamId: string; sport: string | nu
   const unitKey = cfg.scoreUnit; // "goals" | "points" | "sets"
   const unitLabels = {
     goals: {
-      for: t("stats.goalsFor", { defaultValue: "Buts pour" }),
-      against: t("stats.goalsAgainst", { defaultValue: "Buts contre" }),
+      for: t("stats.goalsFor"),
+      against: t("stats.goalsAgainst"),
     },
     points: {
-      for: t("stats.pointsFor", { defaultValue: "Points pour" }),
-      against: t("stats.pointsAgainst", { defaultValue: "Points contre" }),
+      for: t("stats.pointsFor"),
+      against: t("stats.pointsAgainst"),
     },
     sets: {
-      for: t("stats.setsFor", { defaultValue: "Sets gagnés" }),
-      against: t("stats.setsAgainst", { defaultValue: "Sets perdus" }),
+      for: t("stats.setsFor"),
+      against: t("stats.setsAgainst"),
     },
   }[unitKey];
 
@@ -481,7 +467,7 @@ function TeamMatchRecord({ teamId, sport }: { teamId: string; sport: string | nu
   const chips = [
     {
       icon: null,
-      label: `${r.played} ${t("stats.matchesWithResult", { defaultValue: "Matchs" }).toLowerCase()}`,
+      label: `${r.played} ${t("stats.matchesWithResult").toLowerCase()}`,
       cls: "bg-muted text-foreground",
     },
     {
@@ -526,24 +512,22 @@ function TeamMatchRecord({ teamId, sport }: { teamId: string; sport: string | nu
     { label: unitLabels.for, value: r.gf },
     { label: unitLabels.against, value: r.ga },
     {
-      label: t("stats.diff", { defaultValue: "Différence" }),
+      label: t("stats.diff"),
       value: `${diff > 0 ? "+" : ""}${diff}`,
     },
-    { label: t("stats.winRate", { defaultValue: "% Victoires" }), value: `${winRate}%` },
+    { label: t("stats.winRate"), value: `${winRate}%` },
   ];
 
   return (
     <section
       className="rounded-2xl border border-border bg-card p-5 shadow-sm space-y-4"
-      aria-label={t("stats.summaryAria", { defaultValue: "Season summary" })}
+      aria-label={t("stats.summaryAria")}
     >
       <div className="flex items-center justify-between gap-2 flex-wrap">
         <h2 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground flex items-center gap-2">
           <BarChart3 className="h-4 w-4" /> {season.label}
         </h2>
-        <span className="text-[10px] text-muted-foreground">
-          {t("stats.currentSeason", { defaultValue: "Saison en cours" })}
-        </span>
+        <span className="text-[10px] text-muted-foreground">{t("stats.currentSeason")}</span>
       </div>
 
       {/* Compact summary chips */}
@@ -572,7 +556,7 @@ function TeamMatchRecord({ teamId, sport }: { teamId: string; sport: string | nu
           </div>
           <div className="flex justify-between text-[10px] text-muted-foreground tabular-nums">
             <span>
-              {winRate}% {t("stats.wins", { defaultValue: "Victoires" }).toLowerCase()}
+              {winRate}% {t("stats.wins").toLowerCase()}
             </span>
             <span>
               {unitLabels.for}: {r.gf} · {unitLabels.against}: {r.ga}
@@ -588,9 +572,7 @@ function TeamMatchRecord({ teamId, sport }: { teamId: string; sport: string | nu
         className="flex items-center gap-1 text-xs font-medium text-primary hover:underline"
         aria-expanded={expanded}
       >
-        {expanded
-          ? t("stats.hideRecordDetail", { defaultValue: "Hide details" })
-          : t("stats.showRecordDetail", { defaultValue: "Show details" })}
+        {expanded ? t("stats.hideRecordDetail") : t("stats.showRecordDetail")}
         <ChevronDown className={cn("h-3.5 w-3.5 transition-transform", expanded && "rotate-180")} />
       </button>
 
@@ -746,23 +728,18 @@ function TeamPlayersStats({ teamId, sport }: { teamId: string; sport: string | n
     }
   }
 
-  if (isLoading)
-    return (
-      <p className="text-sm text-muted-foreground">
-        {t("common.loading", { defaultValue: "Chargement…" })}
-      </p>
-    );
+  if (isLoading) return <p className="text-sm text-muted-foreground">{t("common.loading")}</p>;
   if (sorted.length === 0) {
     return (
       <div className="rounded-xl border border-dashed bg-card p-6 text-sm text-muted-foreground">
-        {t("stats.noPlayersInTeam", { defaultValue: "Aucun joueur dans cette équipe." })}
+        {t("stats.noPlayersInTeam")}
       </div>
     );
   }
 
   const headers: Array<{ key: SortKey; label: string; align?: "right"; negative?: boolean }> = [
-    { key: "name", label: t("stats.col.player", { defaultValue: "Joueur" }) },
-    { key: "matches", label: t("stats.col.matches", { defaultValue: "Matchs" }), align: "right" },
+    { key: "name", label: t("stats.col.player") },
+    { key: "matches", label: t("stats.col.matches"), align: "right" },
     ...scorerKinds.map((k) => ({
       key: `kind:${k}` as SortKey,
       label: t(`match.kinds.${k}`, { defaultValue: k }),
@@ -775,14 +752,14 @@ function TeamPlayersStats({ teamId, sport }: { teamId: string; sport: string | n
       ? [
           {
             key: "assists" as SortKey,
-            label: t("match.kinds.assist", { defaultValue: "Passes" }),
+            label: t("match.kinds.assist"),
             align: "right" as const,
           },
         ]
       : []),
     {
       key: "attendance",
-      label: t("stats.col.attendance", { defaultValue: "% Présent" }),
+      label: t("stats.col.attendance"),
       align: "right",
     },
   ];
@@ -841,9 +818,7 @@ function TeamPlayersStats({ teamId, sport }: { teamId: string; sport: string | n
       </table>
       {scorerKinds.length === 0 && (
         <p className="px-3 py-3 text-xs text-muted-foreground italic">
-          {t("stats.noStatKindsForSport", {
-            defaultValue: "Aucune stat individuelle configurée pour ce sport.",
-          })}
+          {t("stats.noStatKindsForSport")}
         </p>
       )}
     </div>

@@ -168,7 +168,7 @@
     },
     "currenttool": {
       "title": "Vandaag beheer je dit met…",
-      "subtitle": "",
+      "subtitle": "WhatsApp, Excel, een andere tool…",
       "options": {
         "whatsapp": {
           "label": "WhatsApp / SMS",
@@ -233,8 +233,8 @@
     "stats": {
       "sessions": "Sessies gestart",
       "completed": "Sessies voltooid",
-      "newsletter": "Newsletter leads",
-      "beta": "Beta leads",
+      "newsletter": "Nieuwsbriefleads",
+      "beta": "Bètaleads",
       "duration": "Gem. duur (min)"
     },
     "sections": {
@@ -251,7 +251,7 @@
       "phone": "Telefoon",
       "club": "Club",
       "newsletter": "Newsletter",
-      "beta": "Beta",
+      "beta": "Bèta",
       "date": "Voltooid op",
       "exportCsv": "CSV exporteren",
       "lastName": "Achternaam"

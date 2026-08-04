@@ -3,6 +3,7 @@ import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
 import { enqueueTransactionalEmailServer } from "@/lib/email/send.server";
+import { resolveEmailLocale } from "@/lib/email/locale";
 
 const MANUAL_OFFSET_BASE = 1000; // manual reminders use offset = 1000 + day-of-year to allow re-sends across days
 
@@ -66,32 +67,32 @@ async function paidCents(obligationId: string): Promise<number> {
 async function recipientsForObligation(o: {
   player_id: string | null;
   payer_user_id: string | null;
-}): Promise<{ email: string }[]> {
-  const out: { email: string }[] = [];
+}): Promise<{ email: string; userId?: string | null }[]> {
+  const out: { email: string; userId?: string | null }[] = [];
   const seen = new Set<string>();
-  const add = (e?: string | null) => {
+  const add = (e?: string | null, userId?: string | null) => {
     if (!e) return;
     const k = e.toLowerCase();
     if (seen.has(k)) return;
     seen.add(k);
-    out.push({ email: e });
+    out.push({ email: e, userId: userId ?? null });
   };
   if (o.payer_user_id) {
     const { data } = await supabaseAdmin.auth.admin.getUserById(o.payer_user_id);
-    add(data?.user?.email);
+    add(data?.user?.email, o.payer_user_id);
   }
   if (o.player_id) {
     const { data: p } = await supabaseAdmin
       .from("players")
-      .select("email")
+      .select("email, user_id")
       .eq("id", o.player_id)
       .maybeSingle();
-    add(p?.email);
+    add(p?.email, p?.user_id);
     const { data: parents } = await supabaseAdmin
       .from("player_parents")
-      .select("email")
+      .select("email, parent_user_id")
       .eq("player_id", o.player_id);
-    for (const pp of parents ?? []) add(pp.email);
+    for (const pp of parents ?? []) add(pp.email, pp.parent_user_id);
     const { data: guardians } = await supabaseAdmin
       .from("player_guardians")
       .select("user_id")
@@ -99,10 +100,29 @@ async function recipientsForObligation(o: {
     for (const g of guardians ?? []) {
       if (!g.user_id) continue;
       const { data } = await supabaseAdmin.auth.admin.getUserById(g.user_id);
-      add(data?.user?.email);
+      add(data?.user?.email, g.user_id);
     }
   }
   return out;
+}
+
+async function localesForUserIds(
+  userIds: Array<string | null | undefined>,
+): Promise<Map<string, string | null>> {
+  const ids = [...new Set(userIds.filter((id): id is string => !!id))];
+  const map = new Map<string, string | null>();
+  if (ids.length === 0) return map;
+  const { data } = await supabaseAdmin
+    .from("profiles")
+    .select("id, preferred_language")
+    .in("id", ids);
+  for (const p of data ?? []) {
+    map.set(
+      (p as { id: string }).id,
+      (p as { preferred_language: string | null }).preferred_language,
+    );
+  }
+  return map;
 }
 
 /** Send reminder now to all unpaid obligations of a payment item. */
@@ -112,7 +132,9 @@ export const sendItemRemindersNow = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     const { data: item, error } = await supabaseAdmin
       .from("payment_items")
-      .select("id, club_id, title, due_date, amount_cents, currency, clubs:club_id(name)")
+      .select(
+        "id, club_id, title, due_date, amount_cents, currency, clubs:club_id(name, default_language)",
+      )
       .eq("id", data.paymentItemId)
       .maybeSingle();
     if (error || !item) throw new Error(error?.message ?? "Item not found");
@@ -130,6 +152,7 @@ export const sendItemRemindersNow = createServerFn({ method: "POST" })
     const offset = MANUAL_OFFSET_BASE + dayOfYear;
     const baseUrl = process.env.SITE_URL || "https://www.clubero.app";
     const clubName = (item as any).clubs?.name ?? "Clubero";
+    const clubLang = ((item as any).clubs?.default_language as string | null) ?? null;
 
     const paymentEmailEnabled = true;
 
@@ -140,6 +163,7 @@ export const sendItemRemindersNow = createServerFn({ method: "POST" })
       if (remaining <= 0) continue;
 
       const recipients = await recipientsForObligation(o);
+      const langByUser = await localesForUserIds(recipients.map((r) => r.userId));
       const pname = o.player_id
         ? await (async () => {
             const { data: p } = await supabaseAdmin
@@ -163,6 +187,7 @@ export const sendItemRemindersNow = createServerFn({ method: "POST" })
 
         try {
           if (paymentEmailEnabled) {
+            const locale = resolveEmailLocale(r.userId ? langByUser.get(r.userId) : null, clubLang);
             await enqueueTransactionalEmailServer({
               templateName: "payment-reminder",
               recipientEmail: r.email,
@@ -181,6 +206,7 @@ export const sendItemRemindersNow = createServerFn({ method: "POST" })
                     )
                   : 0,
                 payUrl: `${baseUrl}/payments`,
+                locale,
               },
             });
           } else {

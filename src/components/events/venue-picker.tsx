@@ -133,7 +133,7 @@ export function VenuePicker({ clubId, venueId, facilityId, onChange, autoApplyDe
   return (
     <div className="space-y-2">
       <div className="space-y-1.5">
-        <Label className="text-xs">{t("venues.picker.siteLabel", { defaultValue: "Site" })}</Label>
+        <Label className="text-xs">{t("venues.picker.siteLabel")}</Label>
         <Select
           value={venueId ?? ""}
           onValueChange={(v) => {
@@ -144,9 +144,7 @@ export function VenuePicker({ clubId, venueId, facilityId, onChange, autoApplyDe
           }}
         >
           <SelectTrigger>
-            <SelectValue
-              placeholder={t("venues.picker.sitePlaceholder", { defaultValue: "Choisir un site" })}
-            />
+            <SelectValue placeholder={t("venues.picker.sitePlaceholder")} />
           </SelectTrigger>
           <SelectContent>
             {list.map((v) => (
@@ -161,9 +159,7 @@ export function VenuePicker({ clubId, venueId, facilityId, onChange, autoApplyDe
 
       {selectedVenue && selectedVenue.facilities.length > 0 && (
         <div className="space-y-1.5">
-          <Label className="text-xs">
-            {t("venues.picker.facilityLabel", { defaultValue: "Terrain / installation" })}
-          </Label>
+          <Label className="text-xs">{t("venues.picker.facilityLabel")}</Label>
           <Select
             value={facilityId ?? NO_FACILITY_VALUE}
             onValueChange={(v) =>
@@ -171,15 +167,11 @@ export function VenuePicker({ clubId, venueId, facilityId, onChange, autoApplyDe
             }
           >
             <SelectTrigger>
-              <SelectValue
-                placeholder={t("venues.picker.facilityPlaceholder", {
-                  defaultValue: "Choisir un terrain",
-                })}
-              />
+              <SelectValue placeholder={t("venues.picker.facilityPlaceholder")} />
             </SelectTrigger>
             <SelectContent>
               <SelectItem value={NO_FACILITY_VALUE}>
-                {t("venues.picker.noFacilityOption", { defaultValue: "Aucun terrain" })}
+                {t("venues.picker.noFacilityOption")}
               </SelectItem>
               {selectedVenue.facilities.map((f) => (
                 <SelectItem key={f.id} value={f.id}>
@@ -194,11 +186,7 @@ export function VenuePicker({ clubId, venueId, facilityId, onChange, autoApplyDe
       )}
 
       {totalFacilities === 0 && (
-        <p className="text-[11px] text-muted-foreground">
-          {t("venues.picker.noFacilitiesHint", {
-            defaultValue: "Aucun terrain configuré pour ce site.",
-          })}
-        </p>
+        <p className="text-[11px] text-muted-foreground">{t("venues.picker.noFacilitiesHint")}</p>
       )}
     </div>
   );

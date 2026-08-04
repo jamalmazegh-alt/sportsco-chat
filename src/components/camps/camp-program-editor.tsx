@@ -168,11 +168,7 @@ export function CampProgramEditor({
   return (
     <div className="space-y-3">
       {localOrder.length === 0 && !showForm && (
-        <p className="text-sm text-muted-foreground">
-          {t("program.empty", {
-            defaultValue: "Aucun élément de programme pour l'instant.",
-          })}
-        </p>
+        <p className="text-sm text-muted-foreground">{t("program.empty")}</p>
       )}
 
       {localOrder.length > 0 && (
@@ -201,21 +197,17 @@ export function CampProgramEditor({
       {showForm ? (
         <div className="rounded-lg border border-dashed border-border p-3 space-y-2">
           <Label className="text-xs uppercase tracking-wide text-muted-foreground">
-            {draft.id
-              ? t("program.editTitle", { defaultValue: "Modifier l'élément" })
-              : t("program.addTitle", { defaultValue: "Nouvel élément" })}
+            {draft.id ? t("program.editTitle") : t("program.addTitle")}
           </Label>
           <Input
             value={draft.title}
             onChange={(e) => setDraft({ ...draft, title: e.target.value })}
-            placeholder={t("program.titlePlaceholder", {
-              defaultValue: "Ex. Entraînement technique",
-            })}
+            placeholder={t("program.titlePlaceholder")}
             disabled={disabled}
           />
           <div className="grid gap-2 sm:grid-cols-2">
             <div className="space-y-1">
-              <Label className="text-xs">{t("program.startsAt", { defaultValue: "Début" })}</Label>
+              <Label className="text-xs">{t("program.startsAt")}</Label>
               <Input
                 type="datetime-local"
                 value={draft.starts_at}
@@ -224,7 +216,7 @@ export function CampProgramEditor({
               />
             </div>
             <div className="space-y-1">
-              <Label className="text-xs">{t("program.endsAt", { defaultValue: "Fin" })}</Label>
+              <Label className="text-xs">{t("program.endsAt")}</Label>
               <Input
                 type="datetime-local"
                 value={draft.ends_at}
@@ -237,9 +229,7 @@ export function CampProgramEditor({
             rows={2}
             value={draft.description}
             onChange={(e) => setDraft({ ...draft, description: e.target.value })}
-            placeholder={t("program.descPlaceholder", {
-              defaultValue: "Description (facultatif)",
-            })}
+            placeholder={t("program.descPlaceholder")}
             disabled={disabled}
           />
           <div className="flex gap-2">
@@ -253,7 +243,7 @@ export function CampProgramEditor({
               ) : (
                 <Check className="h-4 w-4" />
               )}
-              <span className="ml-1.5">{t("common.save", { defaultValue: "Enregistrer" })}</span>
+              <span className="ml-1.5">{t("common.save")}</span>
             </Button>
             <Button
               type="button"
@@ -264,7 +254,7 @@ export function CampProgramEditor({
               }}
             >
               <X className="h-4 w-4 mr-1.5" />
-              {t("common.cancel", { defaultValue: "Annuler" })}
+              {t("common.cancel")}
             </Button>
           </div>
         </div>
@@ -280,7 +270,7 @@ export function CampProgramEditor({
           disabled={disabled}
         >
           <Plus className="h-4 w-4 mr-1.5" />
-          {t("program.add", { defaultValue: "Ajouter un élément" })}
+          {t("program.add")}
         </Button>
       )}
     </div>

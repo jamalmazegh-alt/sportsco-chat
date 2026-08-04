@@ -119,21 +119,17 @@ export function DeclareStaffAbsenceDrawer({ open, onOpenChange, onCreated, avail
 
   async function onSubmit() {
     if (!user || !activeClubId) {
-      toast.error(
-        t("staffAvailability.errors.noClub", {
-          defaultValue: "Aucun club actif — impossible d'enregistrer.",
-        }),
-      );
+      toast.error(t("staffAvailability.errors.noClub"));
       return;
     }
     if (!range.from) {
-      toast.error(t("availability.errors.invalidRange", { defaultValue: "Dates invalides." }));
+      toast.error(t("availability.errors.invalidRange"));
       return;
     }
     const startDate = format(range.from, "yyyy-MM-dd");
     const endDate = format(range.to ?? range.from, "yyyy-MM-dd");
     if (endDate < startDate) {
-      toast.error(t("availability.errors.invalidRange", { defaultValue: "Dates invalides." }));
+      toast.error(t("availability.errors.invalidRange"));
       return;
     }
     setBusy(true);
@@ -151,12 +147,7 @@ export function DeclareStaffAbsenceDrawer({ open, onOpenChange, onCreated, avail
       const { count, error: overlapErr } = await q;
       if (overlapErr) throw overlapErr;
       if ((count ?? 0) > 0) {
-        toast.error(
-          t("availability.errors.overlap", {
-            defaultValue:
-              "Tu as déjà une indisponibilité sur ces dates. Édite l'existante à la place.",
-          }),
-        );
+        toast.error(t("availability.errors.overlap"));
         setBusy(false);
         return;
       }
@@ -174,9 +165,7 @@ export function DeclareStaffAbsenceDrawer({ open, onOpenChange, onCreated, avail
           })
           .eq("id", availability!.id);
         if (error) throw error;
-        toast.success(
-          t("staffAvailability.updated", { defaultValue: "Indisponibilité mise à jour" }),
-        );
+        toast.success(t("staffAvailability.updated"));
       } else {
         const { error } = await supabase.from("staff_availabilities").insert({
           user_id: user.id,
@@ -190,9 +179,7 @@ export function DeclareStaffAbsenceDrawer({ open, onOpenChange, onCreated, avail
           comment: comment.trim() || null,
         });
         if (error) throw error;
-        toast.success(
-          t("staffAvailability.saved", { defaultValue: "Indisponibilité enregistrée" }),
-        );
+        toast.success(t("staffAvailability.saved"));
       }
       qc.invalidateQueries({ queryKey: ["my-staff-availabilities"] });
       qc.invalidateQueries({ queryKey: ["staff-availabilities"] });
@@ -211,23 +198,14 @@ export function DeclareStaffAbsenceDrawer({ open, onOpenChange, onCreated, avail
       <SheetContent side="right" className="w-full sm:max-w-md overflow-y-auto">
         <SheetHeader className="pt-[env(safe-area-inset-top)]">
           <SheetTitle>
-            {editing
-              ? t("staffAvailability.edit", { defaultValue: "Modifier l'indisponibilité" })
-              : t("staffAvailability.declare", {
-                  defaultValue: "Déclarer une indisponibilité",
-                })}
+            {editing ? t("staffAvailability.edit") : t("staffAvailability.declare")}
           </SheetTitle>
-          <SheetDescription>
-            {t("staffAvailability.drawerHint", {
-              defaultValue:
-                "S'applique à toutes tes équipes dans le club actif. Le staff sera informé.",
-            })}
-          </SheetDescription>
+          <SheetDescription>{t("staffAvailability.drawerHint")}</SheetDescription>
         </SheetHeader>
 
         <div className="mt-4 space-y-4">
           <div className="space-y-1.5">
-            <Label>{t("availability.dates", { defaultValue: "Période d'absence" })}</Label>
+            <Label>{t("availability.dates")}</Label>
             <Popover>
               <PopoverTrigger asChild>
                 <Button
@@ -247,7 +225,7 @@ export function DeclareStaffAbsenceDrawer({ open, onOpenChange, onCreated, avail
                       </span>
                     )
                   ) : (
-                    t("availability.pickRange", { defaultValue: "Sélectionner une période" })
+                    t("availability.pickRange")
                   )}
                 </Button>
               </PopoverTrigger>
@@ -271,7 +249,7 @@ export function DeclareStaffAbsenceDrawer({ open, onOpenChange, onCreated, avail
           </div>
 
           <div className="space-y-1.5">
-            <Label>{t("availability.reasonLabel", { defaultValue: "Motif" })}</Label>
+            <Label>{t("availability.reasonLabel")}</Label>
             <div className="grid grid-cols-2 gap-2">
               {REASONS.map(({ value, Icon }) => (
                 <WizardOptionCard
@@ -287,7 +265,7 @@ export function DeclareStaffAbsenceDrawer({ open, onOpenChange, onCreated, avail
 
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1.5">
-              <Label>{t("staffAvailability.certainty", { defaultValue: "Certitude" })}</Label>
+              <Label>{t("staffAvailability.certaintyLabel")}</Label>
               <Select value={certainty} onValueChange={(v) => setCertainty(v as Certainty)}>
                 <SelectTrigger>
                   <SelectValue />
@@ -296,24 +274,20 @@ export function DeclareStaffAbsenceDrawer({ open, onOpenChange, onCreated, avail
                   <SelectItem value="confirmed">
                     <span className="inline-flex items-center gap-2">
                       <CheckCircle2 className="h-3.5 w-3.5 opacity-70" />
-                      {t("staffAvailability.certainty.confirmed", {
-                        defaultValue: "Confirmée",
-                      })}
+                      {t("staffAvailability.certainty.confirmed")}
                     </span>
                   </SelectItem>
                   <SelectItem value="tentative">
                     <span className="inline-flex items-center gap-2">
                       <CircleDashed className="h-3.5 w-3.5 opacity-70" />
-                      {t("staffAvailability.certainty.tentative", {
-                        defaultValue: "Possible",
-                      })}
+                      {t("staffAvailability.certainty.tentative")}
                     </span>
                   </SelectItem>
                 </SelectContent>
               </Select>
             </div>
             <div className="space-y-1.5">
-              <Label>{t("staffAvailability.visibility", { defaultValue: "Visibilité" })}</Label>
+              <Label>{t("staffAvailability.visibility")}</Label>
               <Select value={visibility} onValueChange={(v) => setVisibility(v as Visibility)}>
                 <SelectTrigger>
                   <SelectValue />
@@ -322,17 +296,13 @@ export function DeclareStaffAbsenceDrawer({ open, onOpenChange, onCreated, avail
                   <SelectItem value="staff">
                     <span className="inline-flex items-center gap-2">
                       <Eye className="h-3.5 w-3.5 opacity-70" />
-                      {t("staffAvailability.visibility.staff", {
-                        defaultValue: "Staff du club",
-                      })}
+                      {t("staffAvailability.visibilityStaff")}
                     </span>
                   </SelectItem>
                   <SelectItem value="admins_only">
                     <span className="inline-flex items-center gap-2">
                       <EyeOff className="h-3.5 w-3.5 opacity-70" />
-                      {t("staffAvailability.visibility.admins_only", {
-                        defaultValue: "Admins uniquement",
-                      })}
+                      {t("staffAvailability.visibilityAdminsOnly")}
                     </span>
                   </SelectItem>
                 </SelectContent>
@@ -341,21 +311,16 @@ export function DeclareStaffAbsenceDrawer({ open, onOpenChange, onCreated, avail
           </div>
 
           <div className="space-y-1.5">
-            <Label>{t("availability.comment", { defaultValue: "Commentaire" })}</Label>
+            <Label>{t("availability.comment")}</Label>
             <Textarea
               value={comment}
               onChange={(e) => setComment(e.target.value.slice(0, 300))}
               rows={3}
               maxLength={300}
-              placeholder={t("availability.commentPlaceholder", {
-                defaultValue: "Optionnel",
-              })}
+              placeholder={t("availability.commentPlaceholder")}
             />
             <p className="text-[11px] text-muted-foreground">
-              {t("staffAvailability.commentHint", {
-                defaultValue:
-                  "Le motif et le commentaire ne sont visibles que par les admins (ou tout le staff selon la visibilité choisie).",
-              })}
+              {t("staffAvailability.commentHint")}
             </p>
           </div>
 
@@ -368,9 +333,9 @@ export function DeclareStaffAbsenceDrawer({ open, onOpenChange, onCreated, avail
             {busy ? (
               <Loader2 className="h-4 w-4 animate-spin" />
             ) : editing ? (
-              t("common.saveChanges", { defaultValue: "Enregistrer les modifications" })
+              t("common.saveChanges")
             ) : (
-              t("common.save", { defaultValue: "Enregistrer" })
+              t("common.save")
             )}
           </Button>
         </div>

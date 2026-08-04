@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Trans, useTranslation } from "react-i18next";
 import { Loader2, Calculator, AlertTriangle } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -11,6 +12,7 @@ import { DestructiveConfirmSheet } from "@/components/destructive-confirm-sheet"
 type Result = Awaited<ReturnType<typeof recomputePlayerCategoriesForSeason>>;
 
 export function RecomputeCategoriesPanel({ clubId }: { clubId: string }) {
+  const { t } = useTranslation();
   const [seasonLabel, setSeasonLabel] = useState("");
   const [overwrite, setOverwrite] = useState(false);
   const [confirmOpen, setConfirmOpen] = useState(false);
@@ -29,9 +31,9 @@ export function RecomputeCategoriesPanel({ clubId }: { clubId: string }) {
         },
       });
       setResult(res);
-      toast.success(`Catégories recalculées (saison ${res.seasonLabel})`);
+      toast.success(t("superadmin.components.categoriesRecomputed", { season: res.seasonLabel }));
     } catch (e) {
-      toast.error(e instanceof Error ? e.message : "Échec du recalcul");
+      toast.error(e instanceof Error ? e.message : t("superadmin.components.recomputeFailed"));
     } finally {
       setLoading(false);
       setConfirmOpen(false);
@@ -47,21 +49,20 @@ export function RecomputeCategoriesPanel({ clubId }: { clubId: string }) {
     <section className="mb-6">
       <div className="rounded-xl border border-border bg-card p-5">
         <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground flex items-center gap-2 mb-3">
-          <Calculator className="h-4 w-4" /> Recalcul des catégories FFF
+          <Calculator className="h-4 w-4" /> {t("superadmin.components.recomputeTitle")}
         </h2>
         <p className="text-xs text-muted-foreground mb-4">
-          Recalcule les catégories d'âge (U6 → Senior) des joueurs du club pour la saison choisie.
-          Par défaut, seules les lignes sans catégorie sont remplies (non destructif).
+          {t("superadmin.components.recomputeBody")}
         </p>
 
         <div className="grid sm:grid-cols-2 gap-3 mb-4">
           <div className="space-y-1.5">
             <Label htmlFor="season-label" className="text-xs">
-              Saison (optionnel)
+              {t("superadmin.components.seasonOptional")}
             </Label>
             <Input
               id="season-label"
-              placeholder="Saison courante par défaut (ex. 2024-2025)"
+              placeholder={t("superadmin.components.seasonPlaceholder")}
               value={seasonLabel}
               onChange={(e) => setSeasonLabel(e.target.value)}
               disabled={loading}
@@ -77,31 +78,47 @@ export function RecomputeCategoriesPanel({ clubId }: { clubId: string }) {
             className="mt-0.5"
           />
           <span className="text-xs leading-relaxed">
-            <span className="font-medium text-foreground">Écraser</span> les catégories déjà
-            saisies, <span className="text-destructive">y compris les surclassements manuels</span>.
+            <Trans
+              i18nKey="superadmin.components.overwriteLabel"
+              components={{
+                strong: <span className="font-medium text-foreground" />,
+                danger: <span className="text-destructive" />,
+              }}
+            />
           </span>
         </label>
 
         <Button onClick={onClick} disabled={loading} size="sm">
           {loading ? (
             <>
-              <Loader2 className="h-4 w-4 mr-1.5 animate-spin" /> Recalcul en cours…
+              <Loader2 className="h-4 w-4 mr-1.5 animate-spin" />{" "}
+              {t("superadmin.components.recomputeRunning")}
             </>
           ) : (
             <>
-              <Calculator className="h-4 w-4 mr-1.5" /> Recalculer
+              <Calculator className="h-4 w-4 mr-1.5" /> {t("superadmin.components.recomputeAction")}
             </>
           )}
         </Button>
 
         {result && (
           <div className="mt-4 rounded-lg border border-border bg-muted/30 p-3">
-            <div className="text-xs font-medium mb-2">Résultat — saison {result.seasonLabel}</div>
+            <div className="text-xs font-medium mb-2">
+              {t("superadmin.components.recomputeResult", { season: result.seasonLabel })}
+            </div>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
-              <Stat label="Total" value={result.total} />
-              <Stat label="Mises à jour" value={result.updated} tone="success" />
-              <Stat label="Ignorées" value={result.skipped} />
-              <Stat label="Sans date de naissance" value={result.missingDob} tone="warn" />
+              <Stat label={t("superadmin.components.statTotal")} value={result.total} />
+              <Stat
+                label={t("superadmin.components.statUpdated")}
+                value={result.updated}
+                tone="success"
+              />
+              <Stat label={t("superadmin.components.statSkipped")} value={result.skipped} />
+              <Stat
+                label={t("superadmin.components.statMissingDob")}
+                value={result.missingDob}
+                tone="warn"
+              />
             </div>
           </div>
         )}
@@ -112,22 +129,25 @@ export function RecomputeCategoriesPanel({ clubId }: { clubId: string }) {
         onOpenChange={setConfirmOpen}
         mode="type"
         confirmWord="ECRASER"
-        title="Écraser les catégories existantes ?"
+        title={t("superadmin.components.overwriteConfirmTitle")}
         description={
-          <>
-            Toutes les catégories déjà saisies pour la saison sélectionnée seront{" "}
-            <strong>remplacées</strong> par le calcul FFF automatique.
-          </>
+          <Trans
+            i18nKey="superadmin.components.overwriteConfirmDesc"
+            components={{ strong: <strong /> }}
+          />
         }
         consequences={
           <div className="flex items-start gap-2">
             <AlertTriangle className="h-4 w-4 text-destructive shrink-0 mt-0.5" />
             <span>
-              Les <strong>surclassements manuels</strong> (ex. un U14 jouant en U15) seront perdus.
+              <Trans
+                i18nKey="superadmin.components.overwriteConsequence"
+                components={{ strong: <strong /> }}
+              />
             </span>
           </div>
         }
-        confirmLabel="Écraser et recalculer"
+        confirmLabel={t("superadmin.components.overwriteConfirmAction")}
         onConfirm={run}
         loading={loading}
       />

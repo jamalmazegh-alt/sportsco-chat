@@ -154,7 +154,8 @@ function EventChallengesPage() {
   if (loadingEvent) {
     return <FullscreenLoader />;
   }
-  if (!eventInfo) return <div className="p-4 text-sm text-muted-foreground">Event not found.</div>;
+  if (!eventInfo)
+    return <div className="p-4 text-sm text-muted-foreground">{t("errors.eventNotFound")}</div>;
 
   const challenges = challengesData?.challenges ?? [];
   const entryCounts = countsData?.counts ?? {};
@@ -278,9 +279,7 @@ function ChallengesList({
               onClick={onToggleShowAll}
               className="h-8 px-2 text-xs"
             >
-              {showAll
-                ? t("list.active_only", { defaultValue: "Actifs" })
-                : t("list.show_all", { defaultValue: "Tout voir" })}
+              {showAll ? t("list.active_only") : t("list.show_all")}
             </Button>
           )}
           {isStaff && (
@@ -293,27 +292,9 @@ function ChallengesList({
       {displayed.length === 0 && (
         <Card>
           <CardContent className="p-6 text-center text-sm text-muted-foreground">
-            <p>
-              {showAll
-                ? t("list.empty", { defaultValue: "Aucun défi pour l'instant." })
-                : t("list.no_active", {
-                    defaultValue: "Aucune activité n'a encore été utilisée pour cette séance.",
-                  })}
-            </p>
-            {!showAll && hasHidden && (
-              <p className="mt-1">
-                {t("list.show_all_hint", {
-                  defaultValue: "Affiche toutes les activités de l'équipe pour en saisir une.",
-                })}
-              </p>
-            )}
-            {showAll && isStaff && (
-              <p className="mt-1">
-                {t("list.empty_hint", {
-                  defaultValue: "Ajoute un défi ou un test à cette séance.",
-                })}
-              </p>
-            )}
+            <p>{showAll ? t("list.empty") : t("list.no_active")}</p>
+            {!showAll && hasHidden && <p className="mt-1">{t("list.show_all_hint")}</p>}
+            {showAll && isStaff && <p className="mt-1">{t("list.empty_hint")}</p>}
           </CardContent>
         </Card>
       )}
@@ -499,9 +480,7 @@ function AddChallenge({
         {items.length === 0 && (
           <Card>
             <CardContent className="p-6 text-center text-sm text-muted-foreground">
-              {t("add.all_added", {
-                defaultValue: "Toutes les activités disponibles sont déjà ajoutées à cette équipe.",
-              })}
+              {t("add.all_added")}
             </CardContent>
           </Card>
         )}
@@ -537,17 +516,17 @@ function AddChallenge({
                     <div className="font-medium">{it.name}</div>
                     {it.kind === "existing" && it.popular && (
                       <span className="inline-flex items-center rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-primary">
-                        {t("add.popular", { defaultValue: "Populaire" })}
+                        {t("add.popular")}
                       </span>
                     )}
                     {isUsed && (
                       <span className="inline-flex items-center rounded-full bg-muted px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
-                        {t("add.already_in_session", { defaultValue: "Déjà dans la séance" })}
+                        {t("add.already_in_session")}
                       </span>
                     )}
                     {isSelected && (
                       <span className="inline-flex items-center rounded-full bg-primary px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-primary-foreground">
-                        {t("add.selected", { defaultValue: "Sélectionné" })}
+                        {t("add.selected")}
                       </span>
                     )}
                   </div>
@@ -584,7 +563,7 @@ function AddChallenge({
                   setName("");
                 }}
               >
-                {t("add.cancel", { defaultValue: "Annuler" })}
+                {t("add.cancel")}
               </Button>
             </div>
             <Input value={name} onChange={(e) => setName(e.target.value)} />

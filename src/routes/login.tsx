@@ -308,7 +308,7 @@ function LoginPage() {
               <button
                 type="button"
                 className="toggle"
-                aria-label={showPw ? "Masquer le mot de passe" : "Afficher le mot de passe"}
+                aria-label={showPw ? t("auth.hidePassword") : t("auth.showPassword")}
                 onClick={() => setShowPw((v) => !v)}
               >
                 {showPw ? <EyeOff size={20} /> : <Eye size={20} />}
@@ -328,7 +328,7 @@ function LoginPage() {
         </p>
 
         <div className="install-cta">
-          <InstallAppButton label="Installer l'app sur mon téléphone" />
+          <InstallAppButton label={t("install.cta")} />
         </div>
       </main>
     </div>

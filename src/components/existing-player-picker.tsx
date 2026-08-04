@@ -124,7 +124,7 @@ export function ExistingPlayerPicker({
       toast.warning(t("players.alreadyInTeam"));
     }
     if (failed > 0) {
-      toast.error(t("common.error", { defaultValue: "Erreur" }));
+      toast.error(t("common.error"));
     }
     qc.invalidateQueries({ queryKey: ["team-players", teamId] });
     qc.invalidateQueries({ queryKey: ["teams-with-counts"] });
@@ -135,11 +135,7 @@ export function ExistingPlayerPicker({
   return (
     <div className="space-y-3">
       <p className="text-xs text-muted-foreground">{t("players.existingHint")}</p>
-      <Input
-        placeholder={t("common.search", { defaultValue: "Rechercher" })}
-        value={q}
-        onChange={(e) => setQ(e.target.value)}
-      />
+      <Input placeholder={t("common.search")} value={q} onChange={(e) => setQ(e.target.value)} />
       {isLoading ? (
         <div className="space-y-2">
           {[0, 1, 2].map((i) => (

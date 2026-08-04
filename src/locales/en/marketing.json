@@ -349,7 +349,9 @@
         "s2": "Parents stay informed",
         "s3": "Coaches get the spotlight",
         "s4": "Clubs grow their visibility",
-        "showcase": "Every club has its own public showcase page."
+        "showcase": "Every club has its own public showcase page.",
+        "soonBadge": "Coming soon",
+        "soonNote": "Social features are rolling out soon."
       },
       "forwho": {
         "title": "Who is it for?",
@@ -516,7 +518,8 @@
     "mockFeedbackTagStrong": "Vision",
     "mockFeedbackTagWork": "Finishing",
     "mockAiBadge": "AI summary",
-    "mockAiBody": "Steady season, clear progress on playmaking. Recommendation: weak-foot finishing drills."
+    "mockAiBody": "Steady season, clear progress on playmaking. Recommendation: weak-foot finishing drills.",
+    "mockSeasonLabel": "Season"
   },
   "coachAssist": {
     "chip": "Coach side",
@@ -765,7 +768,8 @@
       "b1": "Rotating sponsor banner on the club home",
       "b2": "Automatic impression & click tracking",
       "b3": "Multiple partners, order and logos managed from admin",
-      "cta": "See sponsor management"
+      "cta": "See sponsor management",
+      "demoName": "Your Partner"
     },
     "future": {
       "badge": "Coming soon",
@@ -1058,7 +1062,10 @@
           }
         ]
       }
-    }
+    },
+    "learnMore": "Learn more",
+    "modulesCount": "modules",
+    "includedV1": "Included in V1"
   },
   "faq": {
     "metaTitle": "FAQ — Clubero",
@@ -2079,5 +2086,37 @@
         "cta": "View the installation guide"
       }
     }
+  },
+  "mock": {
+    "toDoCount": "3 to do",
+    "attendance": "Attendance",
+    "u15Training": "U15 Training"
+  },
+  "publicPlayers": {
+    "eyebrow": "Public directory",
+    "title": "Clubero players",
+    "subtitle": "Browse the public profiles players have chosen to share: honours, sporting journey, club. Limited to adult players who have activated their profile.",
+    "searchPlaceholder": "Player or club name…",
+    "allSports": "All sports",
+    "allClubs": "All clubs",
+    "clubFilter": "Club",
+    "search": "Search",
+    "reset": "Reset",
+    "loading": "Loading…",
+    "count": "{{count}} players",
+    "page": "Page {{page}} / {{total}}",
+    "error": "Unable to load the directory right now.",
+    "emptyTitle": "No matching profile",
+    "emptyBody": "Refine your filters or check back soon — new players share their profile every week.",
+    "prev": "Previous",
+    "next": "Next",
+    "ctaTitle": "Are you a player? Create your public profile.",
+    "ctaBody": "Share your honours, seasons and journey in a single link. Free, opt-in, under your control.",
+    "ctaJoin": "Create my account",
+    "ctaFeatures": "See the features"
+  },
+  "common": {
+    "stop": "Stop",
+    "listen": "Listen"
   }
 }

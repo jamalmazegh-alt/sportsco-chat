@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { ShieldCheck, Loader2 } from "lucide-react";
@@ -45,6 +46,7 @@ export function BillingExemptionActions({
   onUpdated: () => void;
   compact?: boolean;
 }) {
+  const { t } = useTranslation();
   const queryClient = useQueryClient();
   const grantFn = useServerFn(grantBillingExemption);
   const revokeFn = useServerFn(revokeBillingExemption);
@@ -68,12 +70,12 @@ export function BillingExemptionActions({
     setBusy(true);
     try {
       await grantFn({ data: { clubId, reason } });
-      toast.success("Exemption accordée");
+      toast.success(t("superadmin.components.exemptionGranted"));
       setGrantOpen(false);
       setReason("");
       await invalidateCaches();
     } catch (e) {
-      toast.error(e instanceof Error ? e.message : "Échec");
+      toast.error(e instanceof Error ? e.message : t("superadmin.components.failed"));
     } finally {
       setBusy(false);
     }
@@ -83,11 +85,11 @@ export function BillingExemptionActions({
     setBusy(true);
     try {
       await revokeFn({ data: { clubId } });
-      toast.success("Exemption retirée");
+      toast.success(t("superadmin.components.exemptionRemoved"));
       setRevokeOpen(false);
       await invalidateCaches();
     } catch (e) {
-      toast.error(e instanceof Error ? e.message : "Échec");
+      toast.error(e instanceof Error ? e.message : t("superadmin.components.failed"));
     } finally {
       setBusy(false);
     }

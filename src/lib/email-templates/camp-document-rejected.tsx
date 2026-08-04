@@ -1,6 +1,6 @@
 import * as React from "react";
 import { Button, Heading, Img, Section, Text } from "@react-email/components";
-import { EmailShell } from "./_layout";
+import { EmailShell, pickLocale, type Locale } from "./_layout";
 import type { TemplateEntry } from "./registry";
 
 interface Props {
@@ -11,7 +11,53 @@ interface Props {
   documentLabel: string;
   rejectionReason: string;
   trackingUrl?: string;
+  locale?: string;
 }
+
+const T = {
+  fr: {
+    preview: (camp: string) => `Document à renvoyer — ${camp}`,
+    brand: "Clubero · Stages",
+    hello: (n?: string) => (n ? `Bonjour ${n},` : "Bonjour,"),
+    body: (participant: string, camp: string, club: string) => (
+      <>
+        Un document du dossier de <strong>{participant}</strong> pour le stage
+        <strong> {camp}</strong> ({club}) a été <strong>refusé</strong> par le club.
+      </>
+    ),
+    docLabel: "Document concerné",
+    reasonLabel: "Motif du refus",
+    resubmit: "Merci de renvoyer une nouvelle version depuis votre espace de suivi personnel :",
+    cta: "Renvoyer le document",
+    orLink: "Ou ouvrez ce lien :",
+    personalLink: "Ce lien est personnel — ne le partagez pas.",
+    help: "Une question sur ce refus ? Répondez directement au club organisateur.",
+    subject: (camp: string) => `Document à renvoyer — ${camp}`,
+    fallbackCamp: "stage",
+  },
+  en: {
+    preview: (camp: string) => `Document to resubmit — ${camp}`,
+    brand: "Clubero · Camps",
+    hello: (n?: string) => (n ? `Hi ${n},` : "Hi,"),
+    body: (participant: string, camp: string, club: string) => (
+      <>
+        A document in <strong>{participant}</strong>'s file for the camp
+        <strong> {camp}</strong> ({club}) was <strong>rejected</strong> by the club.
+      </>
+    ),
+    docLabel: "Document concerned",
+    reasonLabel: "Reason for rejection",
+    resubmit: "Please send a new version from your personal tracking page:",
+    cta: "Resubmit document",
+    orLink: "Or open this link:",
+    personalLink: "This link is personal — do not share it.",
+    help: "Questions about this rejection? Reply directly to the organizing club.",
+    subject: (camp: string) => `Document to resubmit — ${camp}`,
+    fallbackCamp: "camp",
+  },
+} as const;
+
+const pick = (l: Locale) => (l === "fr" ? T.fr : T.en);
 
 const CampDocumentRejected = ({
   guardianFirstName,
@@ -21,9 +67,13 @@ const CampDocumentRejected = ({
   documentLabel,
   rejectionReason,
   trackingUrl,
+  locale,
 }: Props) => {
+  const l = pickLocale(locale);
+  const t = pick(l);
+
   return (
-    <EmailShell preview={`Document à renvoyer — ${campTitle}`} locale="fr">
+    <EmailShell preview={t.preview(campTitle)} locale={l}>
       <Section style={header}>
         <Img
           src="https://www.clubero.app/clubero-logo.png"
@@ -32,47 +82,42 @@ const CampDocumentRejected = ({
           height="56"
           style={logo}
         />
-        <Text style={brand}>Clubero · Stages</Text>
+        <Text style={brand}>{t.brand}</Text>
       </Section>
-      <Heading style={h1}>
-        {guardianFirstName ? `Bonjour ${guardianFirstName},` : "Bonjour,"}
-      </Heading>
-      <Text style={text}>
-        Un document du dossier de <strong>{participantName}</strong> pour le stage
-        <strong> {campTitle}</strong> ({clubName}) a été <strong>refusé</strong> par le club.
-      </Text>
+      <Heading style={h1}>{t.hello(guardianFirstName)}</Heading>
+      <Text style={text}>{t.body(participantName, campTitle, clubName)}</Text>
       <Section style={card}>
-        <Text style={cardLabel}>Document concerné</Text>
+        <Text style={cardLabel}>{t.docLabel}</Text>
         <Text style={cardValue}>{documentLabel}</Text>
-        <Text style={cardLabel}>Motif du refus</Text>
+        <Text style={cardLabel}>{t.reasonLabel}</Text>
         <Text style={cardValue}>{rejectionReason}</Text>
       </Section>
-      <Text style={text}>
-        Merci de renvoyer une nouvelle version depuis votre espace de suivi personnel :
-      </Text>
+      <Text style={text}>{t.resubmit}</Text>
       {trackingUrl && (
         <>
           <Button style={button} href={trackingUrl}>
-            Renvoyer le document
+            {t.cta}
           </Button>
           <Text style={small}>
-            Ou ouvrez ce lien :<br />
+            {t.orLink}
+            <br />
             <span style={{ wordBreak: "break-all", color: "#3b82f6" }}>{trackingUrl}</span>
             <br />
-            <em>Ce lien est personnel — ne le partagez pas.</em>
+            <em>{t.personalLink}</em>
           </Text>
         </>
       )}
-      <Text style={small}>
-        Une question sur ce refus ? Répondez directement au club organisateur.
-      </Text>
+      <Text style={small}>{t.help}</Text>
     </EmailShell>
   );
 };
 
 export const template = {
   component: CampDocumentRejected,
-  subject: (data) => `Document à renvoyer — ${data.campTitle ?? "stage"}`,
+  subject: (data) => {
+    const t = pick(pickLocale((data as { locale?: string }).locale));
+    return t.subject((data.campTitle as string | undefined) ?? t.fallbackCamp);
+  },
   displayName: "Camp document rejected",
   previewData: {
     guardianFirstName: "Marie",
@@ -82,6 +127,7 @@ export const template = {
     documentLabel: "Certificat médical",
     rejectionReason: "Le document est illisible, merci d'envoyer un scan de meilleure qualité.",
     trackingUrl: "https://clubero.app/stages/fc-villeneuve/stage-printemps/suivi/token",
+    locale: "fr",
   },
 } satisfies TemplateEntry;
 

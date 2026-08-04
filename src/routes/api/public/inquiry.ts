@@ -100,15 +100,16 @@ export const Route = createFileRoute("/api/public/inquiry")({
         const safeEmail = parsed.email.replace(/[\r\n<>"]/g, "");
         const replyTo = `${safeName} <${safeEmail}>`;
 
-        // 1) Admin notification to hello@clubero.app
+        // 1) Admin notification to hello@clubero.app (ops inbox — always FR)
         try {
           const adminId = crypto.randomUUID();
-          const adminEl = React.createElement(adminTemplate.component, parsed);
+          const adminData = { ...parsed, locale: "fr" as const };
+          const adminEl = React.createElement(adminTemplate.component, adminData);
           const adminHtml = await render(adminEl);
           const adminText = await render(adminEl, { plainText: true });
           const adminSubject =
             typeof adminTemplate.subject === "function"
-              ? adminTemplate.subject(parsed)
+              ? adminTemplate.subject(adminData)
               : adminTemplate.subject;
           const adminToken = await getOrCreateUnsubscribeToken(supabase, adminTemplate.to);
 

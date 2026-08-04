@@ -106,7 +106,7 @@ export function AdminKpis({ clubId }: AdminKpisProps) {
     },
     {
       icon: Clock,
-      label: t("dashboard.kpis.pendingResponses", { defaultValue: "Réponses en attente" }),
+      label: t("dashboard.kpis.pendingResponses"),
       value: data?.pendingResponses ?? 0,
       bar: "linear-gradient(90deg, #b45309 0%, #f59e0b 100%)",
       iconBg: "linear-gradient(135deg, #fef3c7 0%, #fde68a 100%)",

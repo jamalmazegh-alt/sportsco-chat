@@ -51,6 +51,9 @@ test.describe("équipes", () => {
       .first()
       .click();
     await page.getByTestId("team-name-input").fill(teamName);
+    // Age category is required since feat(teams) catalogue — leave it empty and Create is a no-op.
+    await page.getByTestId("age-group-select").click();
+    await page.getByRole("option", { name: "U13" }).click();
     await page.getByRole("button", { name: tx("common.create") }).click();
 
     await expect(page.getByText(teamName)).toBeVisible();

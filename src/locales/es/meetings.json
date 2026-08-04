@@ -1,0 +1,46 @@
+{
+  "section": {
+    "title": "Convocatorias de reunión",
+    "count": "{{count}} convocado(s)"
+  },
+  "empty": {
+    "staff": "Sin convocados — usa « Gestionar convocados » para invitar a grupos o personas.",
+    "member": "No estás convocado a esta reunión."
+  },
+  "self": {
+    "prompt": "Tu asistencia:"
+  },
+  "source": {
+    "manual": "añadido manualmente"
+  },
+  "row": {
+    "actions": "Acciones",
+    "resend": {
+      "cta": "Reenviar convocatoria",
+      "success": "Convocatoria reenviada"
+    },
+    "remove": {
+      "cta": "Cancelar convocatoria",
+      "success": "Convocatoria cancelada",
+      "confirmTitle": "¿Cancelar convocatoria?",
+      "confirmDesc": "{{name}} será retirado/a de la reunión y recibirá una notificación.",
+      "confirmCta": "Quitar"
+    }
+  },
+  "manage": {
+    "cta": "Gestionar convocados",
+    "title": "¿A quién convocar?",
+    "desc": "Selecciona grupos, equipos o personas. Cada persona se convoca solo una vez.",
+    "save": "Guardar",
+    "confirm": "Convocar"
+  },
+  "sync": {
+    "success": "{{added}} añadido(s), {{removed}} retirado(s)"
+  },
+  "confirmRemove": {
+    "title": "¿Quitar a personas que ya respondieron?",
+    "desc": "Estas personas ya han respondido o han sido registradas. Al quitarlas también se eliminará su respuesta y asistencia. Siguen convocadas hasta que confirmes.",
+    "keep": "Conservarlas",
+    "confirm": "Quitar de todos modos"
+  }
+}

@@ -175,7 +175,7 @@ function PublicPlayersDirectory() {
               }}
             >
               <SelectTrigger>
-                <SelectValue placeholder="Club" />
+                <SelectValue placeholder={t("publicPlayers.clubFilter")} />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">{t("publicPlayers.allClubs", "Tous les clubs")}</SelectItem>

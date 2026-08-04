@@ -95,15 +95,15 @@ function PaymentsSettingsPage() {
           </TabsTrigger>
           <TabsTrigger value="seasons" className="gap-1.5">
             <CalendarRange className="h-3.5 w-3.5" />
-            <span className="hidden sm:inline">Saisons</span>
+            <span className="hidden sm:inline">{t("admin.payments.tabSeasons")}</span>
           </TabsTrigger>
           <TabsTrigger value="reminders" className="gap-1.5">
             <BellRing className="h-3.5 w-3.5" />
-            <span className="hidden sm:inline">Rappels</span>
+            <span className="hidden sm:inline">{t("admin.payments.tabReminders")}</span>
           </TabsTrigger>
           <TabsTrigger value="general" className="gap-1.5">
             <Settings2 className="h-3.5 w-3.5" />
-            <span className="hidden sm:inline">Général</span>
+            <span className="hidden sm:inline">{t("admin.payments.tabGeneral")}</span>
           </TabsTrigger>
         </TabsList>
 
@@ -343,6 +343,7 @@ function StripeTab({ clubId, successFlag }: { clubId: string; successFlag: boole
 /* ----------------------------- HelloAsso tab ----------------------------- */
 
 function HelloAssoTab({ clubId }: { clubId: string }) {
+  const { t } = useTranslation();
   const getFn = useServerFn(getPaymentSettings);
   const updateFn = useServerFn(updatePaymentSettings);
   const qc = useQueryClient();
@@ -388,7 +389,7 @@ function HelloAssoTab({ clubId }: { clubId: string }) {
         },
       }),
     onSuccess: () => {
-      toast.success("Paramètres HelloAsso enregistrés");
+      toast.success(t("admin.payments.helloassoSaved"));
       qc.invalidateQueries({ queryKey: ["payment-settings", clubId] });
     },
     onError: (e: Error) => toast.error(e.message),
@@ -412,8 +413,7 @@ function HelloAssoTab({ clubId }: { clubId: string }) {
           <div className="flex-1 min-w-0">
             <p className="text-sm font-semibold">HelloAsso</p>
             <p className="text-xs text-muted-foreground mt-0.5">
-              Encaissez sans commission via la plateforme HelloAsso (pourboire libre laissé au
-              donateur).
+              {t("admin.payments.helloassoHint")}
             </p>
           </div>
           <Switch checked={enabled} onCheckedChange={setEnabled} />
@@ -421,28 +421,28 @@ function HelloAssoTab({ clubId }: { clubId: string }) {
 
         <div className="grid gap-4">
           <UrlField
-            label="Adhésions / licences"
+            label={t("admin.payments.urlMembership")}
             placeholder="https://www.helloasso.com/associations/..."
             value={urls.membership}
             onChange={(v) => setUrls((s) => ({ ...s, membership: v }))}
             disabled={!enabled}
           />
           <UrlField
-            label="Collectes / cagnottes"
+            label={t("admin.payments.urlFundraising")}
             placeholder="https://www.helloasso.com/associations/.../collectes/..."
             value={urls.fundraising}
             onChange={(v) => setUrls((s) => ({ ...s, fundraising: v }))}
             disabled={!enabled}
           />
           <UrlField
-            label="Boutique"
+            label={t("admin.payments.urlShop")}
             placeholder="https://www.helloasso.com/associations/.../boutiques/..."
             value={urls.shop}
             onChange={(v) => setUrls((s) => ({ ...s, shop: v }))}
             disabled={!enabled}
           />
           <UrlField
-            label="Tournois / événements"
+            label={t("admin.payments.urlTournament")}
             placeholder="https://www.helloasso.com/associations/.../evenements/..."
             value={urls.tournament}
             onChange={(v) => setUrls((s) => ({ ...s, tournament: v }))}
@@ -455,7 +455,7 @@ function HelloAssoTab({ clubId }: { clubId: string }) {
           disabled={save.isPending}
           className="w-full sm:w-auto"
         >
-          {save.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : "Enregistrer"}
+          {save.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : t("common.save")}
         </Button>
       </div>
     </div>
@@ -493,6 +493,7 @@ function UrlField({
 /* ------------------------------ Seasons tab ------------------------------ */
 
 function SeasonsTab({ clubId }: { clubId: string }) {
+  const { t } = useTranslation();
   const listFn = useServerFn(listSeasons);
   const createFn = useServerFn(createSeason);
   const setCurrentFn = useServerFn(setCurrentSeason);
@@ -520,7 +521,7 @@ function SeasonsTab({ clubId }: { clubId: string }) {
         },
       }),
     onSuccess: () => {
-      toast.success("Saison créée");
+      toast.success(t("admin.payments.seasonCreated"));
       qc.invalidateQueries({ queryKey: ["seasons", clubId] });
     },
     onError: (e: Error) => toast.error(e.message),
@@ -529,7 +530,7 @@ function SeasonsTab({ clubId }: { clubId: string }) {
   const setCurrent = useMutation({
     mutationFn: (seasonId: string) => setCurrentFn({ data: { clubId, seasonId } }),
     onSuccess: () => {
-      toast.success("Saison courante mise à jour");
+      toast.success(t("admin.payments.seasonCurrentUpdated"));
       qc.invalidateQueries({ queryKey: ["seasons", clubId] });
     },
     onError: (e: Error) => toast.error(e.message),
@@ -538,7 +539,7 @@ function SeasonsTab({ clubId }: { clubId: string }) {
   const remove = useMutation({
     mutationFn: (seasonId: string) => deleteFn({ data: { clubId, seasonId } }),
     onSuccess: () => {
-      toast.success("Saison supprimée");
+      toast.success(t("admin.payments.seasonDeleted"));
       qc.invalidateQueries({ queryKey: ["seasons", clubId] });
     },
     onError: (e: Error) => toast.error(e.message),
@@ -547,10 +548,10 @@ function SeasonsTab({ clubId }: { clubId: string }) {
   return (
     <div className="space-y-5">
       <div className="rounded-2xl border border-border bg-card p-5 space-y-4">
-        <p className="text-sm font-semibold">Nouvelle saison</p>
+        <p className="text-sm font-semibold">{t("admin.payments.newSeason")}</p>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
           <div className="space-y-1.5">
-            <Label className="text-xs">Libellé</Label>
+            <Label className="text-xs">{t("admin.payments.seasonLabel")}</Label>
             <Input
               value={label}
               onChange={(e) => setLabel(e.target.value)}
@@ -558,18 +559,18 @@ function SeasonsTab({ clubId }: { clubId: string }) {
             />
           </div>
           <div className="space-y-1.5">
-            <Label className="text-xs">Début</Label>
+            <Label className="text-xs">{t("admin.payments.seasonStart")}</Label>
             <Input type="date" value={start} onChange={(e) => setStart(e.target.value)} />
           </div>
           <div className="space-y-1.5">
-            <Label className="text-xs">Fin</Label>
+            <Label className="text-xs">{t("admin.payments.seasonEnd")}</Label>
             <Input type="date" value={end} onChange={(e) => setEnd(e.target.value)} />
           </div>
         </div>
         <div className="flex items-center gap-2">
           <Switch checked={isCurrent} onCheckedChange={setIsCurrent} id="is-current" />
           <Label htmlFor="is-current" className="text-xs">
-            Définir comme saison courante
+            {t("admin.payments.setAsCurrent")}
           </Label>
         </div>
         <Button onClick={() => create.mutate()} disabled={create.isPending}>
@@ -578,21 +579,21 @@ function SeasonsTab({ clubId }: { clubId: string }) {
           ) : (
             <>
               <Plus className="h-4 w-4" />
-              Créer
+              {t("common.create")}
             </>
           )}
         </Button>
       </div>
 
       <div className="rounded-2xl border border-border bg-card p-5 space-y-3">
-        <p className="text-sm font-semibold">Saisons existantes</p>
+        <p className="text-sm font-semibold">{t("admin.payments.existingSeasons")}</p>
         {q.isLoading && (
           <div className="flex justify-center py-6">
             <Loader2 className="h-4 w-4 animate-spin text-primary" />
           </div>
         )}
         {q.data?.seasons.length === 0 && (
-          <p className="text-xs text-muted-foreground">Aucune saison pour le moment.</p>
+          <p className="text-xs text-muted-foreground">{t("admin.payments.noSeasons")}</p>
         )}
         <ul className="divide-y divide-border">
           {q.data?.seasons.map((s) => (
@@ -602,7 +603,7 @@ function SeasonsTab({ clubId }: { clubId: string }) {
                   {s.label}
                   {s.is_current && (
                     <span className="inline-flex items-center gap-0.5 text-[10px] uppercase tracking-wide bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 px-1.5 py-0.5 rounded">
-                      <Star className="h-2.5 w-2.5" /> en cours
+                      <Star className="h-2.5 w-2.5" /> {t("admin.payments.seasonCurrent")}
                     </span>
                   )}
                 </p>
@@ -617,7 +618,7 @@ function SeasonsTab({ clubId }: { clubId: string }) {
                   onClick={() => setCurrent.mutate(s.id)}
                   disabled={setCurrent.isPending}
                 >
-                  <Star className="h-3.5 w-3.5" /> Définir
+                  <Star className="h-3.5 w-3.5" /> {t("admin.payments.setCurrent")}
                 </Button>
               )}
               <Button
@@ -640,6 +641,7 @@ function SeasonsTab({ clubId }: { clubId: string }) {
 /* ------------------------------ General tab ------------------------------ */
 
 function GeneralTab({ clubId }: { clubId: string }) {
+  const { t } = useTranslation();
   const getFn = useServerFn(getPaymentSettings);
   const updateFn = useServerFn(updatePaymentSettings);
   const qc = useQueryClient();
@@ -671,7 +673,7 @@ function GeneralTab({ clubId }: { clubId: string }) {
         },
       }),
     onSuccess: () => {
-      toast.success("Paramètres enregistrés");
+      toast.success(t("admin.saved"));
       qc.invalidateQueries({ queryKey: ["payment-settings", clubId] });
     },
     onError: (e: Error) => toast.error(e.message),
@@ -690,7 +692,7 @@ function GeneralTab({ clubId }: { clubId: string }) {
       <div className="rounded-2xl border border-border bg-card p-5 space-y-4">
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <div className="space-y-1.5">
-            <Label className="text-xs">Devise (ISO 4217)</Label>
+            <Label className="text-xs">{t("admin.payments.currency")}</Label>
             <Input
               value={currency}
               onChange={(e) => setCurrency(e.target.value)}
@@ -699,7 +701,7 @@ function GeneralTab({ clubId }: { clubId: string }) {
             />
           </div>
           <div className="space-y-1.5">
-            <Label className="text-xs">Montant minimum de paiement partiel</Label>
+            <Label className="text-xs">{t("admin.payments.minPartial")}</Label>
             <Input
               type="number"
               min={0}
@@ -708,12 +710,12 @@ function GeneralTab({ clubId }: { clubId: string }) {
               onChange={(e) => setMinPartial(e.target.value)}
             />
             <p className="text-[11px] text-muted-foreground">
-              En dessous de ce montant, les parents devront payer la totalité.
+              {t("admin.payments.minPartialHint")}
             </p>
           </div>
         </div>
         <Button onClick={() => save.mutate()} disabled={save.isPending}>
-          {save.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : "Enregistrer"}
+          {save.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : t("common.save")}
         </Button>
       </div>
     </div>
@@ -722,23 +724,24 @@ function GeneralTab({ clubId }: { clubId: string }) {
 
 /* ----------------------------- Reminders tab ----------------------------- */
 
-const PRESET_OFFSETS: { label: string; value: number[] }[] = [
-  { label: "Standard (J-7, J-1, J+3, J+7)", value: [-7, -1, 3, 7] },
-  { label: "Strict (J-14, J-3, J+1, J+7, J+14)", value: [-14, -3, 1, 7, 14] },
-  { label: "Léger (J-3, J+7)", value: [-3, 7] },
-  { label: "Échéance + retard (J0, J+3, J+7)", value: [0, 3, 7] },
+const PRESET_OFFSETS: { key: string; value: number[] }[] = [
+  { key: "presetStandard", value: [-7, -1, 3, 7] },
+  { key: "presetStrict", value: [-14, -3, 1, 7, 14] },
+  { key: "presetLight", value: [-3, 7] },
+  { key: "presetDueLate", value: [0, 3, 7] },
 ];
 
-function offsetLabel(o: number) {
-  if (o === 0) return "Le jour J";
-  if (o < 0) return `${Math.abs(o)} j. avant`;
-  return `${o} j. après`;
-}
-
 function RemindersTab({ clubId }: { clubId: string }) {
+  const { t } = useTranslation();
   const getFn = useServerFn(getReminderSettings);
   const updateFn = useServerFn(updateReminderSettings);
   const qc = useQueryClient();
+
+  function offsetLabel(o: number) {
+    if (o === 0) return t("admin.payments.offsetDayOf");
+    if (o < 0) return t("admin.payments.offsetBefore", { n: Math.abs(o) });
+    return t("admin.payments.offsetAfter", { n: o });
+  }
 
   const q = useQuery({
     queryKey: ["reminder-settings", clubId],
@@ -758,7 +761,7 @@ function RemindersTab({ clubId }: { clubId: string }) {
   const save = useMutation({
     mutationFn: () => updateFn({ data: { clubId, enabled, offsets } }),
     onSuccess: () => {
-      toast.success("Rappels enregistrés");
+      toast.success(t("admin.payments.remindersSaved"));
       qc.invalidateQueries({ queryKey: ["reminder-settings", clubId] });
     },
     onError: (e: Error) => toast.error(e.message),
@@ -780,24 +783,23 @@ function RemindersTab({ clubId }: { clubId: string }) {
             <BellRing className="h-5 w-5 text-amber-600 dark:text-amber-400" />
           </div>
           <div className="flex-1 min-w-0">
-            <p className="text-sm font-semibold">Rappels automatiques de paiement</p>
+            <p className="text-sm font-semibold">{t("admin.payments.remindersTitle")}</p>
             <p className="text-xs text-muted-foreground mt-0.5">
-              Envoyés chaque matin par email aux familles dont les obligations sont impayées, en
-              fonction de la date d'échéance configurée sur chaque item.
+              {t("admin.payments.remindersHint")}
             </p>
           </div>
           <Switch checked={enabled} onCheckedChange={setEnabled} />
         </div>
 
         <div className={enabled ? "" : "opacity-50 pointer-events-none"}>
-          <Label className="text-xs mb-2 block">Préréglage</Label>
+          <Label className="text-xs mb-2 block">{t("admin.payments.preset")}</Label>
           <div className="grid gap-2">
             {PRESET_OFFSETS.map((p) => {
               const selected =
                 p.value.length === offsets.length && p.value.every((v) => offsets.includes(v));
               return (
                 <button
-                  key={p.label}
+                  key={p.key}
                   type="button"
                   onClick={() => setOffsets(p.value)}
                   className={`text-left rounded-lg border px-3 py-2.5 text-sm transition-colors ${
@@ -806,17 +808,19 @@ function RemindersTab({ clubId }: { clubId: string }) {
                       : "border-border hover:border-primary/50"
                   }`}
                 >
-                  {p.label}
+                  {t(`admin.payments.${p.key}`)}
                 </button>
               );
             })}
           </div>
 
           <div className="mt-4 space-y-1.5">
-            <Label className="text-xs">Jalons sélectionnés</Label>
+            <Label className="text-xs">{t("admin.payments.selectedMilestones")}</Label>
             <div className="flex flex-wrap gap-1.5">
               {offsets.length === 0 ? (
-                <span className="text-xs text-muted-foreground">Aucun rappel ne sera envoyé.</span>
+                <span className="text-xs text-muted-foreground">
+                  {t("admin.payments.noReminders")}
+                </span>
               ) : (
                 offsets.map((o) => (
                   <span
@@ -832,19 +836,13 @@ function RemindersTab({ clubId }: { clubId: string }) {
         </div>
 
         <Button onClick={() => save.mutate()} disabled={save.isPending}>
-          {save.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : "Enregistrer"}
+          {save.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : t("common.save")}
         </Button>
       </div>
 
       <div className="rounded-2xl border border-border bg-muted/30 p-4 text-xs text-muted-foreground space-y-1">
-        <p>
-          <strong>Note :</strong> Les rappels sont envoyés aux payeurs, joueurs et parents/tuteurs
-          reliés. Chaque famille ne reçoit qu'un email par jalon.
-        </p>
-        <p>
-          Vous pouvez également déclencher une relance manuelle depuis la page{" "}
-          <em>Items de paiement</em> via le bouton « Relancer ».
-        </p>
+        <p>{t("admin.payments.remindersNote")}</p>
+        <p>{t("admin.payments.remindersNoteManual")}</p>
       </div>
     </div>
   );

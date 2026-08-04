@@ -475,10 +475,7 @@ function LineupPage() {
         <div
           className="rounded-xl border bg-muted/40 px-3 py-2 text-xs text-muted-foreground"
           dangerouslySetInnerHTML={{
-            __html: t(
-              "lineup.tapHint",
-              "💡 <b>Astuce mobile :</b> touche un joueur puis touche une case (ou le banc) pour le placer. Touche un joueur déjà placé pour le déplacer ou définir capitaine/gardien.",
-            ),
+            __html: t("lineup.tapHint"),
           }}
         />
 
@@ -637,7 +634,6 @@ function LineupPage() {
                       {remaining && remaining > 0 ? (
                         <p
                           title={t("suspensions.warningTooltip", {
-                            defaultValue: "{{count}} match(s) restant(s) à purger",
                             count: remaining,
                           })}
                           className="text-[9px] text-center font-semibold text-amber-700 dark:text-amber-300 mt-0.5"

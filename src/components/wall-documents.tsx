@@ -225,11 +225,7 @@ export function WallDocuments({
 
   if (failed && !docs.length) {
     return (
-      <p className="text-sm text-destructive text-center py-10">
-        {t("wall.documents.loadError", {
-          defaultValue: "Les documents n'ont pas pu être chargés. Réessayez dans un instant.",
-        })}
-      </p>
+      <p className="text-sm text-destructive text-center py-10">{t("wall.documents.loadError")}</p>
     );
   }
 
@@ -241,7 +237,7 @@ export function WallDocuments({
         checked={showExcluded}
         onChange={(e) => setShowExcluded(e.target.checked)}
       />
-      {t("wall.documents.showExcluded", { defaultValue: "Voir les documents retirés" })}
+      {t("wall.documents.showExcluded")}
     </label>
   ) : null;
 
@@ -250,10 +246,7 @@ export function WallDocuments({
       <div className="space-y-4">
         {excludedToggle}
         <p className="text-sm text-muted-foreground text-center py-10">
-          {t("wall.documents.empty", {
-            defaultValue:
-              "Aucun document pour l'instant. Les fichiers joints aux publications du mur apparaîtront ici.",
-          })}
+          {t("wall.documents.empty")}
         </p>
       </div>
     );
@@ -290,7 +283,7 @@ export function WallDocuments({
             {loadingMore ? (
               <Loader2 className="h-4 w-4 animate-spin" />
             ) : (
-              t("wall.documents.loadMore", { defaultValue: "Voir plus" })
+              t("wall.documents.loadMore")
             )}
           </Button>
         </div>
@@ -341,9 +334,7 @@ function DocumentRow({
       await onRename(doc, label);
       setEditing(false);
     } catch {
-      toast.error(
-        t("wall.documents.renameError", { defaultValue: "Le renommage a échoué. Réessayez." }),
-      );
+      toast.error(t("wall.documents.renameError"));
     } finally {
       setSaving(false);
     }
@@ -359,22 +350,18 @@ function DocumentRow({
     try {
       await onSetExcluded(doc, excluded);
       if (excluded) {
-        toast.success(t("wall.documents.excluded", { defaultValue: "Retiré de la docuthèque" }), {
+        toast.success(t("wall.documents.excluded"), {
           action: {
-            label: t("common.undo", { defaultValue: "Annuler" }),
+            label: t("common.undo"),
             onClick: () => {
               void onSetExcluded(doc, false).catch(() =>
-                toast.error(
-                  t("wall.documents.excludeError", {
-                    defaultValue: "L'opération a échoué. Réessayez.",
-                  }),
-                ),
+                toast.error(t("wall.documents.excludeError")),
               );
             },
           },
         });
       } else {
-        toast.success(t("wall.documents.restored", { defaultValue: "Remis dans la docuthèque" }));
+        toast.success(t("wall.documents.restored"));
       }
     } catch (e) {
       // « Réessayez » est un mauvais conseil quand la fonction n'existe pas en
@@ -384,13 +371,8 @@ function DocumentRow({
       const code = (e as { code?: string })?.code;
       toast.error(
         code === "PGRST202"
-          ? t("wall.documents.excludeUnavailable", {
-              defaultValue:
-                "Cette action n'est pas encore disponible sur ce serveur. Contactez le support.",
-            })
-          : t("wall.documents.excludeError", {
-              defaultValue: "L'opération a échoué. Réessayez.",
-            }),
+          ? t("wall.documents.excludeUnavailable")
+          : t("wall.documents.excludeError"),
       );
     } finally {
       setBusyExcluding(false);
@@ -426,11 +408,7 @@ function DocumentRow({
               className="h-8 text-sm"
             />
             <Button size="sm" className="h-8" onClick={() => void save()} disabled={saving}>
-              {saving ? (
-                <Loader2 className="h-3.5 w-3.5 animate-spin" />
-              ) : (
-                t("common.save", { defaultValue: "Enregistrer" })
-              )}
+              {saving ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : t("common.save")}
             </Button>
           </div>
         ) : (
@@ -463,7 +441,7 @@ function DocumentRow({
                     setEditing(true);
                   }}
                   className="shrink-0 text-muted-foreground hover:text-foreground"
-                  aria-label={t("wall.documents.rename", { defaultValue: "Renommer" })}
+                  aria-label={t("wall.documents.rename")}
                 >
                   <Pencil className="h-3.5 w-3.5" />
                 </button>
@@ -474,8 +452,8 @@ function DocumentRow({
                   className="shrink-0 text-muted-foreground hover:text-foreground disabled:opacity-50"
                   aria-label={
                     doc.excludedFromLibrary
-                      ? t("wall.documents.restore", { defaultValue: "Remettre dans la docuthèque" })
-                      : t("wall.documents.exclude", { defaultValue: "Retirer de la docuthèque" })
+                      ? t("wall.documents.restore")
+                      : t("wall.documents.exclude")
                   }
                 >
                   {doc.excludedFromLibrary ? (
@@ -496,7 +474,7 @@ function DocumentRow({
             type="button"
             onClick={() => setPreview(true)}
             className="mt-1 w-24 shrink-0 rounded-lg overflow-hidden border border-border"
-            aria-label={t("wall.documents.preview", { defaultValue: "Aperçu" })}
+            aria-label={t("wall.documents.preview")}
           >
             <img src={doc.url} alt="" loading="lazy" className="h-24 w-24 object-cover" />
           </button>
@@ -505,12 +483,12 @@ function DocumentRow({
         <div className="flex items-center gap-2">
           {doc.hidden && (
             <span className="text-[10px] uppercase tracking-wider font-semibold text-amber-700 dark:text-amber-400">
-              {t("wall.moderation.hiddenBadgeShort", { defaultValue: "Masqué" })}
+              {t("wall.moderation.hiddenBadgeShort")}
             </span>
           )}
           {doc.excludedFromLibrary && (
             <span className="text-[10px] uppercase tracking-wider font-semibold text-muted-foreground">
-              {t("wall.documents.excludedBadge", { defaultValue: "Retiré" })}
+              {t("wall.documents.excludedBadge")}
             </span>
           )}
           {previewable && (
@@ -519,7 +497,7 @@ function DocumentRow({
               onClick={() => setPreview(true)}
               className="text-[11px] text-primary hover:underline"
             >
-              {t("wall.documents.preview", { defaultValue: "Aperçu" })}
+              {t("wall.documents.preview")}
             </button>
           )}
           {/* Téléchargement direct depuis la liste : `?download=` fait renvoyer
@@ -531,7 +509,7 @@ function DocumentRow({
             onClick={() => void downloadDocument(documentDownloadUrl(doc), doc.name)}
             className="text-[11px] text-primary hover:underline"
           >
-            {t("wall.documents.download", { defaultValue: "Télécharger" })}
+            {t("wall.documents.download")}
           </button>
 
           <button
@@ -539,7 +517,7 @@ function DocumentRow({
             onClick={() => onOpenPost(doc.postId)}
             className="text-[11px] text-primary hover:underline"
           >
-            {t("wall.documents.viewPost", { defaultValue: "Voir la publication" })}
+            {t("wall.documents.viewPost")}
           </button>
         </div>
       </div>

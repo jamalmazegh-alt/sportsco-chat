@@ -3,6 +3,7 @@ import { createClient } from "@supabase/supabase-js";
 import { z } from "zod";
 import { buildCheckoutForRegistration } from "@/modules/tournaments/tournament-payments.server";
 import { enqueueTransactionalEmailServer } from "@/lib/email/send.server";
+import { resolveEmailLocale } from "@/lib/email/locale";
 import { checkRateLimit, getClientIp } from "@/lib/rate-limit.server";
 
 const Schema = z.object({
@@ -45,7 +46,7 @@ export const Route = createFileRoute("/api/public/tournament-registration")({
         const { data: tournament, error: tErr } = await supabase
           .from("tournaments")
           .select(
-            "id, name, status, settings, num_teams, slug, registration_fee, registration_currency, payment_mode, created_by",
+            "id, name, status, settings, num_teams, slug, registration_fee, registration_currency, payment_mode, created_by, club_id, clubs:club_id(default_language)",
           )
           .eq("slug", parsed.tournament_slug)
           .maybeSingle();
@@ -135,6 +136,9 @@ export const Route = createFileRoute("/api/public/tournament-registration")({
 
         const origin = new URL(request.url).origin;
         const rosterUrl = `${origin}/tournament/${tournament.slug}/roster/${row.roster_token}`;
+        const acceptLang = request.headers.get("accept-language") ?? "";
+        const clubLang = ((tournament as any).clubs?.default_language as string | null) ?? null;
+        const contactLocale = resolveEmailLocale(acceptLang, clubLang);
 
         // Auto-approval path: create team immediately
         if (!reg.requiresApproval) {
@@ -170,6 +174,7 @@ export const Route = createFileRoute("/api/public/tournament-registration")({
                 teamName: parsed.team_name,
                 rosterUrl,
                 status: "approved",
+                locale: contactLocale,
               },
               idempotencyKey: `roster-link:${row.id}`,
             });
@@ -188,6 +193,7 @@ export const Route = createFileRoute("/api/public/tournament-registration")({
                 teamName: parsed.team_name,
                 rosterUrl,
                 status: "pending",
+                locale: contactLocale,
               },
               idempotencyKey: `roster-link-pending:${row.id}`,
             });
@@ -219,7 +225,7 @@ export const Route = createFileRoute("/api/public/tournament-registration")({
             } else {
               const { data: organizerProfile } = await supabase
                 .from("profiles")
-                .select("first_name, full_name")
+                .select("first_name, full_name, preferred_language")
                 .eq("id", createdBy)
                 .maybeSingle();
               const organizerName =
@@ -227,6 +233,11 @@ export const Route = createFileRoute("/api/public/tournament-registration")({
                 (organizerProfile as any)?.full_name ||
                 undefined;
               const manageUrl = `${origin}/tournaments/${tournament.id}#section-registrations`;
+              const organizerLocale = resolveEmailLocale(
+                (organizerProfile as { preferred_language?: string | null } | null)
+                  ?.preferred_language,
+                clubLang,
+              );
               await enqueueTransactionalEmailServer({
                 templateName: "tournament-registration-received",
                 recipientEmail: organizerEmail,
@@ -239,6 +250,7 @@ export const Route = createFileRoute("/api/public/tournament-registration")({
                   contactPhone: parsed.contact_phone ?? undefined,
                   manageUrl,
                   requiresApproval: !!reg.requiresApproval,
+                  locale: organizerLocale,
                 },
                 idempotencyKey: `registration-received:${row.id}`,
               });

@@ -5,7 +5,10 @@
     "cancel": "Cancel",
     "delete": "Delete",
     "save": "Save",
-    "copied": "Copied"
+    "copied": "Copied",
+    "refresh": "Refresh",
+    "copyFailed": "Unable to copy",
+    "copy": "Copy"
   },
   "chooser": {
     "title": "New camp",
@@ -139,7 +142,14 @@
     "facilityPlaceholder": "Optional",
     "facilityNone": "— None —",
     "save": "Save",
-    "saved": "Changes saved"
+    "saved": "Changes saved",
+    "venueModeHome": "Club venues",
+    "venueModeHomeHint": "Pitch, gym, hall…",
+    "venueModeExternal": "External address",
+    "venueModeExternalHint": "Other venue, outside the club",
+    "externalAddress": "Address",
+    "externalAddressPlaceholder": "e.g. 12 Stadium Street, 75001 Paris",
+    "externalAddressHint": "Free-form address — shown to registrants and clickable to Google Maps."
   },
   "ageGroups": {
     "empty": "No age groups yet.",
@@ -150,7 +160,9 @@
     "quickAdd": "Quick add",
     "pickPreset": "Pick U6 – U19",
     "allAdded": "All added",
-    "addCustom": "+ Custom category"
+    "addCustom": "+ Custom category",
+    "selectAll": "Select the relevant categories",
+    "customs": "Custom categories"
   },
   "cover": {
     "empty": "No cover image",
@@ -168,7 +180,9 @@
     "archive": "Archive",
     "archived": "Camp archived",
     "publicUrl": "Public link",
-    "publicUrlSoon": "public page coming soon"
+    "publicUrlSoon": "public page coming soon",
+    "openPublic": "View public page",
+    "publicUrlCopied": "Link copied"
   },
   "duplicate": {
     "action": "Duplicate",
@@ -279,11 +293,49 @@
       "ageMismatch": "The child's age does not match the chosen category.",
       "generic": "An error occurred. Please try again.",
       "network": "Network error. Check your connection.",
-      "duplicate": "This child is already registered for this camp. Check the email you received to follow the file."
+      "duplicate": "This child is already registered for this camp. Check the email you received to follow the file.",
+      "loadFailed": "Unable to load this camp.",
+      "notFound": "Camp not found",
+      "notFoundBody": "This camp is unavailable or has not been published yet.",
+      "formLoadFailed": "Unable to load the form."
     },
     "full": "Full — waiting list registration available",
     "lastSpots": "Last spots ({{count}} left)",
-    "registerWaitlistCta": "Join the waiting list"
+    "registerWaitlistCta": "Join the waiting list",
+    "tracking": {
+      "invalidTitle": "Invalid or expired link",
+      "invalidBody": "This tracking link is not valid. Check the link you received by email.",
+      "title": "Registration tracking",
+      "participant": "Participant",
+      "bornOn": "Born on {{date}}",
+      "campDates": "Camp dates: {{dates}}",
+      "reason": "Reason: {{reason}}",
+      "noDocs": "No documents required.",
+      "personalLink": "Personal link — do not share it. It gives access to your file and documents.",
+      "status": {
+        "pending": "Pending validation",
+        "under_review": "Under review",
+        "approved": "Approved",
+        "rejected": "Rejected",
+        "cancelled": "Cancelled",
+        "waitlisted": "Waitlist"
+      },
+      "docMissing": "Document required",
+      "docPending": "Pending review",
+      "docApproved": "Approved",
+      "docRejected": "Rejected",
+      "download": "Download",
+      "upload": "Upload",
+      "replace": "Replace",
+      "errors": {
+        "downloadUnavailable": "Download unavailable.",
+        "fileTooLarge": "File too large (15 MB max).",
+        "invalidMime": "Unsupported format (PDF, JPG, PNG).",
+        "rateLimited": "Too many attempts.",
+        "uploadFailed": "Upload failed."
+      },
+      "uploadSuccess": "Document sent. Status: pending."
+    }
   },
   "registrations": {
     "status": {
@@ -367,7 +419,19 @@
       "capacityFullTitle": "Camp full",
       "capacityFullHelp": "The camp has reached capacity. Do you want to place this family on the waitlist?",
       "placeOnWaitlist": "Place on waitlist",
-      "emailsHint": "Automatic emails to families will be added in the next step (Phase 3, step 3)."
+      "emailsHint": "Automatic emails to families will be added in the next step (Phase 3, step 3).",
+      "paymentUpdated": "Payment updated",
+      "paymentSection": "Payment",
+      "paymentNotRequired": "No payment required for this camp.",
+      "paymentPrice": "Camp price: {{price}} {{currency}}",
+      "paymentReceived": "Received: {{amount}} {{currency}}",
+      "paymentRemaining": "Balance due: {{amount}} {{currency}}",
+      "markPaid": "Mark as paid",
+      "markUnpaid": "Mark as unpaid",
+      "markRefunded": "Mark as refunded",
+      "markPartialTitle": "Record a partial payment",
+      "markPartial": "Mark as partial",
+      "partialRemainingPreview": "Balance due: {{amount}} {{currency}}"
     },
     "csv": {
       "cta": "Export CSV",
@@ -388,6 +452,40 @@
       "dossierStatus": "Documents status",
       "amountPaid": "Amount paid",
       "requestedAt": "Request date"
-    }
+    },
+    "age": "{{age}} years",
+    "extend": {
+      "done": "Reservation extended by 72 h."
+    },
+    "stats": {
+      "capacity": "Capacity",
+      "approved": "Approved",
+      "reserved": "Reserved (72h)",
+      "remaining": "Spots left",
+      "pending": "Pending requests",
+      "expiredHint": "{{count}} 72 h reservation(s) expired — use “Extend” to hold the spot."
+    },
+    "searchPlaceholder": "Search (name, email…)",
+    "col": {
+      "participant": "Participant",
+      "guardian": "Guardian",
+      "requested": "Requested",
+      "regStatus": "Registration",
+      "payment": "Payment",
+      "dossier": "File",
+      "actions": ""
+    },
+    "empty": "No registrations to display.",
+    "reservationExpired": "Reservation expired",
+    "reservationUntil": "Until {{date}}",
+    "docsSummary": "{{ok}}/{{total}} documents",
+    "noRequiredDocs": "No documents required",
+    "rejected": "rejected",
+    "extendCta": "Extend 72 h",
+    "draftHint": "Registrations will appear here after the camp is published."
+  },
+  "tabs": {
+    "edit": "Edit",
+    "registrations": "Registrations"
   }
 }

@@ -49,10 +49,7 @@ export function AlertsPanel({ alerts, onAlertClick }: Props) {
   if (alerts.length === 0) return null;
 
   return (
-    <section
-      aria-label={t("cockpit.alerts.heading", { defaultValue: "Alertes" })}
-      className="space-y-2.5"
-    >
+    <section aria-label={t("cockpit.alerts.heading")} className="space-y-2.5">
       <header className="flex items-center gap-2 px-1">
         <div className="relative flex h-5 w-5 items-center justify-center">
           <span className="absolute inset-0 animate-ping rounded-full bg-amber-400/40" />
@@ -60,7 +57,6 @@ export function AlertsPanel({ alerts, onAlertClick }: Props) {
         </div>
         <h3 className="text-xs font-bold uppercase tracking-wider text-muted-foreground dark:text-slate-300">
           {t("cockpit.alerts.title", {
-            defaultValue: "{{count}} chose à régler",
             defaultValue_plural: "{{count}} choses à régler",
             count: alerts.length,
           })}
@@ -120,12 +116,9 @@ function alertLabel(
       });
     case "missing_referee":
       return t("cockpit.alerts.missingReferee", {
-        defaultValue: "Arbitre manquant (démarrage dans {{minutes}} min)",
         minutes: a.minutes ?? 0,
       });
     case "finals_not_generated":
-      return t("cockpit.alerts.finalsNotGenerated", {
-        defaultValue: "Phase finale non générée — les poules sont terminées",
-      });
+      return t("cockpit.alerts.finalsNotGenerated");
   }
 }

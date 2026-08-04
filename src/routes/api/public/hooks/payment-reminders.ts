@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
 import { enqueueTransactionalEmailServer } from "@/lib/email/send.server";
+import { resolveEmailLocale } from "@/lib/email/locale";
 import { verifyCronSecret } from "@/lib/cron-secret.server";
 
 /**
@@ -36,8 +37,8 @@ async function recipientsForObligation(o: {
   id: string;
   player_id: string | null;
   payer_user_id: string | null;
-}): Promise<{ email: string; name?: string | null }[]> {
-  const out: { email: string; name?: string | null }[] = [];
+}): Promise<{ email: string; name?: string | null; userId?: string | null }[]> {
+  const out: { email: string; name?: string | null; userId?: string | null }[] = [];
   const seen = new Set<string>();
 
   if (o.payer_user_id) {
@@ -45,13 +46,13 @@ async function recipientsForObligation(o: {
     const e = data?.user?.email;
     if (e && !seen.has(e.toLowerCase())) {
       seen.add(e.toLowerCase());
-      out.push({ email: e, name: null });
+      out.push({ email: e, name: null, userId: o.payer_user_id });
     }
   }
   if (o.player_id) {
     const { data: player } = await supabaseAdmin
       .from("players")
-      .select("first_name, last_name, email")
+      .select("first_name, last_name, email, user_id")
       .eq("id", o.player_id)
       .maybeSingle();
     if (player?.email && !seen.has(player.email.toLowerCase())) {
@@ -59,16 +60,17 @@ async function recipientsForObligation(o: {
       out.push({
         email: player.email,
         name: `${player.first_name ?? ""} ${player.last_name ?? ""}`.trim(),
+        userId: player.user_id,
       });
     }
     const { data: parents } = await supabaseAdmin
       .from("player_parents")
-      .select("email, full_name")
+      .select("email, full_name, parent_user_id")
       .eq("player_id", o.player_id);
     for (const p of parents ?? []) {
       if (p.email && !seen.has(p.email.toLowerCase())) {
         seen.add(p.email.toLowerCase());
-        out.push({ email: p.email, name: p.full_name ?? null });
+        out.push({ email: p.email, name: p.full_name ?? null, userId: p.parent_user_id });
       }
     }
     // Guardians (linked users)
@@ -82,11 +84,30 @@ async function recipientsForObligation(o: {
       const e = data?.user?.email;
       if (e && !seen.has(e.toLowerCase())) {
         seen.add(e.toLowerCase());
-        out.push({ email: e, name: null });
+        out.push({ email: e, name: null, userId: g.user_id });
       }
     }
   }
   return out;
+}
+
+async function localesForUserIds(
+  userIds: Array<string | null | undefined>,
+): Promise<Map<string, string | null>> {
+  const ids = [...new Set(userIds.filter((id): id is string => !!id))];
+  const map = new Map<string, string | null>();
+  if (ids.length === 0) return map;
+  const { data } = await supabaseAdmin
+    .from("profiles")
+    .select("id, preferred_language")
+    .in("id", ids);
+  for (const p of data ?? []) {
+    map.set(
+      (p as { id: string }).id,
+      (p as { preferred_language: string | null }).preferred_language,
+    );
+  }
+  return map;
 }
 
 async function paidCentsForObligation(obligationId: string): Promise<number> {
@@ -122,7 +143,7 @@ export const Route = createFileRoute("/api/public/hooks/payment-reminders")({
         const { data: clubs, error: clubsErr } = await supabaseAdmin
           .from("club_payment_settings")
           .select(
-            "club_id, payment_reminders_enabled, payment_reminder_offsets_days, clubs:club_id(name)",
+            "club_id, payment_reminders_enabled, payment_reminder_offsets_days, clubs:club_id(name, default_language)",
           )
           .eq("payment_reminders_enabled", true);
         if (clubsErr) {
@@ -139,6 +160,7 @@ export const Route = createFileRoute("/api/public/hooks/payment-reminders")({
             : [];
           if (offsets.length === 0) continue;
           const clubName = c.clubs?.name ?? "Clubero";
+          const clubLang = (c.clubs?.default_language as string | null) ?? null;
 
           // Open items with a due_date
           const { data: items } = await supabaseAdmin
@@ -183,6 +205,7 @@ export const Route = createFileRoute("/api/public/hooks/payment-reminders")({
                 recipientsForObligation(o),
                 playerName,
               ]);
+              const langByUser = await localesForUserIds(recipients.map((r) => r.userId));
 
               for (const r of recipients) {
                 // Dedup
@@ -196,6 +219,10 @@ export const Route = createFileRoute("/api/public/hooks/payment-reminders")({
                 if (existing) continue;
 
                 try {
+                  const locale = resolveEmailLocale(
+                    r.userId ? langByUser.get(r.userId) : null,
+                    clubLang,
+                  );
                   await enqueueTransactionalEmailServer({
                     templateName: "payment-reminder",
                     recipientEmail: r.email,
@@ -212,6 +239,7 @@ export const Route = createFileRoute("/api/public/hooks/payment-reminders")({
                       dueDateLabel: frDate(item.due_date),
                       offsetDays: offset,
                       payUrl: `${baseUrl}/payments`,
+                      locale,
                     },
                   });
                   await supabaseAdmin.from("payment_reminder_log").insert({

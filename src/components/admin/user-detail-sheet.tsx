@@ -174,7 +174,7 @@ export function UserDetailSheet({ userId, open, onOpenChange }: Props) {
       : currentRoles.filter((r) => r !== role);
     const rolesForUpdate = nextStaff.filter((r) => !NON_STAFF_ROLES.has(r));
     if (rolesForUpdate.length === 0) {
-      toast.error(t("permissions.atLeastOneRole", { defaultValue: "Au moins un rôle est requis" }));
+      toast.error(t("permissions.atLeastOneRole"));
       return;
     }
     setActing("roles");
@@ -182,7 +182,7 @@ export function UserDetailSheet({ userId, open, onOpenChange }: Props) {
       await callSetRoles({
         data: { club_id: activeClubId, user_id: userId, roles: rolesForUpdate },
       });
-      toast.success(t("admin.rolesUpdated", { defaultValue: "Rôles mis à jour" }));
+      toast.success(t("admin.rolesUpdated"));
       qc.invalidateQueries({ queryKey: ["admin-club-users", activeClubId] });
       refetch();
       if (nextStaff.length > 0) setPromoting(false);
@@ -197,7 +197,7 @@ export function UserDetailSheet({ userId, open, onOpenChange }: Props) {
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent
         side="right"
-        closeLabel={t("common.close", { defaultValue: "Fermer" })}
+        closeLabel={t("common.close")}
         onCloseClick={() => onOpenChange(false)}
         className="w-full sm:max-w-md p-0 flex flex-col gap-0 overflow-hidden"
       >
@@ -288,12 +288,10 @@ export function UserDetailSheet({ userId, open, onOpenChange }: Props) {
                 <section className="rounded-xl border border-border bg-card p-4 space-y-3">
                   <div>
                     <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                      {t("permissions.clubRoles", { defaultValue: "Rôles dans le club" })}
+                      {t("permissions.clubRoles")}
                     </h3>
                     <p className="text-[11px] text-muted-foreground mt-0.5">
-                      {t("permissions.clubRolesHint", {
-                        defaultValue: "Un utilisateur peut cumuler plusieurs rôles.",
-                      })}
+                      {t("permissions.clubRolesHint")}
                     </p>
                   </div>
 

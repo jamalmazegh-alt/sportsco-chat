@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
+import { useTranslation } from "react-i18next";
 import { listObligationsForItem, recordManualPayment } from "@/lib/payment-checkout.functions";
 import {
   exemptObligation,
@@ -56,19 +57,22 @@ type Obligation = {
   players: { first_name: string | null; last_name: string | null } | null;
 };
 
-const METHOD_LABELS: Record<string, string> = {
-  cash: "Espèces",
-  cheque: "Chèque",
-  bank_transfer: "Virement",
-  helloasso: "HelloAsso",
-  manual: "Autre (manuel)",
-};
+const METHOD_KEYS = ["cash", "cheque", "bank_transfer", "helloasso", "manual"] as const;
+
 const STATUS_COLORS: Record<string, string> = {
   pending: "bg-amber-500/10 text-amber-700 dark:text-amber-400",
   partially_paid: "bg-blue-500/10 text-blue-700 dark:text-blue-400",
   paid: "bg-emerald-500/10 text-emerald-700 dark:text-emerald-400",
   cancelled: "bg-muted text-muted-foreground",
   exempted: "bg-muted text-muted-foreground",
+};
+
+const STATUS_I18N: Record<string, string> = {
+  pending: "payments.status.pending",
+  partially_paid: "payments.status.partiallyPaid",
+  paid: "payments.status.paid",
+  cancelled: "payments.status.cancelled",
+  exempted: "payments.status.exempted",
 };
 
 export function CollectPaymentDialog({
@@ -84,6 +88,7 @@ export function CollectPaymentDialog({
   open: boolean;
   onOpenChange: (v: boolean) => void;
 }) {
+  const { t } = useTranslation();
   const listFn = useServerFn(listObligationsForItem);
   const qc = useQueryClient();
 
@@ -109,7 +114,7 @@ export function CollectPaymentDialog({
   const reopenMut = useMutation({
     mutationFn: (id: string) => reopenFn({ data: { obligationId: id } }),
     onSuccess: () => {
-      toast.success("Obligation réouverte");
+      toast.success(t("adminPayments.reopened"));
       invalidate();
     },
     onError: (e: Error) => toast.error(e.message),
@@ -119,7 +124,7 @@ export function CollectPaymentDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Suivi & encaissement — {itemTitle}</DialogTitle>
+          <DialogTitle>{t("adminPayments.collectTitle", { title: itemTitle })}</DialogTitle>
         </DialogHeader>
 
         {q.isLoading && (
@@ -130,14 +135,15 @@ export function CollectPaymentDialog({
 
         {q.isError && (
           <div className="rounded-md border border-destructive/40 bg-destructive/5 p-3 text-sm text-destructive">
-            Impossible de charger le suivi : {(q.error as Error)?.message ?? "erreur inconnue"}
+            {t("adminPayments.loadError", {
+              message: (q.error as Error)?.message ?? t("adminPayments.unknownError"),
+            })}
           </div>
         )}
 
         {q.data && q.data.obligations.length === 0 && (
           <p className="text-sm text-muted-foreground py-6 text-center">
-            Aucun joueur n'a encore d'obligation pour ce poste. Vérifiez que la cible (club /
-            équipes / joueurs) contient bien des joueurs.
+            {t("adminPayments.emptyObligations")}
           </p>
         )}
 
@@ -154,13 +160,15 @@ export function CollectPaymentDialog({
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-medium truncate">{playerName}</p>
                   <p className="text-[11px] text-muted-foreground truncate">
-                    {o.payer?.name ? `Payeur : ${o.payer.name}` : "Payeur non lié"}
+                    {o.payer?.name
+                      ? t("adminPayments.payer", { name: o.payer.name })
+                      : t("adminPayments.payerUnlinked")}
                   </p>
                 </div>
                 <span
                   className={`text-[10px] uppercase tracking-wide px-1.5 py-0.5 rounded ${STATUS_COLORS[o.status] ?? ""}`}
                 >
-                  {o.status}
+                  {STATUS_I18N[o.status] ? t(STATUS_I18N[o.status]) : o.status}
                 </span>
                 <div className="text-right">
                   <p className="text-sm font-semibold">
@@ -169,14 +177,17 @@ export function CollectPaymentDialog({
                   </p>
                   {remaining > 0 && !isClosed && (
                     <p className="text-[11px] text-muted-foreground">
-                      reste {(remaining / 100).toFixed(2)} {currency}
+                      {t("adminPayments.remaining", {
+                        amount: (remaining / 100).toFixed(2),
+                        currency,
+                      })}
                     </p>
                   )}
                 </div>
                 {remaining > 0 && !isClosed && (
                   <Button size="sm" onClick={() => setActive(o)}>
                     <BanknoteArrowDown className="h-3.5 w-3.5" />
-                    Encaisser
+                    {t("adminPayments.collect")}
                   </Button>
                 )}
                 <DropdownMenu>
@@ -191,7 +202,7 @@ export function CollectPaymentDialog({
                         onClick={() => reopenMut.mutate(o.id)}
                         disabled={reopenMut.isPending}
                       >
-                        <RotateCcw className="h-4 w-4 mr-2" /> Rouvrir
+                        <RotateCcw className="h-4 w-4 mr-2" /> {t("adminPayments.reopen")}
                       </DropdownMenuItem>
                     ) : (
                       <>
@@ -200,23 +211,23 @@ export function CollectPaymentDialog({
                             <DropdownMenuItem
                               onClick={() => setReasonDialog({ kind: "exempt", obligation: o })}
                             >
-                              <ShieldOff className="h-4 w-4 mr-2" /> Exempter
+                              <ShieldOff className="h-4 w-4 mr-2" /> {t("adminPayments.exempt")}
                             </DropdownMenuItem>
                             <DropdownMenuItem
                               onClick={() => setReasonDialog({ kind: "cancel", obligation: o })}
                             >
-                              <Ban className="h-4 w-4 mr-2" /> Annuler
+                              <Ban className="h-4 w-4 mr-2" /> {t("common.cancel")}
                             </DropdownMenuItem>
                           </>
                         )}
                         {hasPaid && (
                           <>
                             <DropdownMenuItem onClick={() => setRefundDialog(o)}>
-                              <Undo2 className="h-4 w-4 mr-2" /> Rembourser…
+                              <Undo2 className="h-4 w-4 mr-2" /> {t("adminPayments.refundEllipsis")}
                             </DropdownMenuItem>
                             <DropdownMenuSeparator />
                             <p className="px-2 py-1 text-[10px] text-muted-foreground">
-                              Annulation impossible — paiements existants
+                              {t("adminPayments.cancelBlocked")}
                             </p>
                           </>
                         )}
@@ -245,22 +256,28 @@ export function CollectPaymentDialog({
           <ReasonDialog
             title={
               reasonDialog.kind === "exempt"
-                ? "Exempter cette obligation"
-                : "Annuler cette obligation"
+                ? t("adminPayments.exemptTitle")
+                : t("adminPayments.cancelTitle")
             }
             description={
               reasonDialog.kind === "exempt"
-                ? "Le joueur sera marqué comme exempté de ce paiement. Indiquez la raison (bourse, situation familiale, etc.)."
-                : "L'obligation sera annulée et ne pourra plus être payée. Précisez la raison."
+                ? t("adminPayments.exemptDescription")
+                : t("adminPayments.cancelDescription")
             }
-            confirmLabel={reasonDialog.kind === "exempt" ? "Exempter" : "Annuler l'obligation"}
+            confirmLabel={
+              reasonDialog.kind === "exempt"
+                ? t("adminPayments.exempt")
+                : t("adminPayments.cancelConfirm")
+            }
             onClose={() => setReasonDialog(null)}
             onConfirm={async (reason) => {
               const fn = reasonDialog.kind === "exempt" ? exemptFn : cancelFn;
               try {
                 await fn({ data: { obligationId: reasonDialog.obligation.id, reason } });
                 toast.success(
-                  reasonDialog.kind === "exempt" ? "Obligation exemptée" : "Obligation annulée",
+                  reasonDialog.kind === "exempt"
+                    ? t("adminPayments.exempted")
+                    : t("adminPayments.cancelled"),
                 );
                 setReasonDialog(null);
                 invalidate();
@@ -302,6 +319,7 @@ function ReasonDialog({
   onClose: () => void;
   onConfirm: (reason: string) => Promise<void> | void;
 }) {
+  const { t } = useTranslation();
   const [reason, setReason] = useState("");
   const [pending, setPending] = useState(false);
   return (
@@ -312,18 +330,18 @@ function ReasonDialog({
         </DialogHeader>
         <p className="text-xs text-muted-foreground">{description}</p>
         <div className="space-y-1.5">
-          <Label className="text-xs">Raison</Label>
+          <Label className="text-xs">{t("adminPayments.reason")}</Label>
           <Textarea
             value={reason}
             onChange={(e) => setReason(e.target.value)}
             maxLength={500}
             rows={3}
-            placeholder="Justification interne (visible dans les audits)"
+            placeholder={t("adminPayments.reasonPlaceholder")}
           />
         </div>
         <DialogFooter>
           <Button variant="outline" onClick={onClose}>
-            Annuler
+            {t("common.cancel")}
           </Button>
           <Button
             disabled={!reason.trim() || pending}
@@ -357,10 +375,10 @@ function RefundDialog({
   onClose: () => void;
   onDone: () => void;
 }) {
+  const { t, i18n } = useTranslation();
   const refundFn = useServerFn(refundTransaction);
   const currency = (obligation.currency || "eur").toUpperCase();
 
-  // Load refundable transactions for this obligation
   const txQ = useQuery({
     queryKey: ["obligation-refundable", obligation.id],
     queryFn: async () => {
@@ -374,7 +392,7 @@ function RefundDialog({
         .order("created_at", { ascending: false });
       if (error) throw error;
       return (data ?? []).filter(
-        (t) => (t.amount_gross_cents ?? 0) > (t.refunded_amount_cents ?? 0),
+        (tx) => (tx.amount_gross_cents ?? 0) > (tx.refunded_amount_cents ?? 0),
       );
     },
   });
@@ -384,7 +402,7 @@ function RefundDialog({
   const [reason, setReason] = useState("");
   const [pending, setPending] = useState(false);
 
-  const current = txQ.data?.find((t) => t.id === selectedTx) ?? null;
+  const current = txQ.data?.find((tx) => tx.id === selectedTx) ?? null;
   const maxRefundable = current
     ? current.amount_gross_cents - (current.refunded_amount_cents ?? 0)
     : 0;
@@ -393,7 +411,7 @@ function RefundDialog({
     <Dialog open onOpenChange={(v) => !v && onClose()}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Rembourser un paiement</DialogTitle>
+          <DialogTitle>{t("adminPayments.refundTitle")}</DialogTitle>
         </DialogHeader>
 
         {txQ.isLoading ? (
@@ -402,32 +420,35 @@ function RefundDialog({
           </div>
         ) : (txQ.data ?? []).length === 0 ? (
           <p className="text-sm text-muted-foreground py-4 text-center">
-            Aucune transaction remboursable.
+            {t("adminPayments.noRefundable")}
           </p>
         ) : (
           <div className="space-y-3">
             <div className="space-y-1.5">
-              <Label className="text-xs">Transaction à rembourser</Label>
+              <Label className="text-xs">{t("adminPayments.refundTransaction")}</Label>
               <div className="space-y-1 max-h-48 overflow-y-auto">
-                {txQ.data!.map((t) => {
-                  const refundable = t.amount_gross_cents - (t.refunded_amount_cents ?? 0);
+                {txQ.data!.map((tx) => {
+                  const refundable = tx.amount_gross_cents - (tx.refunded_amount_cents ?? 0);
+                  const methodLabel = t(`payments.method.${tx.method}`, {
+                    defaultValue: tx.method,
+                  });
                   return (
                     <button
-                      key={t.id}
+                      key={tx.id}
                       type="button"
                       onClick={() => {
-                        setSelectedTx(t.id);
+                        setSelectedTx(tx.id);
                         setAmount((refundable / 100).toFixed(2));
                       }}
                       className={`w-full text-left px-3 py-2 rounded-md border text-xs flex justify-between items-center ${
-                        selectedTx === t.id
+                        selectedTx === tx.id
                           ? "border-primary bg-primary/5"
                           : "border-border hover:border-primary/50"
                       }`}
                     >
                       <span>
-                        {t.method} ·{" "}
-                        {new Date(t.paid_at ?? t.created_at).toLocaleDateString("fr-FR")}
+                        {methodLabel} ·{" "}
+                        {new Date(tx.paid_at ?? tx.created_at).toLocaleDateString(i18n.language)}
                       </span>
                       <span className="font-medium">
                         {(refundable / 100).toFixed(2)} {currency}
@@ -441,7 +462,7 @@ function RefundDialog({
             {current && (
               <>
                 <div className="space-y-1.5">
-                  <Label className="text-xs">Montant à rembourser ({currency})</Label>
+                  <Label className="text-xs">{t("adminPayments.refundAmount", { currency })}</Label>
                   <Input
                     type="number"
                     min="0.01"
@@ -451,11 +472,14 @@ function RefundDialog({
                     onChange={(e) => setAmount(e.target.value)}
                   />
                   <p className="text-[11px] text-muted-foreground">
-                    Maximum : {(maxRefundable / 100).toFixed(2)} {currency}
+                    {t("adminPayments.maximum", {
+                      amount: (maxRefundable / 100).toFixed(2),
+                      currency,
+                    })}
                   </p>
                 </div>
                 <div className="space-y-1.5">
-                  <Label className="text-xs">Raison (optionnel)</Label>
+                  <Label className="text-xs">{t("adminPayments.reasonOptional")}</Label>
                   <Textarea
                     value={reason}
                     onChange={(e) => setReason(e.target.value)}
@@ -465,8 +489,8 @@ function RefundDialog({
                 </div>
                 <Badge variant="outline" className="text-[10px]">
                   {current.method === "stripe"
-                    ? "Remboursement Stripe automatique"
-                    : "Écriture comptable manuelle (aucun mouvement bancaire)"}
+                    ? t("adminPayments.refundStripe")
+                    : t("adminPayments.refundManual")}
                 </Badge>
               </>
             )}
@@ -475,7 +499,7 @@ function RefundDialog({
 
         <DialogFooter>
           <Button variant="outline" onClick={onClose}>
-            Fermer
+            {t("common.close")}
           </Button>
           <Button
             disabled={
@@ -495,7 +519,7 @@ function RefundDialog({
                     reason: reason.trim() || null,
                   },
                 });
-                toast.success("Remboursement enregistré");
+                toast.success(t("adminPayments.refunded"));
                 onDone();
               } catch (e) {
                 toast.error((e as Error).message);
@@ -504,7 +528,7 @@ function RefundDialog({
               }
             }}
           >
-            {pending ? <Loader2 className="h-4 w-4 animate-spin" /> : "Rembourser"}
+            {pending ? <Loader2 className="h-4 w-4 animate-spin" /> : t("admin.payments.refund")}
           </Button>
         </DialogFooter>
       </DialogContent>
@@ -523,6 +547,7 @@ function ManualPaymentForm({
   onClose: () => void;
   onSaved: () => void;
 }) {
+  const { t } = useTranslation();
   const recordFn = useServerFn(recordManualPayment);
   const remaining = obligation.amount_due_cents - obligation.amount_paid_cents;
   const currency = (obligation.currency || "eur").toUpperCase();
@@ -546,7 +571,7 @@ function ManualPaymentForm({
         },
       }),
     onSuccess: () => {
-      toast.success("Paiement enregistré, reçu généré");
+      toast.success(t("adminPayments.paymentRecorded"));
       onSaved();
     },
     onError: (e: Error) => toast.error(e.message),
@@ -556,27 +581,29 @@ function ManualPaymentForm({
     <Dialog open onOpenChange={(v) => !v && onClose()}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Encaisser un paiement</DialogTitle>
+          <DialogTitle>{t("adminPayments.manualCollectTitle")}</DialogTitle>
         </DialogHeader>
         <div className="space-y-3">
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1.5">
-              <Label className="text-xs">Mode</Label>
+              <Label className="text-xs">{t("adminPayments.mode")}</Label>
               <Select value={method} onValueChange={(v) => setMethod(v as typeof method)}>
                 <SelectTrigger>
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  {Object.entries(METHOD_LABELS).map(([v, l]) => (
-                    <SelectItem key={v} value={v}>
-                      {l}
+                  {METHOD_KEYS.map((key) => (
+                    <SelectItem key={key} value={key}>
+                      {key === "manual"
+                        ? t("adminPayments.methodOther")
+                        : t(`payments.method.${key}`)}
                     </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
             </div>
             <div className="space-y-1.5">
-              <Label className="text-xs">Montant ({currency})</Label>
+              <Label className="text-xs">{t("adminPayments.amount", { currency })}</Label>
               <Input
                 type="number"
                 min="0.01"
@@ -586,35 +613,38 @@ function ManualPaymentForm({
                 onChange={(e) => setAmount(e.target.value)}
               />
               <p className="text-[11px] text-muted-foreground">
-                Reste à encaisser : {(remaining / 100).toFixed(2)} {currency}
+                {t("adminPayments.remainingToCollect", {
+                  amount: (remaining / 100).toFixed(2),
+                  currency,
+                })}
               </p>
             </div>
           </div>
           <div className="space-y-1.5">
-            <Label className="text-xs">Référence (N° chèque, virement…)</Label>
+            <Label className="text-xs">{t("adminPayments.reference")}</Label>
             <Input
               value={reference}
               onChange={(e) => setReference(e.target.value)}
-              placeholder="optionnel"
+              placeholder={t("common.optional")}
               maxLength={120}
             />
           </div>
           <div className="space-y-1.5">
-            <Label className="text-xs">Commentaire</Label>
+            <Label className="text-xs">{t("adminPayments.comment")}</Label>
             <Input
               value={comment}
               onChange={(e) => setComment(e.target.value)}
-              placeholder="optionnel"
+              placeholder={t("common.optional")}
               maxLength={500}
             />
           </div>
           <Badge variant="outline" className="text-[10px]">
-            Un reçu sera émis automatiquement
+            {t("adminPayments.receiptAuto")}
           </Badge>
         </div>
         <DialogFooter>
           <Button variant="outline" onClick={onClose}>
-            Annuler
+            {t("common.cancel")}
           </Button>
           <Button
             onClick={() => save.mutate()}
@@ -624,7 +654,7 @@ function ManualPaymentForm({
               Math.round(parseFloat(amount || "0") * 100) > remaining
             }
           >
-            {save.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : "Enregistrer"}
+            {save.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : t("common.save")}
           </Button>
         </DialogFooter>
       </DialogContent>

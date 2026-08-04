@@ -133,7 +133,7 @@ export function TournamentSettingsMenu({
           variant="outline"
           size="icon"
           className="bg-white text-slate-900 hover:bg-white/90 hover:text-slate-900 border-white shadow-sm"
-          aria-label={t("controlCenter.settings.title", { defaultValue: "Configuration" })}
+          aria-label={t("controlCenter.settings.title")}
         >
           <MoreVertical className="h-4 w-4" />
         </Button>
@@ -145,7 +145,7 @@ export function TournamentSettingsMenu({
               variant="ghost"
               size="icon-sm"
               onClick={() => setTopic(null)}
-              aria-label={t("common.back", { defaultValue: "Retour" })}
+              aria-label={t("common.back")}
             >
               <ChevronRight className="h-4 w-4 rotate-180" />
             </Button>
@@ -155,7 +155,7 @@ export function TournamentSettingsMenu({
               ? t(TOPICS.find((x) => x.id === topic)!.labelKey, {
                   defaultValue: TOPICS.find((x) => x.id === topic)!.defaultLabel,
                 })
-              : t("controlCenter.settings.title", { defaultValue: "Configuration" })}
+              : t("controlCenter.settings.title")}
           </SheetTitle>
         </SheetHeader>
 
@@ -285,7 +285,7 @@ export function TournamentSettingsMenu({
                 rel="noreferrer"
                 className="block w-full text-center rounded-md border border-border px-3 py-2 text-sm hover:bg-muted/60"
               >
-                {t("detail.viewPublic", { defaultValue: "Voir la page publique" })}
+                {t("detail.viewPublic")}
               </a>
               <a
                 href={`/tournament/${tournament.slug}/tv`}
@@ -293,7 +293,7 @@ export function TournamentSettingsMenu({
                 rel="noreferrer"
                 className="block w-full text-center rounded-md border border-border px-3 py-2 text-sm hover:bg-muted/60"
               >
-                {t("sections.openTv", { defaultValue: "Ouvrir l'écran live (TV)" })}
+                {t("sections.openTv")}
               </a>
             </div>
           )}

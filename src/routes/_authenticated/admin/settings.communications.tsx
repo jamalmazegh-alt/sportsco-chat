@@ -136,15 +136,8 @@ function CommunicationsSettings() {
 
       <section className="rounded-2xl border border-border bg-card p-5 space-y-3">
         <div>
-          <p className="text-sm font-medium">
-            {t("admin.emailLanguage", { defaultValue: "Langue des emails de communication" })}
-          </p>
-          <p className="text-xs text-muted-foreground mt-0.5">
-            {t("admin.emailLanguageHint", {
-              defaultValue:
-                "Langue utilisée pour les emails envoyés par le club aux destinataires qui n'ont pas défini de langue préférée.",
-            })}
-          </p>
+          <p className="text-sm font-medium">{t("admin.emailLanguage")}</p>
+          <p className="text-xs text-muted-foreground mt-0.5">{t("admin.emailLanguageHint")}</p>
         </div>
         <div role="radiogroup" className="grid grid-cols-2 gap-2 sm:grid-cols-3">
           {LANGS.map((opt) => {

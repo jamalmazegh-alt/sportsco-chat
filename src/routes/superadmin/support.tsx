@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { useTranslation } from "react-i18next";
 import { useEffect, useState } from "react";
 import {
   searchUsers,
@@ -34,6 +35,7 @@ type UserHit = { id: string; full_name: string | null; phone: string | null };
 type ClubHit = { id: string; name: string };
 
 function SupportPage() {
+  const { t } = useTranslation();
   const [q, setQ] = useState("");
   const [mode, setMode] = useState<"user" | "club">("user");
   const [busy, setBusy] = useState(false);
@@ -68,7 +70,7 @@ function SupportPage() {
         setUserHits(null);
       }
     } catch (e) {
-      setErr(e instanceof Error ? e.message : "Search failed");
+      setErr(e instanceof Error ? e.message : t("superadmin.support.searchFailed"));
     } finally {
       setBusy(false);
     }
@@ -82,7 +84,7 @@ function SupportPage() {
       setUserSummary(r);
       setClubSummary(null);
     } catch (e) {
-      setErr(e instanceof Error ? e.message : "Failed");
+      setErr(e instanceof Error ? e.message : t("superadmin.common.failed"));
     } finally {
       setBusy(false);
     }
@@ -96,7 +98,7 @@ function SupportPage() {
       setClubSummary(r);
       setUserSummary(null);
     } catch (e) {
-      setErr(e instanceof Error ? e.message : "Failed");
+      setErr(e instanceof Error ? e.message : t("superadmin.common.failed"));
     } finally {
       setBusy(false);
     }
@@ -113,12 +115,10 @@ function SupportPage() {
     <div className="p-6 md:p-8 max-w-6xl">
       <header className="mb-6">
         <div className="flex items-center gap-2 text-xs uppercase tracking-wide text-muted-foreground">
-          <LifeBuoy className="h-3.5 w-3.5" /> Support
+          <LifeBuoy className="h-3.5 w-3.5" /> {t("superadmin.support.eyebrow")}
         </div>
-        <h1 className="text-xl font-semibold mt-1">Support hub</h1>
-        <p className="text-sm text-muted-foreground mt-1">
-          Live operational alerts and direct lookup. Every lookup is audited.
-        </p>
+        <h1 className="text-xl font-semibold mt-1">{t("superadmin.support.title")}</h1>
+        <p className="text-sm text-muted-foreground mt-1">{t("superadmin.support.subtitle")}</p>
       </header>
 
       {/* ALERTS */}
@@ -126,7 +126,7 @@ function SupportPage() {
         <div className="flex items-center justify-between mb-3">
           <h2 className="text-sm font-semibold flex items-center gap-2">
             <AlertTriangle className="h-4 w-4 text-amber-500" />
-            Live alerts
+            {t("superadmin.support.liveAlerts")}
             {totalAlerts > 0 && <StatusBadge tone="warn">{totalAlerts}</StatusBadge>}
           </h2>
           {alertsLoading && <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />}
@@ -136,12 +136,12 @@ function SupportPage() {
           <AlertCard
             tone="warn"
             icon={<Clock className="h-4 w-4" />}
-            title="Trials ending in 7 days"
+            title={t("superadmin.support.trialsEnding")}
             count={alerts?.trials_ending.length ?? 0}
-            empty="All trials are safe."
+            empty={t("superadmin.support.trialsSafe")}
           >
             {alerts?.trials_ending.map((s) => {
-              const t = trialCountdown(s.trial_end);
+              const countdown = trialCountdown(s.trial_end);
               return (
                 <li key={s.club_id} className="flex justify-between items-center text-sm">
                   <Link
@@ -151,7 +151,7 @@ function SupportPage() {
                   >
                     {s.club_name}
                   </Link>
-                  <StatusBadge tone="warn">{t ?? "—"}</StatusBadge>
+                  <StatusBadge tone="warn">{countdown ?? "—"}</StatusBadge>
                 </li>
               );
             })}
@@ -160,9 +160,9 @@ function SupportPage() {
           <AlertCard
             tone="danger"
             icon={<CreditCard className="h-4 w-4" />}
-            title="Past-due / incomplete billing"
+            title={t("superadmin.support.pastDueBilling")}
             count={alerts?.past_due.length ?? 0}
-            empty="No payment issues."
+            empty={t("superadmin.support.noPaymentIssues")}
           >
             {alerts?.past_due.map((s) => (
               <li key={s.club_id} className="flex justify-between items-center text-sm">
@@ -181,9 +181,9 @@ function SupportPage() {
           <AlertCard
             tone="info"
             icon={<User className="h-4 w-4" />}
-            title="Stale invites (>30 days)"
+            title={t("superadmin.support.staleInvites")}
             count={alerts?.stale_invites.length ?? 0}
-            empty="No stale invites."
+            empty={t("superadmin.support.noStaleInvites")}
           >
             {alerts?.stale_invites.slice(0, 8).map((i) => (
               <li key={i.id} className="flex justify-between items-center text-sm gap-3">
@@ -201,9 +201,9 @@ function SupportPage() {
           <AlertCard
             tone="danger"
             icon={<MailX className="h-4 w-4" />}
-            title="Recent email failures"
+            title={t("superadmin.support.emailFailures")}
             count={alerts?.email_failures.length ?? 0}
-            empty="All emails delivered."
+            empty={t("superadmin.support.allEmailsDelivered")}
           >
             {alerts?.email_failures.slice(0, 8).map((e) => (
               <li key={e.id} className="text-sm">
@@ -224,7 +224,7 @@ function SupportPage() {
 
       {/* LOOKUP */}
       <section>
-        <h2 className="text-sm font-semibold mb-3">Direct lookup</h2>
+        <h2 className="text-sm font-semibold mb-3">{t("superadmin.support.directLookup")}</h2>
 
         <div className="flex gap-2 mb-3">
           <Button
@@ -232,14 +232,14 @@ function SupportPage() {
             variant={mode === "user" ? "default" : "outline"}
             onClick={() => setMode("user")}
           >
-            <User className="h-4 w-4 mr-1.5" /> User
+            <User className="h-4 w-4 mr-1.5" /> {t("superadmin.support.modeUser")}
           </Button>
           <Button
             size="sm"
             variant={mode === "club" ? "default" : "outline"}
             onClick={() => setMode("club")}
           >
-            <Building2 className="h-4 w-4 mr-1.5" /> Club
+            <Building2 className="h-4 w-4 mr-1.5" /> {t("superadmin.support.modeClub")}
           </Button>
         </div>
 
@@ -251,7 +251,11 @@ function SupportPage() {
           className="flex gap-2 mb-5"
         >
           <Input
-            placeholder={mode === "user" ? "Search by name or phone…" : "Search clubs by name…"}
+            placeholder={
+              mode === "user"
+                ? t("superadmin.support.searchUserPlaceholder")
+                : t("superadmin.support.searchClubPlaceholder")
+            }
             value={q}
             onChange={(e) => setQ(e.target.value)}
           />
@@ -269,7 +273,9 @@ function SupportPage() {
         {userHits && (
           <ul className="rounded-lg border border-border divide-y divide-border bg-card mb-6">
             {userHits.length === 0 && (
-              <li className="px-4 py-3 text-sm text-muted-foreground">No matches.</li>
+              <li className="px-4 py-3 text-sm text-muted-foreground">
+                {t("superadmin.support.noMatches")}
+              </li>
             )}
             {userHits.map((u) => (
               <li key={u.id} className="px-4 py-2.5 flex items-center justify-between gap-3">
@@ -279,11 +285,11 @@ function SupportPage() {
                 </div>
                 <div className="flex gap-1.5">
                   <Button size="sm" variant="ghost" onClick={() => loadUser(u.id)}>
-                    Summary
+                    {t("superadmin.support.summary")}
                   </Button>
                   <Button asChild size="sm" variant="outline">
                     <Link to="/superadmin/users/$userId" params={{ userId: u.id }}>
-                      Manage
+                      {t("superadmin.support.manage")}
                     </Link>
                   </Button>
                 </div>
@@ -295,18 +301,20 @@ function SupportPage() {
         {clubHits && (
           <ul className="rounded-lg border border-border divide-y divide-border bg-card mb-6">
             {clubHits.length === 0 && (
-              <li className="px-4 py-3 text-sm text-muted-foreground">No matches.</li>
+              <li className="px-4 py-3 text-sm text-muted-foreground">
+                {t("superadmin.support.noMatches")}
+              </li>
             )}
             {clubHits.map((c) => (
               <li key={c.id} className="px-4 py-2.5 flex items-center justify-between gap-3">
                 <div className="text-sm font-medium truncate">{c.name}</div>
                 <div className="flex gap-1.5">
                   <Button size="sm" variant="ghost" onClick={() => loadClub(c.id)}>
-                    Summary
+                    {t("superadmin.support.summary")}
                   </Button>
                   <Button asChild size="sm" variant="outline">
                     <Link to="/superadmin/clubs/$clubId" params={{ clubId: c.id }}>
-                      Manage
+                      {t("superadmin.support.manage")}
                     </Link>
                   </Button>
                 </div>
@@ -318,7 +326,9 @@ function SupportPage() {
         {userSummary && (
           <section className="rounded-lg border border-border bg-card p-4 space-y-4">
             <div>
-              <div className="text-xs uppercase tracking-wide text-muted-foreground mb-1">User</div>
+              <div className="text-xs uppercase tracking-wide text-muted-foreground mb-1">
+                {t("superadmin.support.modeUser")}
+              </div>
               <div className="text-sm font-medium">{userSummary.profile?.full_name ?? "—"}</div>
               <div className="text-xs text-muted-foreground">
                 {userSummary.profile?.phone ?? "—"} ·{" "}
@@ -327,7 +337,7 @@ function SupportPage() {
             </div>
             <div>
               <div className="text-xs uppercase tracking-wide text-muted-foreground mb-2">
-                Clubs ({userSummary.clubs.length})
+                {t("superadmin.support.clubsCount", { count: userSummary.clubs.length })}
               </div>
               <ul className="space-y-1 text-sm">
                 {userSummary.clubs.map((m) => (
@@ -339,7 +349,9 @@ function SupportPage() {
                     >
                       {m.club?.name ?? m.club_id}
                       {m.club?.archived_at && (
-                        <span className="ml-2 text-xs text-muted-foreground">(archived)</span>
+                        <span className="ml-2 text-xs text-muted-foreground">
+                          {t("superadmin.support.archived")}
+                        </span>
                       )}
                     </Link>
                     <div className="flex items-center gap-2 shrink-0">
@@ -356,7 +368,9 @@ function SupportPage() {
                   </li>
                 ))}
                 {userSummary.clubs.length === 0 && (
-                  <li className="text-muted-foreground">No club memberships.</li>
+                  <li className="text-muted-foreground">
+                    {t("superadmin.support.noClubMemberships")}
+                  </li>
                 )}
               </ul>
             </div>
@@ -364,7 +378,7 @@ function SupportPage() {
               <div className="pt-2">
                 <Button asChild size="sm" variant="outline">
                   <Link to="/superadmin/users/$userId" params={{ userId: userSummary.profile.id }}>
-                    Open full user page →
+                    {t("superadmin.support.openFullUser")}
                   </Link>
                 </Button>
               </div>
@@ -375,12 +389,14 @@ function SupportPage() {
         {clubSummary && (
           <section className="rounded-lg border border-border bg-card p-4 space-y-4">
             <div>
-              <div className="text-xs uppercase tracking-wide text-muted-foreground mb-1">Club</div>
+              <div className="text-xs uppercase tracking-wide text-muted-foreground mb-1">
+                {t("superadmin.support.modeClub")}
+              </div>
               <div className="text-sm font-medium">{clubSummary.club?.name}</div>
             </div>
             <div>
               <div className="text-xs uppercase tracking-wide text-muted-foreground mb-2">
-                Admins
+                {t("superadmin.support.admins")}
               </div>
               <ul className="space-y-1 text-sm">
                 {clubSummary.admins.map((a) => (
@@ -396,7 +412,7 @@ function SupportPage() {
                   </li>
                 ))}
                 {clubSummary.admins.length === 0 && (
-                  <li className="text-muted-foreground">No admins.</li>
+                  <li className="text-muted-foreground">{t("superadmin.support.noAdmins")}</li>
                 )}
               </ul>
             </div>
@@ -404,7 +420,7 @@ function SupportPage() {
               <div className="pt-2">
                 <Button asChild size="sm" variant="outline">
                   <Link to="/superadmin/clubs/$clubId" params={{ clubId: clubSummary.club.id }}>
-                    Open full club page →
+                    {t("superadmin.support.openFullClub")}
                   </Link>
                 </Button>
               </div>

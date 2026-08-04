@@ -992,7 +992,7 @@ function V2SocialClub() {
           </div>
           <div className="mt-3 inline-flex items-center gap-1.5 rounded-full bg-amber-500/15 px-3 py-1 text-[11px] font-bold uppercase tracking-wider text-amber-700 dark:text-amber-300">
             <Clock className="h-3 w-3" />
-            {t("home.v2.social.soonBadge", { defaultValue: "Bientôt" })}
+            {t("home.v2.social.soonBadge")}
           </div>
           <h2 className="mt-4 font-display text-3xl font-bold tracking-tight sm:text-5xl">
             {t("home.v2.social.title")}
@@ -1012,10 +1012,7 @@ function V2SocialClub() {
         </div>
 
         <p className="mx-auto mt-10 max-w-2xl text-center text-sm font-medium text-muted-foreground">
-          {t("home.v2.social.soonNote", {
-            defaultValue:
-              "Disponible après la bêta. Pendant la bêta : mur du club et actualités Facebook restent inclus.",
-          })}
+          {t("home.v2.social.soonNote")}
         </p>
       </div>
     </section>
@@ -1203,46 +1200,39 @@ function HeroDual() {
               <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-primary opacity-75" />
               <span className="relative inline-flex h-2 w-2 rounded-full bg-primary" />
             </span>
-            {t("home.hero.kicker", { defaultValue: "Pensée par et pour les clubs amateurs" })}
+            {t("home.hero.kicker")}
           </div>
           <h1 className="mt-6 font-display text-4xl font-bold leading-[1.05] tracking-tight text-foreground sm:text-5xl lg:text-6xl">
-            {t("home.hero.headline1", { defaultValue: "On a compris ce dont vous aviez besoin" })}{" "}
-            <span className="text-primary">
-              {t("home.hero.headline2", { defaultValue: "pour gagner du temps" })}
-            </span>{" "}
-            {t("home.hero.headline3", { defaultValue: "et vous reconcentrer sur le sport." })}
+            {t("home.hero.headline1")}{" "}
+            <span className="text-primary">{t("home.hero.headline2")}</span>{" "}
+            {t("home.hero.headline3")}
           </h1>
           <p className="mx-auto mt-6 max-w-2xl text-lg text-muted-foreground">
-            {t("home.hero.sub", {
-              defaultValue:
-                "On a digitalisé tout ce qui fait perdre vos soirées : convocations, paiements, tournois, communication. Vous coachez, on s'occupe du reste.",
-            })}
+            {t("home.hero.sub")}
           </p>
           <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
             <Button asChild size="lg" className="h-12 px-6">
               <Link to="/register">
-                {t("home.hero.cta", { defaultValue: "Essayer gratuitement" })}
+                {t("home.hero.cta")}
                 <ArrowRight className="ml-1.5 h-4 w-4" />
               </Link>
             </Button>
             <Button asChild size="lg" variant="outline" className="h-12 px-6">
-              <Link to="/features">
-                {t("home.hero.ctaSecondary", { defaultValue: "Voir les fonctionnalités" })}
-              </Link>
+              <Link to="/features">{t("home.hero.ctaSecondary")}</Link>
             </Button>
           </div>
           <div className="mt-8 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-xs text-muted-foreground">
             <span className="inline-flex items-center gap-1.5">
               <CheckCircle2 className="h-3.5 w-3.5 text-primary" />
-              {t("home.hero.trust1", { defaultValue: "Essai gratuit" })}
+              {t("home.hero.trust1")}
             </span>
             <span className="inline-flex items-center gap-1.5">
               <CheckCircle2 className="h-3.5 w-3.5 text-primary" />
-              {t("home.hero.trust2", { defaultValue: "Sans carte bancaire" })}
+              {t("home.hero.trust2")}
             </span>
             <span className="inline-flex items-center gap-1.5">
               <CheckCircle2 className="h-3.5 w-3.5 text-primary" />
-              {t("home.hero.trust3", { defaultValue: "Données hébergées en Europe" })}
+              {t("home.hero.trust3")}
             </span>
           </div>
         </div>
@@ -1256,50 +1246,33 @@ function DigitalizedFeatures() {
   const features = [
     {
       icon: CalendarCheck,
-      title: t("home.digit.f1Title", { defaultValue: "Convocations en 12 secondes" }),
-      body: t("home.digit.f1Body", {
-        defaultValue: "Envoyez, relancez, suivez les réponses. Sans relancer chacun par SMS.",
-      }),
+      title: t("home.digit.f1Title"),
+      body: t("home.digit.f1Body"),
     },
     {
       icon: Sparkles,
-      title: t("home.digit.f2Title", { defaultValue: "Paiements en ligne" }),
-      body: t("home.digit.f2Body", {
-        defaultValue:
-          "Cotisations, équipements, stages. Stripe intégré, reçus automatiques, relances incluses.",
-      }),
+      title: t("home.digit.f2Title"),
+      body: t("home.digit.f2Body"),
     },
     {
       icon: MessageSquareText,
-      title: t("home.digit.f3Title", { defaultValue: "Communication centralisée" }),
-      body: t("home.digit.f3Body", {
-        defaultValue:
-          "Wall du club, chat d'événement, emails multilingues. Fini les groupes WhatsApp qui débordent.",
-      }),
+      title: t("home.digit.f3Title"),
+      body: t("home.digit.f3Body"),
     },
     {
       icon: BarChart3,
-      title: t("home.digit.f4Title", { defaultValue: "Stats & suivi joueurs" }),
-      body: t("home.digit.f4Body", {
-        defaultValue:
-          "Présences, feedback coach, progression. Une vraie carrière pour vos joueurs.",
-      }),
+      title: t("home.digit.f4Title"),
+      body: t("home.digit.f4Body"),
     },
     {
       icon: ShieldCheck,
-      title: t("home.digit.f5Title", { defaultValue: "Disciplines & suspensions" }),
-      body: t("home.digit.f5Body", {
-        defaultValue:
-          "Cartons, suspensions, blessures suivis automatiquement par équipe et par saison.",
-      }),
+      title: t("home.digit.f5Title"),
+      body: t("home.digit.f5Body"),
     },
     {
       icon: ClipboardList,
-      title: t("home.digit.f6Title", { defaultValue: "Compositions & feuilles de match" }),
-      body: t("home.digit.f6Body", {
-        defaultValue:
-          "Préparez la compo, partagez-la, exportez la feuille. Le coach a tout sur son téléphone.",
-      }),
+      title: t("home.digit.f6Title"),
+      body: t("home.digit.f6Body"),
     },
   ];
   return (
@@ -1307,19 +1280,12 @@ function DigitalizedFeatures() {
       <div className="mx-auto max-w-7xl px-5 lg:px-8">
         <div className="mx-auto max-w-2xl text-center">
           <p className="text-xs font-semibold uppercase tracking-wider text-primary">
-            {t("home.digit.kicker", { defaultValue: "On l'a digitalisé pour vous" })}
+            {t("home.digit.kicker")}
           </p>
           <h2 className="mt-3 font-display text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
-            {t("home.digit.title", {
-              defaultValue: "Tout ce qui vous prenait des heures, maintenant en quelques clics.",
-            })}
+            {t("home.digit.title")}
           </h2>
-          <p className="mt-4 text-muted-foreground">
-            {t("home.digit.sub", {
-              defaultValue:
-                "Chaque fonctionnalité répond à un vrai problème de bénévole : moins de tableurs, moins de messages, plus de terrain.",
-            })}
-          </p>
+          <p className="mt-4 text-muted-foreground">{t("home.digit.sub")}</p>
         </div>
 
         <div className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
@@ -1348,12 +1314,7 @@ function DigitalizedFeatures() {
 
 function AISection() {
   const { t } = useTranslation("marketing");
-  const bullets = [
-    t("home.ai.b1", { defaultValue: "Résume vos matchs et propose la prochaine compo" }),
-    t("home.ai.b2", { defaultValue: "Rédige vos communications en un clic, dans 7 langues" }),
-    t("home.ai.b3", { defaultValue: "Détecte automatiquement les progrès et alertes joueurs" }),
-    t("home.ai.b4", { defaultValue: "Assistant intégré : posez-lui une question sur votre club" }),
-  ];
+  const bullets = [t("home.ai.b1"), t("home.ai.b2"), t("home.ai.b3"), t("home.ai.b4")];
   return (
     <section className="border-b border-border/60 py-20 lg:py-24">
       <div className="mx-auto max-w-7xl px-5 lg:px-8">
@@ -1361,17 +1322,12 @@ function AISection() {
           <div>
             <div className="inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-primary">
               <BrainCircuit className="h-3.5 w-3.5" />
-              {t("home.ai.kicker", { defaultValue: "Intelligence artificielle intégrée" })}
+              {t("home.ai.kicker")}
             </div>
             <h2 className="mt-4 font-display text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
-              {t("home.ai.title", { defaultValue: "L'IA vous épaule au quotidien." })}
+              {t("home.ai.title")}
             </h2>
-            <p className="mt-4 text-muted-foreground">
-              {t("home.ai.sub", {
-                defaultValue:
-                  "Pas un gadget. Une vraie assistance qui prend en charge les tâches répétitives — pour que les bénévoles se consacrent aux joueurs.",
-              })}
-            </p>
+            <p className="mt-4 text-muted-foreground">{t("home.ai.sub")}</p>
             <ul className="mt-6 space-y-3">
               {bullets.map((b) => (
                 <li key={b} className="flex items-start gap-3 text-sm text-foreground/80">
@@ -1382,7 +1338,7 @@ function AISection() {
             </ul>
             <Button asChild className="mt-8 h-11 px-6">
               <Link to="/features">
-                {t("home.ai.cta", { defaultValue: "Découvrir l'assistant" })}
+                {t("home.ai.cta")}
                 <ArrowRight className="ml-1.5 h-4 w-4" />
               </Link>
             </Button>
@@ -1396,25 +1352,22 @@ function AISection() {
                   <Bot className="h-4 w-4" />
                 </div>
                 <p className="text-sm font-semibold text-foreground">
-                  {t("home.ai.assistantName", { defaultValue: "Assistant Clubero" })}
+                  {t("home.ai.assistantName")}
                 </p>
                 <span className="ml-auto flex items-center gap-1.5 text-[10px] font-semibold text-muted-foreground">
                   <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-500" />
-                  {t("home.ai.online", { defaultValue: "En ligne" })}
+                  {t("home.ai.online")}
                 </span>
               </div>
               <div className="mt-4 space-y-3">
                 <div className="ml-auto max-w-[80%] rounded-2xl rounded-tr-sm bg-primary px-4 py-2 text-sm text-primary-foreground">
-                  {t("home.ai.q1", { defaultValue: "Qui n'a pas encore payé la cotisation ?" })}
+                  {t("home.ai.q1")}
                 </div>
                 <div className="max-w-[85%] rounded-2xl rounded-tl-sm border border-border bg-muted/50 px-4 py-2 text-sm text-foreground">
-                  {t("home.ai.a1", {
-                    defaultValue:
-                      "3 joueurs : Lucas M., Sarah B. et Tom D. Je lance une relance par email ?",
-                  })}
+                  {t("home.ai.a1")}
                 </div>
                 <div className="ml-auto max-w-[60%] rounded-2xl rounded-tr-sm bg-primary px-4 py-2 text-sm text-primary-foreground">
-                  {t("home.ai.q2", { defaultValue: "Oui, en français." })}
+                  {t("home.ai.q2")}
                 </div>
               </div>
             </div>
@@ -1427,12 +1380,7 @@ function AISection() {
 
 function TournamentsStrip() {
   const { t } = useTranslation("marketing");
-  const bullets = [
-    t("home.tourn.b1", { defaultValue: "Inscriptions en ligne, paiement intégré" }),
-    t("home.tourn.b2", { defaultValue: "Tableaux, poules, brackets, scores live" }),
-    t("home.tourn.b3", { defaultValue: "Page publique TV pour vos spectateurs" }),
-    t("home.tourn.b4", { defaultValue: "Convocations & feuilles de match incluses" }),
-  ];
+  const bullets = [t("home.tourn.b1"), t("home.tourn.b2"), t("home.tourn.b3"), t("home.tourn.b4")];
   return (
     <section className="border-b border-border/60 bg-muted/30 py-20 lg:py-24">
       <div className="mx-auto max-w-7xl px-5 lg:px-8">
@@ -1440,19 +1388,12 @@ function TournamentsStrip() {
           <div>
             <div className="inline-flex items-center gap-2 rounded-full border border-amber-500/30 bg-amber-500/10 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-amber-700 dark:text-amber-400">
               <Trophy className="h-3.5 w-3.5" />
-              {t("home.tourn.kicker", { defaultValue: "Module tournois — appli complète" })}
+              {t("home.tourn.kicker")}
             </div>
             <h2 className="mt-4 font-display text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
-              {t("home.tourn.title", {
-                defaultValue: "Une vraie appli de gestion de tournois, dans Clubero.",
-              })}
+              {t("home.tourn.title")}
             </h2>
-            <p className="mt-4 text-muted-foreground">
-              {t("home.tourn.sub", {
-                defaultValue:
-                  "Pas un module gadget : un outil professionnel utilisé par des dizaines de clubs et organisateurs indépendants. Du tournoi amical à la compétition régionale.",
-              })}
-            </p>
+            <p className="mt-4 text-muted-foreground">{t("home.tourn.sub")}</p>
             <ul className="mt-6 space-y-3">
               {bullets.map((b) => (
                 <li key={b} className="flex items-start gap-3 text-sm text-foreground/80">
@@ -1464,14 +1405,11 @@ function TournamentsStrip() {
             <div className="mt-8 flex flex-wrap gap-3">
               <Button asChild className="h-11 bg-amber-500 px-6 text-white hover:bg-amber-600">
                 <Link to="/tournaments/start">
-                  {t("home.tourn.cta", { defaultValue: "Démarrer un tournoi" })}{" "}
-                  <ArrowRight className="ml-1.5 h-4 w-4" />
+                  {t("home.tourn.cta")} <ArrowRight className="ml-1.5 h-4 w-4" />
                 </Link>
               </Button>
               <Button asChild variant="outline" className="h-11 px-6">
-                <Link to="/pricing">
-                  {t("home.tourn.pricing", { defaultValue: "Voir les tarifs" })}
-                </Link>
+                <Link to="/pricing">{t("home.tourn.pricing")}</Link>
               </Button>
             </div>
           </div>
@@ -1484,21 +1422,14 @@ function TournamentsStrip() {
                 </div>
                 <div>
                   <p className="text-[10px] font-semibold uppercase tracking-wider text-primary">
-                    {t("home.tourn.included", { defaultValue: "Inclus dans l'abonnement club" })}
+                    {t("home.tourn.included")}
                   </p>
                   <p className="font-display text-base font-semibold text-foreground">
-                    {t("home.tourn.includedDesc", {
-                      defaultValue: "Tournois illimités, sans frais par événement",
-                    })}
+                    {t("home.tourn.includedDesc")}
                   </p>
                 </div>
               </div>
-              <p className="mt-3 text-sm text-muted-foreground">
-                {t("home.tourn.includedBody", {
-                  defaultValue:
-                    "Si vous avez un abonnement Clubero, organisez autant de tournois que vous voulez sans surcoût.",
-                })}
-              </p>
+              <p className="mt-3 text-sm text-muted-foreground">{t("home.tourn.includedBody")}</p>
             </div>
             <div className="rounded-3xl border border-border bg-card p-6">
               <div className="flex items-center gap-3">
@@ -1507,23 +1438,14 @@ function TournamentsStrip() {
                 </div>
                 <div>
                   <p className="text-[10px] font-semibold uppercase tracking-wider text-amber-700 dark:text-amber-400">
-                    {t("home.tourn.standalone", {
-                      defaultValue: "Sans abonnement — à l'événement",
-                    })}
+                    {t("home.tourn.standalone")}
                   </p>
                   <p className="font-display text-base font-semibold text-foreground">
-                    {t("home.tourn.standaloneDesc", {
-                      defaultValue: "Payez 40 € par tournoi, c'est tout",
-                    })}
+                    {t("home.tourn.standaloneDesc")}
                   </p>
                 </div>
               </div>
-              <p className="mt-3 text-sm text-muted-foreground">
-                {t("home.tourn.standaloneBody", {
-                  defaultValue:
-                    "Vous organisez un tournoi ponctuel sans club ? Utilisez Clubero à la demande, sans engagement.",
-                })}
-              </p>
+              <p className="mt-3 text-sm text-muted-foreground">{t("home.tourn.standaloneBody")}</p>
             </div>
           </div>
         </div>
@@ -1540,45 +1462,30 @@ function SocialNetworkSection() {
         <div className="mx-auto max-w-2xl text-center">
           <div className="inline-flex items-center gap-2 rounded-full border border-secondary/30 bg-secondary/10 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-secondary">
             <Network className="h-3.5 w-3.5" />
-            {t("home.social.kicker", { defaultValue: "Le réseau social du sport amateur" })}
+            {t("home.social.kicker")}
           </div>
           <h2 className="mt-4 font-display text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
-            {t("home.social.title", {
-              defaultValue:
-                "Au-delà de la gestion : on a créé le réseau des joueurs et des coachs.",
-            })}
+            {t("home.social.title")}
           </h2>
-          <p className="mt-4 text-muted-foreground">
-            {t("home.social.sub", {
-              defaultValue:
-                "Chaque joueur a un vrai profil public — stats, carrière, médias. Chaque coach a une page. Tout le monde peut se suivre, se découvrir, se contacter.",
-            })}
-          </p>
+          <p className="mt-4 text-muted-foreground">{t("home.social.sub")}</p>
         </div>
 
         <div className="mx-auto mt-12 grid max-w-5xl gap-6 md:grid-cols-3">
           {[
             {
               icon: UserCircle2,
-              title: t("home.social.c1Title", { defaultValue: "Profil joueur public" }),
-              body: t("home.social.c1Body", {
-                defaultValue: "Stats, carrière, médias — partageable, certifié par tes clubs.",
-              }),
+              title: t("home.social.c1Title"),
+              body: t("home.social.c1Body"),
             },
             {
               icon: GraduationCap,
-              title: t("home.social.c2Title", { defaultValue: "Page coach" }),
-              body: t("home.social.c2Body", {
-                defaultValue: "Visibilité, suivi, recrutement. Les coachs ne sont plus invisibles.",
-              }),
+              title: t("home.social.c2Title"),
+              body: t("home.social.c2Body"),
             },
             {
               icon: Heart,
-              title: t("home.social.c3Title", { defaultValue: "Followers & suivi" }),
-              body: t("home.social.c3Body", {
-                defaultValue:
-                  "Suivez vos clubs préférés, vos enfants, vos amis. Comme un vrai réseau.",
-              }),
+              title: t("home.social.c3Title"),
+              body: t("home.social.c3Body"),
             },
           ].map((c) => {
             const Icon = c.icon;
@@ -1602,8 +1509,7 @@ function SocialNetworkSection() {
         <div className="mt-10 flex justify-center">
           <Button asChild variant="outline" className="h-11 px-6">
             <Link to="/register/player">
-              {t("home.social.cta", { defaultValue: "Créer mon profil joueur" })}{" "}
-              <ArrowRight className="ml-1.5 h-4 w-4" />
+              {t("home.social.cta")} <ArrowRight className="ml-1.5 h-4 w-4" />
             </Link>
           </Button>
         </div>
@@ -1619,23 +1525,15 @@ function FinalCTA() {
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_center,color-mix(in_oklab,var(--primary)_15%,transparent),transparent_60%)]" />
       <div className="relative mx-auto max-w-3xl px-5 text-center lg:px-8">
         <h2 className="font-display text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
-          {t("home.finalCta.title", { defaultValue: "Reprenez du temps pour le sport." })}
+          {t("home.finalCta.title")}
         </h2>
-        <p className="mt-4 text-muted-foreground">
-          {t("home.finalCta.sub", {
-            defaultValue: "Essai gratuit. Sans carte bancaire. Données hébergées en Europe.",
-          })}
-        </p>
+        <p className="mt-4 text-muted-foreground">{t("home.finalCta.sub")}</p>
         <div className="mt-8 flex flex-wrap justify-center gap-3">
           <Button asChild size="lg" className="h-12 px-7">
-            <Link to="/register">
-              {t("home.finalCta.club", { defaultValue: "Créer mon club" })}
-            </Link>
+            <Link to="/register">{t("home.finalCta.club")}</Link>
           </Button>
           <Button asChild size="lg" variant="outline" className="h-12 px-7">
-            <Link to="/register/player">
-              {t("home.finalCta.player", { defaultValue: "Créer mon profil joueur" })}
-            </Link>
+            <Link to="/register/player">{t("home.finalCta.player")}</Link>
           </Button>
         </div>
       </div>
@@ -2363,7 +2261,7 @@ export function PlayerJournalSection() {
                 </div>
                 <div>
                   <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">
-                    Saison
+                    {t("playerJournal.mockSeasonLabel")}
                   </p>
                   <p className="text-sm font-bold tabular-nums">+18%</p>
                 </div>
@@ -2569,7 +2467,7 @@ export function CoachAssistSection() {
                   <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">
                     Insights
                   </p>
-                  <p className="text-sm font-bold tabular-nums">3 à faire</p>
+                  <p className="text-sm font-bold tabular-nums">{t("mock.toDoCount")}</p>
                 </div>
               </div>
             </div>
@@ -2703,7 +2601,7 @@ function Hero() {
                 </div>
                 <div>
                   <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">
-                    Présence
+                    {t("mock.attendance")}
                   </p>
                   <p className="text-sm font-bold tabular-nums">94%</p>
                 </div>
@@ -3195,7 +3093,7 @@ function ProductPreview() {
                     <span className="text-[10px] text-muted-foreground">Sam 14:30</span>
                   </div>
                   <div className="flex items-center justify-between">
-                    <span className="text-xs font-semibold truncate">U15 Entraînement</span>
+                    <span className="text-xs font-semibold truncate">{t("mock.u15Training")}</span>
                     <span className="text-[10px] text-muted-foreground">Mer 18:00</span>
                   </div>
                 </div>
@@ -3241,7 +3139,9 @@ function ProductPreview() {
                   </div>
                   <div>
                     <p className="font-display text-base font-bold tabular-nums">94%</p>
-                    <p className="text-[9px] uppercase text-muted-foreground">Présence</p>
+                    <p className="text-[9px] uppercase text-muted-foreground">
+                      {t("mock.attendance")}
+                    </p>
                   </div>
                 </div>
               </div>

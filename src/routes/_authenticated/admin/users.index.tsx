@@ -7,6 +7,7 @@ import { useRef, useState, type FormEvent } from "react";
 import { useAuth, useActiveRole, useMyRoles } from "@/lib/auth-context";
 import { supabase } from "@/integrations/supabase/client";
 import { sendTransactionalEmail } from "@/lib/email/send";
+import { resolveEmailLocale } from "@/lib/email/locale";
 import { Loader2, Users, Mail, ShieldCheck, Trophy, UserPlus, Search, X } from "lucide-react";
 import { listClubUsers } from "@/lib/admin.functions";
 import {
@@ -42,7 +43,7 @@ export const Route = createFileRoute("/_authenticated/admin/users/")({
 });
 
 function AdminUsersPage() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { activeClubId, user } = useAuth();
   const role = useActiveRole();
   const roles = useMyRoles();
@@ -125,12 +126,7 @@ function AdminUsersPage() {
       try {
         const { data: exists } = await supabase.rpc("email_exists", { _email: email });
         if (exists === true) {
-          toast.error(
-            t("admin.inviteEmailAlreadyUser", {
-              defaultValue:
-                "Cette adresse a déjà un compte Clubero. Demandez-lui de se connecter, puis ajoutez-la via son profil.",
-            }),
-          );
+          toast.error(t("admin.inviteEmailAlreadyUser"));
           return;
         }
       } catch {
@@ -159,7 +155,7 @@ function AdminUsersPage() {
 
       const { data: clubRow } = await supabase
         .from("clubs")
-        .select("name, logo_url")
+        .select("name, logo_url, default_language")
         .eq("id", activeClubId)
         .maybeSingle();
       const clubLabel = clubRow?.name ?? "Clubero";
@@ -180,14 +176,14 @@ function AdminUsersPage() {
             clubLogoUrl,
             inviteUrl,
             roleLabel,
+            locale: resolveEmailLocale(
+              (clubRow as { default_language?: string | null } | null)?.default_language,
+              i18n.language,
+            ),
           },
         });
       } catch (err: any) {
-        toast.error(
-          t("admin.inviteEmailFailed", {
-            defaultValue: "Invitation créée mais l'email n'a pas pu être envoyé.",
-          }),
-        );
+        toast.error(t("admin.inviteEmailFailed"));
         qc.invalidateQueries({ queryKey: ["admin-club-users", activeClubId] });
         return;
       }
@@ -227,19 +223,15 @@ function AdminUsersPage() {
           trigger={
             <Button size="sm" className="h-9">
               <UserPlus className="h-4 w-4" />
-              {t("admin.inviteUser", { defaultValue: "Inviter" })}
+              {t("admin.inviteUser")}
             </Button>
           }
-          title={t("admin.inviteUser", { defaultValue: "Inviter un utilisateur" })}
+          title={t("admin.inviteUser")}
         >
           <form onSubmit={onInvite} className="space-y-4 mt-4 pb-6">
             <div className="space-y-1.5">
-              <Label>{t("admin.inviteRole", { defaultValue: "Rôles" })}</Label>
-              <p className="text-[11px] text-muted-foreground">
-                {t("permissions.clubRolesHint", {
-                  defaultValue: "Un utilisateur peut cumuler plusieurs rôles.",
-                })}
-              </p>
+              <Label>{t("admin.inviteRole")}</Label>
+              <p className="text-[11px] text-muted-foreground">{t("permissions.clubRolesHint")}</p>
               <TooltipProvider delayDuration={150}>
                 <div className="space-y-1">
                   {CLUB_ROLE_KEYS.map((r) => {
@@ -317,7 +309,7 @@ function AdminUsersPage() {
               ) : (
                 <>
                   <Mail className="h-4 w-4" />
-                  {t("admin.sendInvite", { defaultValue: "Envoyer l'invitation" })}
+                  {t("admin.sendInvite")}
                 </>
               )}
             </Button>
@@ -331,9 +323,7 @@ function AdminUsersPage() {
         <Input
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          placeholder={t("admin.searchUsersPlaceholder", {
-            defaultValue: "Rechercher par nom ou email…",
-          })}
+          placeholder={t("admin.searchUsersPlaceholder")}
           className="pl-9 pr-9 h-10"
         />
         {search && (
@@ -341,7 +331,7 @@ function AdminUsersPage() {
             type="button"
             onClick={() => setSearch("")}
             className="absolute right-2 top-1/2 -translate-y-1/2 p-1 rounded-md hover:bg-muted text-muted-foreground"
-            aria-label={t("common.clear", { defaultValue: "Effacer" })}
+            aria-label={t("common.clear")}
           >
             <X className="h-3.5 w-3.5" />
           </button>
@@ -457,9 +447,7 @@ function AdminUsersPage() {
                             }}
                           >
                             <ShieldCheck className="h-3.5 w-3.5" />
-                            {t("admin.promoteToClubMember", {
-                              defaultValue: "Promouvoir en membre",
-                            })}
+                            {t("admin.promoteToClubMember")}
                           </Button>
                         )}
                       </div>
@@ -473,11 +461,10 @@ function AdminUsersPage() {
             <Tabs defaultValue="staff" className="w-full">
               <TabsList className="grid grid-cols-2 w-full">
                 <TabsTrigger value="staff">
-                  {t("admin.tabClubMembers", { defaultValue: "Membres du club" })} ({staff.length})
+                  {t("admin.tabClubMembers")} ({staff.length})
                 </TabsTrigger>
                 <TabsTrigger value="players">
-                  {t("admin.tabPlayersParents", { defaultValue: "Joueurs & parents" })} (
-                  {playersParents.length})
+                  {t("admin.tabPlayersParents")} ({playersParents.length})
                 </TabsTrigger>
               </TabsList>
               <TabsContent value="staff" className="mt-3">

@@ -33,19 +33,19 @@ export function AddToCalendarButton({ event, className }: Props) {
       <DropdownMenuTrigger asChild>
         <Button variant="outline" size="sm" className={className}>
           <CalendarPlus className="h-4 w-4" />
-          <span>{t("events.addToCalendar", { defaultValue: "Ajouter au calendrier" })}</span>
+          <span>{t("events.addToCalendar")}</span>
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="start">
         <DropdownMenuItem asChild>
           <a href={buildGoogleCalendarUrl(event)} target="_blank" rel="noopener noreferrer">
             <ExternalLink className="h-4 w-4" />
-            {t("events.addToGoogleCalendar", { defaultValue: "Google Agenda" })}
+            {t("events.addToGoogleCalendar")}
           </a>
         </DropdownMenuItem>
         <DropdownMenuItem onSelect={() => downloadIcs()}>
           <Download className="h-4 w-4" />
-          {t("events.downloadIcs", { defaultValue: "Apple / Outlook (.ics)" })}
+          {t("events.downloadIcs")}
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

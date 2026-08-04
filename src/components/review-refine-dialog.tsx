@@ -48,10 +48,7 @@ export function ReviewRefineDialog({
       setTurns([
         {
           role: "assistant",
-          changes: t("feedback.refineWelcome", {
-            defaultValue:
-              "Salut 👋 Dis-moi ce que tu veux ajuster : longueur, ton, structure, focus particulier… Je réécris la synthèse à chaque message.",
-          }),
+          changes: t("feedback.refineWelcome"),
           preview: "",
         },
       ]);
@@ -95,31 +92,21 @@ export function ReviewRefineDialog({
         ...s,
         {
           role: "assistant",
-          changes:
-            changes ||
-            t("feedback.refineDoneFallback", {
-              defaultValue: "Synthèse mise à jour selon ta demande.",
-            }),
+          changes: changes || t("feedback.refineDoneFallback"),
           preview,
         },
       ]);
-      toast.success(t("feedback.refineUpdated", { defaultValue: "Synthèse mise à jour" }));
+      toast.success(t("feedback.refineUpdated"));
     } catch (e: any) {
       const msg = e?.message ?? "";
       const assistantMessage =
         msg.includes("rate_limited") || msg.includes("429")
-          ? t("feedback.rateLimit", { defaultValue: "Trop de requêtes, réessaie dans un instant." })
+          ? t("feedback.rateLimit")
           : msg.includes("credits_exhausted") || msg.includes("402")
-            ? t("feedback.creditsExhausted", { defaultValue: "Crédits IA épuisés." })
-            : msg ||
-              t("feedback.refineFailed", {
-                defaultValue:
-                  "Je n'ai pas pu appliquer ta demande. La synthèse n'a pas été modifiée.",
-              });
-      if (msg.includes("429"))
-        toast.error(t("feedback.rateLimit", { defaultValue: "Trop de requêtes." }));
-      else if (msg.includes("402"))
-        toast.error(t("feedback.creditsExhausted", { defaultValue: "Crédits IA épuisés." }));
+            ? t("feedback.creditsExhausted")
+            : msg || t("feedback.refineFailed");
+      if (msg.includes("429")) toast.error(t("feedback.rateLimit"));
+      else if (msg.includes("402")) toast.error(t("feedback.creditsExhausted"));
       else toast.error(assistantMessage);
       setTurns((s) => [
         ...s,
@@ -143,7 +130,7 @@ export function ReviewRefineDialog({
             <div className="h-8 w-8 rounded-xl bg-primary/10 flex items-center justify-center">
               <Wand2 className="h-4 w-4 text-primary" />
             </div>
-            {t("feedback.refineChatTitle", { defaultValue: "Affiner la synthèse avec l'IA" })}
+            {t("feedback.refineChatTitle")}
           </DialogTitle>
         </DialogHeader>
 
@@ -152,10 +139,7 @@ export function ReviewRefineDialog({
             <div className="rounded-xl border border-dashed border-border bg-muted/30 p-4 text-sm text-muted-foreground">
               <p className="flex items-center gap-2 font-medium text-foreground">
                 <Sparkles className="h-4 w-4 text-primary" />
-                {t("feedback.refineChatHint", {
-                  defaultValue:
-                    "Décris ce que tu veux changer (ton, longueur, structure…). Tu verras la synthèse se mettre à jour à chaque échange.",
-                })}
+                {t("feedback.refineChatHint")}
               </p>
               <ul className="mt-2 space-y-1 text-xs">
                 <li>· « {t("feedback.refineExample1", "Résume en 5 phrases")} »</li>
@@ -233,14 +217,14 @@ export function ReviewRefineDialog({
           {busy && (
             <div className="flex items-center gap-2 text-xs text-muted-foreground">
               <Loader2 className="h-3.5 w-3.5 animate-spin text-primary" />
-              {t("feedback.refineWorking", { defaultValue: "L'IA réécrit la synthèse…" })}
+              {t("feedback.refineWorking")}
             </div>
           )}
         </div>
 
         <div className="border-t border-border bg-muted/20 px-5 py-3">
           <p className="mb-1 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
-            {t("feedback.currentSynthesis", { defaultValue: "Synthèse actuelle" })}
+            {t("feedback.currentSynthesis")}
           </p>
           <p className="max-h-24 overflow-y-auto whitespace-pre-wrap text-xs leading-relaxed text-muted-foreground">
             {currentContent}
@@ -259,9 +243,7 @@ export function ReviewRefineDialog({
                   send();
                 }
               }}
-              placeholder={t("feedback.refineChatPlaceholder", {
-                defaultValue: "Que veux-tu changer ?",
-              })}
+              placeholder={t("feedback.refineChatPlaceholder")}
               className="min-h-[44px] max-h-[140px] text-sm resize-none flex-1"
               disabled={busy}
             />
@@ -269,16 +251,13 @@ export function ReviewRefineDialog({
               size="icon"
               onClick={send}
               disabled={busy || input.trim().length < 2}
-              aria-label={t("feedback.send", { defaultValue: "Envoyer" })}
+              aria-label={t("feedback.send")}
             >
               {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
             </Button>
           </div>
           <p className="mt-1.5 text-[10px] text-muted-foreground">
-            {t("feedback.refineChatFooter", {
-              defaultValue:
-                "Chaque message met à jour la synthèse affichée. L'historique de cet échange n'est pas sauvegardé.",
-            })}
+            {t("feedback.refineChatFooter")}
           </p>
         </div>
       </DialogContent>

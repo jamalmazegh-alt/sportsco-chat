@@ -37,7 +37,7 @@ export function HeaderActions() {
       {showSupport && (
         <Link
           to="/support"
-          aria-label={t("support.fab", { defaultValue: "Support" })}
+          aria-label={t("support.fab")}
           className={cn(
             "h-9 w-9 rounded-full bg-secondary text-secondary-foreground shadow-sm",
             "flex items-center justify-center hover:scale-105 active:scale-95 transition-transform",
@@ -49,7 +49,7 @@ export function HeaderActions() {
       {showAssistant && (
         <Link
           to="/assistant"
-          aria-label={t("assistant.open", { defaultValue: "Open assistant" })}
+          aria-label={t("assistant.open")}
           className={cn(
             "h-9 w-9 rounded-full bg-primary text-primary-foreground shadow-sm",
             "flex items-center justify-center hover:scale-105 active:scale-95 transition-transform",

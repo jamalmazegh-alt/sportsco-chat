@@ -100,7 +100,7 @@ function PayPage() {
     return (
       <CenterCard
         icon={<XCircle className="h-10 w-10 text-destructive" />}
-        title={t("register.payNotFound", { defaultValue: "Lien introuvable" })}
+        title={t("register.payNotFound")}
         body={t("payments.linkExpiredMessage")}
       />
     );
@@ -124,9 +124,7 @@ function PayPage() {
     return (
       <CenterCard
         icon={<XCircle className="h-10 w-10 text-muted-foreground" />}
-        title={t("payments.refundedMessage", {
-          defaultValue: "Cette inscription a été remboursée.",
-        })}
+        title={t("payments.refundedMessage")}
         body=""
       />
     );
@@ -159,11 +157,7 @@ function PayPage() {
         <Button onClick={onPay} disabled={paying} size="lg" className="w-full">
           {paying ? <Loader2 className="h-4 w-4 animate-spin" /> : t("payments.payNow", { amount })}
         </Button>
-        <p className="text-[11px] text-muted-foreground">
-          {t("register.securePayment", {
-            defaultValue: "Paiement sécurisé via Stripe.",
-          })}
-        </p>
+        <p className="text-[11px] text-muted-foreground">{t("register.securePayment")}</p>
       </div>
     </div>
   );

@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { useTranslation } from "react-i18next";
 import { useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
@@ -25,6 +26,7 @@ function fmtDate(iso: string) {
 }
 
 function EmailDispatchesPage() {
+  const { t } = useTranslation();
   const { data, isLoading, refetch, isFetching } = useQuery({
     queryKey: ["superadmin", "email-dispatches"],
     queryFn: () => listEmailDispatches({ data: { limit: 100 } }),
@@ -62,19 +64,18 @@ function EmailDispatchesPage() {
     <div className="p-6 md:p-8 max-w-6xl">
       <header className="mb-5">
         <div className="flex items-center gap-2 text-xs uppercase tracking-wide text-muted-foreground">
-          <Mail className="h-3.5 w-3.5" /> Emails
+          <Mail className="h-3.5 w-3.5" /> {t("superadmin.emailDispatches.eyebrow")}
         </div>
         <div className="flex items-center justify-between gap-3 mt-1">
           <div>
-            <h1 className="text-xl font-semibold">Envois groupés</h1>
+            <h1 className="text-xl font-semibold">{t("superadmin.emailDispatches.title")}</h1>
             <p className="text-sm text-muted-foreground mt-0.5">
-              Chaque campagne (convocation, invitation…) avec le statut agrégé jusqu'à son état
-              final. Se rafraîchit toutes les 20&nbsp;s.
+              {t("superadmin.emailDispatches.subtitle")}
             </p>
           </div>
           <Button size="sm" variant="outline" onClick={() => refetch()} disabled={isFetching}>
             <RefreshCw className={`h-3.5 w-3.5 mr-1.5 ${isFetching ? "animate-spin" : ""}`} />
-            Rafraîchir
+            {t("superadmin.emailDispatches.refresh")}
           </Button>
         </div>
       </header>
@@ -82,10 +83,10 @@ function EmailDispatchesPage() {
       <div className="flex flex-wrap gap-2 mb-3">
         {(
           [
-            ["all", "Tous"],
-            ["in_progress", "En cours"],
-            ["settled", "Finalisés"],
-            ["has_failures", "Avec échecs"],
+            ["all", t("superadmin.emailDispatches.filterAll")],
+            ["in_progress", t("superadmin.emailDispatches.filterInProgress")],
+            ["settled", t("superadmin.emailDispatches.filterSettled")],
+            ["has_failures", t("superadmin.emailDispatches.filterFailures")],
           ] as const
         ).map(([k, label]) => (
           <Button
@@ -101,7 +102,7 @@ function EmailDispatchesPage() {
       </div>
 
       <Input
-        placeholder="Filtrer par template, événement, club, équipe, auteur…"
+        placeholder={t("superadmin.emailDispatches.filterPlaceholder")}
         value={q}
         onChange={(e) => setQ(e.target.value)}
         className="mb-4 max-w-md"
@@ -111,11 +112,11 @@ function EmailDispatchesPage() {
 
       {isLoading && (
         <div className="flex items-center gap-2 text-sm text-muted-foreground">
-          <Loader2 className="h-4 w-4 animate-spin" /> Chargement…
+          <Loader2 className="h-4 w-4 animate-spin" /> {t("superadmin.emailDispatches.loading")}
         </div>
       )}
       {!isLoading && filtered.length === 0 && (
-        <div className="text-sm text-muted-foreground">Aucun envoi ne correspond aux filtres.</div>
+        <div className="text-sm text-muted-foreground">{t("superadmin.emailDispatches.empty")}</div>
       )}
       {!isLoading && filtered.length > 0 && (
         <ul className="space-y-1.5">
@@ -137,20 +138,26 @@ function EmailDispatchesPage() {
                         </span>
                         <StatusBadge tone={d.dispatch_type === "manual_resend" ? "warn" : "info"}>
                           {d.dispatch_type === "manual_resend"
-                            ? "Renvoi"
+                            ? t("superadmin.emailDispatches.resend")
                             : d.dispatch_type === "dlq_replay"
-                              ? "Replay DLQ"
-                              : "Initial"}
+                              ? t("superadmin.emailDispatches.replayDlq")
+                              : t("superadmin.emailDispatches.initial")}
                         </StatusBadge>
                         <span className="text-[11px] text-muted-foreground font-mono">
                           {d.template_name}
                         </span>
                         {d.is_settled ? (
-                          <StatusBadge tone="success">Finalisé</StatusBadge>
+                          <StatusBadge tone="success">
+                            {t("superadmin.emailDispatches.finalized")}
+                          </StatusBadge>
                         ) : d.counts.total === 0 ? (
-                          <StatusBadge tone="muted">Aucun log</StatusBadge>
+                          <StatusBadge tone="muted">
+                            {t("superadmin.emailDispatches.noLog")}
+                          </StatusBadge>
                         ) : (
-                          <StatusBadge tone="info">En cours</StatusBadge>
+                          <StatusBadge tone="info">
+                            {t("superadmin.emailDispatches.inProgress")}
+                          </StatusBadge>
                         )}
                       </div>
                       <div className="text-xs text-muted-foreground mt-0.5 truncate">
@@ -186,6 +193,7 @@ function EmailDispatchesPage() {
 }
 
 function BackfillPanel({ onDone }: { onDone: () => void }) {
+  const { t } = useTranslation();
   const backfill = useServerFn(backfillConvocationEmails);
   const [raw, setRaw] = useState("");
   const [busy, setBusy] = useState(false);
@@ -204,7 +212,7 @@ function BackfillPanel({ onDone }: { onDone: () => void }) {
       ),
     );
     if (ids.length === 0) {
-      setError("Aucun UUID d'événement valide détecté.");
+      setError(t("superadmin.emailDispatches.noValidUuid"));
       return;
     }
     setBusy(true);

@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import {
   listPrivacyRequests,
   approveDeletion,
@@ -30,6 +31,7 @@ function StatusPill({ status }: { status: string }) {
 }
 
 export function PrivacyRequestsSection() {
+  const { t } = useTranslation();
   const [data, setData] = useState<Data | null>(null);
   const [busy, setBusy] = useState<string | null>(null);
 
@@ -44,7 +46,7 @@ export function PrivacyRequestsSection() {
   if (!data) {
     return (
       <div className="flex items-center gap-2 text-sm text-muted-foreground">
-        <Loader2 className="h-4 w-4 animate-spin" /> Loading privacy requests…
+        <Loader2 className="h-4 w-4 animate-spin" /> {t("superadmin.privacyRequests.loading")}
       </div>
     );
   }
@@ -60,7 +62,7 @@ export function PrivacyRequestsSection() {
     setBusy(id);
     try {
       await retryExport({ data: { id } });
-      toast.success("Export relancé");
+      toast.success(t("superadmin.components.exportRestarted"));
       reload();
     } catch (e: any) {
       toast.error(e.message);
@@ -72,14 +74,16 @@ export function PrivacyRequestsSection() {
   const doApprove = async (id: string, hardDelete: boolean) => {
     if (
       !confirm(
-        hardDelete ? "Suppression DURE confirmée ? Action irréversible." : "Anonymiser ce compte ?",
+        hardDelete
+          ? t("superadmin.privacyRequests.confirmHardDelete")
+          : t("superadmin.privacyRequests.confirmAnonymize"),
       )
     )
       return;
     setBusy(id);
     try {
       await approveDeletion({ data: { id, hardDelete } });
-      toast.success("Demande traitée");
+      toast.success(t("superadmin.components.requestProcessed"));
       reload();
     } catch (e: any) {
       toast.error(e.message);
@@ -89,11 +93,11 @@ export function PrivacyRequestsSection() {
   };
 
   const doReject = async (id: string) => {
-    if (!confirm("Rejeter cette demande de suppression ?")) return;
+    if (!confirm(t("superadmin.privacyRequests.confirmRejectDeletion"))) return;
     setBusy(id);
     try {
       await rejectDeletion({ data: { id } });
-      toast.success("Rejetée");
+      toast.success(t("superadmin.components.rejected"));
       reload();
     } catch (e: any) {
       toast.error(e.message);
@@ -106,14 +110,16 @@ export function PrivacyRequestsSection() {
     <section>
       <div className="flex items-center justify-between mb-3">
         <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground flex items-center gap-2">
-          <ShieldAlert className="h-4 w-4" /> Privacy / RGPD (
-          {pendingExports.length + pendingDeletions.length} en attente)
+          <ShieldAlert className="h-4 w-4" />{" "}
+          {t("superadmin.privacyRequests.title", {
+            count: pendingExports.length + pendingDeletions.length,
+          })}
         </h2>
         <button
           onClick={reload}
           className="text-xs text-primary hover:underline flex items-center gap-1"
         >
-          <RefreshCw className="h-3 w-3" /> Refresh
+          <RefreshCw className="h-3 w-3" /> {t("superadmin.privacyRequests.refresh")}
         </button>
       </div>
 
@@ -123,7 +129,7 @@ export function PrivacyRequestsSection() {
           <Download className="h-3 w-3" /> Exports ({data.exports.length})
         </h3>
         {data.exports.length === 0 ? (
-          <p className="text-sm text-muted-foreground">Aucune demande.</p>
+          <p className="text-sm text-muted-foreground">{t("superadmin.privacyRequests.empty")}</p>
         ) : (
           <div className="space-y-1">
             {data.exports.slice(0, 10).map((r: any) => (
@@ -150,7 +156,7 @@ export function PrivacyRequestsSection() {
                     rel="noopener"
                     className="text-xs text-primary hover:underline"
                   >
-                    Lien
+                    {t("superadmin.privacyRequests.link")}
                   </a>
                 )}
                 {(r.status === "pending" || r.status === "failed") && (
@@ -160,7 +166,11 @@ export function PrivacyRequestsSection() {
                     disabled={busy === r.id}
                     onClick={() => doRetry(r.id)}
                   >
-                    {busy === r.id ? <Loader2 className="h-3 w-3 animate-spin" /> : "Traiter"}
+                    {busy === r.id ? (
+                      <Loader2 className="h-3 w-3 animate-spin" />
+                    ) : (
+                      t("superadmin.privacyRequests.process")
+                    )}
                   </Button>
                 )}
               </div>
@@ -172,10 +182,11 @@ export function PrivacyRequestsSection() {
       {/* Deletions */}
       <div className="rounded-lg border border-border bg-card p-4">
         <h3 className="text-xs uppercase tracking-wide text-muted-foreground mb-2 flex items-center gap-2">
-          <UserX className="h-3 w-3" /> Account deletions ({data.deletions.length})
+          <UserX className="h-3 w-3" />{" "}
+          {t("superadmin.privacyRequests.deletions", { count: data.deletions.length })}
         </h3>
         {data.deletions.length === 0 ? (
-          <p className="text-sm text-muted-foreground">Aucune demande.</p>
+          <p className="text-sm text-muted-foreground">{t("superadmin.privacyRequests.empty")}</p>
         ) : (
           <div className="space-y-1">
             {data.deletions.slice(0, 15).map((r: any) => (
@@ -198,7 +209,10 @@ export function PrivacyRequestsSection() {
                   {r.scheduled_for && (
                     <span className="text-muted-foreground">
                       {" "}
-                      · échéance {new Date(r.scheduled_for).toLocaleDateString()}
+                      ·{" "}
+                      {t("superadmin.privacyRequests.deadline", {
+                        date: new Date(r.scheduled_for).toLocaleDateString(),
+                      })}
                     </span>
                   )}
                 </span>
@@ -215,7 +229,7 @@ export function PrivacyRequestsSection() {
                       disabled={busy === r.id}
                       onClick={() => doApprove(r.id, false)}
                     >
-                      <Check className="h-3 w-3 mr-1" /> Anonymiser
+                      <Check className="h-3 w-3 mr-1" /> {t("superadmin.privacyRequests.anonymize")}
                     </Button>
                     <Button
                       size="sm"
@@ -223,7 +237,8 @@ export function PrivacyRequestsSection() {
                       disabled={busy === r.id}
                       onClick={() => doApprove(r.id, true)}
                     >
-                      <UserX className="h-3 w-3 mr-1" /> Suppr. dure
+                      <UserX className="h-3 w-3 mr-1" />{" "}
+                      {t("superadmin.privacyRequests.hardDelete")}
                     </Button>
                     <Button
                       size="sm"
@@ -242,7 +257,7 @@ export function PrivacyRequestsSection() {
                     disabled={busy === r.id}
                     onClick={() => doApprove(r.id, r.hard_delete)}
                   >
-                    Réessayer
+                    {t("superadmin.common.retry")}
                   </Button>
                 )}
               </div>

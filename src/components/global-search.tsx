@@ -86,20 +86,18 @@ export function GlobalSearch() {
         variant="ghost"
         size="icon"
         className="h-8 w-8"
-        aria-label={t("search.open", { defaultValue: "Search" })}
+        aria-label={t("search.open")}
         onClick={() => setOpen(true)}
       >
         <Search className="h-4 w-4" />
       </Button>
       <CommandDialog open={open} onOpenChange={setOpen}>
-        <CommandInput
-          placeholder={t("search.placeholder", { defaultValue: "Search players, teams, events…" })}
-        />
+        <CommandInput placeholder={t("search.placeholder")} />
         <CommandList>
-          <CommandEmpty>{t("search.empty", { defaultValue: "No results." })}</CommandEmpty>
+          <CommandEmpty>{t("search.empty")}</CommandEmpty>
 
           {data?.players && data.players.length > 0 && (
-            <CommandGroup heading={t("nav.players", { defaultValue: "Players" })}>
+            <CommandGroup heading={t("nav.players")}>
               {data.players.map((p) => (
                 <CommandItem
                   key={`p-${p.id}`}

@@ -87,9 +87,7 @@ export function CoachFeedbackTab({ playerId, isCoach }: { playerId: string; isCo
           reviews: [review, ...(current?.reviews ?? []).filter((r: any) => r.id !== review.id)],
         }));
       }
-      toast.success(
-        t("feedback.reviewGenerated", { defaultValue: "Synthèse générée — disponible ci-dessous" }),
-      );
+      toast.success(t("feedback.reviewGenerated"));
       setGenOpen(false);
       await qc.invalidateQueries({ queryKey: ["player-reviews", playerId] });
       // Scroll to the reviews section so the new synthesis is immediately visible.
@@ -100,12 +98,8 @@ export function CoachFeedbackTab({ playerId, isCoach }: { playerId: string; isCo
       }, 150);
     } catch (e: any) {
       const msg = e?.message ?? "";
-      if (msg.includes("429"))
-        toast.error(
-          t("feedback.rateLimit", { defaultValue: "Trop de requêtes, réessaie dans un instant." }),
-        );
-      else if (msg.includes("402"))
-        toast.error(t("feedback.creditsExhausted", { defaultValue: "Crédits IA épuisés." }));
+      if (msg.includes("429")) toast.error(t("feedback.rateLimit"));
+      else if (msg.includes("402")) toast.error(t("feedback.creditsExhausted"));
       else toast.error(msg || "Error");
     } finally {
       setGenBusy(false);
@@ -126,16 +120,16 @@ export function CoachFeedbackTab({ playerId, isCoach }: { playerId: string; isCo
       <div className="flex items-center justify-between gap-2">
         <div>
           <h2 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">
-            {t("feedback.coachTab", { defaultValue: "Retours Coach" })}
+            {t("feedback.coachTab")}
           </h2>
           <p className="mt-0.5 text-[11px] text-muted-foreground">
-            {t("feedback.profileInternalHint", { defaultValue: "Profil joueur · interne staff" })}
+            {t("feedback.profileInternalHint")}
           </p>
         </div>
         {isCoach && (
           <Button size="sm" variant="outline" className="h-8" onClick={() => setGenOpen(true)}>
             <Sparkles className="h-4 w-4" />
-            {t("feedback.generate", { defaultValue: "Générer une synthèse" })}
+            {t("feedback.generate")}
           </Button>
         )}
       </div>
@@ -144,7 +138,7 @@ export function CoachFeedbackTab({ playerId, isCoach }: { playerId: string; isCo
       <div className="space-y-2 scroll-mt-20" id="coach-reviews-anchor">
         <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
           <Sparkles className="h-3 w-3 text-primary" />
-          {t("feedback.aiSyntheses", { defaultValue: "Synthèses IA" })}
+          {t("feedback.aiSyntheses")}
         </p>
         {(rv?.reviews ?? []).length > 0 ? (
           (rv?.reviews ?? []).map((r: any, idx: number) => (
@@ -214,7 +208,7 @@ export function CoachFeedbackTab({ playerId, isCoach }: { playerId: string; isCo
                       }
                     >
                       <Wand2 className="h-3.5 w-3.5" />
-                      {t("feedback.refineWithAi", { defaultValue: "Affiner avec l'IA" })}
+                      {t("feedback.refineWithAi")}
                     </Button>
                   </div>
                 )}
@@ -223,7 +217,7 @@ export function CoachFeedbackTab({ playerId, isCoach }: { playerId: string; isCo
           ))
         ) : !lRv ? (
           <div className="rounded-xl border border-dashed border-border p-4 text-center text-xs text-muted-foreground">
-            {t("feedback.noSyntheses", { defaultValue: "Aucune synthèse IA pour ce joueur." })}
+            {t("feedback.noSyntheses")}
           </div>
         ) : null}
       </div>
@@ -235,7 +229,7 @@ export function CoachFeedbackTab({ playerId, isCoach }: { playerId: string; isCo
         </div>
       ) : (fb?.feedback ?? []).length === 0 ? (
         <div className="rounded-xl border border-dashed border-border p-6 text-center text-sm text-muted-foreground">
-          {t("feedback.empty", { defaultValue: "Pas encore de retours coach pour ce joueur." })}
+          {t("feedback.empty")}
         </div>
       ) : (
         <ul className="space-y-2">
@@ -325,38 +319,26 @@ export function CoachFeedbackTab({ playerId, isCoach }: { playerId: string; isCo
       <Dialog open={genOpen} onOpenChange={setGenOpen}>
         <DialogContent className="max-w-md">
           <DialogHeader>
-            <DialogTitle>
-              {t("feedback.generateTitle", { defaultValue: "Générer une synthèse" })}
-            </DialogTitle>
+            <DialogTitle>{t("feedback.generateTitle")}</DialogTitle>
           </DialogHeader>
           <div className="space-y-3">
             <div className="space-y-1.5">
-              <Label className="text-xs">{t("feedback.kindLabel", { defaultValue: "Type" })}</Label>
+              <Label className="text-xs">{t("feedback.kindLabel")}</Label>
               <Select value={kind} onValueChange={(v) => setKind(v as any)}>
                 <SelectTrigger>
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="end_of_season">
-                    {t("feedback.kind_end_of_season", { defaultValue: "Bilan de saison" })}
-                  </SelectItem>
-                  <SelectItem value="meeting">
-                    {t("feedback.kind_meeting", { defaultValue: "Préparation d'entretien" })}
-                  </SelectItem>
-                  <SelectItem value="development">
-                    {t("feedback.kind_development", { defaultValue: "Rapport de développement" })}
-                  </SelectItem>
-                  <SelectItem value="coaching">
-                    {t("feedback.kind_coaching", { defaultValue: "Synthèse staff coaching" })}
-                  </SelectItem>
+                  <SelectItem value="end_of_season">{t("feedback.kind_end_of_season")}</SelectItem>
+                  <SelectItem value="meeting">{t("feedback.kind_meeting")}</SelectItem>
+                  <SelectItem value="development">{t("feedback.kind_development")}</SelectItem>
+                  <SelectItem value="coaching">{t("feedback.kind_coaching")}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1.5">
-                <Label className="text-xs">
-                  {t("feedback.periodStart", { defaultValue: "Début" })}
-                </Label>
+                <Label className="text-xs">{t("feedback.periodStart")}</Label>
                 <Input
                   type="date"
                   value={periodStart}
@@ -364,9 +346,7 @@ export function CoachFeedbackTab({ playerId, isCoach }: { playerId: string; isCo
                 />
               </div>
               <div className="space-y-1.5">
-                <Label className="text-xs">
-                  {t("feedback.periodEnd", { defaultValue: "Fin" })}
-                </Label>
+                <Label className="text-xs">{t("feedback.periodEnd")}</Label>
                 <Input
                   type="date"
                   value={periodEnd}
@@ -376,9 +356,7 @@ export function CoachFeedbackTab({ playerId, isCoach }: { playerId: string; isCo
             </div>
             <p className="text-[11px] text-muted-foreground flex items-center gap-1.5">
               <Lock className="h-3 w-3" />
-              {t("feedback.generateInternalHint", {
-                defaultValue: "Synthèse interne, visible uniquement par le staff coach.",
-              })}
+              {t("feedback.generateInternalHint")}
             </p>
           </div>
           <DialogFooter>
@@ -391,7 +369,7 @@ export function CoachFeedbackTab({ playerId, isCoach }: { playerId: string; isCo
               ) : (
                 <Sparkles className="h-4 w-4" />
               )}
-              {t("feedback.generate", { defaultValue: "Générer" })}
+              {t("feedback.generate")}
             </Button>
           </DialogFooter>
         </DialogContent>

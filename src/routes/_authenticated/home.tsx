@@ -477,10 +477,7 @@ function HomePage() {
                             {((e as any).convocations_sent || convocSentSet?.has(e.id)) && (
                               <span
                                 className="inline-flex items-center gap-1 rounded-full border border-primary/20 bg-primary/10 px-2 py-0.5 text-[10px] font-semibold text-primary"
-                                title={t("events.convocsSentTitle", {
-                                  defaultValue:
-                                    "Les convocations ont été envoyées pour cet événement",
-                                })}
+                                title={t("events.convocsSentTitle")}
                               >
                                 <Send className="h-3 w-3" />
                                 {t("events.convocationsSentShort")}
@@ -583,7 +580,7 @@ function HomePage() {
         <section>
           <Button variant="outline" className="w-full h-11" onClick={() => setAbsenceOpen(true)}>
             <Plus className="h-4 w-4" />
-            {t("availability.declare", { defaultValue: "Déclarer une absence" })}
+            {t("availability.declare")}
           </Button>
           <DeclareAbsenceDrawer open={absenceOpen} onOpenChange={setAbsenceOpen} />
         </section>
@@ -773,7 +770,7 @@ function HomePage() {
                                 </p>
                                 {isCancelled ? (
                                   <span className="text-[9px] font-black uppercase tracking-[0.1em] px-1.5 py-0.5 rounded-[4px] bg-red-600 text-white shrink-0">
-                                    {t("events.status.cancelled", { defaultValue: "Annulé" })}
+                                    {t("events.status.cancelled")}
                                   </span>
                                 ) : (
                                   actionRequired && (

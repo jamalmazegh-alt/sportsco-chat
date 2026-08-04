@@ -25,7 +25,11 @@
     "aet": "Verlenging",
     "pen": "Pen.",
     "mvp": "MVP",
-    "field": "Veld"
+    "field": "Veld",
+    "remove": "Verwijderen",
+    "retry": "Opnieuw proberen",
+    "fileTooLarge": "Bestand te groot (max. 5 MB)",
+    "invalidImage": "Niet-ondersteund afbeeldingsformaat"
   },
   "public": {
     "metaTitle": "{{name}} — {{sport}} wedstrijd · Clubero",
@@ -105,6 +109,10 @@
       "hint": "Kies een veld om de live-uitzending te bekijken.",
       "unsupported": "Platform niet herkend. Open de link in een nieuw tabblad.",
       "openExternal": "Stream openen"
+    },
+    "match": {
+      "aet": "n.v.",
+      "pen": "PEN"
     }
   },
   "register": {
@@ -138,9 +146,12 @@
     "success": {
       "metaTitle": "Aanmelding bevestigd — {{slug}} · Clubero",
       "title": "Betaling ontvangen, aanmelding bevestigd!",
-      "body": "Er is een bevestigingsmail naar je verzonden. Tot snel op het veld!"
+      "body": "Er is een bevestigingsmail naar je verzonden. Tot snel op het veld!",
+      "settling": "Betaling ontvangen — finalisatie van uw inschrijving..."
     },
-    "payMetaTitle": "Betaling — {{slug}} · Clubero"
+    "payMetaTitle": "Betaling — {{slug}} · Clubero",
+    "payNotFound": "Link niet gevonden",
+    "securePayment": "Veilig betalen via Stripe."
   },
   "tv": {
     "metaTitle": "Presentatie — {{slug}} · Clubero",
@@ -191,7 +202,10 @@
     "loginPrompt": "Meld je aan om deze uitnodiging te accepteren.",
     "signIn": "Aanmelden",
     "accept": "Uitnodiging accepteren",
-    "accepted": "Uitnodiging geaccepteerd"
+    "accepted": "Uitnodiging geaccepteerd",
+    "noAccountPrompt": "Om deze uitnodiging te accepteren, maakt u uw Clubero-account aan met het uitgenodigde e-mailadres of logt u in als u er al een heeft.",
+    "createAccount": "Maak mijn account aan",
+    "useExactEmail": "Gebruik het e-mailadres {{email}} zodat de uitnodiging wordt herkend."
   },
   "passSuccess": {
     "metaTitle": "Toernooipas bevestigd — Clubero",
@@ -284,7 +298,8 @@
     "noneAssigned": "Geen wedstrijd toegewezen.",
     "unassigned": "Niet toegewezen",
     "unassignedSection": "Niet toegewezen",
-    "assignPlaceholder": "Toewijzen"
+    "assignPlaceholder": "Toewijzen",
+    "streamUrlPlaceholder": "Streaming-URL (YouTube, Twitch…)"
   },
   "collab": {
     "title": "Organisatieteam",
@@ -389,8 +404,26 @@
       "linkSentOn": "Link verzonden op {{date}}",
       "linkExpired": "Link verlopen",
       "requestPayment": "Betaling aanvragen",
-      "whatsappTemplate": "Hallo {{teamName}} 👋\nHier is de betaallink voor jullie aanmelding voor {{tournamentName}} ({{amount}}):\n{{paymentLink}}\nDeze link is 7 dagen geldig."
-    }
+      "whatsappTemplate": "Hallo {{teamName}} 👋\nHier is de betaallink voor jullie aanmelding voor {{tournamentName}} ({{amount}}):\n{{paymentLink}}\nDeze link is 7 dagen geldig.",
+      "linkSendFailed": "Kan de betalingslink niet verzenden"
+    },
+    "invite": {
+      "success": "Uitnodiging per e-mail verzonden",
+      "button": "Nodig een team uit",
+      "title": "Nodig een team uit om te betalen",
+      "description": "Het team ontvangt een gepersonaliseerde e-mail met hun beveiligde betalingslink.",
+      "teamName": "Teamnaam",
+      "contactName": "Naam contactpersoon",
+      "email": "Email",
+      "phone": "Telefoon (optioneel)",
+      "send": "Uitnodiging versturen"
+    },
+    "stripeNotConnected": {
+      "title": "Betaalrekening niet gekoppeld",
+      "description": "Voor dit toernooi is online betaling vereist, maar je club heeft geen Stripe-account. Teams kunnen pas betalen als het account is ingesteld.",
+      "cta": "Koppel een Stripe-account"
+    },
+    "loadError": "Fout bij het laden van registraties"
   },
   "teams": {
     "count_one": "{{count}}{{limit}} Team",
@@ -441,7 +474,8 @@
       "external": " · Extern",
       "players": "Spelers",
       "edit": "Bewerken",
-      "delete": "Verwijderen"
+      "delete": "Verwijderen",
+      "noContact": "Geen contact"
     },
     "deleteConfirm": {
       "title": "{{name}} verwijderen?",
@@ -449,11 +483,33 @@
       "consequences": "De spelers, plaatsing en toernooigeschiedenis van dit team gaan verloren. Reeds gespeelde wedstrijden kunnen worden beïnvloed.",
       "confirm": "Team verwijderen",
       "cancel": "Annuleren"
+    },
+    "payment": {
+      "markedPaid": "Gemarkeerd als betaald",
+      "markedExempt": "Gemarkeerd vrijgesteld",
+      "markedUnpaid": "Gemarkeerd als onbetaald",
+      "paid": "Betaald",
+      "exempt": "Vrijstellen",
+      "unpaid": "Om te verzamelen",
+      "cycleHint": "Klik om de betalingsstatus te wijzigen"
     }
   },
   "roster": {
     "title": "Speler · {{team}}",
-    "import": "Importeren",
+    "import": {
+      "empty": "Er zijn geen spelers gedetecteerd in het bestand.",
+      "blocked": "Import geblokkeerd: {{total}} spelers overschrijden de limiet van {{max}}. Verklein het bestand of kies \"Vervangen\".",
+      "ok": "{{n}} speler(s) geïmporteerd",
+      "button": "CSV importeren",
+      "title": "Spelers importeren",
+      "desc": "CSV-formaat: voornaam, achternaam, truinummer, positie, is_aanvoerder. Afscheiders , ; of tabblad geaccepteerd.",
+      "file": "Kies een bestand",
+      "template": "Sjabloon",
+      "orPaste": "Of plak CSV-inhoud:",
+      "append": "Toevoegen aan rooster",
+      "replace": "Rooster vervangen",
+      "confirm": "Importeren"
+    },
     "add": "Toevoegen",
     "empty": "Geen Spelers. Voeg Spelers toe of importeer een lijst.",
     "edit": "Bewerken",
@@ -486,7 +542,31 @@
       "imported_one": "{{count}} Speler geïmporteerd",
       "imported_other": "{{count}} Spelers geïmporteerd",
       "noneDetected": "Geen Speler gedetecteerd"
-    }
+    },
+    "metaTitle": "Samenstelling van het rooster",
+    "invalidTitle": "Ongeldige link",
+    "invalidBody": "Deze roosterlink is ongeldig of verlopen.",
+    "tooMany": "Selectie beperkt tot {{max}} spelers.",
+    "saved": "Rooster opgeslagen",
+    "heading": "Selectie - {{team}}",
+    "logo": {
+      "none": "Geen embleem",
+      "title": "Teamlogo",
+      "help": "PNG, JPG, WEBP of SVG · Maximaal 4 MB",
+      "change": "Wijziging",
+      "upload": "Voeg een logo toe",
+      "removed": "Logo verwijderd",
+      "tooLarge": "Bestand te groot (max. 4 MB)",
+      "uploaded": "Logo opgeslagen"
+    },
+    "pendingTitle": "Aanvraag wordt beoordeeld",
+    "pendingBody": "Zodra de organisatie uw registratie heeft goedgekeurd, kunt u via dezelfde link spelers toevoegen of bewerken.",
+    "playersLabelMax": "Spelers ({{count}} / {{max}})",
+    "remaining": "{{n}} plaats(en) over",
+    "captain": "Kapitein",
+    "setCaptain": "Kapitein instellen",
+    "lastSaved": "Laatst opgeslagen: {{date}}",
+    "save": "Opslaan"
   },
   "wizard": {
     "title": "Nieuw Toernooi",
@@ -534,10 +614,14 @@
     "formatSwissDesc": "Paringen op stand per ronde, vast aantal ronden",
     "swissRounds": "Aantal ronden",
     "swissRoundsHint": "Aanbevolen: ceil(log₂(teams)) — 8 ≈ 3, 16 ≈ 4, 32 ≈ 5.",
-    "formatFlightedFinals": "Flighted finales",
+    "formatFlightedFinals": "Finales in poules",
     "formatFlightedFinalsDesc": "Poulefase gevolgd door meerdere parallelle finaletabellen (Champions, Europa…)",
     "formatConsolation": "Consolatie",
-    "formatConsolationDesc": "Hoofdtabel + consolatietabel voor vroeg uitgeschakelde teams"
+    "formatConsolationDesc": "Hoofdtabel + consolatietabel voor vroeg uitgeschakelde teams",
+    "stepEyebrow": "Stap 1 / 4",
+    "stepEyebrow2": "Stap 2 / 4",
+    "stepEyebrow3": "Stap 3 / 4",
+    "stepEyebrow4": "Stap 4 / 4"
   },
   "groups": {
     "drawTitle": "Loting",
@@ -615,7 +699,8 @@
     "minRestSubtitle": "Per Team · 0 = uitgeschakeld",
     "lunchBreakSubtitle": "Geen wedstrijd in dit tijdslot",
     "addFieldShort": "+ Plaats toevoegen",
-    "fieldAddedToast": "Plaats {{name}} toegevoegd"
+    "fieldAddedToast": "Plaats {{name}} toegevoegd",
+    "regenFinalsConfirm": "De finalefase heeft al resultaat. Door opnieuw te genereren WISSEN al deze resultaten. Doorgaan?"
   },
   "draw": {
     "title": "Loting",
@@ -658,7 +743,8 @@
     "overwriteDescStarted": "Het Toernooi is al begonnen. Deze actie verwijdert de huidige structuur (groepen/schema) en de resultaten van de betreffende wedstrijden. Aangemelde Teams blijven behouden.",
     "overwriteDesc": "Deze actie verwijdert de huidige samenstelling (groepen/schema) en de bijbehorende wedstrijden. Aangemelde Teams blijven behouden.",
     "cancel": "Annuleren",
-    "confirmRelaunch": "Bevestigen en opnieuw starten"
+    "confirmRelaunch": "Bevestigen en opnieuw starten",
+    "relaunchFromFooterHint": "Trekking voltooid. Gebruik “Opnieuw starten” onderaan het dialoogvenster om een ​​nieuwe te genereren (huidige resultaten gaan verloren)."
   },
   "rules": {
     "savedToast": "Regels opgeslagen",
@@ -729,7 +815,9 @@
     "regulationsUploadedToast": "Reglement geüpload.",
     "regulationsCurrentFile": "Huidig reglement",
     "save": "Opslaan",
-    "reset": "Herstellen"
+    "reset": "Herstellen",
+    "otWin": "OT overwinning",
+    "otLoss": "OT-verlies"
   },
   "matches": {
     "title": "Resultaat invoeren",
@@ -787,15 +875,15 @@
       "scheduled": "Gepland",
       "live": "Bezig",
       "completed": "Voltooid",
-      "forfeit_a": "Forfait Team A",
-      "forfeit_b": "Forfait Team B",
+      "forfeit_a": "Forfait team A",
+      "forfeit_b": "Forfait team B",
       "no_show_a": "Team A niet komen opdagen",
       "no_show_b": "Team B niet komen opdagen",
       "abandoned": "Gestopt",
       "cancelled": "Geannuleerd"
     },
     "statusAria": "Status van de wedstrijd",
-    "liveScore": "Live score",
+    "liveScore": "Livescore",
     "fullEntry": "Volledige invoer",
     "finishMatch": "Wedstrijd beëindigen",
     "tbd": "Nog te bepalen",
@@ -854,15 +942,15 @@
     "changeStatusAction": "Status wijzigen",
     "vs": "VS",
     "matchDetails": {
-      "title": "Détails du match (buteurs, passeurs, cartons)",
-      "addGoal": "Ajouter un but",
-      "addCard": "Ajouter un carton",
-      "scorer": "Buteur (opt.)",
-      "assist": "Passeur (opt.)",
-      "addGoalBtn": "Ajouter le but",
-      "addCardBtn": "Ajouter le carton",
-      "pending": "en attente",
-      "goal": "But"
+      "title": "Wedstrijddetails (doelpuntenmakers, assists, kaarten)",
+      "addGoal": "Doelpunt toevoegen",
+      "addCard": "Kaart toevoegen",
+      "scorer": "Doelpuntenmaker (opt.)",
+      "assist": "Assist (opt.)",
+      "addGoalBtn": "Doelpunt toevoegen",
+      "addCardBtn": "Kaart toevoegen",
+      "pending": "in afwachting",
+      "goal": "Doelpunt"
     }
   },
   "list": {
@@ -876,7 +964,16 @@
     "emptyTitle": "Geen toernooi",
     "emptyDescManage": "Maak je eerste toernooi aan om een wedstrijd te organiseren.",
     "emptyDescView": "Er is momenteel geen toernooi actief bij deze Club.",
-    "create": "Toernooi aanmaken"
+    "create": "Toernooi aanmaken",
+    "ctaEyebrow": "Organisator",
+    "ctaTitle": "Maak je toernooi in 30 s met AI",
+    "ctaAnnualActive": "Jaarpas actief — onbeperkt aanmaken.",
+    "ctaCredits_one": "{{count}} toernooikrediet beschikbaar.",
+    "ctaCredits_other": "{{count}} toernooikredieten beschikbaar.",
+    "ctaChoosePlan": "Kies een plan — vanaf 39 €.",
+    "ctaCreateNow": "Nu maken",
+    "viewPlans": "Bekijk plannen",
+    "buyCredit": "Toernooikrediet kopen"
   },
   "detail": {
     "back": "Toernooien",
@@ -885,7 +982,18 @@
     "close": "Afsluiten",
     "viewPublic": "Openbare pagina bekijken",
     "formatAdminOnly": "Alleen admins en verantwoordelijken kunnen het format configureren.",
-    "statusUpdated": "Status bijgewerkt"
+    "statusUpdated": "Status bijgewerkt",
+    "logoUpdated": "Logo bijgewerkt",
+    "changeLogo": "Wijzig logo",
+    "addLogo": "Voeg een logo toe",
+    "teams": "ploegen",
+    "linkCopiedOpenBrowser": "Link gekopieerd – open deze in uw browser (Safari/Chrome).",
+    "openPublic": "Openbare pagina",
+    "openTv": "TV-scherm",
+    "autoScheduleCta": {
+      "title": "Automatisch wedstrijden plannen",
+      "subtitle": "Nog geen rechtbank of schema toegewezen. Voer automatische planning uit."
+    }
   },
   "publishFlow": {
     "stepDraft": "Concept",
@@ -1034,7 +1142,15 @@
     "formatMixed": "Groepsfase + Knock-outfase",
     "numTeams": "Aantal Teams",
     "consumeHint": "Je pas wordt verbruikt bij het aanmaken. Deze geeft je volledige toegang tot het Toernooi-beheer (Teams, Groepen, Resultaten, openbaar delen).",
-    "submit": "Toernooi aanmaken"
+    "submit": "Toernooi aanmaken",
+    "noCreditTitle": "Geen toernooikrediet beschikbaar",
+    "noCreditBody": "Kies een plan om je toernooi in 30 seconden met AI te starten.",
+    "viewPlans": "Bekijk plannen",
+    "newTitle": "Nieuw toernooi",
+    "annualActive": "Jaarpas actief — onbeperkt aanmaken",
+    "creditsLeft_one": "{{count}} toernooikrediet beschikbaar",
+    "creditsLeft_other": "{{count}} toernooikredieten beschikbaar",
+    "consumeOneCredit": "Dit toernooi verbruikt 1 van je kredieten."
   },
   "tournament": {
     "publishProgramme": "Programma publiceren",
@@ -1056,7 +1172,7 @@
     "beFirst": "Wees het eerste Team dat zich aanmeldt!",
     "podium": "Ereprijzen",
     "topScorer": "Topscorer",
-    "fairPlay": "Fair Play",
+    "fairPlay": "Fair play",
     "registrationConfirmed": "Je registratie is bevestigd.",
     "programmeComingSoon": "Het programma wordt binnenkort gepubliceerd.",
     "viewRules": "Reglement bekijken",
@@ -1072,7 +1188,8 @@
     "tournamentInfo": "Informatie",
     "rules": "Reglement",
     "finalStandings": "Eindstand",
-    "allResults": "Alle resultaten"
+    "allResults": "Alle resultaten",
+    "registrationOpensAt": "Inschrijving opent op {{date}}"
   },
   "flights": {
     "title": "Flights / finalefasen",
@@ -1101,7 +1218,7 @@
       "consolation": "Hoofd / Troostronde"
     },
     "dist": {
-      "twoFlights": "2 Flights (top + rest)",
+      "twoFlights": "2 poules (top + rest)",
       "twoFlightsBalanced": "2 gebalanceerde Flights",
       "threeFlights": "3 Flights (elite + 2 niveaus)",
       "threeEqual": "3 gelijke Flights",
@@ -1121,7 +1238,7 @@
       "consolationDesc": "Maakt 2 flights: Hoofd (groepswinnaars) en Troostronde (verliezers). Klaar om op te slaan."
     },
     "public": {
-      "empty": "No flights configured yet.",
+      "empty": "Er zijn nog geen poules ingesteld.",
       "noMatches": "Matches will be generated after group stage."
     },
     "templatesDesc": {
@@ -1129,7 +1246,13 @@
       "cup_plate": "Hoofdtableau (Beker) voor de winnaars + nevenpoule (Plaat) voor de verliezers van de 1e ronde. Niemand valt vroeg af.",
       "medals": "Directe eliminatie met podium Goud / Zilver / Brons voor de top 3. Kort en klassiek format.",
       "consolation": "2 tableaus: Hoofd (groepswinnaars) en Troostronde (verliezers). Eenvoudige oplossing om iedereen te laten spelen."
-    }
+    },
+    "regenConfirm": "Finalewedstrijden hebben al uitslag. Het opnieuw genereren van haakjes zal al deze resultaten WISSEN. Doorgaan?",
+    "advancedDanger": "Geavanceerde opties (gevaarlijk)",
+    "regenWarn": "Als u de haakjes opnieuw genereert, worden alle reeds ingevoerde finaleresultaten gewist.",
+    "regenerate": "Herstel haakjes",
+    "fifthPlaceDisabled": "Schakel eerst de 3e plaats in",
+    "seventhPlaceDisabled": "Schakel eerst de 5e plaats in"
   },
   "controlCenter": {
     "nextAction": "Volgende actie",
@@ -1168,32 +1291,35 @@
       "payments": "Betaling",
       "fields": "Velden",
       "share": "Delen"
-    }
+    },
+    "byCourts": "Via de rechtbank",
+    "progress": "Voortgang"
   },
   "cockpit": {
-    "tvMode": "Mode TV",
-    "exitTv": "Quitter le mode TV",
-    "next": "Prochain",
-    "estimatedEnd": "Fin prévue",
-    "averageDelay": "Retard moyen {{minutes}} min",
+    "tvMode": "TV-modus",
+    "exitTv": "TV-modus verlaten",
+    "next": "Volgende",
+    "estimatedEnd": "Verwacht einde",
+    "averageDelay": "Gemiddelde vertraging {{minutes}} min",
     "alerts": {
-      "title": "{{count}} chose(s) à régler",
-      "heading": "Alertes",
-      "lateMatch": "Match en retard de {{minutes}} min",
-      "missingReferee": "Arbitre manquant (démarrage dans {{minutes}} min)",
-      "finalsNotGenerated": "Phase finale non générée — les poules sont terminées"
+      "title": "{{count}} ding(en) om te regelen",
+      "heading": "Meldingen",
+      "lateMatch": "Wedstrijd {{minutes}} min te laat",
+      "missingReferee": "Scheidsrechter ontbreekt (start over {{minutes}} min)",
+      "finalsNotGenerated": "Eindfase niet gegenereerd — poulefase is afgerond"
     }
   },
   "createChooser": {
-    "title": "Créer un tournoi",
-    "subtitle": "Deux portes, zéro jargon. Choisis ton flow.",
-    "aiTitle": "Créer avec l'IA",
+    "title": "Toernooi aanmaken",
+    "subtitle": "Twee deuren, nul jargon. Kies je flow.",
+    "aiTitle": "Aanmaken met AI",
     "aiHint": "Stap voor stap — je toernooi volledig geconfigureerd.",
-    "aiBadge": "Nouveau",
-    "quickTitle": "Mode rapide",
-    "quickHint": "5 écrans, gros boutons, aucune surprise.",
-    "simulatorLink": "Simuler un format avant de créer",
-    "back": "Retour"
+    "aiBadge": "Nieuw",
+    "quickTitle": "Snelle modus",
+    "quickHint": "5 schermen, grote knoppen, geen verrassingen.",
+    "simulatorLink": "Simuleer een format voordat je aanmaakt",
+    "back": "Terug",
+    "abandonConfirm": "De assistent verlaten? Uw antwoorden worden gewist. Je kunt ook sluiten om ze de volgende keer weer te vinden."
   },
   "aiAssistant": {
     "intro": "Hoi 👋 We stellen je toernooi stap voor stap in.",
@@ -1267,11 +1393,14 @@
       "simTotal": "Totaal wedstrijden",
       "simSlot": "Slot (duur + pauze)",
       "simLunch": "Lunchpauze",
-      "simLunchNone": "Aucune",
-      "simLunchDuration": "Durée pause déjeuner",
+      "simLunchNone": "Geen",
+      "simLunchDuration": "Duur lunchpauze",
       "simLunchMin": "{{min}} min",
-      "simLunchStart": "Heure de début",
-      "simTerrains": "Velden"
+      "simLunchStart": "Starttijd",
+      "simTerrains": "Velden",
+      "matchDuration": "Wedstrijdduur",
+      "pause": "Pauze tussen wedstrijden",
+      "terrains": "Rechtbanken"
     },
     "footerSub": {
       "question": "De assistent blijft — aanpassen zonder iets te verliezen",
@@ -1302,7 +1431,7 @@
       "playersPerTeam": "{{count}} spelers",
       "customTeamsPlaceholder": "Ander aantal…",
       "customDurationPlaceholder": "Andere duur (min)…",
-      "customPausePlaceholder": "Autre pause (min)…",
+      "customPausePlaceholder": "Andere pauze (min)…",
       "durationMin": "{{min}} min",
       "poolsFinalsHint": "Meest voorkomend",
       "roundRobinHint": "Iedereen tegen iedereen",
@@ -1340,11 +1469,12 @@
       "lunch0": "Geen pauze",
       "lunch30": "30 min",
       "lunch45": "45 min",
-      "lunch60": "1 heure",
+      "lunch60": "1 uur",
       "publicRegistrationYes": "Ja, open de openbare pagina",
       "publicRegistrationYesHint": "Teams kunnen zich online inschrijven",
       "publicRegistrationNo": "Nee, ik beheer inschrijvingen zelf",
-      "publicRegistrationNoHint": "Je nodigt teams zelf uit"
+      "publicRegistrationNoHint": "Je nodigt teams zelf uit",
+      "none": "Geen"
     },
     "cta": {
       "create": "Toernooi maken",
@@ -1378,7 +1508,8 @@
       "invalidName": "De naam moet minstens 2 tekens zijn.",
       "invalidDate": "Kies een startdatum.",
       "invalidLocation": "Geef een locatie.",
-      "incomplete": "Configuratie onvolledig."
+      "incomplete": "Configuratie onvolledig.",
+      "invalidPause": "Ongeldige pauze (0–60 min)"
     },
     "formats": {
       "poolsFinals": "Poules + finale fase",
@@ -1416,50 +1547,119 @@
       "registration": "Inschrijving & betaling",
       "registrationHint": "Online, prijs, validatie",
       "fairPlay": "Fair-play",
-      "fairPlayHint": "Activer le bonus/malus cartons",
+      "fairPlayHint": "Kaartenbonus/-malus inschakelen",
       "openExpert": "Expert-editor openen",
       "close": "Terug naar assistent"
     }
   },
   "simulator": {
-    "title": "Simulateur de tournoi",
-    "subtitle": "Ajuste les paramètres, vois l'impact en direct.",
-    "teams": "Équipes",
-    "terrains": "Terrains",
-    "duration": "Durée d'un match",
-    "flights": "Plusieurs trophées",
+    "title": "Toernooisimulator",
+    "subtitle": "Pas de instellingen aan en zie de impact live.",
+    "teams": "Teams",
+    "terrains": "Velden",
+    "duration": "Wedstrijdduur",
+    "flights": "Meerdere trofeeën",
     "flightsHint": "Champions · Europa · Conference",
-    "estimatedEnd": "Heure de fin estimée",
-    "matches": "Matchs",
-    "rounds": "Tours",
-    "margin": "Marge avant 18h",
-    "addTerrain": "+ 1 terrain → gain ~{{gain}} min",
-    "verdictOk": "✓ Tient largement la journée",
-    "verdictWarn": "⚠ Ça passe juste",
-    "verdictBad": "✗ Trop serré, ajoute un terrain",
-    "breakdown": "{{pools}} poules × {{perPool}} → {{poolMatches}} matchs de poule + {{finalMatches}} finales",
-    "estimateDisclaimer": "Estimation indicative (pauses, retards non inclus).",
-    "lunch": "Pause déjeuner",
-    "lunchNone": "Aucune",
+    "estimatedEnd": "Geschatte eindtijd",
+    "matches": "Wedstrijden",
+    "rounds": "Rondes",
+    "margin": "Marge vóór 18:00",
+    "addTerrain": "+ 1 veld → winst ~{{gain}} min",
+    "verdictOk": "✓ Past ruim in de dag",
+    "verdictWarn": "⚠ Het is krap",
+    "verdictBad": "✗ Te krap, voeg een veld toe",
+    "breakdown": "{{pools}} poules × {{perPool}} → {{poolMatches}} poulewedstrijden + {{finalMatches}} finales",
+    "estimateDisclaimer": "Indicatieve schatting (pauzes en vertragingen niet inbegrepen).",
+    "lunch": "Lunchpauze",
+    "lunchNone": "Geen",
     "lunchMin": "{{min}} min",
-    "lunchStart": "Début"
+    "lunchStart": "Begin",
+    "startTime": "Start",
+    "finalAt": "Finale",
+    "phasePools": "Groepen",
+    "phaseSemi": "Halve finales",
+    "phaseFinal": "Finale"
   },
   "rulesAi": {
-    "generate": "Générer un règlement avec lIA",
-    "modalTitle": "Règlement proposé",
-    "modalDescription": "Prévisualise, puis insère ou régénère.",
-    "insert": "Insérer dans le règlement",
-    "regenerate": "Regénérer",
-    "close": "Fermer",
-    "loading": "Génération en cours…",
-    "rateLimited": "Limite quotidienne atteinte. Voici un modèle de base.",
-    "error": "Génération indisponible. Voici un modèle de base."
+    "generate": "Reglement genereren met AI",
+    "modalTitle": "Voorgesteld reglement",
+    "modalDescription": "Bekijk een voorbeeld, voeg in of genereer opnieuw. Je kunt het daarna nog bewerken.",
+    "insert": "In reglement invoegen",
+    "regenerate": "Opnieuw genereren",
+    "close": "Sluiten",
+    "loading": "Bezig met genereren…",
+    "rateLimited": "Daglimiet bereikt (5 generaties / dag). Hier is een basissjabloon.",
+    "error": "Genereren niet beschikbaar. Hier is een basissjabloon."
   },
   "coachInsightsAi": {
-    "refresh": "Actualiser",
-    "refreshing": "Actualisation…",
-    "refreshDone": "Insights mis à jour",
-    "refreshLimited": "Tu as déjà actualisé aujourdhui. Réessaie demain.",
-    "refreshError": "Impossible dactualiser pour le moment."
+    "refresh": "Vernieuwen",
+    "refreshing": "Vernieuwen…",
+    "refreshDone": "Insights bijgewerkt",
+    "refreshLimited": "Je hebt vandaag al vernieuwd. Probeer het morgen opnieuw.",
+    "refreshError": "Kan momenteel niet vernieuwen."
+  },
+  "pricing": {
+    "metaTitle": "Toernooifacturatie — Clubero",
+    "metaDesc": "Kies je plan om een toernooi met Clubero te organiseren — 39 € per event of 149 €/jaar onbeperkt.",
+    "backToTournaments": "Terug naar toernooien",
+    "eyebrow": "Toernooifacturatie",
+    "title": "Start je toernooi in 30 seconden",
+    "subtitle": "Onze AI-assistent configureert je toernooi in een paar vragen — poules, knock-outfasen, planning. Kies hieronder je plan.",
+    "canceled": "Betaling geannuleerd. Je kunt het opnieuw proberen wanneer je wilt.",
+    "annualActive": "Je hebt al een actieve Jaarpas — onbeperkt aanmaken tot {{date}}.",
+    "checkoutError": "Betaling kon niet worden gestart",
+    "securePayment": "Veilige betaling via Stripe · Automatische factuur · btw per land",
+    "back": "← Terug",
+    "singleName": "Enkel toernooi",
+    "singlePer": "excl. btw, eenmalige betaling",
+    "singleTagline": "Om een eenmalig toernooi te organiseren",
+    "singleF1": "1 toernooi organiseren",
+    "singleF2": "Aanmaken in 30 s met AI",
+    "singleF3": "Poules, knock-outfasen, standen",
+    "singleF4": "Online inschrijvingen & openbare TV",
+    "singleF5": "Geen vervaldatum",
+    "singleCta": "Mijn toernooi maken — 39 €",
+    "annualName": "Jaarpas",
+    "annualPer": "excl. btw / jaar, zonder verplichting",
+    "annualTagline": "Onbeperkte toernooien gedurende 12 maanden",
+    "annualF1": "Onbeperkte toernooien",
+    "annualF2": "Automatische jaarlijkse verlenging",
+    "annualF3": "Alle Pro-functies",
+    "annualF4": "Bespaar vanaf het 4e toernooi",
+    "annualF5": "Prioritaire support",
+    "annualBadge": "BESTE WAARDE",
+    "annualCta": "Neem de Pas — 149 €/jaar",
+    "annualActiveCta": "Pas actief",
+    "annualFootnote": "Besparing vanaf 4 toernooien (149 € i.p.v. 156 €)",
+    "successTitle": "Betaling bevestigd",
+    "successPendingTitle": "Bevestiging bezig…",
+    "successAnnualBody": "Je Jaarpas is actief. Maak zoveel toernooien als je wilt.",
+    "successSingleBody": "Je toernooikrediet is geactiveerd. Start je toernooi!",
+    "successValidatingBody": "We valideren je betaling met Stripe — dit duurt enkele seconden.",
+    "successCreateCta": "Mijn toernooi maken",
+    "successViewTournaments": "Mijn toernooien bekijken"
+  },
+  "create": {
+    "numTeams": "Maximale teams"
+  },
+  "finalStandings": {
+    "title": "Eindstand",
+    "overall": "Eindstand",
+    "copied": "Stand gekopieerd",
+    "subtitle": "Toernooi afgelopen",
+    "share": "Deel"
+  },
+  "roles": {
+    "referee": "Scheidsrechter"
+  },
+  "poolEditor": {
+    "openButton": "Groepen handmatig bewerken",
+    "savedToast": "Groepen bijgewerkt",
+    "title": "Groepen bewerken",
+    "subtitle": "Wijs de teams opnieuw toe vóór de start van de wedstrijden. Het speelschema wordt opnieuw gegenereerd.",
+    "locked": "De groepswedstrijden zijn al begonnen: bewerken is niet mogelijk.",
+    "teamsShort": "tms",
+    "empty": "Geen teams",
+    "save": "Opslaan & opnieuw genereren"
   }
 }

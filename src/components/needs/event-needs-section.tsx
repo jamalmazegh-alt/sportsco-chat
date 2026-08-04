@@ -319,7 +319,7 @@ function NeedRow({
   const reopenM = useMutation({
     mutationFn: () => reopen({ data: { need_id: need.id } }),
     onSuccess: () => {
-      toast.success(t("needs:status.reopened", { defaultValue: "Besoin rouvert" }));
+      toast.success(t("needs:status.reopened"));
       onChange();
     },
     onError: (e: Error) => toast.error(t(`needs:errors.${e.message}`, { defaultValue: e.message })),
@@ -516,7 +516,7 @@ function NeedRow({
               {isClosed && (
                 <DropdownMenuItem onClick={() => reopenM.mutate()} disabled={reopenM.isPending}>
                   <RotateCcw className="h-3.5 w-3.5 mr-2" />
-                  {t("needs:menu.reopenNeed", { defaultValue: "Rouvrir" })}
+                  {t("needs:menu.reopenNeed")}
                 </DropdownMenuItem>
               )}
               {isOpen && (

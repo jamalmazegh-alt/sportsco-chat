@@ -45,9 +45,7 @@ export function SportSelect({
           </SelectGroup>
           <SelectSeparator />
           <SelectGroup>
-            <SelectLabel>
-              {t("teams.sportsCollective", { defaultValue: "Sports collectifs" })}
-            </SelectLabel>
+            <SelectLabel>{t("teams.sportsCollective")}</SelectLabel>
             {COLLECTIVE_SPORTS.map((s) => (
               <SelectItem key={s} value={s}>
                 {t(`teams.sports.${s}`)}
@@ -56,7 +54,7 @@ export function SportSelect({
           </SelectGroup>
           <SelectSeparator />
           <SelectGroup>
-            <SelectLabel>{t("teams.sportsRacket", { defaultValue: "Raquette" })}</SelectLabel>
+            <SelectLabel>{t("teams.sportsRacket")}</SelectLabel>
             {RACKET_SPORTS.map((s) => (
               <SelectItem key={s} value={s}>
                 {t(`teams.sports.${s}`, { defaultValue: s })}
@@ -65,9 +63,7 @@ export function SportSelect({
           </SelectGroup>
           <SelectSeparator />
           <SelectGroup>
-            <SelectItem value={CUSTOM_SPORT}>
-              {t("teams.sports.custom", { defaultValue: "Autre sport…" })}
-            </SelectItem>
+            <SelectItem value={CUSTOM_SPORT}>{t("teams.sports.custom")}</SelectItem>
           </SelectGroup>
         </SelectContent>
       </Select>
@@ -75,9 +71,7 @@ export function SportSelect({
         <Input
           value={customName ?? ""}
           onChange={(e) => onCustomNameChange(e.target.value)}
-          placeholder={t("teams.sports.customPlaceholder", {
-            defaultValue: "Nom du sport (ex. Pétanque)",
-          })}
+          placeholder={t("teams.sports.customPlaceholder")}
           maxLength={60}
         />
       )}

@@ -36,7 +36,7 @@ export function TournamentStepper({ steps }: Props) {
     >
       <div className="mb-3 flex items-center justify-between">
         <span className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
-          {t("controlCenter.progress", { defaultValue: "Progression" })}
+          {t("controlCenter.progress")}
         </span>
         <span className="text-[11px] font-bold tabular-nums text-emerald-700 dark:text-emerald-400">
           {progress}%

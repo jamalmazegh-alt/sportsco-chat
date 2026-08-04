@@ -4,7 +4,7 @@
     "description": "Start tijdens een training een uitdaging of een fysieke test, voer de resultaten in en volg de progressie."
   },
   "types": {
-    "challenge": "Uitdaging",
+    "challenge": "Challenge",
     "physical_test": "Fysieke test",
     "activity": "Activiteit"
   },
@@ -60,96 +60,96 @@
       "description": "Tijd over 20 m — de snelste tijd wint."
     },
     "plankHold": {
-      "name": "Plank hold",
-      "description": "Hold a plank — best duration record."
+      "name": "Plank vasthouden",
+      "description": "Houd een plank vast - beste duur telt."
     },
     "shuttleRun": {
       "name": "Shuttle run",
-      "description": "Timed back-and-forth run — lowest time wins."
+      "description": "Getimede heen-en-weerloop - laagste tijd wint."
     },
     "slalomBall": {
-      "name": "Ball slalom",
-      "description": "Timed dribbling slalom — lowest time wins."
+      "name": "Balslalom",
+      "description": "Getimede dribbelslalom - laagste tijd wint."
     },
     "freeThrows": {
-      "name": "Free throws",
-      "description": "Free throws made out of a series — record."
+      "name": "Vrije worpen",
+      "description": "Gemaakte vrije worpen uit een reeks - record."
     },
     "threePointShots": {
-      "name": "Three-point shots",
-      "description": "Three-point shots made out of a series — record."
+      "name": "Driepunters",
+      "description": "Gemaakte driepunters uit een reeks - record."
     },
     "dribbleCourse": {
-      "name": "Dribble course",
-      "description": "Timed dribbling course — lowest time wins."
+      "name": "Dribbelparcours",
+      "description": "Getimed dribbelparcours - laagste tijd wint."
     },
     "layupSeries": {
-      "name": "Layup series",
-      "description": "Layups made out of a series — record."
+      "name": "Lay-upreeks",
+      "description": "Gemaakte lay-ups uit een reeks - record."
     },
     "handballDribbleSlalom": {
-      "name": "Dribble slalom",
-      "description": "Timed dribbling slalom — lowest time wins."
+      "name": "Dribbelslalom",
+      "description": "Getimede dribbelslalom - laagste tijd wint."
     },
     "sprint40m": {
       "name": "40 m sprint",
-      "description": "Time on 40 m — lowest wins."
+      "description": "Tijd op 40 m - laagste tijd wint."
     },
     "agilityRunRugby": {
-      "name": "Agility run",
-      "description": "Timed evasion course — lowest time wins."
+      "name": "Wendbaarheidsloop",
+      "description": "Getimed ontwijkparcours - laagste tijd wint."
     },
     "successfulPasses": {
-      "name": "Successful passes",
-      "description": "Longest streak of successful passes — record."
+      "name": "Geslaagde passes",
+      "description": "Langste reeks geslaagde passes - record."
     },
     "rallyConsistency": {
-      "name": "Rally consistency",
-      "description": "Longest error-free rally — record."
+      "name": "Rallyconsistentie",
+      "description": "Langste rally zonder fouten - record."
     },
     "movementSpeed": {
-      "name": "Movement speed",
-      "description": "Timed movement course — lowest time wins."
+      "name": "Bewegingssnelheid",
+      "description": "Getimed bewegingsparcours - laagste tijd wint."
     },
     "shotAccuracy": {
-      "name": "Shot accuracy",
-      "description": "Shots on target zones — cumulative score."
+      "name": "Schotnauwkeurigheid",
+      "description": "Schoten in doelzones - cumulatieve score."
     },
     "handballShotAccuracy": {
-      "name": "Shot accuracy",
-      "description": "Shots on target zones — cumulative score."
+      "name": "Schotnauwkeurigheid",
+      "description": "Schoten in doelzones - cumulatieve score."
     },
     "passingAccuracy": {
-      "name": "Passing accuracy",
-      "description": "Passes made on targets — cumulative score."
+      "name": "Passnauwkeurigheid",
+      "description": "Passes op doelen - cumulatieve score."
     },
     "rugbyPassingAccuracy": {
-      "name": "Passing accuracy",
-      "description": "Passes made on targets — cumulative score."
+      "name": "Passnauwkeurigheid",
+      "description": "Passes op doelen - cumulatieve score."
     },
     "pushPower": {
-      "name": "Scrum push power",
-      "description": "Measured pushing force — score."
+      "name": "Scrumduwkracht",
+      "description": "Gemeten duwkracht - score."
     },
     "serveAccuracy": {
-      "name": "Serve accuracy",
-      "description": "Serves placed on zones — cumulative score."
+      "name": "Servenauwkeurigheid",
+      "description": "Opslagen in zones - cumulatieve score."
     },
     "receptionControl": {
-      "name": "Reception control",
-      "description": "Reception quality rated by staff — score."
+      "name": "Receptiecontrole",
+      "description": "Receptiekwaliteit beoordeeld door de staf - score."
     },
     "attackAccuracy": {
-      "name": "Attack accuracy",
-      "description": "Attacks placed on zones — cumulative score."
+      "name": "Aanvalsnauwkeurigheid",
+      "description": "Aanvallen in zones - cumulatieve score."
     },
     "tennisServeAccuracy": {
-      "name": "Serve accuracy",
-      "description": "Serves placed on zones — cumulative score."
+      "name": "Servenauwkeurigheid",
+      "description": "Opslagen in zones - cumulatieve score."
     },
     "targetShots": {
-      "name": "Target shots",
-      "description": "Balls placed on targets — cumulative score."
+      "name": "Gerichte schoten",
+      "description": "Ballen op doelen geplaatst - cumulatieve score."
     }
   },
   "list": {
@@ -171,7 +171,12 @@
     "custom_name_label": "Naam",
     "custom_name_placeholder": "Bijv. Precisie lange pass",
     "create": "Maken",
-    "creating": "Bezig met maken…"
+    "creating": "Bezig met maken…",
+    "all_added": "Alle beschikbare activiteiten zijn al aan dit team toegevoegd.",
+    "popular": "Populair",
+    "already_in_session": "Al in de sessie",
+    "selected": "Gekozen",
+    "cancel": "Annuleren"
   },
   "entry": {
     "title": "Invoer",
@@ -198,7 +203,8 @@
   },
   "errors": {
     "forbidden": "Actie voorbehouden aan de staf.",
-    "generic": "Er is een fout opgetreden."
+    "generic": "Er is een fout opgetreden.",
+    "eventNotFound": "Evenement niet gevonden."
   },
   "records": {
     "new": "Nieuw record!"

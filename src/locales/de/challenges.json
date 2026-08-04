@@ -60,96 +60,96 @@
       "description": "Zeit über 20 m — die schnellste Zeit gewinnt."
     },
     "plankHold": {
-      "name": "Plank hold",
-      "description": "Hold a plank — best duration record."
+      "name": "Unterarmstütz halten",
+      "description": "Unterarmstütz halten — beste Dauer zählt."
     },
     "shuttleRun": {
-      "name": "Shuttle run",
-      "description": "Timed back-and-forth run — lowest time wins."
+      "name": "Shuttle-Run",
+      "description": "Zeitlauf hin und zurück — die niedrigste Zeit gewinnt."
     },
     "slalomBall": {
-      "name": "Ball slalom",
-      "description": "Timed dribbling slalom — lowest time wins."
+      "name": "Ball-Slalom",
+      "description": "Dribbling-Slalom auf Zeit — die niedrigste Zeit gewinnt."
     },
     "freeThrows": {
-      "name": "Free throws",
-      "description": "Free throws made out of a series — record."
+      "name": "Freiwürfe",
+      "description": "Getroffene Freiwürfe aus einer Serie — Rekord."
     },
     "threePointShots": {
-      "name": "Three-point shots",
-      "description": "Three-point shots made out of a series — record."
+      "name": "Dreipunktewürfe",
+      "description": "Getroffene Dreipunktewürfe aus einer Serie — Rekord."
     },
     "dribbleCourse": {
-      "name": "Dribble course",
-      "description": "Timed dribbling course — lowest time wins."
+      "name": "Dribbling-Parcours",
+      "description": "Dribbling-Parcours auf Zeit — die niedrigste Zeit gewinnt."
     },
     "layupSeries": {
-      "name": "Layup series",
-      "description": "Layups made out of a series — record."
+      "name": "Korbleger-Serie",
+      "description": "Getroffene Korbleger aus einer Serie — Rekord."
     },
     "handballDribbleSlalom": {
-      "name": "Dribble slalom",
-      "description": "Timed dribbling slalom — lowest time wins."
+      "name": "Dribbling-Slalom",
+      "description": "Dribbling-Slalom auf Zeit — die niedrigste Zeit gewinnt."
     },
     "sprint40m": {
-      "name": "40 m sprint",
-      "description": "Time on 40 m — lowest wins."
+      "name": "40-m-Sprint",
+      "description": "Zeit über 40 m — die niedrigste Zeit gewinnt."
     },
     "agilityRunRugby": {
-      "name": "Agility run",
-      "description": "Timed evasion course — lowest time wins."
+      "name": "Agility-Lauf",
+      "description": "Ausweichparcours auf Zeit — die niedrigste Zeit gewinnt."
     },
     "successfulPasses": {
-      "name": "Successful passes",
-      "description": "Longest streak of successful passes — record."
+      "name": "Erfolgreiche Pässe",
+      "description": "Längste Serie erfolgreicher Pässe — Rekord."
     },
     "rallyConsistency": {
-      "name": "Rally consistency",
-      "description": "Longest error-free rally — record."
+      "name": "Ballwechsel-Konstanz",
+      "description": "Längster fehlerfreier Ballwechsel — Rekord."
     },
     "movementSpeed": {
-      "name": "Movement speed",
-      "description": "Timed movement course — lowest time wins."
+      "name": "Bewegungstempo",
+      "description": "Bewegungsparcours auf Zeit — die niedrigste Zeit gewinnt."
     },
     "shotAccuracy": {
-      "name": "Shot accuracy",
-      "description": "Shots on target zones — cumulative score."
+      "name": "Schussgenauigkeit",
+      "description": "Schüsse in Zielzonen — Gesamtpunktzahl."
     },
     "handballShotAccuracy": {
-      "name": "Shot accuracy",
-      "description": "Shots on target zones — cumulative score."
+      "name": "Wurfgenauigkeit",
+      "description": "Würfe in Zielzonen — Gesamtpunktzahl."
     },
     "passingAccuracy": {
-      "name": "Passing accuracy",
-      "description": "Passes made on targets — cumulative score."
+      "name": "Passgenauigkeit",
+      "description": "Pässe auf Zielpunkte — Gesamtpunktzahl."
     },
     "rugbyPassingAccuracy": {
-      "name": "Passing accuracy",
-      "description": "Passes made on targets — cumulative score."
+      "name": "Passgenauigkeit",
+      "description": "Pässe auf Zielpunkte — Gesamtpunktzahl."
     },
     "pushPower": {
-      "name": "Scrum push power",
-      "description": "Measured pushing force — score."
+      "name": "Gedränge-Schubkraft",
+      "description": "Gemessene Schubkraft — Punktzahl."
     },
     "serveAccuracy": {
-      "name": "Serve accuracy",
-      "description": "Serves placed on zones — cumulative score."
+      "name": "Aufschlaggenauigkeit",
+      "description": "Aufschläge in Zonen — Gesamtpunktzahl."
     },
     "receptionControl": {
-      "name": "Reception control",
-      "description": "Reception quality rated by staff — score."
+      "name": "Annahme-Kontrolle",
+      "description": "Annahmequalität vom Trainerteam bewertet — Punktzahl."
     },
     "attackAccuracy": {
-      "name": "Attack accuracy",
-      "description": "Attacks placed on zones — cumulative score."
+      "name": "Angriffsgenauigkeit",
+      "description": "Angriffe in Zonen — Gesamtpunktzahl."
     },
     "tennisServeAccuracy": {
-      "name": "Serve accuracy",
-      "description": "Serves placed on zones — cumulative score."
+      "name": "Aufschlaggenauigkeit",
+      "description": "Aufschläge in Zonen — Gesamtpunktzahl."
     },
     "targetShots": {
-      "name": "Target shots",
-      "description": "Balls placed on targets — cumulative score."
+      "name": "Zielschüsse",
+      "description": "Bälle auf Zielpunkte — Gesamtpunktzahl."
     }
   },
   "list": {
@@ -171,7 +171,12 @@
     "custom_name_label": "Name",
     "custom_name_placeholder": "z. B. Präzision langer Pass",
     "create": "Erstellen",
-    "creating": "Wird erstellt…"
+    "creating": "Wird erstellt…",
+    "all_added": "Alle verfügbaren Aktivitäten sind diesem Team bereits hinzugefügt.",
+    "popular": "Beliebt",
+    "already_in_session": "Schon in der Sitzung",
+    "selected": "Ausgewählt",
+    "cancel": "Stornieren"
   },
   "entry": {
     "title": "Eingabe",
@@ -198,7 +203,8 @@
   },
   "errors": {
     "forbidden": "Aktion nur für das Trainerteam.",
-    "generic": "Ein Fehler ist aufgetreten."
+    "generic": "Ein Fehler ist aufgetreten.",
+    "eventNotFound": "Ereignis nicht gefunden."
   },
   "records": {
     "new": "Neuer Rekord!"
