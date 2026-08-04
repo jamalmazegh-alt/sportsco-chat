@@ -171,7 +171,12 @@
     "custom_name_label": "Name",
     "custom_name_placeholder": "z. B. Präzision langer Pass",
     "create": "Erstellen",
-    "creating": "Wird erstellt…"
+    "creating": "Wird erstellt…",
+    "all_added": "Alle verfügbaren Aktivitäten sind diesem Team bereits hinzugefügt.",
+    "popular": "Beliebt",
+    "already_in_session": "Schon in der Sitzung",
+    "selected": "Ausgewählt",
+    "cancel": "Stornieren"
   },
   "entry": {
     "title": "Eingabe",

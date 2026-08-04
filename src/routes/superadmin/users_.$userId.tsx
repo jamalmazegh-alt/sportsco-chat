@@ -1,4 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { useTranslation } from "react-i18next";
+import i18nInstance from "@/lib/i18n";
 import { copyText } from "@/lib/clipboard";
 import { useCallback, useEffect, useState } from "react";
 import {
@@ -52,6 +54,7 @@ export const Route = createFileRoute("/superadmin/users_/$userId")({
 type Detail = Awaited<ReturnType<typeof getUserDetail>>;
 
 function UserDetail() {
+  const { t } = useTranslation();
   const { userId } = Route.useParams();
   const [data, setData] = useState<Detail | null>(null);
   const [err, setErr] = useState<string | null>(null);
@@ -67,7 +70,7 @@ function UserDetail() {
     setErr(null);
     getUserDetail({ data: { user_id: userId } })
       .then(setData)
-      .catch((e) => setErr(e instanceof Error ? e.message : "Failed"));
+      .catch((e) => setErr(e instanceof Error ? e.message : t("superadmin.common.failed")));
   }, [userId]);
 
   useEffect(refresh, [refresh]);
@@ -83,10 +86,10 @@ function UserDetail() {
     setBusy(true);
     try {
       await fn();
-      toast.success(`${label} ✓`);
+      toast.success(t("superadmin.users.actionDone", { label }));
       refresh();
     } catch (e) {
-      toast.error(e instanceof Error ? e.message : "Action failed");
+      toast.error(e instanceof Error ? e.message : t("superadmin.common.actionFailed"));
     } finally {
       setBusy(false);
     }
@@ -156,7 +159,9 @@ function UserDetail() {
 
       {/* Sensitive actions */}
       <section className="rounded-xl border border-border bg-card p-4 mb-6">
-        <div className="text-xs uppercase tracking-wide text-muted-foreground mb-3">Actions</div>
+        <div className="text-xs uppercase tracking-wide text-muted-foreground mb-3">
+          {t("superadmin.userDetail.actions")}
+        </div>
         <div className="flex flex-wrap gap-2">
           <Button
             size="sm"
@@ -180,9 +185,9 @@ function UserDetail() {
                   data: { user_id: userId },
                 });
                 setResetLink(r.action_link);
-                toast.success("Recovery link generated");
+                toast.success(t("superadmin.userDetail.recoveryLinkGenerated"));
               } catch (e) {
-                toast.error(e instanceof Error ? e.message : "Failed");
+                toast.error(e instanceof Error ? e.message : t("superadmin.common.failed"));
               } finally {
                 setBusy(false);
               }
@@ -261,7 +266,7 @@ function UserDetail() {
       </section>
 
       <OnboardingProgress
-        title="User onboarding"
+        title={t("superadmin.userDetail.userOnboarding")}
         className="mb-6"
         steps={buildUserOnboardingSteps(data)}
       />
@@ -269,7 +274,7 @@ function UserDetail() {
       <div className="grid md:grid-cols-2 gap-4 mb-6">
         <InfoCard
           icon={Calendar}
-          label="Account"
+          label={t("superadmin.userDetail.account")}
           rows={[
             [
               "Created",
@@ -291,7 +296,7 @@ function UserDetail() {
         />
         <InfoCard
           icon={UsersIcon}
-          label="Relations"
+          label={t("superadmin.userDetail.relations")}
           rows={[
             ["Clubs", String(data.clubs.length)],
             [
@@ -312,7 +317,7 @@ function UserDetail() {
       {/* Clubs */}
       <Section icon={Building2} title={`Clubs (${data.clubs.length})`}>
         {data.clubs.length === 0 ? (
-          <Empty>No club memberships.</Empty>
+          <Empty>{t("superadmin.userDetail.noClubMemberships")}</Empty>
         ) : (
           <ul className="divide-y divide-border">
             {data.clubs.map((m) => (
@@ -349,7 +354,7 @@ function UserDetail() {
       {/* Invites received (provenance) */}
       <Section icon={Mailbox} title={`Invites received (${data.invites.length})`}>
         {data.invites.length === 0 ? (
-          <Empty>No invites match this user's email.</Empty>
+          <Empty>{t("superadmin.userDetail.noInvites")}</Empty>
         ) : (
           <ul className="divide-y divide-border">
             {data.invites.map((inv) => (
@@ -394,7 +399,7 @@ function UserDetail() {
       {/* Teams (direct staff/member role) */}
       <Section icon={UsersIcon} title={`Teams — staff/member roles (${data.teams.length})`}>
         {data.teams.length === 0 ? (
-          <Empty>No direct team assignments.</Empty>
+          <Empty>{t("superadmin.userDetail.noTeamAssignments")}</Empty>
         ) : (
           <ul className="divide-y divide-border">
             {data.teams.map((t) => (
@@ -418,7 +423,7 @@ function UserDetail() {
       {/* Player profiles (with parents + teams) */}
       <Section icon={UsersIcon} title={`Player profiles (${data.players.length})`}>
         {data.players.length === 0 ? (
-          <Empty>No player profile linked to this user.</Empty>
+          <Empty>{t("superadmin.userDetail.noPlayerProfile")}</Empty>
         ) : (
           <ul className="divide-y divide-border">
             {data.players.map((p) => (
@@ -444,7 +449,9 @@ function UserDetail() {
                       Teams
                     </div>
                     {p.teams.length === 0 ? (
-                      <div className="text-xs text-muted-foreground italic">No team.</div>
+                      <div className="text-xs text-muted-foreground italic">
+                        {t("superadmin.userDetail.noTeam")}
+                      </div>
                     ) : (
                       <ul className="space-y-1">
                         {p.teams.map((t) => (
@@ -464,7 +471,9 @@ function UserDetail() {
                       Parents
                     </div>
                     {p.parents.length === 0 ? (
-                      <div className="text-xs text-muted-foreground italic">No parent linked.</div>
+                      <div className="text-xs text-muted-foreground italic">
+                        {t("superadmin.userDetail.noParentLinked")}
+                      </div>
                     ) : (
                       <ul className="space-y-1">
                         {p.parents.map((pa, idx) => (
@@ -487,7 +496,9 @@ function UserDetail() {
                               <span className="text-muted-foreground"> · {pa.phone}</span>
                             )}
                             {pa.can_respond && (
-                              <StatusBadge tone="success">can respond</StatusBadge>
+                              <StatusBadge tone="success">
+                                {t("superadmin.userDetail.canRespond")}
+                              </StatusBadge>
                             )}
                           </li>
                         ))}
@@ -504,7 +515,7 @@ function UserDetail() {
       {/* Children (user is a parent) */}
       <Section icon={UsersIcon} title={`Children — as parent (${data.parent_of.length})`}>
         {data.parent_of.length === 0 ? (
-          <Empty>Not linked as a parent to any player.</Empty>
+          <Empty>{t("superadmin.userDetail.notLinkedAsParent")}</Empty>
         ) : (
           <ul className="divide-y divide-border">
             {data.parent_of.map((r, idx) => (
@@ -526,14 +537,20 @@ function UserDetail() {
                       </div>
                     )}
                   </div>
-                  {r.can_respond && <StatusBadge tone="success">can respond</StatusBadge>}
+                  {r.can_respond && (
+                    <StatusBadge tone="success">
+                      {t("superadmin.userDetail.canRespond")}
+                    </StatusBadge>
+                  )}
                 </div>
                 <div className="mt-2">
                   <div className="text-[10px] uppercase tracking-wide text-muted-foreground mb-1">
                     Teams
                   </div>
                   {r.teams.length === 0 ? (
-                    <div className="text-xs text-muted-foreground italic">No team.</div>
+                    <div className="text-xs text-muted-foreground italic">
+                      {t("superadmin.userDetail.noTeam")}
+                    </div>
                   ) : (
                     <ul className="space-y-1">
                       {r.teams.map((t) => (
@@ -555,9 +572,9 @@ function UserDetail() {
       </Section>
 
       {/* Recent convocations */}
-      <Section icon={Calendar} title="Recent convocations">
+      <Section icon={Calendar} title={t("superadmin.userDetail.recentConvocations")}>
         {data.recent_convocations.length === 0 ? (
-          <Empty>No convocations.</Empty>
+          <Empty>{t("superadmin.userDetail.noConvocations")}</Empty>
         ) : (
           <ul className="divide-y divide-border">
             {data.recent_convocations.map((c) => (
@@ -588,9 +605,9 @@ function UserDetail() {
       </Section>
 
       {/* Admin activity history */}
-      <Section icon={History} title="Recent admin actions on this user">
+      <Section icon={History} title={t("superadmin.userDetail.recentAdminActions")}>
         {data.recent_admin_actions.length === 0 ? (
-          <Empty>No prior admin actions.</Empty>
+          <Empty>{t("superadmin.userDetail.noPriorActions")}</Empty>
         ) : (
           <ul className="divide-y divide-border">
             {data.recent_admin_actions.map((l) => {
@@ -618,7 +635,7 @@ function UserDetail() {
       <Dialog open={impersonateOpen} onOpenChange={setImpersonateOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Impersonate user</DialogTitle>
+            <DialogTitle>{t("superadmin.userDetail.impersonateTitle")}</DialogTitle>
             <DialogDescription>
               One-time magic link as{" "}
               <span className="font-medium text-foreground">{data.auth.email}</span>. Open in a
@@ -635,7 +652,7 @@ function UserDetail() {
                   rows={3}
                   value={impReason}
                   onChange={(e) => setImpReason(e.target.value)}
-                  placeholder="e.g. Ticket #421 — user reports missing events"
+                  placeholder={t("superadmin.userDetail.impersonateReasonPlaceholder")}
                 />
               </div>
               <DialogFooter>
@@ -651,9 +668,9 @@ function UserDetail() {
                         data: { user_id: userId, reason: impReason.trim() },
                       });
                       setImpLink(r.action_link);
-                      toast.success("Impersonation link generated");
+                      toast.success(t("superadmin.userDetail.impersonationLinkGenerated"));
                     } catch (e) {
-                      toast.error(e instanceof Error ? e.message : "Failed");
+                      toast.error(e instanceof Error ? e.message : t("superadmin.common.failed"));
                     } finally {
                       setBusy(false);
                     }
@@ -743,48 +760,49 @@ function InfoCard({
 function buildUserOnboardingSteps(data: Detail): OnboardingStep[] {
   const p = data.profile;
   const hasName = !!(p?.full_name || (p?.first_name && p?.last_name));
+  const tr = i18nInstance.t.bind(i18nInstance);
   return [
     {
       id: "email_confirmed",
-      label: "Email verified",
+      label: tr("superadmin.userOnboarding.emailConfirmed"),
       done: !!data.auth.email_confirmed_at,
-      hint: "User must click the confirmation link received by email.",
+      hint: tr("superadmin.userOnboarding.emailConfirmedHint"),
     },
     {
       id: "first_signin",
-      label: "Signed in at least once",
+      label: tr("superadmin.userOnboarding.firstSignin"),
       done: !!data.auth.last_sign_in_at,
-      hint: "User has never opened the app.",
+      hint: tr("superadmin.userOnboarding.firstSigninHint"),
     },
     {
       id: "name",
-      label: "Name set",
+      label: tr("superadmin.userOnboarding.name"),
       done: hasName,
-      hint: "Profile first/last name missing.",
+      hint: tr("superadmin.userOnboarding.nameHint"),
     },
     {
       id: "avatar",
-      label: "Avatar uploaded",
+      label: tr("superadmin.userOnboarding.avatar"),
       done: !!p?.avatar_url,
-      hint: "Optional but improves recognition.",
+      hint: tr("superadmin.userOnboarding.avatarHint"),
     },
     {
       id: "phone",
-      label: "Phone number added",
+      label: tr("superadmin.userOnboarding.phone"),
       done: !!p?.phone,
-      hint: "Used for SMS/WhatsApp notifications.",
+      hint: tr("superadmin.userOnboarding.phoneHint"),
     },
     {
       id: "language",
-      label: "Preferred language chosen",
+      label: tr("superadmin.userOnboarding.language"),
       done: !!p?.preferred_language,
-      hint: "Defaults to browser language until set.",
+      hint: tr("superadmin.userOnboarding.languageHint"),
     },
     {
       id: "club_link",
-      label: "Linked to a club",
+      label: tr("superadmin.userOnboarding.clubLink"),
       done: data.clubs.length > 0 || data.players.length > 0 || data.parent_of.length > 0,
-      hint: "No club membership, player profile or parent link.",
+      hint: tr("superadmin.userDetail.orphanHint"),
     },
   ];
 }

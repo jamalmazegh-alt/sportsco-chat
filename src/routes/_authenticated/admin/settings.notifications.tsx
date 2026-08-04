@@ -1,6 +1,7 @@
 import { createFileRoute, Navigate } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect, useState, useRef } from "react";
+import { useTranslation } from "react-i18next";
 import { Bell, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -61,6 +62,7 @@ const DEFAULTS: Omit<Settings, "club_id"> = {
 type ToggleKey = keyof Omit<Settings, "club_id">;
 
 function NotificationsSettingsPage() {
+  const { t } = useTranslation();
   const { activeClubId } = useAuth();
   const roles = useMyRoles();
 
@@ -121,19 +123,17 @@ function NotificationsSettingsPage() {
     );
     savingRef.current = false;
     if (error) {
-      // revert
       setForm(form);
       toast.error(error.message);
       return;
     }
-    toast.success("Enregistré", { duration: 1500 });
+    toast.success(t("common.saved"), { duration: 1500 });
   }
 
   return (
     <div className="px-5 py-4 space-y-5 max-w-2xl mx-auto">
-      <BackLink to="/admin" label="Retour aux paramètres" />
+      <BackLink to="/admin" label={t("admin.back")} />
 
-      {/* Header dégradé vert + icône cloche */}
       <header className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-[#1d7a45] via-[#16a34a] to-[#22c55e] p-6 text-white shadow-lg">
         <div className="absolute -right-6 -top-6 opacity-15">
           <Bell className="h-32 w-32" strokeWidth={1.5} />
@@ -143,88 +143,85 @@ function NotificationsSettingsPage() {
             <Bell className="h-5 w-5" strokeWidth={2.2} />
           </div>
           <div className="min-w-0">
-            <h1 className="text-xl font-semibold leading-tight">Notifications push</h1>
-            <p className="text-sm text-white/85 mt-1">
-              Choisissez les notifications envoyées sur l'application mobile. Les emails ne sont pas
-              affectés.
-            </p>
+            <h1 className="text-xl font-semibold leading-tight">{t("adminNotifications.title")}</h1>
+            <p className="text-sm text-white/85 mt-1">{t("adminNotifications.subtitle")}</p>
           </div>
         </div>
       </header>
 
-      <Section title="Convocations">
+      <Section title={t("adminNotifications.sectionConvocations")}>
         <Toggle
-          label="Push envoyé à la création"
-          hint="Notifie joueurs et parents dès qu'une convocation est créée."
+          label={t("adminNotifications.convocationOnCreate")}
+          hint={t("adminNotifications.convocationOnCreateHint")}
           checked={form.convocation_on_create}
           onChange={(v) => update("convocation_on_create", v)}
         />
         <Toggle
-          label="Relances automatiques"
-          hint="Push de rappel parallèle à l'email avant l'événement."
+          label={t("adminNotifications.convocationReminder")}
+          hint={t("adminNotifications.convocationReminderHint")}
           checked={form.convocation_reminder}
           onChange={(v) => update("convocation_reminder", v)}
         />
         <Toggle
-          label="Coach notifié à chaque réponse"
-          hint="Une notification au coach dès qu'un joueur répond."
+          label={t("adminNotifications.convocationCoachEach")}
+          hint={t("adminNotifications.convocationCoachEachHint")}
           checked={form.convocation_coach_each_response}
           onChange={(v) => update("convocation_coach_each_response", v)}
         />
         <Toggle
-          label="Coach notifié quand 100% ont répondu"
-          hint="Récapitulatif présents / absents / incertains."
+          label={t("adminNotifications.convocationCoachComplete")}
+          hint={t("adminNotifications.convocationCoachCompleteHint")}
           checked={form.convocation_coach_complete}
           onChange={(v) => update("convocation_coach_complete", v)}
         />
       </Section>
 
-      <Section title="Événements">
+      <Section title={t("adminNotifications.sectionEvents")}>
         <Toggle
-          label="Notification de report"
-          hint="Push quand un événement change de date."
+          label={t("adminNotifications.eventReschedule")}
+          hint={t("adminNotifications.eventRescheduleHint")}
           checked={form.event_reschedule}
           onChange={(v) => update("event_reschedule", v)}
         />
         <Toggle
-          label="Notification d'annulation"
-          hint="Push quand un événement est annulé."
+          label={t("adminNotifications.eventCancel")}
+          hint={t("adminNotifications.eventCancelHint")}
           checked={form.event_cancel}
           onChange={(v) => update("event_cancel", v)}
         />
         <Toggle
-          label="Résultat de match notifié à l'équipe"
-          hint="Push aux joueurs et coaches quand un score est saisi."
+          label={t("adminNotifications.scoreResult")}
+          hint={t("adminNotifications.scoreResultHint")}
           checked={form.score_result}
           onChange={(v) => update("score_result", v)}
         />
         <Toggle
-          label="Nouveau message dans le chat d'un événement"
-          hint="Push aux convoqués, à leurs parents et au staff (hors auteur, regroupé si plusieurs messages)."
+          label={t("adminNotifications.eventChat")}
+          hint={t("adminNotifications.eventChatHint")}
           checked={form.event_chat_new_message}
           onChange={(v) => update("event_chat_new_message", v)}
         />
       </Section>
 
-      <Section title="Mur du club">
+      <Section title={t("adminNotifications.sectionWall")}>
         <Toggle
-          label="Push pour nouveau message"
-          hint="Tous les membres reçoivent une notification."
+          label={t("adminNotifications.wallNewPost")}
+          hint={t("adminNotifications.wallNewPostHint")}
           checked={form.wall_new_post}
           onChange={(v) => update("wall_new_post", v)}
         />
       </Section>
 
-      <Section title="Tournois">
+      <Section title={t("adminNotifications.sectionTournaments")}>
         <Toggle
-          label="Rappel 30 min avant un match"
-          hint="Push aux joueurs et parents avant chaque match tournoi."
+          label={t("adminNotifications.tournamentMatchReminder")}
+          hint={t("adminNotifications.tournamentMatchReminderHint")}
           checked={form.tournament_match_reminder}
           onChange={(v) => update("tournament_match_reminder", v)}
         />
         <Toggle
-          label="Notification tirage au sort"
-          hint="Push aux équipes inscrites dès la publication des poules."
+          label={t("adminNotifications.tournamentDraw")}
+          hint={t("adminNotifications.tournamentDrawHint")}
           checked={form.tournament_draw}
           onChange={(v) => update("tournament_draw", v)}
         />

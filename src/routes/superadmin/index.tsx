@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { useTranslation } from "react-i18next";
 import { useEffect, useState } from "react";
 import { getPlatformStats, getFinanceOverview } from "@/lib/superadmin.functions";
 import { getSupportStats } from "@/lib/support.functions";
@@ -29,6 +30,7 @@ type Stats = Record<string, number | string>;
 type Finance = Awaited<ReturnType<typeof getFinanceOverview>>;
 
 function SuperAdminDashboard() {
+  const { t } = useTranslation();
   const [stats, setStats] = useState<Stats | null>(null);
   const [finance, setFinance] = useState<Finance | null>(null);
   const [supportStats, setSupportStats] = useState<{
@@ -41,7 +43,9 @@ function SuperAdminDashboard() {
   useEffect(() => {
     getPlatformStats()
       .then((r) => setStats(r.stats))
-      .catch((e) => setErr(e instanceof Error ? e.message : "Failed to load"));
+      .catch((e) =>
+        setErr(e instanceof Error ? e.message : t("superadmin.dashboard.failedToLoad")),
+      );
     getFinanceOverview()
       .then(setFinance)
       .catch((e) => console.error("finance", e));
@@ -53,10 +57,8 @@ function SuperAdminDashboard() {
   return (
     <div className="p-6 md:p-8 max-w-7xl space-y-8">
       <header>
-        <h1 className="text-xl font-semibold">Platform overview</h1>
-        <p className="text-sm text-muted-foreground mt-0.5">
-          Live snapshot of operations and revenue across Clubero.
-        </p>
+        <h1 className="text-xl font-semibold">{t("superadmin.dashboard.title")}</h1>
+        <p className="text-sm text-muted-foreground mt-0.5">{t("superadmin.dashboard.subtitle")}</p>
       </header>
 
       {err && (
@@ -69,55 +71,62 @@ function SuperAdminDashboard() {
       <section>
         <div className="flex items-center justify-between mb-3">
           <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground flex items-center gap-2">
-            <CircleDollarSign className="h-4 w-4" /> Business & finance
+            <CircleDollarSign className="h-4 w-4" /> {t("superadmin.dashboard.businessFinance")}
           </h2>
           <Link to="/superadmin/billing" className="text-xs text-primary hover:underline">
-            All subscriptions →
+            {t("superadmin.dashboard.allSubscriptions")}
           </Link>
         </div>
 
         {!finance ? (
           <div className="flex items-center gap-2 text-sm text-muted-foreground">
-            <Loader2 className="h-4 w-4 animate-spin" /> Loading revenue…
+            <Loader2 className="h-4 w-4 animate-spin" /> {t("superadmin.dashboard.loadingRevenue")}
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
             <BigTile
               icon={<Banknote className="h-4 w-4" />}
-              label="Monthly recurring revenue"
+              label={t("superadmin.dashboard.mrr")}
               primary={formatMoney(finance.mrr_cents, finance.currency)}
-              secondary={`ARR ${formatMoney(finance.arr_cents, finance.currency)}`}
+              secondary={t("superadmin.dashboard.arr", {
+                amount: formatMoney(finance.arr_cents, finance.currency),
+              })}
               accent="primary"
             />
             <BigTile
               icon={<Building2 className="h-4 w-4" />}
-              label="Paying clubs"
+              label={t("superadmin.dashboard.payingClubs")}
               primary={String(finance.paying_clubs)}
-              secondary={`ARPU ${formatMoney(finance.arpu_cents, finance.currency)}`}
+              secondary={t("superadmin.dashboard.arpu", {
+                amount: formatMoney(finance.arpu_cents, finance.currency),
+              })}
             />
             <BigTile
               icon={<TrendingUp className="h-4 w-4" />}
-              label="Trial conversion (30d cohort)"
+              label={t("superadmin.dashboard.trialConversion")}
               primary={`${finance.trial_conversion_rate}%`}
-              secondary={`${finance.new_subs_30d} new · ${finance.trialing} active trials`}
+              secondary={t("superadmin.dashboard.newAndTrials", {
+                new: finance.new_subs_30d,
+                trials: finance.trialing,
+              })}
             />
 
             <MiniTile
               icon={<ArrowUpRight className="h-3.5 w-3.5 text-emerald-500" />}
-              label="New subscriptions (30d)"
+              label={t("superadmin.dashboard.newSubs")}
               value={finance.new_subs_30d}
             />
             <MiniTile
               icon={<ArrowDownRight className="h-3.5 w-3.5 text-destructive" />}
-              label="Churned (30d)"
+              label={t("superadmin.dashboard.churned")}
               value={finance.churned_30d}
-              sub={`${finance.churn_rate_30d}% churn rate`}
+              sub={t("superadmin.dashboard.churnRate", { rate: finance.churn_rate_30d })}
             />
             <MiniTile
               icon={<AlertTriangle className="h-3.5 w-3.5 text-amber-500" />}
-              label="Past due"
+              label={t("superadmin.dashboard.pastDue")}
               value={finance.past_due}
-              sub={`${finance.trials_ending_7d} trials ending < 7d`}
+              sub={t("superadmin.dashboard.trialsEnding", { count: finance.trials_ending_7d })}
               alert={finance.past_due > 0}
             />
           </div>
@@ -127,23 +136,27 @@ function SuperAdminDashboard() {
       {/* ============== Operations ============== */}
       <section>
         <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground mb-3 flex items-center gap-2">
-          <Users className="h-4 w-4" /> Operations
+          <Users className="h-4 w-4" /> {t("superadmin.dashboard.operations")}
         </h2>
 
         {!stats ? (
           <div className="flex items-center gap-2 text-sm text-muted-foreground">
-            <Loader2 className="h-4 w-4 animate-spin" /> Loading metrics…
+            <Loader2 className="h-4 w-4 animate-spin" /> {t("superadmin.dashboard.loadingMetrics")}
           </div>
         ) : (
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-            <OpTile label="Clubs" value={stats.clubs_total} />
-            <OpTile label="Active clubs" value={stats.clubs_active} hint="With active sub" />
-            <OpTile label="Users" value={stats.users_total} />
-            <OpTile label="Active subs (db)" value={stats.subs_active} />
-            <OpTile label="Trials" value={stats.subs_trialing} />
-            <OpTile label="Expiring < 7 days" value={stats.subs_expiring_7d} />
-            <OpTile label="Events (30d)" value={stats.events_30d} />
-            <OpTile label="Call-ups (30d)" value={stats.convocations_30d} />
+            <OpTile label={t("superadmin.dashboard.clubs")} value={stats.clubs_total} />
+            <OpTile
+              label={t("superadmin.dashboard.activeClubs")}
+              value={stats.clubs_active}
+              hint={t("superadmin.dashboard.withActiveSub")}
+            />
+            <OpTile label={t("superadmin.dashboard.users")} value={stats.users_total} />
+            <OpTile label={t("superadmin.dashboard.activeSubsDb")} value={stats.subs_active} />
+            <OpTile label={t("superadmin.dashboard.trials")} value={stats.subs_trialing} />
+            <OpTile label={t("superadmin.dashboard.expiring7d")} value={stats.subs_expiring_7d} />
+            <OpTile label={t("superadmin.dashboard.events30d")} value={stats.events_30d} />
+            <OpTile label={t("superadmin.dashboard.callups30d")} value={stats.convocations_30d} />
           </div>
         )}
       </section>
@@ -152,37 +165,37 @@ function SuperAdminDashboard() {
       <section>
         <div className="flex items-center justify-between mb-3">
           <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground flex items-center gap-2">
-            <LifeBuoy className="h-4 w-4" /> Support tickets
+            <LifeBuoy className="h-4 w-4" /> {t("superadmin.dashboard.supportTickets")}
           </h2>
           <Link to="/superadmin/support-tickets" className="text-xs text-primary hover:underline">
-            All tickets →
+            {t("superadmin.dashboard.allTickets")}
           </Link>
         </div>
 
         {supportStats === null ? (
           <div className="flex items-center gap-2 text-sm text-muted-foreground">
-            <Loader2 className="h-4 w-4 animate-spin" /> Loading support stats…
+            <Loader2 className="h-4 w-4 animate-spin" /> {t("superadmin.dashboard.loadingSupport")}
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
             <BigTile
               icon={<Inbox className="h-4 w-4" />}
-              label="Open tickets"
+              label={t("superadmin.dashboard.openTickets")}
               primary={String(supportStats.open)}
-              secondary={`${supportStats.unread} unread`}
+              secondary={t("superadmin.dashboard.unreadCount", { count: supportStats.unread })}
             />
             <BigTile
               icon={<AlertTriangle className="h-4 w-4 text-destructive" />}
-              label="Urgent tickets"
+              label={t("superadmin.dashboard.urgentTickets")}
               primary={String(supportStats.urgent)}
-              secondary="Requires immediate attention"
+              secondary={t("superadmin.dashboard.urgentHint")}
               accent="primary"
             />
             <BigTile
               icon={<MessageSquare className="h-4 w-4" />}
-              label="Total unread"
+              label={t("superadmin.dashboard.totalUnread")}
               primary={String(supportStats.unread)}
-              secondary="Staff unread count"
+              secondary={t("superadmin.dashboard.staffUnread")}
             />
           </div>
         )}
@@ -191,11 +204,13 @@ function SuperAdminDashboard() {
       {/* ============== Activité & à surveiller ============== */}
       <section className="space-y-4">
         <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground flex items-center gap-2">
-          <TrendingUp className="h-4 w-4" /> Activité & à surveiller
+          <TrendingUp className="h-4 w-4" /> {t("superadmin.dashboard.activityWatch")}
         </h2>
         <WatchlistPanel />
         <div>
-          <div className="text-xs text-muted-foreground mb-2">Fil d'activité produit</div>
+          <div className="text-xs text-muted-foreground mb-2">
+            {t("superadmin.dashboard.productFeed")}
+          </div>
           <ProductActivityFeed />
         </div>
       </section>
@@ -204,8 +219,9 @@ function SuperAdminDashboard() {
 
       {(stats?.generated_at || finance?.generated_at) && (
         <div className="text-xs text-muted-foreground">
-          Generated at{" "}
-          {new Date(String(finance?.generated_at ?? stats?.generated_at)).toLocaleString()}
+          {t("superadmin.common.generatedAt", {
+            date: new Date(String(finance?.generated_at ?? stats?.generated_at)).toLocaleString(),
+          })}
         </div>
       )}
     </div>

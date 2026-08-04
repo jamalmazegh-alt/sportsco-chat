@@ -5,7 +5,10 @@
     "cancel": "Annuleren",
     "delete": "Verwijderen",
     "save": "Opslaan",
-    "copied": "Copied"
+    "copied": "Copied",
+    "refresh": "Vernieuwen",
+    "copyFailed": "Kan niet kopiëren",
+    "copy": "Kopiëren"
   },
   "chooser": {
     "title": "Nieuwe stage",
@@ -139,7 +142,14 @@
     "facilityPlaceholder": "Optioneel",
     "facilityNone": "— Geen —",
     "save": "Opslaan",
-    "saved": "Wijzigingen opgeslagen"
+    "saved": "Wijzigingen opgeslagen",
+    "venueModeHome": "Clublocaties",
+    "venueModeHomeHint": "Veld, gymzaal, hal…",
+    "venueModeExternal": "Extern adres",
+    "venueModeExternalHint": "Een andere locatie, buiten de club",
+    "externalAddress": "Adres",
+    "externalAddressPlaceholder": "Bijvoorbeeld 12 Stadium Street, 75001 Parijs",
+    "externalAddressHint": "Adres in vrije vorm: getoond aan registranten en klikbaar naar Google Maps."
   },
   "ageGroups": {
     "empty": "Nog geen categorieën.",
@@ -150,7 +160,9 @@
     "quickAdd": "Snel toevoegen",
     "pickPreset": "Kies U6 – U19",
     "allAdded": "Alle toegevoegd",
-    "addCustom": "+ Eigen categorie"
+    "addCustom": "+ Eigen categorie",
+    "selectAll": "Selecteer de relevante categorieën",
+    "customs": "Aangepaste categorieën"
   },
   "cover": {
     "empty": "Geen coverafbeelding",
@@ -168,7 +180,9 @@
     "archive": "Archiveren",
     "archived": "Stage gearchiveerd",
     "publicUrl": "Publieke link",
-    "publicUrlSoon": "publieke pagina binnenkort beschikbaar"
+    "publicUrlSoon": "publieke pagina binnenkort beschikbaar",
+    "openPublic": "Bekijk openbare pagina",
+    "publicUrlCopied": "Link gekopieerd"
   },
   "duplicate": {
     "action": "Dupliceren",
@@ -283,7 +297,41 @@
     },
     "full": "Vol — inschrijving mogelijk op wachtlijst",
     "lastSpots": "Laatste plaatsen (nog {{count}})",
-    "registerWaitlistCta": "Op de wachtlijst"
+    "registerWaitlistCta": "Op de wachtlijst",
+    "tracking": {
+      "invalidTitle": "Ongeldige of verlopen link",
+      "invalidBody": "Deze volglink is niet geldig. Controleer de link die u per e-mail ontving.",
+      "title": "Inschrijving volgen",
+      "participant": "Deelnemer",
+      "bornOn": "Geboren op {{date}}",
+      "campDates": "Kampdata: {{dates}}",
+      "reason": "Reden: {{reason}}",
+      "noDocs": "Geen documenten gevraagd.",
+      "personalLink": "Persoonlijke link — deel hem niet. Hij geeft toegang tot uw dossier en documenten.",
+      "status": {
+        "pending": "Wacht op validatie",
+        "under_review": "In behandeling",
+        "approved": "Goedgekeurd",
+        "rejected": "Afgewezen",
+        "cancelled": "Geannuleerd",
+        "waitlisted": "Wachtlijst"
+      },
+      "docMissing": "Document vereist",
+      "docPending": "In afwachting van controle",
+      "docApproved": "Goedgekeurd",
+      "docRejected": "Afgewezen",
+      "download": "Downloaden",
+      "upload": "Uploaden",
+      "replace": "Vervangen",
+      "errors": {
+        "downloadUnavailable": "Download niet beschikbaar.",
+        "fileTooLarge": "Bestand te groot (max. 15 MB).",
+        "invalidMime": "Niet-ondersteund formaat (PDF, JPG, PNG).",
+        "rateLimited": "Te veel pogingen.",
+        "uploadFailed": "Upload mislukt."
+      },
+      "uploadSuccess": "Document verzonden. Status: in behandeling."
+    }
   },
   "registrations": {
     "status": {
@@ -367,7 +415,19 @@
       "capacityFullTitle": "Camp full",
       "capacityFullHelp": "The camp has reached capacity. Do you want to place this family on the waitlist?",
       "placeOnWaitlist": "Place on waitlist",
-      "emailsHint": "Automatic emails to families will be added in the next step (Phase 3, step 3)."
+      "emailsHint": "Automatic emails to families will be added in the next step (Phase 3, step 3).",
+      "paymentUpdated": "Betaling bijgewerkt",
+      "paymentSection": "Betaling",
+      "paymentNotRequired": "Voor dit kamp is geen betaling vereist.",
+      "paymentPrice": "Camp price: {{price}} {{currency}}",
+      "paymentReceived": "Received: {{amount}} {{currency}}",
+      "paymentRemaining": "Balance due: {{amount}} {{currency}}",
+      "markPaid": "Markeer als betaald",
+      "markUnpaid": "Markeer als onbetaald",
+      "markRefunded": "Markeer als terugbetaald",
+      "markPartialTitle": "Registreer een gedeeltelijke betaling",
+      "markPartial": "Markeer als gedeeltelijk",
+      "partialRemainingPreview": "Balance due: {{amount}} {{currency}}"
     },
     "csv": {
       "cta": "Export CSV",
@@ -388,6 +448,40 @@
       "dossierStatus": "Documents status",
       "amountPaid": "Amount paid",
       "requestedAt": "Request date"
-    }
+    },
+    "age": "{{age}} years",
+    "extend": {
+      "done": "Reservering verlengd met 72u."
+    },
+    "stats": {
+      "capacity": "Capaciteit",
+      "approved": "Goedgekeurd",
+      "reserved": "Gereserveerd (72u)",
+      "remaining": "Resterende plekken",
+      "pending": "In behandeling zijnde verzoeken",
+      "expiredHint": "{{count}} 72 h reservation(s) expired — use “Extend” to hold the spot."
+    },
+    "searchPlaceholder": "Zoeken (naam, e-mail…)",
+    "col": {
+      "participant": "Participant",
+      "guardian": "Voogd",
+      "requested": "Verzoek",
+      "regStatus": "Registratie",
+      "payment": "Betaling",
+      "dossier": "Bestand",
+      "actions": ""
+    },
+    "empty": "Er zijn geen registraties om weer te geven.",
+    "reservationExpired": "Reservering verlopen",
+    "reservationUntil": "Until {{date}}",
+    "docsSummary": "{{ok}}/{{total}} documents",
+    "noRequiredDocs": "Geen vereiste documenten",
+    "rejected": "afgewezen",
+    "extendCta": "Verleng 72 uur",
+    "draftHint": "Inschrijvingen verschijnen hier nadat het kamp is gepubliceerd."
+  },
+  "tabs": {
+    "edit": "Bewerken",
+    "registrations": "Registraties"
   }
 }

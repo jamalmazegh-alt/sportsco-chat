@@ -171,7 +171,12 @@
     "custom_name_label": "Nome",
     "custom_name_placeholder": "Es. Precisione lancio lungo",
     "create": "Crea",
-    "creating": "Creazione…"
+    "creating": "Creazione…",
+    "all_added": "Tutte le attività disponibili sono già aggiunte a questo team.",
+    "popular": "Popolare",
+    "already_in_session": "Già in seduta",
+    "selected": "Selezionato",
+    "cancel": "Cancellare"
   },
   "entry": {
     "title": "Inserimento",

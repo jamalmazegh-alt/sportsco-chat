@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { useTranslation } from "react-i18next";
 import { useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
@@ -15,6 +16,7 @@ import { ArrowLeft, Loader2, Mail, RefreshCw, RotateCw } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
+import i18nInstance from "@/lib/i18n";
 
 export const Route = createFileRoute("/superadmin/email-dispatches_/$dispatchId")({
   component: DispatchDetailPage,
@@ -42,26 +44,17 @@ function statusTone(status: string): Tone {
 }
 
 function statusLabel(status: string): string {
-  switch (status) {
-    case "sent":
-      return "Envoyé";
-    case "delivered":
-      return "Délivré";
-    case "pending":
-      return "En attente";
-    case "suppressed":
-      return "Supprimé";
-    case "failed":
-      return "Échec";
-    case "dlq":
-      return "DLQ";
-    case "bounced":
-      return "Rejeté";
-    case "complained":
-      return "Plainte";
-    default:
-      return status;
-  }
+  const map: Record<string, string> = {
+    sent: "superadmin.emailDispatches.statusSent",
+    delivered: "superadmin.emailDispatches.statusDelivered",
+    pending: "superadmin.emailDispatches.statusPending",
+    suppressed: "superadmin.emailDispatches.statusSuppressed",
+    failed: "superadmin.emailDispatches.statusFailed",
+    dlq: "superadmin.emailDispatches.statusDlq",
+    bounced: "superadmin.emailDispatches.statusBounced",
+    complained: "superadmin.emailDispatches.statusComplained",
+  };
+  return map[status] ? i18nInstance.t(map[status]) : status;
 }
 
 function fmtDate(iso: string) {
@@ -69,6 +62,7 @@ function fmtDate(iso: string) {
 }
 
 function DispatchDetailPage() {
+  const { t } = useTranslation();
   const { dispatchId } = Route.useParams();
   const { data, isLoading, refetch, isFetching } = useQuery({
     queryKey: ["superadmin", "email-dispatch", dispatchId],
@@ -103,17 +97,27 @@ function DispatchDetailPage() {
 
   function summarize(r: SuperadminRetryReport, label: string) {
     if (!r.ok) {
-      toast.error(`${label} : ${r.reason ?? "erreur"}`);
+      toast.error(
+        t("superadmin.emailDispatches.actionError", {
+          label,
+          reason: r.reason ?? t("superadmin.emailDispatches.errorFallback"),
+        }),
+      );
       return;
     }
     const parts = [
-      `${r.replayed} renfilé(s)`,
-      r.skippedAlreadyDelivered > 0 && `${r.skippedAlreadyDelivered} déjà délivré(s)`,
-      r.skippedInFlight > 0 && `${r.skippedInFlight} en cours`,
-      r.skippedNotRetryable > 0 && `${r.skippedNotRetryable} non-relançable(s)`,
-      r.errors > 0 && `${r.errors} erreur(s)`,
+      t("superadmin.emailDispatches.replayed", { count: r.replayed }),
+      r.skippedAlreadyDelivered > 0 &&
+        t("superadmin.emailDispatches.skippedDelivered", { count: r.skippedAlreadyDelivered }),
+      r.skippedInFlight > 0 &&
+        t("superadmin.emailDispatches.skippedInFlight", { count: r.skippedInFlight }),
+      r.skippedNotRetryable > 0 &&
+        t("superadmin.emailDispatches.skippedNotRetryable", { count: r.skippedNotRetryable }),
+      r.errors > 0 && t("superadmin.emailDispatches.errorsCount", { count: r.errors }),
     ].filter(Boolean);
-    toast.success(`${label} — ${parts.join(" · ")}`);
+    toast.success(
+      t("superadmin.emailDispatches.actionSuccess", { label, parts: parts.join(" · ") }),
+    );
   }
 
   async function retryAll() {
@@ -121,7 +125,7 @@ function DispatchDetailPage() {
     setBusyKey("batch");
     try {
       const r = await retryFn({ data: { dispatchId } });
-      summarize(r, "Batch");
+      summarize(r, t("superadmin.emailDispatches.batch"));
       refetch();
     } catch (e) {
       toast.error(e instanceof Error ? e.message : String(e));
@@ -134,7 +138,7 @@ function DispatchDetailPage() {
     setBusyKey(rowId);
     try {
       const r = await retryFn({ data: { dispatchId, logRowIds: [rowId] } });
-      summarize(r, "Envoi");
+      summarize(r, t("superadmin.emailDispatches.send"));
       refetch();
     } catch (e) {
       toast.error(e instanceof Error ? e.message : String(e));
@@ -150,12 +154,12 @@ function DispatchDetailPage() {
         className="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground mb-4"
       >
         <ArrowLeft className="h-3.5 w-3.5" />
-        Retour aux envois
+        {t("superadmin.emailDispatches.backToList")}
       </Link>
 
       <header className="mb-5">
         <div className="flex items-center gap-2 text-xs uppercase tracking-wide text-muted-foreground">
-          <Mail className="h-3.5 w-3.5" /> Envoi groupé
+          <Mail className="h-3.5 w-3.5" /> {t("superadmin.emailDispatches.detailEyebrow")}
         </div>
         <div className="flex items-start justify-between gap-3 mt-1">
           <div className="min-w-0">
@@ -206,11 +210,23 @@ function DispatchDetailPage() {
       {data && (
         <>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-2 mb-4">
-            <StatCard label="Destinataires" value={data.counts.total} tone="muted" />
-            <StatCard label="Envoyés" value={data.counts.sent} tone="success" />
-            <StatCard label="En attente" value={data.counts.pending} tone="info" />
             <StatCard
-              label="Échecs"
+              label={t("superadmin.emailDispatches.recipients")}
+              value={data.counts.total}
+              tone="muted"
+            />
+            <StatCard
+              label={t("superadmin.emailDispatches.sent")}
+              value={data.counts.sent}
+              tone="success"
+            />
+            <StatCard
+              label={t("superadmin.emailDispatches.pending")}
+              value={data.counts.pending}
+              tone="info"
+            />
+            <StatCard
+              label={t("superadmin.emailDispatches.failures")}
               value={
                 data.counts.failed + data.counts.dlq + data.counts.bounced + data.counts.complained
               }
@@ -220,7 +236,9 @@ function DispatchDetailPage() {
 
           <div className="flex flex-wrap items-center gap-2 mb-3">
             {data.is_settled ? (
-              <StatusBadge tone="success">Campagne finalisée</StatusBadge>
+              <StatusBadge tone="success">
+                {t("superadmin.emailDispatches.campaignFinalized")}
+              </StatusBadge>
             ) : (
               <StatusBadge tone="info">
                 <Loader2 className="h-3 w-3 animate-spin" />
@@ -273,13 +291,27 @@ function DispatchDetailPage() {
               <table className="w-full text-sm">
                 <thead className="bg-muted/40 text-xs text-muted-foreground">
                   <tr>
-                    <th className="text-left px-3 py-2 font-medium">Destinataire</th>
-                    <th className="text-left px-3 py-2 font-medium">Statut</th>
-                    <th className="text-left px-3 py-2 font-medium">Type</th>
-                    <th className="text-left px-3 py-2 font-medium">Tentatives</th>
-                    <th className="text-left px-3 py-2 font-medium">Dernier événement</th>
-                    <th className="text-left px-3 py-2 font-medium">Erreur</th>
-                    <th className="text-right px-3 py-2 font-medium">Action</th>
+                    <th className="text-left px-3 py-2 font-medium">
+                      {t("superadmin.emailDispatches.recipient")}
+                    </th>
+                    <th className="text-left px-3 py-2 font-medium">
+                      {t("superadmin.emailDispatches.status")}
+                    </th>
+                    <th className="text-left px-3 py-2 font-medium">
+                      {t("superadmin.emailDispatches.type")}
+                    </th>
+                    <th className="text-left px-3 py-2 font-medium">
+                      {t("superadmin.emailDispatches.attempts")}
+                    </th>
+                    <th className="text-left px-3 py-2 font-medium">
+                      {t("superadmin.emailDispatches.lastEvent")}
+                    </th>
+                    <th className="text-left px-3 py-2 font-medium">
+                      {t("superadmin.emailDispatches.error")}
+                    </th>
+                    <th className="text-right px-3 py-2 font-medium">
+                      {t("superadmin.emailDispatches.action")}
+                    </th>
                   </tr>
                 </thead>
                 <tbody>

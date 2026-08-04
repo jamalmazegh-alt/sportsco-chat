@@ -52,14 +52,7 @@ export const Route = createFileRoute("/_authenticated/admin/payments/dashboard")
   }),
 });
 
-const METHOD_LABELS: Record<string, string> = {
-  stripe: "Stripe",
-  helloasso: "HelloAsso",
-  cash: "Espèces",
-  cheque: "Chèque",
-  bank_transfer: "Virement",
-  manual: "Manuel",
-};
+const METHOD_KEYS = ["stripe", "helloasso", "cash", "cheque", "bank_transfer", "manual"] as const;
 
 const STATUS_VARIANTS: Record<string, "default" | "secondary" | "destructive" | "outline"> = {
   succeeded: "default",
@@ -68,8 +61,8 @@ const STATUS_VARIANTS: Record<string, "default" | "secondary" | "destructive" | 
   refunded: "outline",
 };
 
-function fmtCents(c: number, currency = "eur"): string {
-  return new Intl.NumberFormat("fr-FR", {
+function fmtCents(c: number, currency = "eur", locale = "fr-FR"): string {
+  return new Intl.NumberFormat(locale, {
     style: "currency",
     currency: currency.toUpperCase(),
   }).format((c ?? 0) / 100);
@@ -81,12 +74,15 @@ function downloadCsv(csv: string, filename: string) {
 }
 
 function PaymentsDashboardPage() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { activeClubId } = useAuth();
   const roles = useMyRoles();
   const [seasonId, setSeasonId] = useState<string | "all">("all");
   const [from, setFrom] = useState<string>("");
   const [to, setTo] = useState<string>("");
+
+  const methodLabel = (m: string) =>
+    METHOD_KEYS.includes(m as (typeof METHOD_KEYS)[number]) ? t(`payments.method.${m}`) : m;
 
   const fetchSeasons = useServerFn(listSeasons);
   const fetchDashboard = useServerFn(getPaymentDashboard);
@@ -131,7 +127,7 @@ function PaymentsDashboardPage() {
     try {
       const res = await exportTx({ data: filters });
       downloadCsv(res.csv, res.filename);
-      toast.success("Export CSV téléchargé");
+      toast.success(t("fundraising.exportDownloaded"));
     } catch (e) {
       toast.error((e as Error).message);
     }
@@ -140,7 +136,7 @@ function PaymentsDashboardPage() {
     try {
       const res = await exportItems({ data: filters });
       downloadCsv(res.csv, res.filename);
-      toast.success("Export CSV téléchargé");
+      toast.success(t("fundraising.exportDownloaded"));
     } catch (e) {
       toast.error((e as Error).message);
     }
@@ -154,9 +150,7 @@ function PaymentsDashboardPage() {
           <TrendingUp className="h-6 w-6 text-primary" />
           {t("fundraising.dashboardTitle")}
         </h1>
-        <p className="text-sm text-muted-foreground mt-1">
-          Encaissements, soldes restants et exports comptables
-        </p>
+        <p className="text-sm text-muted-foreground mt-1">{t("fundraising.dashboardSubtitle")}</p>
       </div>
 
       {/* Filters */}
@@ -298,7 +292,7 @@ function PaymentsDashboardPage() {
                   <Card key={m}>
                     <CardContent className="p-4 flex items-center justify-between">
                       <div>
-                        <p className="font-medium">{METHOD_LABELS[m] ?? m}</p>
+                        <p className="font-medium">{methodLabel(m)}</p>
                         <p className="text-xs text-muted-foreground">{v.count} transactions</p>
                       </div>
                       <div className="text-right">
@@ -350,35 +344,35 @@ function PaymentsDashboardPage() {
                 <p className="text-sm text-muted-foreground">Aucune transaction.</p>
               ) : (
                 <div className="space-y-2">
-                  {txQ.data!.transactions.map((t) => (
-                    <Card key={t.id}>
+                  {txQ.data!.transactions.map((tx) => (
+                    <Card key={tx.id}>
                       <CardContent className="p-3 flex items-center justify-between gap-3">
                         <div className="min-w-0">
                           <div className="flex items-center gap-2 flex-wrap">
-                            <p className="font-medium text-sm truncate">{t.item_title}</p>
+                            <p className="font-medium text-sm truncate">{tx.item_title}</p>
                             <Badge
-                              variant={STATUS_VARIANTS[t.status] ?? "secondary"}
+                              variant={STATUS_VARIANTS[tx.status] ?? "secondary"}
                               className="text-[10px]"
                             >
-                              {t.status}
+                              {tx.status}
                             </Badge>
                             <Badge variant="outline" className="text-[10px]">
-                              {METHOD_LABELS[t.method] ?? t.method}
+                              {methodLabel(tx.method)}
                             </Badge>
                           </div>
                           <p className="text-xs text-muted-foreground truncate">
-                            {t.player_name ? `${t.player_name} • ` : ""}
-                            {t.payer_name ?? "—"} •{" "}
-                            {new Date(t.created_at).toLocaleDateString("fr-FR")}
+                            {tx.player_name ? `${tx.player_name} • ` : ""}
+                            {tx.payer_name ?? "—"} •{" "}
+                            {new Date(tx.created_at).toLocaleDateString(i18n.language)}
                           </p>
                         </div>
                         <div className="text-right shrink-0">
                           <p className="text-sm font-semibold">
-                            {fmtCents(t.amount_gross_cents, t.currency)}
+                            {fmtCents(tx.amount_gross_cents, tx.currency, i18n.language)}
                           </p>
-                          {t.provider_fee_cents > 0 && (
+                          {tx.provider_fee_cents > 0 && (
                             <p className="text-[10px] text-muted-foreground">
-                              -{fmtCents(t.provider_fee_cents, t.currency)} frais
+                              -{fmtCents(tx.provider_fee_cents, tx.currency, i18n.language)} frais
                             </p>
                           )}
                         </div>

@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import {
   listPrivacyRequests,
   approveDeletion,
@@ -30,6 +31,7 @@ function StatusPill({ status }: { status: string }) {
 }
 
 export function PrivacyRequestsSection() {
+  const { t } = useTranslation();
   const [data, setData] = useState<Data | null>(null);
   const [busy, setBusy] = useState<string | null>(null);
 
@@ -60,7 +62,7 @@ export function PrivacyRequestsSection() {
     setBusy(id);
     try {
       await retryExport({ data: { id } });
-      toast.success("Export relancé");
+      toast.success(t("superadmin.components.exportRestarted"));
       reload();
     } catch (e: any) {
       toast.error(e.message);
@@ -79,7 +81,7 @@ export function PrivacyRequestsSection() {
     setBusy(id);
     try {
       await approveDeletion({ data: { id, hardDelete } });
-      toast.success("Demande traitée");
+      toast.success(t("superadmin.components.requestProcessed"));
       reload();
     } catch (e: any) {
       toast.error(e.message);
@@ -93,7 +95,7 @@ export function PrivacyRequestsSection() {
     setBusy(id);
     try {
       await rejectDeletion({ data: { id } });
-      toast.success("Rejetée");
+      toast.success(t("superadmin.components.rejected"));
       reload();
     } catch (e: any) {
       toast.error(e.message);

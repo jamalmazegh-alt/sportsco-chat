@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { useTranslation } from "react-i18next";
 import { useMemo, useState } from "react";
 import { useQuery, queryOptions } from "@tanstack/react-query";
 import {
@@ -30,6 +31,7 @@ const inviteStatusesQuery = (clubId: string) =>
   });
 
 function ClubInvitesPage() {
+  const { t } = useTranslation();
   const { clubId } = Route.useParams();
   const { data, isLoading, error } = useSuspenseQueryOrPending(clubId);
 
@@ -78,12 +80,10 @@ function ClubInvitesPage() {
         params={{ clubId }}
         className="inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground mb-3"
       >
-        <ArrowLeft className="h-3.5 w-3.5" /> Back to club
+        <ArrowLeft className="h-3.5 w-3.5" /> {t("superadmin.invites.backToClub")}
       </Link>
-      <h1 className="text-2xl font-semibold mb-1">Invitations</h1>
-      <p className="text-xs text-muted-foreground mb-6">
-        Statut d'envoi email pour chaque invitation créée dans ce club.
-      </p>
+      <h1 className="text-2xl font-semibold mb-1">{t("superadmin.invites.title")}</h1>
+      <p className="text-xs text-muted-foreground mb-6">{t("superadmin.invites.subtitle")}</p>
 
       {error && (
         <div className="rounded-md border border-destructive/30 bg-destructive/5 p-3 text-sm text-destructive mb-4">
@@ -92,68 +92,68 @@ function ClubInvitesPage() {
       )}
 
       <section className="grid grid-cols-2 md:grid-cols-5 gap-3 mb-6">
-        <KPI label="Invitations" value={stats.total} />
-        <KPI label="Acceptées" value={stats.accepted} tone="success" />
-        <KPI label="Email envoyé" value={stats.emailSent} tone="info" />
-        <KPI label="Email échoué" value={stats.emailFailed} tone="danger" />
-        <KPI label="Sans trace email" value={stats.emailMissing} tone="warn" />
+        <KPI label={t("superadmin.invites.title")} value={stats.total} />
+        <KPI label={t("superadmin.invites.accepted")} value={stats.accepted} tone="success" />
+        <KPI label={t("superadmin.invites.emailSent")} value={stats.emailSent} tone="info" />
+        <KPI label={t("superadmin.invites.emailFailed")} value={stats.emailFailed} tone="danger" />
+        <KPI label={t("superadmin.invites.noEmailTrace")} value={stats.emailMissing} tone="warn" />
       </section>
 
       <section className="flex flex-col md:flex-row gap-2 mb-4">
         <Input
-          placeholder="Rechercher (email, nom, joueur)…"
+          placeholder={t("superadmin.invites.searchPlaceholder")}
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           className="max-w-sm"
         />
         <Select value={emailStatusFilter} onValueChange={(v) => setEmailStatusFilter(v as any)}>
           <SelectTrigger className="max-w-[200px]">
-            <SelectValue placeholder="Statut email" />
+            <SelectValue placeholder={t("superadmin.invites.emailStatus")} />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">Tous statuts email</SelectItem>
-            <SelectItem value="sent">Envoyé</SelectItem>
-            <SelectItem value="pending">En attente</SelectItem>
-            <SelectItem value="failed">Échoué</SelectItem>
-            <SelectItem value="dlq">DLQ</SelectItem>
-            <SelectItem value="suppressed">Bloqué</SelectItem>
-            <SelectItem value="bounced">Rebond</SelectItem>
-            <SelectItem value="complained">Plainte</SelectItem>
-            <SelectItem value="none">Sans trace</SelectItem>
+            <SelectItem value="all">{t("superadmin.invites.allEmailStatuses")}</SelectItem>
+            <SelectItem value="sent">{t("superadmin.invites.sent")}</SelectItem>
+            <SelectItem value="pending">{t("superadmin.invites.pending")}</SelectItem>
+            <SelectItem value="failed">{t("superadmin.invites.failed")}</SelectItem>
+            <SelectItem value="dlq">{t("superadmin.invites.dlq")}</SelectItem>
+            <SelectItem value="suppressed">{t("superadmin.invites.blocked")}</SelectItem>
+            <SelectItem value="bounced">{t("superadmin.invites.bounce")}</SelectItem>
+            <SelectItem value="complained">{t("superadmin.invites.complaint")}</SelectItem>
+            <SelectItem value="none">{t("superadmin.invites.noTrace")}</SelectItem>
           </SelectContent>
         </Select>
         <Select value={inviteStatusFilter} onValueChange={(v) => setInviteStatusFilter(v as any)}>
           <SelectTrigger className="max-w-[200px]">
-            <SelectValue placeholder="Statut invitation" />
+            <SelectValue placeholder={t("superadmin.invites.inviteStatus")} />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">Toutes invitations</SelectItem>
-            <SelectItem value="pending">En attente</SelectItem>
-            <SelectItem value="active">Compte actif</SelectItem>
-            <SelectItem value="accepted">Acceptée</SelectItem>
-            <SelectItem value="expired">Expirée</SelectItem>
+            <SelectItem value="all">{t("superadmin.invites.allInvites")}</SelectItem>
+            <SelectItem value="pending">{t("superadmin.invites.pending")}</SelectItem>
+            <SelectItem value="active">{t("superadmin.invites.activeAccount")}</SelectItem>
+            <SelectItem value="accepted">{t("superadmin.invites.acceptedStatus")}</SelectItem>
+            <SelectItem value="expired">{t("superadmin.invites.expired")}</SelectItem>
           </SelectContent>
         </Select>
       </section>
 
       {isLoading ? (
         <div className="flex items-center gap-2 text-sm text-muted-foreground">
-          <Loader2 className="h-4 w-4 animate-spin" /> Chargement…
+          <Loader2 className="h-4 w-4 animate-spin" /> {t("superadmin.invites.loading")}
         </div>
       ) : filtered.length === 0 ? (
         <div className="text-sm text-muted-foreground p-6 border border-border rounded-md bg-muted/20">
-          Aucune invitation ne correspond aux filtres.
+          {t("superadmin.invites.empty")}
         </div>
       ) : (
         <div className="border border-border rounded-md overflow-hidden">
           <table className="w-full text-sm">
             <thead className="bg-muted/40 text-[11px] uppercase tracking-wider text-muted-foreground">
               <tr>
-                <th className="text-left px-3 py-2">Destinataire</th>
-                <th className="text-left px-3 py-2">Rôle</th>
-                <th className="text-left px-3 py-2">Invitation</th>
-                <th className="text-left px-3 py-2">Email</th>
-                <th className="text-left px-3 py-2">Créée</th>
+                <th className="text-left px-3 py-2">{t("superadmin.invites.recipient")}</th>
+                <th className="text-left px-3 py-2">{t("superadmin.invites.role")}</th>
+                <th className="text-left px-3 py-2">{t("superadmin.invites.invitation")}</th>
+                <th className="text-left px-3 py-2">{t("superadmin.invites.email")}</th>
+                <th className="text-left px-3 py-2">{t("superadmin.invites.created")}</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-border">
@@ -206,15 +206,16 @@ function KPI({
 }
 
 function InviteRow({ row }: { row: ClubInviteStatusRow }) {
+  const { t } = useTranslation();
   const name = [row.firstName, row.lastName].filter(Boolean).join(" ").trim() || row.email || "—";
   const inviteBadge = row.usedAt ? (
-    <StatusBadge tone="success">Acceptée</StatusBadge>
+    <StatusBadge tone="success">{t("superadmin.invites.acceptedStatus")}</StatusBadge>
   ) : row.hasActiveAccount ? (
-    <StatusBadge tone="success">Compte actif</StatusBadge>
+    <StatusBadge tone="success">{t("superadmin.invites.activeAccount")}</StatusBadge>
   ) : row.isExpired ? (
-    <StatusBadge tone="danger">Expirée</StatusBadge>
+    <StatusBadge tone="danger">{t("superadmin.invites.expired")}</StatusBadge>
   ) : (
-    <StatusBadge tone="warn">En attente</StatusBadge>
+    <StatusBadge tone="warn">{t("superadmin.invites.pending")}</StatusBadge>
   );
 
   return (

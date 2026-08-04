@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { useTranslation } from "react-i18next";
 import { useState, useMemo, useCallback, useEffect } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import * as XLSX from "xlsx";
@@ -220,6 +221,7 @@ const FIELD_LABEL_FR: Record<string, string> = {
 };
 
 function ImportPage() {
+  const { t } = useTranslation();
   const listClubs = useServerFn(listClubsForImport);
   const getStats = useServerFn(getClubImportStats);
   const aiAnalyze = useServerFn(analyzeFileWithAI);
@@ -297,7 +299,9 @@ function ImportPage() {
       const isTemplate = detected.ratio >= 0.8;
       if (detected.type !== type && isTemplate) {
         setType(detected.type);
-        toast.info(`Type détecté automatiquement : ${TYPE_LABELS[detected.type]}`);
+        toast.info(
+          t("superadmin.onboardingImport.typeDetected", { type: TYPE_LABELS[detected.type] }),
+        );
       }
       setTemplateDetected(isTemplate);
       setStep(3);
@@ -475,7 +479,7 @@ function ImportPage() {
         <ArrowLeft className="h-4 w-4" /> Super Admin
       </Link>
       <div>
-        <h1 className="text-2xl font-semibold">Import de données — Onboarding club</h1>
+        <h1 className="text-2xl font-semibold">{t("superadmin.onboardingImport.title")}</h1>
         <p className="text-sm text-muted-foreground">Outil interne Clubero. Étape {step} sur 5.</p>
       </div>
 
@@ -489,9 +493,9 @@ function ImportPage() {
       {/* STEP 1 — Club */}
       {step === 1 && (
         <div className="space-y-4">
-          <h2 className="font-medium">Sélectionner le club</h2>
+          <h2 className="font-medium">{t("superadmin.onboardingImport.selectClub")}</h2>
           <Input
-            placeholder="Rechercher un club..."
+            placeholder={t("superadmin.onboardingImport.searchClub")}
             value={search}
             onChange={(e) => doSearch(e.target.value)}
           />
@@ -532,7 +536,7 @@ function ImportPage() {
       {/* STEP 2 — Type + upload */}
       {step === 2 && club && (
         <div className="space-y-4">
-          <h2 className="font-medium">Choisir le type d'import</h2>
+          <h2 className="font-medium">{t("superadmin.onboardingImport.chooseType")}</h2>
           <p className="text-xs text-muted-foreground">
             Ordre conseillé : Joueurs → Coachs → Planning (les événements dépendent des équipes).
           </p>
@@ -582,18 +586,18 @@ function ImportPage() {
                 const f = e.dataTransfer.files?.[0];
                 if (!f) return;
                 if (!/\.(xlsx|xls|csv)$/i.test(f.name)) {
-                  toast.error("Format non supporté (xlsx/xls/csv uniquement)");
+                  toast.error(t("superadmin.onboardingImport.unsupportedFormat"));
                   return;
                 }
                 if (f.size > 5 * 1024 * 1024) {
-                  toast.error("Fichier trop volumineux (max 5 Mo)");
+                  toast.error(t("superadmin.onboardingImport.fileTooLarge"));
                   return;
                 }
                 onFile(f);
               }}
             >
               <Upload className="h-6 w-6 mx-auto mb-2 text-muted-foreground" />
-              <div className="text-sm">Glissez le fichier ou cliquez (xlsx/xls/csv, max 5 Mo)</div>
+              <div className="text-sm">{t("superadmin.onboardingImport.dropFile")}</div>
               <input
                 type="file"
                 accept=".xlsx,.xls,.csv,text/csv,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,text/comma-separated-values,text/plain,*/*"
@@ -602,7 +606,7 @@ function ImportPage() {
                   const f = e.target.files?.[0];
                   if (f) {
                     if (f.size > 5 * 1024 * 1024) {
-                      toast.error("Fichier trop volumineux (max 5 Mo)");
+                      toast.error(t("superadmin.onboardingImport.fileTooLarge"));
                       return;
                     }
                     onFile(f);
@@ -621,7 +625,7 @@ function ImportPage() {
           <div className="rounded-lg border border-amber-500/40 bg-amber-500/10 p-4 flex gap-3">
             <Sparkles className="h-5 w-5 text-amber-600 flex-shrink-0" />
             <div className="text-sm">
-              <p className="font-medium">Ce fichier ne correspond pas au modèle standard.</p>
+              <p className="font-medium">{t("superadmin.onboardingImport.notStandardModel")}</p>
               <p className="text-muted-foreground">
                 L'IA peut analyser et mapper les colonnes vers les champs Clubero.
               </p>
@@ -650,7 +654,11 @@ function ImportPage() {
               >
                 {analysis.summary.to_fix} à compléter
               </span>
-              {iaUsed && <span className="ml-2 text-xs text-primary">✨ analysé par l'IA</span>}
+              {iaUsed && (
+                <span className="ml-2 text-xs text-primary">
+                  {t("superadmin.onboardingImport.aiAnalyzed")}
+                </span>
+              )}
             </div>
           </div>
           {analysis.corrections.length > 0 && (
@@ -736,19 +744,25 @@ function ImportPage() {
                   <div className="text-xl font-semibold text-blue-600">
                     {preview.summary.update}
                   </div>
-                  <div className="text-muted-foreground">à mettre à jour</div>
+                  <div className="text-muted-foreground">
+                    {t("superadmin.onboardingImport.toUpdate")}
+                  </div>
                 </div>
                 <div className="rounded-lg border p-2">
                   <div className="text-xl font-semibold text-amber-600">
                     {preview.summary.restore}
                   </div>
-                  <div className="text-muted-foreground">à réactiver</div>
+                  <div className="text-muted-foreground">
+                    {t("superadmin.onboardingImport.toReactivate")}
+                  </div>
                 </div>
               </div>
 
               {preview.teamResolutions.length > 0 && (
                 <div className="space-y-2">
-                  <div className="text-sm font-medium">Résolution des équipes</div>
+                  <div className="text-sm font-medium">
+                    {t("superadmin.onboardingImport.teamResolution")}
+                  </div>
                   <div className="rounded-md border divide-y">
                     {preview.teamResolutions.map((tr) => (
                       <div key={tr.key} className="flex items-center gap-2 p-2 text-xs flex-wrap">
@@ -765,8 +779,10 @@ function ImportPage() {
                             setTeamChoices((prev) => ({ ...prev, [tr.key]: e.target.value }))
                           }
                         >
-                          <option value="">— choisir —</option>
-                          <option value="__create__">➕ Créer cette équipe</option>
+                          <option value="">{t("superadmin.onboardingImport.choose")}</option>
+                          <option value="__create__">
+                            {t("superadmin.onboardingImport.createTeam")}
+                          </option>
                           {tr.existingTeams.map((et) => (
                             <option key={et.id} value={et.id}>
                               {et.name} ({et.sport ?? "?"} · {et.age_group ?? "?"})
@@ -782,7 +798,9 @@ function ImportPage() {
 
               {preview.rowPreviews.some((r) => r.diffs.length > 0) && (
                 <div className="space-y-2">
-                  <div className="text-sm font-medium">Différences détectées</div>
+                  <div className="text-sm font-medium">
+                    {t("superadmin.onboardingImport.differences")}
+                  </div>
                   <div className="rounded-md border border-blue-200 bg-blue-50 p-2 text-xs text-blue-900">
                     Cochez uniquement les champs à écraser. Par défaut, aucun écrasement — seuls les
                     champs vides sont complétés.
@@ -938,7 +956,7 @@ function ImportPage() {
               Changer de club
             </Button>
             <Link to="/superadmin">
-              <Button variant="ghost">Retour au dashboard</Button>
+              <Button variant="ghost">{t("superadmin.onboardingImport.backToDashboard")}</Button>
             </Link>
           </div>
         </div>

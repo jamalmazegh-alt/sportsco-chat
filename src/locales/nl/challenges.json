@@ -171,7 +171,12 @@
     "custom_name_label": "Naam",
     "custom_name_placeholder": "Bijv. Precisie lange pass",
     "create": "Maken",
-    "creating": "Bezig met maken…"
+    "creating": "Bezig met maken…",
+    "all_added": "Alle beschikbare activiteiten zijn al aan dit team toegevoegd.",
+    "popular": "Populair",
+    "already_in_session": "Al in de sessie",
+    "selected": "Gekozen",
+    "cancel": "Annuleren"
   },
   "entry": {
     "title": "Invoer",

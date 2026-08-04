@@ -5,7 +5,10 @@
     "cancel": "Abbrechen",
     "delete": "Löschen",
     "save": "Speichern",
-    "copied": "Copied"
+    "copied": "Copied",
+    "refresh": "Aktualisieren",
+    "copyFailed": "Kopieren nicht möglich",
+    "copy": "Kopie"
   },
   "chooser": {
     "title": "Neues Camp",
@@ -139,7 +142,14 @@
     "facilityPlaceholder": "Optional",
     "facilityNone": "— Keine —",
     "save": "Speichern",
-    "saved": "Änderungen gespeichert"
+    "saved": "Änderungen gespeichert",
+    "venueModeHome": "Club-Veranstaltungsorte",
+    "venueModeHomeHint": "Spielfeld, Turnhalle, Halle…",
+    "venueModeExternal": "Externe Adresse",
+    "venueModeExternalHint": "Ein anderer Ort, außerhalb des Clubs",
+    "externalAddress": "Adresse",
+    "externalAddressPlaceholder": "Z.B. 12 Stadium Street, 75001 Paris",
+    "externalAddressHint": "Freiformadresse – wird den Registranten angezeigt und kann in Google Maps angeklickt werden."
   },
   "ageGroups": {
     "empty": "Noch keine Altersgruppen.",
@@ -150,7 +160,9 @@
     "quickAdd": "Schnell hinzufügen",
     "pickPreset": "U6 – U19 wählen",
     "allAdded": "Alle hinzugefügt",
-    "addCustom": "+ Eigene Kategorie"
+    "addCustom": "+ Eigene Kategorie",
+    "selectAll": "Wähle die relevanten Kategorien aus",
+    "customs": "Benutzerdefinierte Kategorien"
   },
   "cover": {
     "empty": "Kein Titelbild",
@@ -168,7 +180,9 @@
     "archive": "Archivieren",
     "archived": "Camp archiviert",
     "publicUrl": "Öffentlicher Link",
-    "publicUrlSoon": "öffentliche Seite bald verfügbar"
+    "publicUrlSoon": "öffentliche Seite bald verfügbar",
+    "openPublic": "Öffentliche Seite anzeigen",
+    "publicUrlCopied": "Link kopiert"
   },
   "duplicate": {
     "action": "Duplizieren",
@@ -283,7 +297,41 @@
     },
     "full": "Ausgebucht — Anmeldung auf Warteliste möglich",
     "lastSpots": "Letzte Plätze (noch {{count}})",
-    "registerWaitlistCta": "Auf die Warteliste"
+    "registerWaitlistCta": "Auf die Warteliste",
+    "tracking": {
+      "invalidTitle": "Ungültiger oder abgelaufener Link",
+      "invalidBody": "Dieser Tracking-Link ist ungültig. Prüfen Sie den per E-Mail erhaltenen Link.",
+      "title": "Anmeldungsverfolgung",
+      "participant": "Teilnehmer",
+      "bornOn": "Geboren am {{date}}",
+      "campDates": "Camp-Daten: {{dates}}",
+      "reason": "Grund: {{reason}}",
+      "noDocs": "Keine Dokumente erforderlich.",
+      "personalLink": "Persönlicher Link — nicht teilen. Er gibt Zugang zu Ihrer Akte und Ihren Dokumenten.",
+      "status": {
+        "pending": "Ausstehende Validierung",
+        "under_review": "In Prüfung",
+        "approved": "Genehmigt",
+        "rejected": "Abgelehnt",
+        "cancelled": "Storniert",
+        "waitlisted": "Warteliste"
+      },
+      "docMissing": "Dokument erforderlich",
+      "docPending": "In Prüfung",
+      "docApproved": "Genehmigt",
+      "docRejected": "Abgelehnt",
+      "download": "Herunterladen",
+      "upload": "Senden",
+      "replace": "Ersetzen",
+      "errors": {
+        "downloadUnavailable": "Download nicht verfügbar.",
+        "fileTooLarge": "Datei zu groß (max. 15 MB).",
+        "invalidMime": "Nicht unterstütztes Format (PDF, JPG, PNG).",
+        "rateLimited": "Zu viele Versuche.",
+        "uploadFailed": "Upload fehlgeschlagen."
+      },
+      "uploadSuccess": "Dokument gesendet. Status: ausstehend."
+    }
   },
   "registrations": {
     "status": {
@@ -367,7 +415,19 @@
       "capacityFullTitle": "Camp full",
       "capacityFullHelp": "The camp has reached capacity. Do you want to place this family on the waitlist?",
       "placeOnWaitlist": "Place on waitlist",
-      "emailsHint": "Automatic emails to families will be added in the next step (Phase 3, step 3)."
+      "emailsHint": "Automatic emails to families will be added in the next step (Phase 3, step 3).",
+      "paymentUpdated": "Zahlung aktualisiert",
+      "paymentSection": "Zahlung",
+      "paymentNotRequired": "Für dieses Camps ist keine Zahlung erforderlich.",
+      "paymentPrice": "Camp price: {{price}} {{currency}}",
+      "paymentReceived": "Received: {{amount}} {{currency}}",
+      "paymentRemaining": "Balance due: {{amount}} {{currency}}",
+      "markPaid": "Als bezahlt markieren",
+      "markUnpaid": "Als unbezahlt markieren",
+      "markRefunded": "Als erstattet markieren",
+      "markPartialTitle": "Erfassen Sie eine Teilzahlung",
+      "markPartial": "Als teilweise markieren",
+      "partialRemainingPreview": "Balance due: {{amount}} {{currency}}"
     },
     "csv": {
       "cta": "Export CSV",
@@ -388,6 +448,40 @@
       "dossierStatus": "Documents status",
       "amountPaid": "Amount paid",
       "requestedAt": "Request date"
-    }
+    },
+    "age": "{{age}} years",
+    "extend": {
+      "done": "Reservierung um 72 Stunden verlängert."
+    },
+    "stats": {
+      "capacity": "Kapazität",
+      "approved": "Genehmigt",
+      "reserved": "Reserviert (72h)",
+      "remaining": "Es sind noch Flecken vorhanden",
+      "pending": "Ausstehende Anfragen",
+      "expiredHint": "{{count}} 72 h reservation(s) expired — use “Extend” to hold the spot."
+    },
+    "searchPlaceholder": "Suche (Name, E-Mail…)",
+    "col": {
+      "participant": "Participant",
+      "guardian": "Wächter",
+      "requested": "Anfrage",
+      "regStatus": "Anmeldung",
+      "payment": "Zahlung",
+      "dossier": "Datei",
+      "actions": ""
+    },
+    "empty": "Keine Anmeldungen zur Anzeige.",
+    "reservationExpired": "Reservierung abgelaufen",
+    "reservationUntil": "Until {{date}}",
+    "docsSummary": "{{ok}}/{{total}} documents",
+    "noRequiredDocs": "Keine erforderlichen Dokumente",
+    "rejected": "abgelehnt",
+    "extendCta": "72 Stunden verlängern",
+    "draftHint": "Anmeldungen erscheinen hier nach Veröffentlichung des Camps."
+  },
+  "tabs": {
+    "edit": "Bearbeiten",
+    "registrations": "Anmeldungen"
   }
 }
