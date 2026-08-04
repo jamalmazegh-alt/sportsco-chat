@@ -7,6 +7,7 @@ import { useRef, useState, type FormEvent } from "react";
 import { useAuth, useActiveRole, useMyRoles } from "@/lib/auth-context";
 import { supabase } from "@/integrations/supabase/client";
 import { sendTransactionalEmail } from "@/lib/email/send";
+import { resolveEmailLocale } from "@/lib/email/locale";
 import { Loader2, Users, Mail, ShieldCheck, Trophy, UserPlus, Search, X } from "lucide-react";
 import { listClubUsers } from "@/lib/admin.functions";
 import {
@@ -42,7 +43,7 @@ export const Route = createFileRoute("/_authenticated/admin/users/")({
 });
 
 function AdminUsersPage() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { activeClubId, user } = useAuth();
   const role = useActiveRole();
   const roles = useMyRoles();
@@ -159,7 +160,7 @@ function AdminUsersPage() {
 
       const { data: clubRow } = await supabase
         .from("clubs")
-        .select("name, logo_url")
+        .select("name, logo_url, default_language")
         .eq("id", activeClubId)
         .maybeSingle();
       const clubLabel = clubRow?.name ?? "Clubero";
@@ -180,6 +181,10 @@ function AdminUsersPage() {
             clubLogoUrl,
             inviteUrl,
             roleLabel,
+            locale: resolveEmailLocale(
+              (clubRow as { default_language?: string | null } | null)?.default_language,
+              i18n.language,
+            ),
           },
         });
       } catch (err: any) {

@@ -3,6 +3,7 @@ import { createClient } from "@supabase/supabase-js";
 import { z } from "zod";
 import { checkRateLimit, getClientIp } from "@/lib/rate-limit.server";
 import { enqueueTransactionalEmailServer } from "@/lib/email/send.server";
+import { resolveEmailLocale } from "@/lib/email/locale";
 
 const CAMP_UPLOAD_MAX_BYTES = 15 * 1024 * 1024;
 const ALLOWED_MIME = new Set(["application/pdf", "image/jpeg", "image/png"]);
@@ -157,7 +158,7 @@ export const Route = createFileRoute("/api/public/camp-track-upload")({
           const { data: reg } = await supabase
             .from("club_camp_registrations")
             .select(
-              "participant_first_name, participant_last_name, camp_id, club_camps:camp_id(title, created_by, club:clubs(name))",
+              "participant_first_name, participant_last_name, camp_id, club_camps:camp_id(title, created_by, club:clubs(name, default_language))",
             )
             .eq("id", registrationId)
             .maybeSingle();
@@ -167,6 +168,11 @@ export const Route = createFileRoute("/api/public/camp-track-upload")({
             const { data: organizer } = await supabase.auth.admin.getUserById(createdBy);
             const organizerEmail = organizer?.user?.email;
             if (organizerEmail) {
+              const { data: organizerProfile } = await supabase
+                .from("profiles")
+                .select("preferred_language")
+                .eq("id", createdBy)
+                .maybeSingle();
               const origin = new URL(request.url).origin;
               await enqueueTransactionalEmailServer({
                 templateName: "camp-document-resubmitted",
@@ -179,6 +185,11 @@ export const Route = createFileRoute("/api/public/camp-track-upload")({
                   documentTitle: title,
                   wasRejected,
                   manageUrl: `${origin}/admin/stages/${campId}`,
+                  locale: resolveEmailLocale(
+                    (organizerProfile as { preferred_language?: string | null } | null)
+                      ?.preferred_language,
+                    camp?.club?.default_language,
+                  ),
                 },
                 idempotencyKey:
                   `camp-doc-resub:${registrationId}:${parsed.data.required_document_id}:${Date.now()}`.slice(

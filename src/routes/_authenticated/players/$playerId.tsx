@@ -67,6 +67,7 @@ import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { sendTransactionalEmail } from "@/lib/email/send";
 import i18n from "@/lib/i18n";
+import { resolveEmailLocale } from "@/lib/email/locale";
 import { isV2 } from "@/config/features";
 
 // PR4-WS1: profils publics enrichis (cross-club) sont gated derrière
@@ -252,7 +253,7 @@ function PlayerProfile() {
       try {
         const { data: clubRow } = await supabase
           .from("clubs")
-          .select("name, logo_url")
+          .select("name, logo_url, default_language")
           .eq("id", clubId)
           .maybeSingle();
 
@@ -266,6 +267,10 @@ function PlayerProfile() {
             clubLogoUrl: clubRow?.logo_url ?? undefined,
             inviteUrl,
             roleLabel: "parent",
+            locale: resolveEmailLocale(
+              (clubRow as { default_language?: string | null } | null)?.default_language,
+              i18n.language,
+            ),
           },
         });
         toast.success(t("players.inviteSent"));
@@ -507,7 +512,7 @@ function PlayerProfile() {
     try {
       const { data: clubRow } = await supabase
         .from("clubs")
-        .select("name, logo_url")
+        .select("name, logo_url, default_language")
         .eq("id", clubId)
         .maybeSingle();
 
@@ -520,6 +525,10 @@ function PlayerProfile() {
           clubName: clubRow?.name ?? undefined,
           clubLogoUrl: clubRow?.logo_url ?? undefined,
           inviteUrl,
+          locale: resolveEmailLocale(
+            (clubRow as { default_language?: string | null } | null)?.default_language,
+            i18n.language,
+          ),
         },
       });
       toast.success(t("players.inviteSent", { defaultValue: "Invitation envoyée" }));

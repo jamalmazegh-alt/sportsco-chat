@@ -12,6 +12,7 @@ import { mergeRules, DEFAULT_RULES, defaultRulesForSport } from "./lib/rules";
 import { selectQualified } from "./lib/qualification";
 import { computeProgressionUpdates } from "./lib/progression";
 import { enqueueTransactionalEmailServer } from "@/lib/email/send.server";
+import { resolveEmailLocale } from "@/lib/email/locale";
 import { assertTournamentMutable } from "@/lib/tournament-guards.server";
 import { serverFnError } from "@/lib/server-fn-error";
 
@@ -434,13 +435,24 @@ export const updateTournament = createServerFn({ method: "POST" })
     if (data.patch.status === "completed" && previous?.status !== "completed") {
       try {
         const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-        // Find organiser's email + locale via auth.users
-        const { data: organiser } = await supabaseAdmin.auth.admin.getUserById(
-          (row as any).created_by ?? userId,
-        );
+        // Find organiser's email + locale via auth.users / profiles
+        const organiserId = (row as any).created_by ?? userId;
+        const [{ data: organiser }, { data: organiserProfile }] = await Promise.all([
+          supabaseAdmin.auth.admin.getUserById(organiserId),
+          supabaseAdmin
+            .from("profiles")
+            .select("first_name, preferred_language")
+            .eq("id", organiserId)
+            .maybeSingle(),
+        ]);
         const recipientEmail = organiser?.user?.email;
-        const locale = (organiser?.user?.user_metadata?.locale as string | undefined) ?? "fr";
+        const locale = resolveEmailLocale(
+          (organiserProfile as { preferred_language?: string | null } | null)?.preferred_language,
+          organiser?.user?.user_metadata?.locale as string | undefined,
+          organiser?.user?.user_metadata?.preferred_language as string | undefined,
+        );
         const firstName =
+          (organiserProfile as { first_name?: string | null } | null)?.first_name ??
           (organiser?.user?.user_metadata?.first_name as string | undefined) ??
           (organiser?.user?.user_metadata?.full_name as string | undefined)?.split(" ")[0];
 
@@ -2135,11 +2147,12 @@ export const decideRegistration = createServerFn({ method: "POST" })
     try {
       const { data: tFull } = await supabase
         .from("tournaments")
-        .select("name, slug")
+        .select("name, slug, club_id, clubs:club_id(default_language)")
         .eq("id", reg.tournament_id)
         .maybeSingle();
       const origin = process.env.APP_URL || "https://www.clubero.app";
       const rosterUrl = `${origin}/tournament/${tFull?.slug ?? ""}/roster/${(reg as any).roster_token}`;
+      const clubLang = ((tFull as any)?.clubs?.default_language as string | null) ?? null;
       await enqueueTransactionalEmailServer({
         templateName: "tournament-roster-link",
         recipientEmail: reg.contact_email,
@@ -2149,6 +2162,7 @@ export const decideRegistration = createServerFn({ method: "POST" })
           teamName: reg.team_name,
           rosterUrl,
           status: "approved",
+          locale: resolveEmailLocale(clubLang),
         },
         idempotencyKey: `roster-link-approved:${reg.id}`,
       });
@@ -2443,10 +2457,14 @@ export const inviteTournamentCollaborator = createServerFn({ method: "POST" })
       const { enqueueTransactionalEmailServer } = await import("@/lib/email/send.server");
       const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
       const [{ data: tournament }, { data: inviter }] = await Promise.all([
-        supabaseAdmin.from("tournaments").select("name").eq("id", data.tournament_id).maybeSingle(),
+        supabaseAdmin
+          .from("tournaments")
+          .select("name, club_id, clubs:club_id(default_language)")
+          .eq("id", data.tournament_id)
+          .maybeSingle(),
         supabaseAdmin
           .from("profiles")
-          .select("first_name, last_name, full_name")
+          .select("first_name, last_name, full_name, preferred_language")
           .eq("id", userId)
           .maybeSingle(),
       ]);
@@ -2458,6 +2476,10 @@ export const inviteTournamentCollaborator = createServerFn({ method: "POST" })
           .trim() ||
         null;
       const baseUrl = process.env.SITE_URL || "https://www.clubero.app";
+      const locale = resolveEmailLocale(
+        (inviter as any)?.preferred_language,
+        (tournament as any)?.clubs?.default_language,
+      );
       await enqueueTransactionalEmailServer({
         templateName: "tournament-invite",
         recipientEmail: email,
@@ -2468,6 +2490,7 @@ export const inviteTournamentCollaborator = createServerFn({ method: "POST" })
           roleLabel: data.role === "co_organizer" ? "co-organisateur" : "arbitre",
           inviterName,
           inviteUrl: `${baseUrl}/tournament-invite/${row.invitation_token}`,
+          locale,
         },
       });
     } catch (e) {
