@@ -495,8 +495,8 @@ export function TournamentRulesEditor({ tournamentId, settings, sport }: Props) 
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="fr">Français</SelectItem>
-                  <SelectItem value="en">English</SelectItem>
+                  <SelectItem value="fr">{t("common:languages.fr")}</SelectItem>
+                  <SelectItem value="en">{t("common:languages.en")}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -618,8 +618,8 @@ export function TournamentRulesEditor({ tournamentId, settings, sport }: Props) 
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="fr">Français</SelectItem>
-                      <SelectItem value="en">English</SelectItem>
+                      <SelectItem value="fr">{t("common:languages.fr")}</SelectItem>
+                      <SelectItem value="en">{t("common:languages.en")}</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>

@@ -2569,7 +2569,7 @@ export function CoachAssistSection() {
                   <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">
                     Insights
                   </p>
-                  <p className="text-sm font-bold tabular-nums">3 à faire</p>
+                  <p className="text-sm font-bold tabular-nums">{t("mock.toDoCount")}</p>
                 </div>
               </div>
             </div>
@@ -2703,7 +2703,7 @@ function Hero() {
                 </div>
                 <div>
                   <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">
-                    Présence
+                    {t("mock.attendance")}
                   </p>
                   <p className="text-sm font-bold tabular-nums">94%</p>
                 </div>
@@ -3195,7 +3195,7 @@ function ProductPreview() {
                     <span className="text-[10px] text-muted-foreground">Sam 14:30</span>
                   </div>
                   <div className="flex items-center justify-between">
-                    <span className="text-xs font-semibold truncate">U15 Entraînement</span>
+                    <span className="text-xs font-semibold truncate">{t("mock.u15Training")}</span>
                     <span className="text-[10px] text-muted-foreground">Mer 18:00</span>
                   </div>
                 </div>
@@ -3241,7 +3241,9 @@ function ProductPreview() {
                   </div>
                   <div>
                     <p className="font-display text-base font-bold tabular-nums">94%</p>
-                    <p className="text-[9px] uppercase text-muted-foreground">Présence</p>
+                    <p className="text-[9px] uppercase text-muted-foreground">
+                      {t("mock.attendance")}
+                    </p>
                   </div>
                 </div>
               </div>

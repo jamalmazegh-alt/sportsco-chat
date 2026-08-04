@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { AlertTriangle, ChevronDown, Loader2, Share2, Timer, UploadCloud } from "lucide-react";
 import { Link } from "@tanstack/react-router";
 import {
@@ -14,18 +15,19 @@ import {
 } from "@/lib/superadmin.functions";
 import { redactErrorMessage } from "@/lib/observability/redact";
 import { formatDistanceToNowStrict } from "date-fns";
-import { fr } from "date-fns/locale";
+import { dateLocale } from "@/lib/date-locale";
 
-const SIGNAL_LABELS: Record<StalledSignal, string> = {
-  club_no_team: "Club sans équipe",
-  team_no_player: "Équipe sans joueur",
-  players_no_event: "Joueurs mais aucun event",
-  event_no_convocation: "Event sans convocation",
-  invite_not_accepted: "Invitation non acceptée",
+const SIGNAL_LABEL_KEYS: Record<StalledSignal, string> = {
+  club_no_team: "superadmin.watchlist.signals.clubNoTeam",
+  team_no_player: "superadmin.watchlist.signals.teamNoPlayer",
+  players_no_event: "superadmin.watchlist.signals.playersNoEvent",
+  event_no_convocation: "superadmin.watchlist.signals.eventNoConvocation",
+  invite_not_accepted: "superadmin.watchlist.signals.inviteNotAccepted",
 };
 const MAX_ITEMS_SHOWN = 8;
 
 export function WatchlistPanel() {
+  const { t, i18n } = useTranslation();
   const [social, setSocial] = useState<SocialFailureRow[] | null>(null);
   const [imports, setImports] = useState<FailedImportRow[] | null>(null);
   const [err, setErr] = useState<string | null>(null);
@@ -43,8 +45,8 @@ export function WatchlistPanel() {
     <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
       <WatchCard
         icon={<Share2 className="h-4 w-4" />}
-        title="Synchros réseaux sociaux en échec"
-        emptyLabel="Toutes les connexions sociales sont OK."
+        title={t("superadmin.watchlist.socialFailuresTitle")}
+        emptyLabel={t("superadmin.watchlist.socialFailuresEmpty")}
         loading={social === null}
         count={social?.length ?? 0}
       >
@@ -59,7 +61,9 @@ export function WatchlistPanel() {
             </div>
             {s.last_synced_at && (
               <div className="text-[10px] text-muted-foreground mt-0.5">
-                dernière tentative {new Date(s.last_synced_at).toLocaleString()}
+                {t("superadmin.watchlist.lastAttempt", {
+                  date: new Date(s.last_synced_at).toLocaleString(i18n.language),
+                })}
               </div>
             )}
           </div>
@@ -68,8 +72,8 @@ export function WatchlistPanel() {
 
       <WatchCard
         icon={<UploadCloud className="h-4 w-4" />}
-        title="Imports échoués ou partiels"
-        emptyLabel="Aucun import en échec."
+        title={t("superadmin.watchlist.importFailuresTitle")}
+        emptyLabel={t("superadmin.watchlist.importFailuresEmpty")}
         loading={imports === null}
         count={imports?.length ?? 0}
       >
@@ -80,8 +84,12 @@ export function WatchlistPanel() {
               {i.file_name ? ` · ${i.file_name}` : ""}
             </div>
             <div className="text-muted-foreground mt-0.5">
-              {i.status} — {i.rows_imported}/{i.rows_total} lignes ·{" "}
-              {new Date(i.created_at).toLocaleString()}
+              {t("superadmin.watchlist.importRows", {
+                status: i.status,
+                imported: i.rows_imported,
+                total: i.rows_total,
+                date: new Date(i.created_at).toLocaleString(i18n.language),
+              })}
             </div>
             {i.error_log != null && (
               <div className="text-muted-foreground truncate mt-0.5">
@@ -106,6 +114,7 @@ export function WatchlistPanel() {
 }
 
 function StalledOnboardingCard() {
+  const { t } = useTranslation();
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [groups, setGroups] = useState<StalledOnboardingGroup[] | null>(null);
@@ -133,7 +142,9 @@ function StalledOnboardingCard() {
         className="w-full flex items-center gap-2 p-3 border-b border-border text-left hover:bg-muted/40"
       >
         <Timer className="h-4 w-4" />
-        <div className="text-sm font-medium flex-1">Onboarding potentiellement bloqué</div>
+        <div className="text-sm font-medium flex-1">
+          {t("superadmin.watchlist.stalledOnboardingTitle")}
+        </div>
         {groups && total > 0 && (
           <span className="inline-flex items-center gap-1 rounded-full bg-amber-500/10 text-amber-700 dark:text-amber-400 text-[11px] px-2 py-0.5">
             <AlertTriangle className="h-3 w-3" /> {total}
@@ -146,11 +157,11 @@ function StalledOnboardingCard() {
       {open && (
         <div className="p-3">
           <p className="text-[11px] text-muted-foreground mb-2">
-            Signaux de friction — à interpréter, pas des erreurs certaines. Chargé à la demande.
+            {t("superadmin.watchlist.stalledOnboardingHint")}
           </p>
           {loading && (
             <div className="text-xs text-muted-foreground inline-flex items-center gap-2">
-              <Loader2 className="h-3.5 w-3.5 animate-spin" /> Chargement…
+              <Loader2 className="h-3.5 w-3.5 animate-spin" /> {t("superadmin.common.loading")}
             </div>
           )}
           {err && <div className="text-xs text-destructive">{err}</div>}
@@ -168,7 +179,8 @@ function StalledOnboardingCard() {
 }
 
 function StalledGroup({ group }: { group: StalledOnboardingGroup }) {
-  const label = SIGNAL_LABELS[group.signal];
+  const { t } = useTranslation();
+  const label = t(SIGNAL_LABEL_KEYS[group.signal]);
   const shown = group.items.slice(0, MAX_ITEMS_SHOWN);
   const extra = group.items.length - shown.length + (group.truncated ? 1 : 0);
   return (
@@ -181,7 +193,9 @@ function StalledGroup({ group }: { group: StalledOnboardingGroup }) {
         </span>
       </div>
       {group.items.length === 0 ? (
-        <div className="p-3 text-[11px] text-muted-foreground">Rien à signaler.</div>
+        <div className="p-3 text-[11px] text-muted-foreground">
+          {t("superadmin.watchlist.nothingToReport")}
+        </div>
       ) : (
         <ul className="max-h-56 overflow-y-auto">
           {shown.map((it, idx) => {
@@ -198,7 +212,9 @@ function StalledGroup({ group }: { group: StalledOnboardingGroup }) {
                 <div className="font-medium truncate">{primary}</div>
                 {since && (
                   <div className="text-[10px] text-muted-foreground">
-                    depuis {formatDistanceToNowStrict(since, { locale: fr })}
+                    {t("superadmin.watchlist.since", {
+                      time: formatDistanceToNowStrict(since, { locale: dateLocale() }),
+                    })}
                   </div>
                 )}
               </div>
@@ -221,7 +237,7 @@ function StalledGroup({ group }: { group: StalledOnboardingGroup }) {
           })}
           {extra > 0 && (
             <li className="px-3 py-1.5 text-[11px] text-muted-foreground border-t border-border">
-              + {extra} autre{extra > 1 ? "s" : ""}
+              {t("superadmin.watchlist.extraItems", { count: extra })}
             </li>
           )}
         </ul>
@@ -245,6 +261,8 @@ function WatchCard({
   emptyLabel: string;
   children?: React.ReactNode;
 }) {
+  const { t } = useTranslation();
+
   return (
     <div className="rounded-xl border border-border bg-card">
       <div className="flex items-center gap-2 p-3 border-b border-border">
@@ -258,7 +276,7 @@ function WatchCard({
       </div>
       {loading ? (
         <div className="p-4 text-xs text-muted-foreground inline-flex items-center gap-2">
-          <Loader2 className="h-3.5 w-3.5 animate-spin" /> Chargement…
+          <Loader2 className="h-3.5 w-3.5 animate-spin" /> {t("superadmin.common.loading")}
         </div>
       ) : count === 0 ? (
         <div className="p-4 text-xs text-muted-foreground">{emptyLabel}</div>

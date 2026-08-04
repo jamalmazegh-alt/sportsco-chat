@@ -2083,5 +2083,10 @@
         "cta": "Installationsanleitung ansehen"
       }
     }
+  },
+  "mock": {
+    "toDoCount": "3 offen",
+    "attendance": "Anwesenheit",
+    "u15Training": "U15 Training"
   }
 }

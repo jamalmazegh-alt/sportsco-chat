@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useTranslation } from "react-i18next";
+import { Trans, useTranslation } from "react-i18next";
 import { useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import {
@@ -13,7 +13,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { format } from "date-fns";
-import { fr } from "date-fns/locale";
+import { dateLocale } from "@/lib/date-locale";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
@@ -48,7 +48,7 @@ import {
   revokeBillingExemption,
   getClubBillingAudit,
 } from "@/lib/billing-exemption.functions";
-import { EXEMPT_REASON_LABELS, type ExemptReason } from "@/lib/has-paid-access";
+import type { ExemptReason } from "@/lib/has-paid-access";
 
 export type BillingExemptionSub = {
   status?: string | null;
@@ -68,10 +68,19 @@ type AuditEntry = {
   metadata: Record<string, string | number | boolean | null> | null;
 };
 
-const ACTION_LABEL: Record<string, string> = {
-  billing_exemption_granted: "Exemption accordée",
-  billing_exemption_updated: "Exemption modifiée",
-  billing_exemption_revoked: "Exemption retirée",
+const ACTION_LABEL_KEYS: Record<string, string> = {
+  billing_exemption_granted: "superadmin.billingExemption.actionGranted",
+  billing_exemption_updated: "superadmin.billingExemption.actionUpdated",
+  billing_exemption_revoked: "superadmin.billingExemption.actionRevoked",
+};
+
+const EXEMPT_REASONS: ExemptReason[] = ["beta_club", "partner", "internal", "other"];
+
+const EXEMPT_REASON_KEYS: Record<ExemptReason, string> = {
+  beta_club: "superadmin.billingExemption.reasons.betaClub",
+  partner: "superadmin.billingExemption.reasons.partner",
+  internal: "superadmin.billingExemption.reasons.internal",
+  other: "superadmin.billingExemption.reasons.other",
 };
 
 export function BillingExemptionPanel({
@@ -100,6 +109,16 @@ export function BillingExemptionPanel({
   const [audit, setAudit] = useState<AuditEntry[]>([]);
 
   const isExempt = subscription?.exempt_from_billing === true;
+  const reasonLabel = (value?: string | null) =>
+    value && value in EXEMPT_REASON_KEYS
+      ? t(EXEMPT_REASON_KEYS[value as ExemptReason])
+      : (value ?? t("superadmin.common.none"));
+  const formatDate = (date: Date | string, key = "date") =>
+    format(
+      typeof date === "string" ? new Date(date) : date,
+      t(`superadmin.billingExemption.formats.${key}`),
+      { locale: dateLocale() },
+    );
 
   useEffect(() => {
     fetchAudit({ data: { clubId } })
@@ -198,18 +217,20 @@ export function BillingExemptionPanel({
                   isExempt ? "text-white" : "text-slate-900",
                 )}
               >
-                Exemption de facturation
+                {t("superadmin.billingExemption.title")}
               </h2>
               <p
                 className={cn("text-[11px] mt-0.5", isExempt ? "text-white/80" : "text-slate-500")}
               >
-                {isExempt ? "Club exempté" : "Aucune exemption active"}
+                {isExempt
+                  ? t("superadmin.billingExemption.clubExempt")
+                  : t("superadmin.billingExemption.noActiveExemption")}
               </p>
             </div>
           </div>
           {isExempt && (
             <span className="inline-flex items-center gap-1 rounded-full bg-white/15 border border-white/30 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide text-white">
-              <ShieldCheck className="h-3 w-3" /> Exempté
+              <ShieldCheck className="h-3 w-3" /> {t("superadmin.billingExemption.exemptBadge")}
             </span>
           )}
         </header>
@@ -218,8 +239,7 @@ export function BillingExemptionPanel({
           {!isExempt ? (
             <div className="space-y-4">
               <p className="text-sm text-slate-600 leading-relaxed">
-                Accordez un accès gratuit à ce club pour la phase bêta, un partenariat ou un test
-                interne. Le club accède à toutes les fonctionnalités sans passer par Stripe.
+                {t("superadmin.billingExemption.intro")}
               </p>
               <Button
                 size="sm"
@@ -227,36 +247,32 @@ export function BillingExemptionPanel({
                 className="bg-gradient-to-r from-[#0f4a26] to-[#1d7a45] hover:from-[#0a3a1d] hover:to-[#176237] text-white shadow-sm"
               >
                 <ShieldCheck className="h-4 w-4 mr-1.5" />
-                Accorder une exemption
+                {t("superadmin.billingExemption.grant")}
               </Button>
             </div>
           ) : (
             <div className="space-y-4">
               <dl className="grid sm:grid-cols-2 gap-3 text-sm">
-                <Field label="Raison">
+                <Field label={t("superadmin.billingExemption.reason")}>
                   <span className="inline-flex items-center rounded-full bg-[#eff6ff] border border-[#bfdbfe] text-[#2563eb] px-2 py-0.5 text-xs font-medium">
-                    {EXEMPT_REASON_LABELS[subscription?.exempt_reason as ExemptReason] ??
-                      subscription?.exempt_reason ??
-                      "—"}
+                    {reasonLabel(subscription?.exempt_reason)}
                   </span>
                 </Field>
-                <Field label="Date de fin">
+                <Field label={t("superadmin.billingExemption.endDate")}>
                   {subscription?.exempt_until ? (
-                    <span className="text-slate-900">
-                      {format(new Date(subscription.exempt_until), "d MMM yyyy", { locale: fr })}
-                    </span>
+                    <span className="text-slate-900">{formatDate(subscription.exempt_until)}</span>
                   ) : (
-                    <span className="text-slate-500 italic">Sans limite</span>
+                    <span className="text-slate-500 italic">
+                      {t("superadmin.billingExemption.noLimit")}
+                    </span>
                   )}
                 </Field>
-                <Field label="Accordé le">
+                <Field label={t("superadmin.billingExemption.grantedAt")}>
                   {subscription?.exempt_granted_at
-                    ? format(new Date(subscription.exempt_granted_at), "d MMM yyyy 'à' HH:mm", {
-                        locale: fr,
-                      })
+                    ? formatDate(subscription.exempt_granted_at, "dateTime")
                     : "—"}
                 </Field>
-                <Field label="Accordé par">
+                <Field label={t("superadmin.billingExemption.grantedBy")}>
                   <span className="font-mono text-xs text-slate-700">
                     {subscription?.exempt_granted_by?.slice(0, 8) ?? "—"}
                   </span>
@@ -270,7 +286,7 @@ export function BillingExemptionPanel({
                   className="border-[#86efac] text-[#16a34a] hover:bg-[#f0fdf4] hover:text-[#16a34a]"
                 >
                   <Pencil className="h-3.5 w-3.5 mr-1.5" />
-                  Modifier l&apos;exemption
+                  {t("superadmin.billingExemption.edit")}
                 </Button>
                 <Button
                   size="sm"
@@ -279,7 +295,7 @@ export function BillingExemptionPanel({
                   className="bg-[#fff5f5] border-[#fecaca] text-[#ef4444] hover:bg-[#fee2e2] hover:text-[#dc2626]"
                 >
                   <ShieldOff className="h-3.5 w-3.5 mr-1.5" />
-                  Retirer l&apos;exemption
+                  {t("superadmin.billingExemption.revoke")}
                 </Button>
               </div>
             </div>
@@ -292,11 +308,13 @@ export function BillingExemptionPanel({
         <div className="flex items-center gap-2 mb-3">
           <History className="h-4 w-4 text-slate-500" />
           <h3 className="text-xs font-semibold uppercase tracking-wide text-slate-500">
-            Historique exemption
+            {t("superadmin.billingExemption.auditTitle")}
           </h3>
         </div>
         {audit.length === 0 ? (
-          <p className="text-sm text-slate-500 italic">Aucune action enregistrée.</p>
+          <p className="text-sm text-slate-500 italic">
+            {t("superadmin.billingExemption.auditEmpty")}
+          </p>
         ) : (
           <ul className="divide-y divide-[#e2e8f0] -mx-1">
             {audit.map((row) => {
@@ -305,26 +323,30 @@ export function BillingExemptionPanel({
                 <li key={row.id} className="px-1 py-2 flex items-start justify-between gap-3">
                   <div className="min-w-0">
                     <div className="text-sm font-medium text-slate-900">
-                      {ACTION_LABEL[row.action] ?? row.action}
+                      {ACTION_LABEL_KEYS[row.action]
+                        ? t(ACTION_LABEL_KEYS[row.action])
+                        : row.action}
                     </div>
                     <div className="text-[11px] text-slate-500">
-                      par {row.actor_name}
+                      {t("superadmin.billingExemption.byActor", { actor: row.actor_name })}
                       {typeof meta.reason === "string" && (
                         <>
                           {" · "}
-                          {EXEMPT_REASON_LABELS[meta.reason as ExemptReason] ?? String(meta.reason)}
+                          {reasonLabel(meta.reason)}
                         </>
                       )}
                       {typeof meta.exempt_until === "string" && (
                         <>
-                          {" · jusqu'au "}
-                          {format(new Date(meta.exempt_until), "d MMM yyyy", { locale: fr })}
+                          {" · "}
+                          {t("superadmin.billingExemption.untilDate", {
+                            date: formatDate(meta.exempt_until),
+                          })}
                         </>
                       )}
                     </div>
                   </div>
                   <time className="text-[11px] text-slate-400 whitespace-nowrap">
-                    {format(new Date(row.created_at), "d MMM, HH:mm", { locale: fr })}
+                    {formatDate(row.created_at, "shortDateTime")}
                   </time>
                 </li>
               );
@@ -338,24 +360,28 @@ export function BillingExemptionPanel({
         <DialogContent className="rounded-[20px] sm:max-w-md">
           <DialogHeader>
             <DialogTitle className="text-lg">
-              {editMode ? "Modifier l'exemption" : "Accorder une exemption"}
+              {editMode
+                ? t("superadmin.billingExemption.edit")
+                : t("superadmin.billingExemption.grant")}
             </DialogTitle>
             <DialogDescription>
-              Ce club accèdera à toutes les features sans abonnement Stripe.
+              {t("superadmin.billingExemption.dialogDescription")}
             </DialogDescription>
           </DialogHeader>
 
           <div className="space-y-4 py-2">
             <div className="space-y-1.5">
-              <label className="text-xs font-medium text-slate-700">Raison</label>
+              <label className="text-xs font-medium text-slate-700">
+                {t("superadmin.billingExemption.reason")}
+              </label>
               <Select value={reason} onValueChange={(v) => setReason(v as ExemptReason)}>
                 <SelectTrigger className="rounded-xl border-[1.5px] border-[#e2e8f0]">
-                  <SelectValue placeholder="Sélectionner une raison" />
+                  <SelectValue placeholder={t("superadmin.billingExemption.reasonPlaceholder")} />
                 </SelectTrigger>
                 <SelectContent>
-                  {(Object.keys(EXEMPT_REASON_LABELS) as ExemptReason[]).map((k) => (
+                  {EXEMPT_REASONS.map((k) => (
                     <SelectItem key={k} value={k}>
-                      {EXEMPT_REASON_LABELS[k]}
+                      {t(EXEMPT_REASON_KEYS[k])}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -364,7 +390,7 @@ export function BillingExemptionPanel({
 
             <div className="space-y-1.5">
               <label className="text-xs font-medium text-slate-700">
-                Date de fin d&apos;exemption (optionnel)
+                {t("superadmin.billingExemption.endDateOptional")}
               </label>
               <div className="flex gap-2">
                 <Popover>
@@ -377,7 +403,7 @@ export function BillingExemptionPanel({
                       )}
                     >
                       <CalendarIcon className="h-4 w-4 mr-2" />
-                      {until ? format(until, "d MMM yyyy", { locale: fr }) : "Sans limite"}
+                      {until ? formatDate(until) : t("superadmin.billingExemption.noLimit")}
                     </Button>
                   </PopoverTrigger>
                   <PopoverContent className="w-auto p-0" align="start">
@@ -397,31 +423,36 @@ export function BillingExemptionPanel({
                     size="icon"
                     onClick={() => setUntil(undefined)}
                     className="rounded-xl"
-                    aria-label="Effacer la date"
+                    aria-label={t("superadmin.billingExemption.clearDate")}
                   >
                     <X className="h-4 w-4" />
                   </Button>
                 )}
               </div>
               <p className="text-[11px] text-slate-500 leading-snug">
-                Si définie, l&apos;exemption expirera automatiquement à cette date.
+                {t("superadmin.billingExemption.expiryHint")}
               </p>
             </div>
 
             {reason && (
               <div className="rounded-xl bg-[#f0fdf4] border border-[#86efac] p-3 text-xs text-[#0f4a26]">
-                ✅ <strong>{clubName}</strong> aura accès gratuit{" "}
-                {until
-                  ? `jusqu'au ${format(until, "d MMM yyyy", { locale: fr })}`
-                  : "sans limite de temps"}
-                .
+                <span aria-hidden>✅</span>{" "}
+                <Trans
+                  i18nKey={
+                    until
+                      ? "superadmin.billingExemption.summaryUntil"
+                      : "superadmin.billingExemption.summaryNoLimit"
+                  }
+                  values={{ clubName, date: until ? formatDate(until) : "" }}
+                  components={{ strong: <strong /> }}
+                />
               </div>
             )}
           </div>
 
           <DialogFooter className="gap-2">
             <Button variant="ghost" onClick={() => setGrantOpen(false)} disabled={busy}>
-              Annuler
+              {t("superadmin.billingExemption.cancel")}
             </Button>
             <Button
               onClick={() => void onGrant()}
@@ -431,9 +462,9 @@ export function BillingExemptionPanel({
               {busy ? (
                 <Loader2 className="h-4 w-4 animate-spin" />
               ) : editMode ? (
-                "Enregistrer"
+                t("superadmin.billingExemption.save")
               ) : (
-                "Confirmer l'exemption"
+                t("superadmin.billingExemption.confirm")
               )}
             </Button>
           </DialogFooter>
@@ -444,21 +475,29 @@ export function BillingExemptionPanel({
       <AlertDialog open={revokeOpen} onOpenChange={setRevokeOpen}>
         <AlertDialogContent className="rounded-[20px]">
           <AlertDialogHeader>
-            <AlertDialogTitle>Retirer l&apos;exemption ?</AlertDialogTitle>
+            <AlertDialogTitle>{t("superadmin.billingExemption.revokeTitle")}</AlertDialogTitle>
             <AlertDialogDescription>
-              Le club <strong>{clubName}</strong> perdra son accès gratuit. S&apos;il n&apos;a pas
-              d&apos;abonnement Stripe actif, il sera redirigé vers le tunnel d&apos;abonnement à la
-              prochaine connexion.
+              <Trans
+                i18nKey="superadmin.billingExemption.revokeDescription"
+                values={{ clubName }}
+                components={{ strong: <strong /> }}
+              />
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel disabled={busy}>Annuler</AlertDialogCancel>
+            <AlertDialogCancel disabled={busy}>
+              {t("superadmin.billingExemption.cancel")}
+            </AlertDialogCancel>
             <AlertDialogAction
               disabled={busy}
               onClick={() => void onRevoke()}
               className="bg-[#ef4444] hover:bg-[#dc2626] text-white"
             >
-              {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : "Retirer l'exemption"}
+              {busy ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                t("superadmin.billingExemption.revoke")
+              )}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

@@ -170,32 +170,49 @@ function DispatchDetailPage() {
               {data?.event && (
                 <>
                   {[data.event.club_name, data.event.team_name].filter(Boolean).join(" · ")}
-                  {data.event.starts_at && <> · match le {fmtDate(data.event.starts_at)}</>}
+                  {data.event.starts_at && (
+                    <>
+                      {" "}
+                      ·{" "}
+                      {t("superadmin.emailDispatches.matchOn", {
+                        date: fmtDate(data.event.starts_at),
+                      })}
+                    </>
+                  )}
                   {" · "}
                 </>
               )}
-              template <span className="font-mono">{data?.dispatch.template_name}</span>
-              {data?.dispatch.created_by_name && <> · par {data.dispatch.created_by_name}</>}
+              {t("superadmin.emailDispatches.template")}{" "}
+              <span className="font-mono">{data?.dispatch.template_name}</span>
+              {data?.dispatch.created_by_name && (
+                <>
+                  {" "}
+                  ·{" "}
+                  {t("superadmin.emailDispatches.byAuthor", {
+                    name: data.dispatch.created_by_name,
+                  })}
+                </>
+              )}
               {data && <> · {fmtDate(data.dispatch.created_at)}</>}
             </p>
           </div>
           <Button size="sm" variant="outline" onClick={() => refetch()} disabled={isFetching}>
             <RefreshCw className={`h-3.5 w-3.5 mr-1.5 ${isFetching ? "animate-spin" : ""}`} />
-            Rafraîchir
+            {t("superadmin.emailDispatches.refresh")}
           </Button>
           {templateSupportsRetry && failuresCount > 0 && (
             <Button
               size="sm"
               onClick={retryAll}
               disabled={busyKey !== null}
-              title="Renfiler les envois failed/DLQ sans dupliquer les envois déjà délivrés"
+              title={t("superadmin.emailDispatches.requeueHint")}
             >
               {busyKey === "batch" ? (
                 <Loader2 className="h-3.5 w-3.5 mr-1.5 animate-spin" />
               ) : (
                 <RotateCw className="h-3.5 w-3.5 mr-1.5" />
               )}
-              Relancer les échecs ({failuresCount})
+              {t("superadmin.emailDispatches.retryFailures", { count: failuresCount })}
             </Button>
           )}
         </div>
@@ -203,7 +220,7 @@ function DispatchDetailPage() {
 
       {isLoading && (
         <div className="flex items-center gap-2 text-sm text-muted-foreground">
-          <Loader2 className="h-4 w-4 animate-spin" /> Chargement…
+          <Loader2 className="h-4 w-4 animate-spin" /> {t("superadmin.emailDispatches.loading")}
         </div>
       )}
 
@@ -242,11 +259,15 @@ function DispatchDetailPage() {
             ) : (
               <StatusBadge tone="info">
                 <Loader2 className="h-3 w-3 animate-spin" />
-                En cours — rafraîchissement auto toutes les 5&nbsp;s
+                {t("superadmin.emailDispatches.autoRefreshInProgress")}
               </StatusBadge>
             )}
             {data.counts.suppressed > 0 && (
-              <StatusBadge tone="warn">{data.counts.suppressed} supprimé(s)</StatusBadge>
+              <StatusBadge tone="warn">
+                {t("superadmin.emailDispatches.suppressedCount", {
+                  count: data.counts.suppressed,
+                })}
+              </StatusBadge>
             )}
           </div>
 
@@ -270,13 +291,13 @@ function DispatchDetailPage() {
                 className="h-7 text-xs"
                 onClick={() => setStatusFilter(s)}
               >
-                {s === "all" ? "Tous" : statusLabel(s)}
+                {s === "all" ? t("superadmin.emailDispatches.filterAll") : statusLabel(s)}
               </Button>
             ))}
           </div>
 
           <Input
-            placeholder="Filtrer par email ou message d'erreur…"
+            placeholder={t("superadmin.emailDispatches.filterRecipient")}
             value={q}
             onChange={(e) => setQ(e.target.value)}
             className="mb-4 max-w-md"
@@ -284,7 +305,7 @@ function DispatchDetailPage() {
 
           {filtered.length === 0 ? (
             <div className="text-sm text-muted-foreground">
-              Aucun destinataire ne correspond aux filtres.
+              {t("superadmin.emailDispatches.noRecipientsMatch")}
             </div>
           ) : (
             <div className="overflow-x-auto rounded-md border border-border">
@@ -336,7 +357,13 @@ function DispatchDetailPage() {
                         <td className="px-3 py-2 text-xs">
                           {r.attempt_count}
                           {r.mismatch_count > 0 && (
-                            <span className="text-destructive"> · mismatch {r.mismatch_count}</span>
+                            <span className="text-destructive">
+                              {" "}
+                              ·{" "}
+                              {t("superadmin.emailDispatches.mismatch", {
+                                count: r.mismatch_count,
+                              })}
+                            </span>
                           )}
                         </td>
                         <td className="px-3 py-2 text-xs text-muted-foreground whitespace-nowrap">
@@ -362,7 +389,7 @@ function DispatchDetailPage() {
                               ) : (
                                 <RotateCw className="h-3 w-3 mr-1" />
                               )}
-                              Relancer
+                              {t("superadmin.emailDispatches.retry")}
                             </Button>
                           ) : null}
                         </td>

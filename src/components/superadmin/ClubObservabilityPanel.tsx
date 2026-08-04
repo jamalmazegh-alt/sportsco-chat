@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { AlertTriangle, Loader2 } from "lucide-react";
 import { Link } from "@tanstack/react-router";
 import { getClubObservability } from "@/lib/superadmin.functions";
@@ -6,11 +7,12 @@ import { redactErrorMessage } from "@/lib/observability/redact";
 import { StatusBadge } from "@/lib/superadmin/ui";
 import { ProductActivityFeed } from "@/components/superadmin/ProductActivityFeed";
 import { formatDistanceToNowStrict } from "date-fns";
-import { fr } from "date-fns/locale";
+import { dateLocale } from "@/lib/date-locale";
 
 type Data = Awaited<ReturnType<typeof getClubObservability>>;
 
 export function ClubObservabilityPanel({ clubId }: { clubId: string }) {
+  const { t, i18n } = useTranslation();
   const [data, setData] = useState<Data | null>(null);
   const [err, setErr] = useState<string | null>(null);
 
@@ -25,7 +27,7 @@ export function ClubObservabilityPanel({ clubId }: { clubId: string }) {
   return (
     <section className="mb-6">
       <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground mb-3">
-        Activité & santé
+        {t("superadmin.observability.title")}
       </h2>
 
       {err && (
@@ -35,16 +37,16 @@ export function ClubObservabilityPanel({ clubId }: { clubId: string }) {
       )}
       {!data && !err && (
         <div className="text-xs text-muted-foreground inline-flex items-center gap-2 mb-3">
-          <Loader2 className="h-3.5 w-3.5 animate-spin" /> Chargement…
+          <Loader2 className="h-3.5 w-3.5 animate-spin" /> {t("superadmin.common.loading")}
         </div>
       )}
 
       {data && (
         <div className="grid lg:grid-cols-2 gap-4">
           <Card
-            title="Erreurs récentes"
+            title={t("superadmin.observability.recentErrors")}
             count={data.recent_failures.length}
-            emptyLabel="Aucune erreur enregistrée."
+            emptyLabel={t("superadmin.observability.recentErrorsEmpty")}
           >
             <ul className="divide-y divide-border">
               {data.recent_failures.map((r) => (
@@ -57,7 +59,9 @@ export function ClubObservabilityPanel({ clubId }: { clubId: string }) {
                     </span>
                   </div>
                   {r.error_code && (
-                    <div className="text-destructive mt-0.5">code: {r.error_code}</div>
+                    <div className="text-destructive mt-0.5">
+                      {t("superadmin.observability.errorCode", { code: r.error_code })}
+                    </div>
                   )}
                   {r.error_message && (
                     <div className="text-muted-foreground truncate mt-0.5">
@@ -65,7 +69,9 @@ export function ClubObservabilityPanel({ clubId }: { clubId: string }) {
                     </div>
                   )}
                   {r.actor_full_name && (
-                    <div className="text-muted-foreground mt-0.5">par {r.actor_full_name}</div>
+                    <div className="text-muted-foreground mt-0.5">
+                      {t("superadmin.observability.byActor", { actor: r.actor_full_name })}
+                    </div>
                   )}
                 </li>
               ))}
@@ -73,9 +79,9 @@ export function ClubObservabilityPanel({ clubId }: { clubId: string }) {
           </Card>
 
           <Card
-            title="Utilisateurs actifs (30 j)"
+            title={t("superadmin.observability.activeUsers")}
             count={data.recent_active_users.length}
-            emptyLabel="Aucune activité utilisateur ces 30 derniers jours."
+            emptyLabel={t("superadmin.observability.activeUsersEmpty")}
           >
             <ul className="divide-y divide-border">
               {data.recent_active_users.map((u) => (
@@ -91,8 +97,12 @@ export function ClubObservabilityPanel({ clubId }: { clubId: string }) {
                     <span className="text-muted-foreground tabular-nums">{u.action_count}</span>
                   </div>
                   <div className="text-muted-foreground truncate">
-                    {u.last_action_type} · il y a{" "}
-                    {formatDistanceToNowStrict(new Date(u.last_action_at), { locale: fr })}
+                    {t("superadmin.observability.lastActionAgo", {
+                      action: u.last_action_type,
+                      time: formatDistanceToNowStrict(new Date(u.last_action_at), {
+                        locale: dateLocale(),
+                      }),
+                    })}
                   </div>
                 </li>
               ))}
@@ -100,9 +110,9 @@ export function ClubObservabilityPanel({ clubId }: { clubId: string }) {
           </Card>
 
           <Card
-            title="Fonctionnalités utilisées (30 j)"
+            title={t("superadmin.observability.featuresUsed")}
             count={data.features_used.length}
-            emptyLabel="Aucune activité mesurée."
+            emptyLabel={t("superadmin.observability.featuresUsedEmpty")}
           >
             <ul className="divide-y divide-border">
               {data.features_used.map((f) => (
@@ -121,9 +131,9 @@ export function ClubObservabilityPanel({ clubId }: { clubId: string }) {
           </Card>
 
           <Card
-            title="Connexions sociales"
+            title={t("superadmin.observability.socialConnections")}
             count={data.social_connections.length}
-            emptyLabel="Aucune connexion sociale."
+            emptyLabel={t("superadmin.observability.socialConnectionsEmpty")}
           >
             <ul className="divide-y divide-border">
               {data.social_connections.map((s) => (
@@ -135,9 +145,13 @@ export function ClubObservabilityPanel({ clubId }: { clubId: string }) {
                     )}
                     <span className="ml-auto">
                       {s.is_active ? (
-                        <StatusBadge tone="success">actif</StatusBadge>
+                        <StatusBadge tone="success">
+                          {t("superadmin.observability.active")}
+                        </StatusBadge>
                       ) : (
-                        <StatusBadge tone="muted">inactif</StatusBadge>
+                        <StatusBadge tone="muted">
+                          {t("superadmin.observability.inactive")}
+                        </StatusBadge>
                       )}
                     </span>
                   </div>
@@ -148,7 +162,9 @@ export function ClubObservabilityPanel({ clubId }: { clubId: string }) {
                   )}
                   {s.last_synced_at && (
                     <div className="text-muted-foreground mt-0.5">
-                      synchro {new Date(s.last_synced_at).toLocaleString()}
+                      {t("superadmin.observability.syncedAt", {
+                        date: new Date(s.last_synced_at).toLocaleString(i18n.language),
+                      })}
                     </div>
                   )}
                 </li>
@@ -156,7 +172,11 @@ export function ClubObservabilityPanel({ clubId }: { clubId: string }) {
             </ul>
           </Card>
 
-          <Card title="Imports" count={data.imports.length} emptyLabel="Aucun import.">
+          <Card
+            title={t("superadmin.observability.imports")}
+            count={data.imports.length}
+            emptyLabel={t("superadmin.observability.importsEmpty")}
+          >
             <ul className="divide-y divide-border">
               {data.imports.map((i) => (
                 <li key={i.id} className="p-2 text-xs">
@@ -180,15 +200,22 @@ export function ClubObservabilityPanel({ clubId }: { clubId: string }) {
                     </StatusBadge>
                   </div>
                   <div className="text-muted-foreground mt-0.5">
-                    {i.rows_imported}/{i.rows_total} lignes ·{" "}
-                    {new Date(i.created_at).toLocaleString()}
+                    {t("superadmin.observability.importRows", {
+                      imported: i.rows_imported,
+                      total: i.rows_total,
+                      date: new Date(i.created_at).toLocaleString(i18n.language),
+                    })}
                   </div>
                 </li>
               ))}
             </ul>
           </Card>
 
-          <Card title="Invitations" count={data.invites.length} emptyLabel="Aucune invitation.">
+          <Card
+            title={t("superadmin.observability.invitations")}
+            count={data.invites.length}
+            emptyLabel={t("superadmin.observability.invitationsEmpty")}
+          >
             <ul className="divide-y divide-border">
               {data.invites.map((i) => (
                 <li key={`${i.kind}-${i.id}`} className="p-2 text-xs">
@@ -218,9 +245,9 @@ export function ClubObservabilityPanel({ clubId }: { clubId: string }) {
           </Card>
 
           <Card
-            title="Tickets support"
+            title={t("superadmin.observability.supportTickets")}
             count={data.support_tickets.length}
-            emptyLabel="Aucun ticket support."
+            emptyLabel={t("superadmin.observability.supportTicketsEmpty")}
           >
             <ul className="divide-y divide-border">
               {data.support_tickets.map((t) => (
@@ -256,7 +283,7 @@ export function ClubObservabilityPanel({ clubId }: { clubId: string }) {
 
       <div className="mt-6">
         <div className="text-xs uppercase tracking-wide text-muted-foreground mb-2">
-          Fil d'activité complet
+          {t("superadmin.observability.fullActivityFeed")}
         </div>
         <ProductActivityFeed clubId={clubId} />
       </div>
