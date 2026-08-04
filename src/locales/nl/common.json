@@ -3707,12 +3707,12 @@
   "cockpit": {
     "alerts": {
       "heading": "Meldingen",
-      "finalsNotGenerated": "Finalefase niet gegenereerd — groepsfase is voltooid",
+      "finalsNotGenerated": "Eindfase niet gegenereerd — poulefase is afgerond",
       "missingReferee": "Scheidsrechter ontbreekt (start over {{minutes}} min)",
       "title": "{{count}} ding om te regelen"
     },
     "next": "Volgende",
-    "estimatedEnd": "Geschat einde"
+    "estimatedEnd": "Verwacht einde"
   },
   "controlCenter": {
     "nextAction": "Volgende actie",

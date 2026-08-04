@@ -3711,12 +3711,12 @@
   },
   "cockpit": {
     "alerts": {
-      "heading": "Hinweise",
-      "finalsNotGenerated": "Die Finalphase wurde nicht generiert – die Gruppenphase ist beendet",
+      "heading": "Warnungen",
+      "finalsNotGenerated": "Endrunde nicht erzeugt — Gruppenphase ist beendet",
       "missingReferee": "Schiedsrichter fehlt (Start in {{minutes}} Min.)",
       "title": "{{count}} Punkt zu klären"
     },
-    "next": "Weiter",
+    "next": "Als Nächstes",
     "estimatedEnd": "Voraussichtliches Ende"
   },
   "controlCenter": {

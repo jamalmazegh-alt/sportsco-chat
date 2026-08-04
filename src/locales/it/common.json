@@ -3707,11 +3707,11 @@
   "cockpit": {
     "alerts": {
       "heading": "Avvisi",
-      "finalsNotGenerated": "Fase finale non generata: la fase a gironi è terminata",
+      "finalsNotGenerated": "Fase finale non generata — i gironi sono finiti",
       "missingReferee": "Arbitro mancante (inizio tra {{minutes}} min)",
       "title": "{{count}} cosa da sistemare"
     },
-    "next": "Avanti",
+    "next": "Prossimo",
     "estimatedEnd": "Fine prevista"
   },
   "controlCenter": {

@@ -3707,12 +3707,12 @@
   "cockpit": {
     "alerts": {
       "heading": "Alertas",
-      "finalsNotGenerated": "Fase final não gerada – fase de grupos concluída",
+      "finalsNotGenerated": "Fase final não gerada — a fase de grupos terminou",
       "missingReferee": "Árbitro em falta (começa em {{minutes}} min)",
       "title": "{{count}} assunto a resolver"
     },
     "next": "Seguinte",
-    "estimatedEnd": "Fim estimado"
+    "estimatedEnd": "Fim previsto"
   },
   "controlCenter": {
     "nextAction": "Próxima ação",
