@@ -1300,7 +1300,7 @@
     "exitTv": "Exit TV mode",
     "next": "Prochain",
     "estimatedEnd": "Expected end",
-    "averageDelay": "Retard moyen {{minutes}} min",
+    "averageDelay": "Average delay {{minutes}} min",
     "alerts": {
       "title": "{{count}} item(s) to resolve",
       "heading": "Alertes",
@@ -1315,7 +1315,7 @@
     "aiTitle": "Create with AI",
     "aiHint": "Step by step — your tournament fully configured.",
     "aiBadge": "Nouveau",
-    "quickTitle": "Mode rapide",
+    "quickTitle": "Quick mode",
     "quickHint": "5 screens, big buttons, no surprises.",
     "simulatorLink": "Simulate a format before creating",
     "back": "Retour",
@@ -1553,7 +1553,7 @@
     }
   },
   "simulator": {
-    "title": "Simulateur de tournoi",
+    "title": "Tournament simulator",
     "subtitle": "Tweak the settings, see the impact live.",
     "teams": "Teams",
     "terrains": "Terrains",
@@ -1567,7 +1567,7 @@
     "estimatedEnd": "Estimated end time",
     "matches": "Matchs",
     "rounds": "Tours",
-    "margin": "Marge avant 18h",
+    "margin": "Buffer before 6 PM",
     "addTerrain": "+ 1 terrain → gain ~{{gain}} min",
     "verdictOk": "✓ Easily fits the day",
     "verdictWarn": "⚠ It's a tight fit",
@@ -1581,22 +1581,22 @@
     "phaseFinal": "Final"
   },
   "rulesAi": {
-    "generate": "Générer un règlement avec lIA",
+    "generate": "Generate rules with AI",
     "modalTitle": "Proposed rules",
-    "modalDescription": "Prévisualise, puis insère ou régénère.",
+    "modalDescription": "Preview, then insert or regenerate. You can still edit it afterwards.",
     "insert": "Insert into rules",
     "regenerate": "Regenerate",
-    "close": "Fermer",
+    "close": "Close",
     "loading": "Generating…",
-    "rateLimited": "Limite quotidienne atteinte. Voici un modèle de base.",
+    "rateLimited": "Daily limit reached (5 generations / day). Here's a basic template.",
     "error": "Generation unavailable. Here's a basic template."
   },
   "coachInsightsAi": {
-    "refresh": "Actualiser",
-    "refreshing": "Actualisation…",
+    "refresh": "Refresh",
+    "refreshing": "Refreshing…",
     "refreshDone": "Insights updated",
-    "refreshLimited": "Tu as déjà actualisé aujourdhui. Réessaie demain.",
-    "refreshError": "Impossible dactualiser pour le moment."
+    "refreshLimited": "You've already refreshed today. Try again tomorrow.",
+    "refreshError": "Unable to refresh right now."
   },
   "pricing": {
     "metaTitle": "Tournament billing — Clubero",

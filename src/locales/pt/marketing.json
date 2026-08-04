@@ -349,7 +349,9 @@
         "s2": "Os pais mantêm-se informados",
         "s3": "Os treinadores ganham destaque",
         "s4": "Os clubes ganham visibilidade",
-        "showcase": "Cada clube tem a sua página pública."
+        "showcase": "Cada clube tem a sua página pública.",
+        "soonBadge": "Em breve",
+        "soonNote": "As funcionalidades sociais serão disponibilizadas em breve."
       },
       "forwho": {
         "title": "Para quem?",
@@ -1058,7 +1060,10 @@
           }
         ]
       }
-    }
+    },
+    "learnMore": "Saber mais",
+    "modulesCount": "módulos",
+    "includedV1": "Incluído na V1"
   },
   "faq": {
     "metaTitle": "FAQ — Clubero",

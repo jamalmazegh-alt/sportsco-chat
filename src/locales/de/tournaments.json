@@ -1300,7 +1300,7 @@
     "exitTv": "TV-Modus verlassen",
     "next": "Prochain",
     "estimatedEnd": "Voraussichtliches Ende",
-    "averageDelay": "Retard moyen {{minutes}} min",
+    "averageDelay": "Durchschnittliche Verspätung {{minutes}} Min.",
     "alerts": {
       "title": "{{count}} Punkt(e) zu klären",
       "heading": "Alertes",
@@ -1315,7 +1315,7 @@
     "aiTitle": "Mit KI erstellen",
     "aiHint": "Schritt für Schritt — dein Turnier vollständig konfiguriert.",
     "aiBadge": "Nouveau",
-    "quickTitle": "Mode rapide",
+    "quickTitle": "Schnellmodus",
     "quickHint": "5 Screens, große Buttons, keine Überraschungen.",
     "simulatorLink": "Format vor dem Erstellen simulieren",
     "back": "Retour",
@@ -1553,7 +1553,7 @@
     }
   },
   "simulator": {
-    "title": "Simulateur de tournoi",
+    "title": "Turniersimulator",
     "subtitle": "Passe die Parameter an und sieh die Wirkung live.",
     "teams": "Teams",
     "terrains": "Terrains",
@@ -1563,7 +1563,7 @@
     "estimatedEnd": "Geschätzte Endzeit",
     "matches": "Matchs",
     "rounds": "Tours",
-    "margin": "Marge avant 18h",
+    "margin": "Puffer vor 18 Uhr",
     "addTerrain": "+ 1 terrain → gain ~{{gain}} min",
     "verdictOk": "✓ Passt locker in den Tag",
     "verdictWarn": "⚠ Es wird knapp",
@@ -1581,19 +1581,19 @@
     "phaseFinal": "Finale"
   },
   "rulesAi": {
-    "generate": "Reglement mit KI erstellen",
+    "generate": "Reglement mit KI generieren",
     "modalTitle": "Vorgeschlagenes Reglement",
-    "modalDescription": "Vorschau anzeigen, dann einfügen oder neu generieren.",
+    "modalDescription": "Vorschau anzeigen, dann einfügen oder neu generieren. Du kannst es danach noch bearbeiten.",
     "insert": "In das Reglement einfügen",
     "regenerate": "Neu generieren",
-    "close": "Fermer",
+    "close": "Schließen",
     "loading": "Wird generiert…",
-    "rateLimited": "Tageslimit erreicht. Hier ist eine Basisvorlage.",
+    "rateLimited": "Tageslimit erreicht (5 Generierungen / Tag). Hier ist eine Basisvorlage.",
     "error": "Generierung nicht verfügbar. Hier ist eine Basisvorlage."
   },
   "coachInsightsAi": {
-    "refresh": "Actualiser",
-    "refreshing": "Actualisation…",
+    "refresh": "Aktualisieren",
+    "refreshing": "Aktualisierung…",
     "refreshDone": "Insights aktualisiert",
     "refreshLimited": "Du hast heute bereits aktualisiert. Versuche es morgen erneut.",
     "refreshError": "Aktualisierung derzeit nicht möglich."

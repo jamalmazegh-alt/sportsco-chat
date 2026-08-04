@@ -349,7 +349,9 @@
         "s2": "Ouders blijven op de hoogte",
         "s3": "Coaches komen in de schijnwerpers",
         "s4": "Clubs vergroten hun bereik",
-        "showcase": "Elke club heeft zijn eigen publieke etalagepagina."
+        "showcase": "Elke club heeft zijn eigen publieke etalagepagina.",
+        "soonBadge": "Binnenkort",
+        "soonNote": "Sociale functies worden binnenkort uitgerold."
       },
       "forwho": {
         "title": "Voor wie?",
@@ -1058,7 +1060,10 @@
           }
         ]
       }
-    }
+    },
+    "learnMore": "Meer informatie",
+    "modulesCount": "modules",
+    "includedV1": "Inbegrepen in V1"
   },
   "faq": {
     "metaTitle": "FAQ — Clubero",

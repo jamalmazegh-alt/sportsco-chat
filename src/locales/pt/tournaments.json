@@ -1300,7 +1300,7 @@
     "exitTv": "Sair do modo TV",
     "next": "Prochain",
     "estimatedEnd": "Fim previsto",
-    "averageDelay": "Retard moyen {{minutes}} min",
+    "averageDelay": "Atraso médio {{minutes}} min",
     "alerts": {
       "title": "{{count}} assunto(s) a resolver",
       "heading": "Alertes",
@@ -1315,7 +1315,7 @@
     "aiTitle": "Criar com IA",
     "aiHint": "Passo a passo — torneio totalmente configurado.",
     "aiBadge": "Nouveau",
-    "quickTitle": "Mode rapide",
+    "quickTitle": "Modo rápido",
     "quickHint": "5 ecrãs, botões grandes, sem surpresas.",
     "simulatorLink": "Simular um formato antes de criar",
     "back": "Retour",
@@ -1553,7 +1553,7 @@
     }
   },
   "simulator": {
-    "title": "Simulateur de tournoi",
+    "title": "Simulador de torneio",
     "subtitle": "Ajuste os parâmetros e veja o impacto em direto.",
     "teams": "Equipas",
     "terrains": "Terrains",
@@ -1563,7 +1563,7 @@
     "estimatedEnd": "Hora de fim estimada",
     "matches": "Matchs",
     "rounds": "Tours",
-    "margin": "Marge avant 18h",
+    "margin": "Margem antes das 18:00",
     "addTerrain": "+ 1 terrain → gain ~{{gain}} min",
     "verdictOk": "✓ Cabe folgadamente no dia",
     "verdictWarn": "⚠ Fica justo",
@@ -1581,19 +1581,19 @@
     "phaseFinal": "Final"
   },
   "rulesAi": {
-    "generate": "Gerar um regulamento com IA",
+    "generate": "Gerar regulamento com IA",
     "modalTitle": "Regulamento proposto",
-    "modalDescription": "Pré-visualize e depois insira ou gere novamente.",
+    "modalDescription": "Pré-visualize, depois inserir ou gerar novamente. Ainda poderá editar depois.",
     "insert": "Inserir no regulamento",
     "regenerate": "Gerar novamente",
-    "close": "Fermer",
+    "close": "Fechar",
     "loading": "A gerar…",
-    "rateLimited": "Limite diário atingido. Aqui está um modelo de base.",
+    "rateLimited": "Limite diário atingido (5 gerações / dia). Eis um modelo básico.",
     "error": "Geração indisponível. Eis um modelo básico."
   },
   "coachInsightsAi": {
-    "refresh": "Actualiser",
-    "refreshing": "Actualisation…",
+    "refresh": "Atualizar",
+    "refreshing": "A atualizar…",
     "refreshDone": "Insights atualizados",
     "refreshLimited": "Já atualizou hoje. Tente novamente amanhã.",
     "refreshError": "Não é possível atualizar de momento."

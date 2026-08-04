@@ -168,7 +168,7 @@
     },
     "currenttool": {
       "title": "Womit organisierst du das heute?",
-      "subtitle": "",
+      "subtitle": "WhatsApp, Excel, anderes Tool…",
       "options": {
         "whatsapp": {
           "label": "WhatsApp / SMS",

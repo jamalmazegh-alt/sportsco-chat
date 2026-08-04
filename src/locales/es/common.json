@@ -195,9 +195,9 @@
     "manageClub": "Gestionar Club",
     "manageClubSubtitle": "Ajustes, miembros, suscripción",
     "viewStats": "Ver estadísticas",
-    "players": "Players",
+    "players": "Jugadores",
     "tournament": "Torneo",
-    "signup": "Sign up"
+    "signup": "Registrarse"
   },
   "auth": {
     "playerSignupLink": "¿Eres jugador? Crea tu perfil aquí →",
@@ -279,7 +279,9 @@
     "teamJoinHint": "Esta información crea la ficha del jugador. El club podrá completarla después.",
     "parentPhone": "Tu teléfono (padre/madre)",
     "showPassword": "Mostrar contraseña",
-    "hidePassword": "Ocultar contraseña"
+    "hidePassword": "Ocultar contraseña",
+    "inviteExpired": "Esta invitación ha caducado.",
+    "inviteUsed": "Esta invitación ya ha sido utilizada."
   },
   "common": {
     "save": "Guardar",
@@ -337,7 +339,7 @@
     "invalidImage": "Formato de imagen no admitido",
     "copyFailed": "No se puede copiar",
     "copy": "Copiar",
-    "moreActions": "More actions"
+    "moreActions": "Más acciones"
   },
   "notFound": {
     "code": "404",
@@ -2967,7 +2969,7 @@
     "deleteConfirm": "¿Eliminar este grupo? Los miembros asociados serán eliminados.",
     "name": "Nombre",
     "namePlaceholder": "P.ej. Junta, Voluntarios",
-    "description": "Description",
+    "description": "Descripción",
     "descriptionPlaceholder": "Opcional",
     "active": "Activo",
     "inactive": "Inactivo",
@@ -3126,19 +3128,19 @@
     "other": "Evento"
   },
   "search": {
-    "open": "Search",
-    "placeholder": "Search players, teams, events…",
-    "empty": "No results."
+    "open": "Buscar",
+    "placeholder": "Buscar jugadores, equipos, eventos…",
+    "empty": "Sin resultados."
   },
   "position": {
-    "placeholder": "Position",
+    "placeholder": "Posición",
     "search": "Busca o escribe…",
     "empty": "Sin sugerencias",
-    "suggested": "Suggestions",
+    "suggested": "Sugerencias",
     "custom": "Costumbre",
     "use": "Usar"
   },
-  "fab": "Support",
+  "fab": "Soporte",
   "voice": {
     "permissionDenied": "Micrófono denegado",
     "error": "Error de dictado de voz",
@@ -3250,7 +3252,7 @@
       "confirmDocReject": "Rechazar documento",
       "currentReason": "Motivo del rechazo",
       "trackingLink": "vínculo familiar",
-      "participant": "Participant",
+      "participant": "Participante",
       "firstName": "Nombre de pila",
       "lastName": "Apellido",
       "birthDate": "Fecha de nacimiento",
@@ -3313,7 +3315,7 @@
       "allDossier": "Todos los archivos"
     },
     "col": {
-      "participant": "Participant",
+      "participant": "Participante",
       "guardian": "Guardián",
       "requested": "Pedido",
       "regStatus": "Registro",
@@ -3569,7 +3571,7 @@
     "venueHint": "Puede omitir este paso y agregarlo más tarde.",
     "ageGroupsEmpty": "Se requiere al menos una categoría para publicar. Puedes agregar más más tarde.",
     "summary": {
-      "deadline": "deadline",
+      "deadline": "fecha límite",
       "places": "manchas",
       "venueSet": "lugar establecido",
       "ageGroups": "Categorías",
@@ -3620,7 +3622,7 @@
     "slug": "Slug (URL)",
     "slugLocked": "El slug se bloquea después de la publicación.",
     "slugHint": "Letras, números y guiones. Editable mientras el campamento es un borrador.",
-    "description": "Description",
+    "description": "Descripción",
     "cover": "Imagen de portada",
     "currency": "Divisa",
     "paymentInstructions": "Instrucciones de pago",
@@ -3660,7 +3662,7 @@
     "addTitle": "Agregar un documento",
     "titlePlaceholder": "Título mostrado (opcional: nombre de archivo predeterminado)",
     "upload": "Subir (PDF, JPG, PNG)",
-    "maxHint": "15 MB max"
+    "maxHint": "15 MB máx."
   },
   "program": {
     "empty": "Aún no hay elementos del programa.",
@@ -3677,7 +3679,7 @@
     "editTitle": "Editar documento",
     "addTitle": "Nuevo documento requerido",
     "titlePlaceholder": "P.ej. Certificado médico con menos de 3 meses de antigüedad.",
-    "type": "Type",
+    "type": "Tipo",
     "mandatory": "Obligatorio",
     "sensitive": "Datos sensibles",
     "sensitiveForced": "Obligado para documentos médicos: cifrado y retención limitada.",

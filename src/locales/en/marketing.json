@@ -349,7 +349,9 @@
         "s2": "Parents stay informed",
         "s3": "Coaches get the spotlight",
         "s4": "Clubs grow their visibility",
-        "showcase": "Every club has its own public showcase page."
+        "showcase": "Every club has its own public showcase page.",
+        "soonBadge": "Coming soon",
+        "soonNote": "Social features are rolling out soon."
       },
       "forwho": {
         "title": "Who is it for?",
@@ -1058,7 +1060,10 @@
           }
         ]
       }
-    }
+    },
+    "learnMore": "Learn more",
+    "modulesCount": "modules",
+    "includedV1": "Included in V1"
   },
   "faq": {
     "metaTitle": "FAQ — Clubero",

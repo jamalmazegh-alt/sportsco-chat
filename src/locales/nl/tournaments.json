@@ -1300,7 +1300,7 @@
     "exitTv": "TV-modus verlaten",
     "next": "Prochain",
     "estimatedEnd": "Verwacht einde",
-    "averageDelay": "Retard moyen {{minutes}} min",
+    "averageDelay": "Gemiddelde vertraging {{minutes}} min",
     "alerts": {
       "title": "{{count}} ding(en) om te regelen",
       "heading": "Alertes",
@@ -1315,7 +1315,7 @@
     "aiTitle": "Aanmaken met AI",
     "aiHint": "Stap voor stap — je toernooi volledig geconfigureerd.",
     "aiBadge": "Nouveau",
-    "quickTitle": "Mode rapide",
+    "quickTitle": "Snelle modus",
     "quickHint": "5 schermen, grote knoppen, geen verrassingen.",
     "simulatorLink": "Simuleer een format voordat je aanmaakt",
     "back": "Retour",
@@ -1553,7 +1553,7 @@
     }
   },
   "simulator": {
-    "title": "Simulateur de tournoi",
+    "title": "Toernooisimulator",
     "subtitle": "Pas de instellingen aan en zie de impact live.",
     "teams": "Teams",
     "terrains": "Terrains",
@@ -1563,7 +1563,7 @@
     "estimatedEnd": "Geschatte eindtijd",
     "matches": "Matchs",
     "rounds": "Tours",
-    "margin": "Marge avant 18h",
+    "margin": "Marge vóór 18:00",
     "addTerrain": "+ 1 terrain → gain ~{{gain}} min",
     "verdictOk": "✓ Past ruim in de dag",
     "verdictWarn": "⚠ Het is krap",
@@ -1583,17 +1583,17 @@
   "rulesAi": {
     "generate": "Reglement genereren met AI",
     "modalTitle": "Voorgesteld reglement",
-    "modalDescription": "Bekijk de preview en voeg in of genereer opnieuw.",
+    "modalDescription": "Bekijk een voorbeeld, voeg in of genereer opnieuw. Je kunt het daarna nog bewerken.",
     "insert": "In reglement invoegen",
     "regenerate": "Opnieuw genereren",
-    "close": "Fermer",
+    "close": "Sluiten",
     "loading": "Bezig met genereren…",
-    "rateLimited": "Daglimiet bereikt. Hier is een basisreglement.",
+    "rateLimited": "Daglimiet bereikt (5 generaties / dag). Hier is een basissjabloon.",
     "error": "Genereren niet beschikbaar. Hier is een basissjabloon."
   },
   "coachInsightsAi": {
-    "refresh": "Actualiser",
-    "refreshing": "Actualisation…",
+    "refresh": "Vernieuwen",
+    "refreshing": "Vernieuwen…",
     "refreshDone": "Insights bijgewerkt",
     "refreshLimited": "Je hebt vandaag al vernieuwd. Probeer het morgen opnieuw.",
     "refreshError": "Kan momenteel niet vernieuwen."

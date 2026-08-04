@@ -1300,7 +1300,7 @@
     "exitTv": "Esci dalla modalità TV",
     "next": "Prochain",
     "estimatedEnd": "Fine prevista",
-    "averageDelay": "Retard moyen {{minutes}} min",
+    "averageDelay": "Ritardo medio {{minutes}} min",
     "alerts": {
       "title": "{{count}} cosa/e da sistemare",
       "heading": "Alertes",
@@ -1315,7 +1315,7 @@
     "aiTitle": "Crea con l'IA",
     "aiHint": "Passo dopo passo — torneo completamente configurato.",
     "aiBadge": "Nouveau",
-    "quickTitle": "Mode rapide",
+    "quickTitle": "Modalità rapida",
     "quickHint": "5 schermate, pulsanti grandi, nessuna sorpresa.",
     "simulatorLink": "Simula un formato prima di creare",
     "back": "Retour",
@@ -1553,7 +1553,7 @@
     }
   },
   "simulator": {
-    "title": "Simulateur de tournoi",
+    "title": "Simulatore di torneo",
     "subtitle": "Regola i parametri e vedi l'impatto in tempo reale.",
     "teams": "Squadre",
     "terrains": "Terrains",
@@ -1563,7 +1563,7 @@
     "estimatedEnd": "Ora di fine stimata",
     "matches": "Matchs",
     "rounds": "Tours",
-    "margin": "Marge avant 18h",
+    "margin": "Margine prima delle 18:00",
     "addTerrain": "+ 1 terrain → gain ~{{gain}} min",
     "verdictOk": "✓ Sta comodamente nella giornata",
     "verdictWarn": "⚠ Si fa giusto",
@@ -1581,19 +1581,19 @@
     "phaseFinal": "Finale"
   },
   "rulesAi": {
-    "generate": "Genera un regolamento con l'IA",
+    "generate": "Genera regolamento con l'IA",
     "modalTitle": "Regolamento proposto",
-    "modalDescription": "Visualizza l'anteprima, poi inserisci o rigenera.",
+    "modalDescription": "Anteprima, poi inserisci o rigenera. Potrai sempre modificarlo dopo.",
     "insert": "Inserisci nel regolamento",
     "regenerate": "Rigenera",
-    "close": "Fermer",
+    "close": "Chiudi",
     "loading": "Generazione in corso…",
-    "rateLimited": "Limite giornaliero raggiunto. Ecco un modello di base.",
+    "rateLimited": "Limite giornaliero raggiunto (5 generazioni / giorno). Ecco un modello di base.",
     "error": "Generazione non disponibile. Ecco un modello di base."
   },
   "coachInsightsAi": {
-    "refresh": "Actualiser",
-    "refreshing": "Actualisation…",
+    "refresh": "Aggiorna",
+    "refreshing": "Aggiornamento…",
     "refreshDone": "Insights aggiornati",
     "refreshLimited": "Hai già aggiornato oggi. Riprova domani.",
     "refreshError": "Impossibile aggiornare per il momento."

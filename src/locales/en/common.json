@@ -279,7 +279,9 @@
     "teamJoinHint": "This information creates the player profile. The club can complete it later.",
     "parentPhone": "Your phone (parent)",
     "showPassword": "Show password",
-    "hidePassword": "Hide password"
+    "hidePassword": "Hide password",
+    "inviteExpired": "This invitation has expired.",
+    "inviteUsed": "This invitation has already been used."
   },
   "common": {
     "save": "Save",

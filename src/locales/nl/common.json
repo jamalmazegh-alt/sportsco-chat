@@ -195,9 +195,9 @@
     "manageClub": "Club beheren",
     "manageClubSubtitle": "Instellingen, leden, abonnement",
     "viewStats": "Statistieken bekijken",
-    "players": "Players",
+    "players": "Spelers",
     "tournament": "Toernooi",
-    "signup": "Sign up"
+    "signup": "Registreren"
   },
   "auth": {
     "playerSignupLink": "Ben je een Speler? Maak hier je profiel aan →",
@@ -279,7 +279,9 @@
     "teamJoinHint": "Deze gegevens maken het spelersprofiel aan. De club kan ze later aanvullen.",
     "parentPhone": "Jouw telefoon (ouder)",
     "showPassword": "Wachtwoord tonen",
-    "hidePassword": "Wachtwoord verbergen"
+    "hidePassword": "Wachtwoord verbergen",
+    "inviteExpired": "Deze uitnodiging is verlopen.",
+    "inviteUsed": "Deze uitnodiging is al gebruikt."
   },
   "common": {
     "save": "Opslaan",
@@ -337,7 +339,7 @@
     "invalidImage": "Niet-ondersteund afbeeldingsformaat",
     "copyFailed": "Kan niet kopiëren",
     "copy": "Kopiëren",
-    "moreActions": "More actions"
+    "moreActions": "Meer acties"
   },
   "notFound": {
     "code": "404",
@@ -2967,7 +2969,7 @@
     "deleteConfirm": "Deze groep verwijderen? Geassocieerde leden worden verwijderd.",
     "name": "Naam",
     "namePlaceholder": "Bijvoorbeeld Bestuur, vrijwilligers",
-    "description": "Description",
+    "description": "Beschrijving",
     "descriptionPlaceholder": "Optioneel",
     "active": "Actief",
     "inactive": "Inactief",
@@ -3126,15 +3128,15 @@
     "other": "Evenement"
   },
   "search": {
-    "open": "Search",
-    "placeholder": "Search players, teams, events…",
-    "empty": "No results."
+    "open": "Zoeken",
+    "placeholder": "Zoek spelers, teams, evenementen…",
+    "empty": "Geen resultaten."
   },
   "position": {
-    "placeholder": "Position",
+    "placeholder": "Positie",
     "search": "Zoek of typ…",
     "empty": "Geen suggesties",
-    "suggested": "Suggestions",
+    "suggested": "Suggesties",
     "custom": "Aangepast",
     "use": "Gebruik"
   },
@@ -3250,7 +3252,7 @@
       "confirmDocReject": "Document afwijzen",
       "currentReason": "Reden van afwijzing",
       "trackingLink": "Familie link",
-      "participant": "Participant",
+      "participant": "Deelnemer",
       "firstName": "Voornaam",
       "lastName": "Achternaam",
       "birthDate": "Geboortedatum",
@@ -3313,7 +3315,7 @@
       "allDossier": "Alle bestanden"
     },
     "col": {
-      "participant": "Participant",
+      "participant": "Deelnemer",
       "guardian": "Voogd",
       "requested": "Verzoek",
       "regStatus": "Registratie",
@@ -3620,7 +3622,7 @@
     "slug": "Slug (URL)",
     "slugLocked": "De slak wordt na publicatie vergrendeld.",
     "slugHint": "Letters, cijfers en koppeltekens. Bewerkbaar terwijl het kamp een concept is.",
-    "description": "Description",
+    "description": "Beschrijving",
     "cover": "Omslagafbeelding",
     "currency": "Munteenheid",
     "paymentInstructions": "Betalingsinstructies",
@@ -3660,7 +3662,7 @@
     "addTitle": "Voeg een document toe",
     "titlePlaceholder": "Weergavetitel (optioneel – standaard bestandsnaam)",
     "upload": "Uploaden (PDF, JPG, PNG)",
-    "maxHint": "15 MB max"
+    "maxHint": "max. 15 MB"
   },
   "program": {
     "empty": "Nog geen programma-items.",

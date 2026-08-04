@@ -168,7 +168,7 @@
     },
     "currenttool": {
       "title": "Vandaag beheer je dit met…",
-      "subtitle": "",
+      "subtitle": "WhatsApp, Excel, een andere tool…",
       "options": {
         "whatsapp": {
           "label": "WhatsApp / SMS",
