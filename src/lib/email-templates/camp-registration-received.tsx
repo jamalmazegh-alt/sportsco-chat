@@ -1,6 +1,6 @@
 import * as React from "react";
 import { Button, Heading, Img, Section, Text } from "@react-email/components";
-import { EmailShell } from "./_layout";
+import { EmailShell, pickLocale, type Locale } from "./_layout";
 import type { TemplateEntry } from "./registry";
 
 interface Props {
@@ -13,7 +13,81 @@ interface Props {
   referenceId?: string;
   trackingUrl?: string;
   isFull?: boolean;
+  locale?: string;
 }
+
+const T = {
+  fr: {
+    preview: (camp: string) => `Inscription bien reçue — ${camp}`,
+    brand: "Clubero · Stages",
+    hello: (n?: string) => (n ? `Bonjour ${n},` : "Bonjour,"),
+    body: (participant: string, camp: string, club: string) => (
+      <>
+        Nous avons bien reçu l'inscription de <strong>{participant}</strong> au stage
+        <strong> {camp}</strong> organisé par <strong>{club}</strong>.
+      </>
+    ),
+    labelCamp: "Stage",
+    labelChild: "Enfant",
+    labelDates: "Dates",
+    labelRef: "Référence",
+    waitlist: (
+      <>
+        ⚠️ Le stage est actuellement <strong>complet</strong>. Votre demande est enregistrée en
+        liste d'attente : le club vous recontactera dès qu'une place se libère ou pour confirmer
+        votre placement.
+      </>
+    ),
+    pending:
+      "Votre dossier est en attente de validation par le club. Vous recevrez un email dès qu'il aura été traité.",
+    trackingIntro:
+      "Vous pouvez suivre l'avancement de votre dossier, télécharger vos pièces et remplacer une pièce refusée depuis votre lien personnel :",
+    cta: "Suivre mon inscription",
+    orLink: "Ou ouvrez ce lien :",
+    personalLink: "Ce lien est personnel — ne le partagez pas.",
+    ignore: "Si vous n'êtes pas à l'origine de cette inscription, vous pouvez ignorer cet email.",
+    subject: (camp: string) => `Inscription bien reçue — ${camp}`,
+    fallbackCamp: "stage",
+  },
+  en: {
+    preview: (camp: string) => `Registration received — ${camp}`,
+    brand: "Clubero · Camps",
+    hello: (n?: string) => (n ? `Hi ${n},` : "Hi,"),
+    body: (participant: string, camp: string, club: string) => (
+      <>
+        We have received the registration of <strong>{participant}</strong> for the camp
+        <strong> {camp}</strong> organized by <strong>{club}</strong>.
+      </>
+    ),
+    labelCamp: "Camp",
+    labelChild: "Child",
+    labelDates: "Dates",
+    labelRef: "Reference",
+    waitlist: (
+      <>
+        ⚠️ The camp is currently <strong>full</strong>. Your request has been added to the waitlist:
+        the club will contact you when a spot opens or to confirm your place.
+      </>
+    ),
+    pending:
+      "Your registration is pending club review. You will receive an email once it has been processed.",
+    trackingIntro:
+      "You can track your registration, upload documents, and replace a rejected document from your personal link:",
+    cta: "Track my registration",
+    orLink: "Or open this link:",
+    personalLink: "This link is personal — do not share it.",
+    ignore: "If you did not submit this registration, you can ignore this email.",
+    subject: (camp: string) => `Registration received — ${camp}`,
+    fallbackCamp: "camp",
+  },
+} as const;
+
+const pick = (l: Locale) => (l === "fr" ? T.fr : T.en);
+
+const formatCampDates = (start: string, end: string, l: Locale) => {
+  const bcp = l === "en" ? "en-GB" : "fr-FR";
+  return `${new Date(start).toLocaleDateString(bcp)} → ${new Date(end).toLocaleDateString(bcp)}`;
+};
 
 const CampRegistrationReceived = ({
   guardianFirstName,
@@ -25,13 +99,15 @@ const CampRegistrationReceived = ({
   referenceId,
   trackingUrl,
   isFull,
+  locale,
 }: Props) => {
+  const l = pickLocale(locale);
+  const t = pick(l);
   const dates =
-    campStartDate && campEndDate
-      ? `${new Date(campStartDate).toLocaleDateString("fr-FR")} → ${new Date(campEndDate).toLocaleDateString("fr-FR")}`
-      : null;
+    campStartDate && campEndDate ? formatCampDates(campStartDate, campEndDate, l) : null;
+
   return (
-    <EmailShell preview={`Inscription bien reçue — ${campTitle}`} locale="fr">
+    <EmailShell preview={t.preview(campTitle)} locale={l}>
       <Section style={header}>
         <Img
           src="https://www.clubero.app/clubero-logo.png"
@@ -40,62 +116,61 @@ const CampRegistrationReceived = ({
           height="56"
           style={logo}
         />
-        <Text style={brand}>Clubero · Stages</Text>
+        <Text style={brand}>{t.brand}</Text>
       </Section>
-      <Heading style={h1}>
-        {guardianFirstName ? `Bonjour ${guardianFirstName},` : "Bonjour,"}
-      </Heading>
-      <Text style={text}>
-        Nous avons bien reçu l'inscription de <strong>{participantName}</strong> au stage
-        <strong> {campTitle}</strong> organisé par <strong>{clubName}</strong>.
-      </Text>
+      <Heading style={h1}>{t.hello(guardianFirstName)}</Heading>
+      <Text style={text}>{t.body(participantName, campTitle, clubName)}</Text>
       <Section style={card}>
-        <Text style={cardLine}>Stage : {campTitle}</Text>
-        <Text style={cardLine}>Enfant : {participantName}</Text>
-        {dates && <Text style={cardLine}>Dates : {dates}</Text>}
-        {referenceId && <Text style={cardLine}>Référence : {referenceId}</Text>}
+        <Text style={cardLine}>
+          {t.labelCamp} : {campTitle}
+        </Text>
+        <Text style={cardLine}>
+          {t.labelChild} : {participantName}
+        </Text>
+        {dates && (
+          <Text style={cardLine}>
+            {t.labelDates} : {dates}
+          </Text>
+        )}
+        {referenceId && (
+          <Text style={cardLine}>
+            {t.labelRef} : {referenceId}
+          </Text>
+        )}
       </Section>
       {isFull ? (
         <Section style={warn}>
-          <Text style={warnText}>
-            ⚠️ Le stage est actuellement <strong>complet</strong>. Votre demande est enregistrée en
-            liste d'attente : le club vous recontactera dès qu'une place se libère ou pour confirmer
-            votre placement.
-          </Text>
+          <Text style={warnText}>{t.waitlist}</Text>
         </Section>
       ) : (
-        <Text style={text}>
-          Votre dossier est en attente de validation par le club. Vous recevrez un email dès qu'il
-          aura été traité.
-        </Text>
+        <Text style={text}>{t.pending}</Text>
       )}
       {trackingUrl && (
         <>
-          <Text style={text}>
-            Vous pouvez suivre l'avancement de votre dossier, télécharger vos pièces et remplacer
-            une pièce refusée depuis votre lien personnel :
-          </Text>
+          <Text style={text}>{t.trackingIntro}</Text>
           <Button style={button} href={trackingUrl}>
-            Suivre mon inscription
+            {t.cta}
           </Button>
           <Text style={small}>
-            Ou ouvrez ce lien :<br />
+            {t.orLink}
+            <br />
             <span style={{ wordBreak: "break-all", color: "#3b82f6" }}>{trackingUrl}</span>
             <br />
-            <em>Ce lien est personnel — ne le partagez pas.</em>
+            <em>{t.personalLink}</em>
           </Text>
         </>
       )}
-      <Text style={small}>
-        Si vous n'êtes pas à l'origine de cette inscription, vous pouvez ignorer cet email.
-      </Text>
+      <Text style={small}>{t.ignore}</Text>
     </EmailShell>
   );
 };
 
 export const template = {
   component: CampRegistrationReceived,
-  subject: (data) => `Inscription bien reçue — ${data.campTitle ?? "stage"}`,
+  subject: (data) => {
+    const t = pick(pickLocale((data as { locale?: string }).locale));
+    return t.subject((data.campTitle as string | undefined) ?? t.fallbackCamp);
+  },
   displayName: "Camp registration received",
   previewData: {
     guardianFirstName: "Marie",
@@ -107,6 +182,7 @@ export const template = {
     referenceId: "AB12CD34",
     trackingUrl: "https://clubero.app/stages/fc-villeneuve/stage-printemps/suivi/token",
     isFull: false,
+    locale: "fr",
   },
 } satisfies TemplateEntry;
 

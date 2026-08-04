@@ -1,6 +1,6 @@
 import * as React from "react";
 import { Button, Heading, Img, Section, Text } from "@react-email/components";
-import { EmailShell } from "./_layout";
+import { EmailShell, pickLocale, type Locale } from "./_layout";
 import type { TemplateEntry } from "./registry";
 
 interface Props {
@@ -10,7 +10,47 @@ interface Props {
   documentTitle: string;
   wasRejected?: boolean;
   manageUrl: string;
+  locale?: string;
 }
+
+const T = {
+  fr: {
+    preview: (doc: string, participant: string) => `Document renvoyé : ${doc} — ${participant}`,
+    brand: "Clubero · Stages",
+    title: "Document renvoyé",
+    body: (camp: string, clubSuffix: string, wasRejected?: boolean) => (
+      <>
+        Un document {wasRejected ? "précédemment refusé " : ""}vient d'être renvoyé pour le stage{" "}
+        <strong>{camp}</strong>
+        {clubSuffix}.
+      </>
+    ),
+    labelDoc: "Document",
+    labelStatus: "Statut : en attente de validation",
+    cta: "Vérifier le document",
+    orLink: "Ou ouvrez ce lien :",
+    subject: (participant: string, doc: string) => `Document renvoyé — ${participant} (${doc})`,
+  },
+  en: {
+    preview: (doc: string, participant: string) => `Document resubmitted: ${doc} — ${participant}`,
+    brand: "Clubero · Camps",
+    title: "Document resubmitted",
+    body: (camp: string, clubSuffix: string, wasRejected?: boolean) => (
+      <>
+        A document{wasRejected ? " previously rejected" : ""} has just been resubmitted for the camp{" "}
+        <strong>{camp}</strong>
+        {clubSuffix}.
+      </>
+    ),
+    labelDoc: "Document",
+    labelStatus: "Status: pending review",
+    cta: "Review document",
+    orLink: "Or open this link:",
+    subject: (participant: string, doc: string) => `Document resubmitted — ${participant} (${doc})`,
+  },
+} as const;
+
+const pick = (l: Locale) => (l === "fr" ? T.fr : T.en);
 
 const CampDocumentResubmitted = ({
   campTitle,
@@ -19,43 +59,54 @@ const CampDocumentResubmitted = ({
   documentTitle,
   wasRejected,
   manageUrl,
-}: Props) => (
-  <EmailShell preview={`Document renvoyé : ${documentTitle} — ${participantName}`} locale="fr">
-    <Section style={header}>
-      <Img
-        src="https://www.clubero.app/clubero-logo.png"
-        alt="Clubero"
-        width="56"
-        height="56"
-        style={logo}
-      />
-      <Text style={brand}>Clubero · Stages</Text>
-    </Section>
-    <Heading style={h1}>Document renvoyé</Heading>
-    <Text style={text}>
-      Un document {wasRejected ? "précédemment refusé " : ""}vient d'être renvoyé pour le stage{" "}
-      <strong>{campTitle}</strong>
-      {clubName ? ` (${clubName})` : ""}.
-    </Text>
-    <Section style={card}>
-      <Text style={cardTitle}>{participantName}</Text>
-      <Text style={cardLine}>Document : {documentTitle}</Text>
-      <Text style={cardLine}>Statut : en attente de validation</Text>
-    </Section>
-    <Button style={button} href={manageUrl}>
-      Vérifier le document
-    </Button>
-    <Text style={small}>
-      Ou ouvrez ce lien :<br />
-      <span style={{ wordBreak: "break-all", color: "#3b82f6" }}>{manageUrl}</span>
-    </Text>
-  </EmailShell>
-);
+  locale,
+}: Props) => {
+  const l = pickLocale(locale);
+  const t = pick(l);
+  const clubSuffix = clubName ? ` (${clubName})` : "";
+
+  return (
+    <EmailShell preview={t.preview(documentTitle, participantName)} locale={l}>
+      <Section style={header}>
+        <Img
+          src="https://www.clubero.app/clubero-logo.png"
+          alt="Clubero"
+          width="56"
+          height="56"
+          style={logo}
+        />
+        <Text style={brand}>{t.brand}</Text>
+      </Section>
+      <Heading style={h1}>{t.title}</Heading>
+      <Text style={text}>{t.body(campTitle, clubSuffix, wasRejected)}</Text>
+      <Section style={card}>
+        <Text style={cardTitle}>{participantName}</Text>
+        <Text style={cardLine}>
+          {t.labelDoc} : {documentTitle}
+        </Text>
+        <Text style={cardLine}>{t.labelStatus}</Text>
+      </Section>
+      <Button style={button} href={manageUrl}>
+        {t.cta}
+      </Button>
+      <Text style={small}>
+        {t.orLink}
+        <br />
+        <span style={{ wordBreak: "break-all", color: "#3b82f6" }}>{manageUrl}</span>
+      </Text>
+    </EmailShell>
+  );
+};
 
 export const template = {
   component: CampDocumentResubmitted,
-  subject: (data) =>
-    `Document renvoyé — ${data.participantName ?? ""} (${data.documentTitle ?? ""})`,
+  subject: (data) => {
+    const t = pick(pickLocale((data as { locale?: string }).locale));
+    return t.subject(
+      (data.participantName as string | undefined) ?? "",
+      (data.documentTitle as string | undefined) ?? "",
+    );
+  },
   displayName: "Camp document resubmitted",
   previewData: {
     campTitle: "Stage de printemps U11",
@@ -64,6 +115,7 @@ export const template = {
     documentTitle: "Certificat médical",
     wasRejected: true,
     manageUrl: "https://clubero.app/admin/stages/sample",
+    locale: "fr",
   },
 } satisfies TemplateEntry;
 

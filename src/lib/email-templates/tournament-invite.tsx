@@ -1,6 +1,6 @@
 import * as React from "react";
 import { Button, Heading, Img, Section, Text } from "@react-email/components";
-import { EmailShell } from "./_layout";
+import { EmailShell, pickLocale, type Locale } from "./_layout";
 import type { TemplateEntry } from "./registry";
 
 interface TournamentInviteProps {
@@ -9,7 +9,74 @@ interface TournamentInviteProps {
   roleLabel?: string;
   inviterName?: string;
   inviteUrl: string;
+  locale?: string;
 }
+
+const T = {
+  fr: {
+    defaultTournament: "un tournoi",
+    defaultRole: "collaborateur",
+    preview: (role: string, tournament: string) =>
+      `Vous êtes invité comme ${role} sur ${tournament}`,
+    brand: "Clubero · Tournois",
+    hello: (n?: string) => (n ? `Bonjour ${n},` : "Bonjour,"),
+    inviterInvite: (name: string) => (
+      <>
+        <strong>{name}</strong> vous invite
+      </>
+    ),
+    youAreInvited: "Vous êtes invité",
+    body: (tournament: string, role: string, inviteLead: React.ReactNode) => (
+      <>
+        {inviteLead} à rejoindre l'organisation du tournoi <strong>{tournament}</strong> en tant que{" "}
+        <strong>{role}</strong>.
+      </>
+    ),
+    roleReferee:
+      "En tant qu'arbitre, vous pourrez saisir les scores et valider les matchs qui vous sont assignés.",
+    roleOrganizer:
+      "En tant que co-organisateur, vous disposerez de droits complets sur la gestion du tournoi.",
+    cta: "Accepter l'invitation",
+    createAccount:
+      "Si vous n'avez pas encore de compte Clubero, vous serez invité à le créer avec cette adresse email avant d'accepter l'invitation.",
+    orLink: "Ou copiez ce lien dans votre navigateur :",
+    subject: (role: string, tournament: string) => `Invitation : ${role} sur ${tournament}`,
+  },
+  en: {
+    defaultTournament: "a tournament",
+    defaultRole: "collaborator",
+    preview: (role: string, tournament: string) => `You're invited as ${role} on ${tournament}`,
+    brand: "Clubero · Tournaments",
+    hello: (n?: string) => (n ? `Hi ${n},` : "Hi,"),
+    inviterInvite: (name: string) => (
+      <>
+        <strong>{name}</strong> invites you
+      </>
+    ),
+    youAreInvited: "You're invited",
+    body: (tournament: string, role: string, inviteLead: React.ReactNode) => (
+      <>
+        {inviteLead} to join the organization of tournament <strong>{tournament}</strong> as{" "}
+        <strong>{role}</strong>.
+      </>
+    ),
+    roleReferee:
+      "As a referee, you'll be able to enter scores and validate the matches assigned to you.",
+    roleOrganizer: "As a co-organizer, you'll have full rights to manage the tournament.",
+    cta: "Accept invitation",
+    createAccount:
+      "If you don't have a Clubero account yet, you'll be asked to create one with this email address before accepting the invitation.",
+    orLink: "Or copy this link into your browser:",
+    subject: (role: string, tournament: string) => `Invitation: ${role} on ${tournament}`,
+  },
+} as const;
+
+const pick = (l: Locale) => (l === "fr" ? T.fr : T.en);
+
+const isRefereeRole = (role: string) => {
+  const r = role.toLowerCase();
+  return r.includes("arbitre") || r.includes("referee");
+};
 
 const TournamentInviteEmail = ({
   displayName,
@@ -17,11 +84,16 @@ const TournamentInviteEmail = ({
   roleLabel,
   inviterName,
   inviteUrl,
+  locale,
 }: TournamentInviteProps) => {
-  const tournament = tournamentName ?? "un tournoi";
-  const role = roleLabel ?? "collaborateur";
+  const l = pickLocale(locale);
+  const t = pick(l);
+  const tournament = tournamentName ?? t.defaultTournament;
+  const role = roleLabel ?? t.defaultRole;
+  const inviteLead = inviterName ? t.inviterInvite(inviterName) : t.youAreInvited;
+
   return (
-    <EmailShell preview={`Vous êtes invité comme ${role} sur ${tournament}`} locale="fr">
+    <EmailShell preview={t.preview(role, tournament)} locale={l}>
       <Section style={header}>
         <Img
           src="https://www.clubero.app/clubero-logo.png"
@@ -30,34 +102,18 @@ const TournamentInviteEmail = ({
           height="56"
           style={logo}
         />
-        <Text style={brand}>Clubero · Tournois</Text>
+        <Text style={brand}>{t.brand}</Text>
       </Section>
-      <Heading style={h1}>{displayName ? `Bonjour ${displayName},` : "Bonjour,"}</Heading>
-      <Text style={text}>
-        {inviterName ? (
-          <>
-            <strong>{inviterName}</strong> vous invite
-          </>
-        ) : (
-          "Vous êtes invité"
-        )}{" "}
-        à rejoindre l'organisation du tournoi <strong>{tournament}</strong> en tant que{" "}
-        <strong>{role}</strong>.
-      </Text>
-      <Text style={text}>
-        {role.toLowerCase().includes("arbitre")
-          ? "En tant qu'arbitre, vous pourrez saisir les scores et valider les matchs qui vous sont assignés."
-          : "En tant que co-organisateur, vous disposerez de droits complets sur la gestion du tournoi."}
-      </Text>
+      <Heading style={h1}>{t.hello(displayName)}</Heading>
+      <Text style={text}>{t.body(tournament, role, inviteLead)}</Text>
+      <Text style={text}>{isRefereeRole(role) ? t.roleReferee : t.roleOrganizer}</Text>
       <Button style={button} href={inviteUrl}>
-        Accepter l'invitation
+        {t.cta}
       </Button>
-      <Text style={text}>
-        Si vous n'avez pas encore de compte Clubero, vous serez invité à le créer avec cette adresse
-        email avant d'accepter l'invitation.
-      </Text>
+      <Text style={text}>{t.createAccount}</Text>
       <Text style={small}>
-        Ou copiez ce lien dans votre navigateur :<br />
+        {t.orLink}
+        <br />
         <span style={{ wordBreak: "break-all", color: "#3b82f6" }}>{inviteUrl}</span>
       </Text>
     </EmailShell>
@@ -67,9 +123,11 @@ const TournamentInviteEmail = ({
 export const template = {
   component: TournamentInviteEmail,
   subject: (data) => {
-    const t = data.tournamentName ?? "un tournoi";
-    const r = data.roleLabel ?? "collaborateur";
-    return `Invitation : ${r} sur ${t}`;
+    const l = pickLocale((data as { locale?: string }).locale);
+    const t = pick(l);
+    const tournament = (data.tournamentName as string | undefined) ?? t.defaultTournament;
+    const role = (data.roleLabel as string | undefined) ?? t.defaultRole;
+    return t.subject(role, tournament);
   },
   displayName: "Tournament collaborator invitation",
   previewData: {
@@ -78,6 +136,7 @@ export const template = {
     roleLabel: "arbitre",
     inviterName: "Jean Dupont",
     inviteUrl: "https://clubero.app/tournament-invite/sample-token",
+    locale: "fr",
   },
 } satisfies TemplateEntry;
 
