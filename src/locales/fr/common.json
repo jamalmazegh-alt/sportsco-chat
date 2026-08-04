@@ -180,7 +180,8 @@
     "tournament_manager": "Responsable tournois",
     "tournament_admin": "Admin du tournoi",
     "referee": "Arbitre",
-    "incompatibleWith": "Incompatible avec {{role}}"
+    "incompatibleWith": "Incompatible avec {{role}}",
+    "replaces": "Remplace {{roles}}"
   },
   "nav": {
     "home": "Accueil",

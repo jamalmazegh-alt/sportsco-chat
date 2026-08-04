@@ -49,13 +49,15 @@ function SuperAdminUsers() {
 
   useEffect(() => {
     setLoading(true);
-    const t = setTimeout(() => {
+    // `t` est déjà la fonction de traduction : nommer le minuteur `t` la
+    // masquait, et le `catch` appelait alors l'identifiant de setTimeout.
+    const timer = setTimeout(() => {
       listAllUsers({ data: { search: search || undefined, limit: 50, page } })
         .then((r) => setItems(r.items))
         .catch((e) => toast.error(e instanceof Error ? e.message : t("superadmin.common.failed")))
         .finally(() => setLoading(false));
     }, 250);
-    return () => clearTimeout(t);
+    return () => clearTimeout(timer);
   }, [search, page]);
 
   const runAction = async (
