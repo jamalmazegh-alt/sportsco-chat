@@ -2095,5 +2095,32 @@
     "toDoCount": "3 offen",
     "attendance": "Anwesenheit",
     "u15Training": "U15 Training"
+  },
+  "publicPlayers": {
+    "eyebrow": "Öffentliches Verzeichnis",
+    "title": "Die Clubero-Spieler",
+    "subtitle": "Durchsuchen Sie die öffentlichen Profile, die Spieler freigegeben haben: Erfolge, sportlicher Werdegang, Verein. Nur für volljährige Spieler mit aktiviertem Profil.",
+    "searchPlaceholder": "Name des Spielers oder Vereins…",
+    "allSports": "Alle Sportarten",
+    "allClubs": "Alle Vereine",
+    "clubFilter": "Verein",
+    "search": "Suchen",
+    "reset": "Zurücksetzen",
+    "loading": "Wird geladen…",
+    "count": "{{count}} Spieler",
+    "page": "Seite {{page}} / {{total}}",
+    "error": "Das Verzeichnis kann derzeit nicht geladen werden.",
+    "emptyTitle": "Kein passendes Profil",
+    "emptyBody": "Verfeinern Sie Ihre Filter oder schauen Sie bald wieder vorbei – jede Woche teilen neue Spieler ihr Profil.",
+    "prev": "Zurück",
+    "next": "Weiter",
+    "ctaTitle": "Sie sind Spieler? Erstellen Sie Ihr öffentliches Profil.",
+    "ctaBody": "Teilen Sie Ihre Erfolge, Saisons und Ihren Werdegang über einen einzigen Link. Kostenlos, freiwillig, unter Ihrer Kontrolle.",
+    "ctaJoin": "Konto erstellen",
+    "ctaFeatures": "Funktionen ansehen"
+  },
+  "common": {
+    "stop": "Stopp",
+    "listen": "Anhören"
   }
 }

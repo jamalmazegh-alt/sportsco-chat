@@ -339,7 +339,9 @@
     "invalidImage": "Formato de imagem não suportado",
     "copyFailed": "Não foi possível copiar",
     "copy": "Cópia",
-    "moreActions": "Mais ações"
+    "moreActions": "Mais ações",
+    "noResults": "Sem resultados",
+    "added": "adicionado"
   },
   "notFound": {
     "code": "404",
@@ -882,7 +884,9 @@
     "inviteWholeTeamHint": "Envie um convite a cada jogador/pai sem conta. Pessoas já inscritas ou já convidadas são ignoradas.",
     "inviteFailedLabel": "Envio falhou",
     "inviteSuppressedSimple": "{{count}} convite(s) bloqueado(s): o endereço está suprimido (bounce, spam ou anulação). Corrija o e-mail ou contacte o suporte.",
-    "photoUploadFailed": "Falha no envio da foto: {{message}}"
+    "photoUploadFailed": "Falha no envio da foto: {{message}}",
+    "inviteFailedReason": "Motivo: {{reason}}",
+    "inviteWholeTeam": "Convidar ({{count}})"
   },
   "events": {
     "isOfficial": "Jogo oficial",
@@ -1194,7 +1198,9 @@
     "response": "Resposta",
     "showLess": "Mostrar menos",
     "toConfirm": "A confirmar",
-    "calledUp": "Convocado"
+    "calledUp": "Convocado",
+    "pendingShort": "{{count}} pendentes",
+    "showAll": "Ver os {{count}} jogadores"
   },
   "stats": {
     "title": "Estatísticas",
@@ -1737,7 +1743,8 @@
       "placeholder": "Mensagem privada ao staff desta equipa…",
       "audienceLocked": "Visível apenas para o staff da equipa e os admins do clube.",
       "badgeTitle": "Mensagem privada ao staff da equipa",
-      "badge": "Staff da equipa"
+      "badge": "Staff da equipa",
+      "badgeWithTeam": "Staff {{team}}"
     },
     "errorNoSession": "A tua sessão expirou. Inicia sessão novamente e tenta outra vez.",
     "errorNotMember": "Já não és membro deste clube. Muda de clube ativo e tenta novamente.",
@@ -1755,7 +1762,9 @@
     "pin": "Fixar",
     "pinned": "Fixado",
     "commentDeleted": "Comentário eliminado",
-    "newPostTitle": "{{name}} publicou no mural"
+    "newPostTitle": "{{name}} publicou no mural",
+    "viewOn": "Ver em {{network}}",
+    "readBy": "Lido por {{n}}/{{total}}"
   },
   "chat": {
     "title": "Chat do Evento",
@@ -2822,7 +2831,8 @@
     "meetingSummary": {
       "subtitle": "Pessoas que receberão o convite",
       "empty": "Nenhuma pessoa correspondente encontrada.",
-      "title": "Convocados · {{count}}"
+      "title": "Convocados · {{count}}",
+      "andOthers": "… e mais {{count}}"
     },
     "homeSubtitle": "Jogamos em casa",
     "awaySubtitle": "Jogamos fora",
@@ -3193,7 +3203,9 @@
       "title": "Conflito de disponibilidade",
       "body": "Este treinador tem um conflito neste slot. Continuar?"
     },
-    "assignNow": "Atribuir um treinador"
+    "assignNow": "Atribuir um treinador",
+    "absentOn": "Ausente a {{d}}",
+    "absentRange": "Ausente de {{s}} a {{e}}"
   },
   "support": {
     "fab": "Suporte",
@@ -3233,7 +3245,10 @@
     "cancelled": "Indisponibilidade eliminada",
     "subtitle": "Períodos em que não estarás disponível para treinar as tuas equipas.",
     "declareCta": "Declarar indisponibilidade",
-    "empty": "Nenhuma indisponibilidade futura declarada."
+    "empty": "Nenhuma indisponibilidade futura declarada.",
+    "certaintyLabel": "Certeza",
+    "visibilityStaff": "Staff do clube",
+    "visibilityAdminsOnly": "Apenas administradores"
   },
   "registrations": {
     "csv": {

@@ -339,7 +339,9 @@
     "invalidImage": "Niet-ondersteund afbeeldingsformaat",
     "copyFailed": "Kan niet kopiëren",
     "copy": "Kopiëren",
-    "moreActions": "Meer acties"
+    "moreActions": "Meer acties",
+    "noResults": "Geen resultaten",
+    "added": "toegevoegd"
   },
   "notFound": {
     "code": "404",
@@ -882,7 +884,9 @@
     "inviteWholeTeamHint": "Stuur een uitnodiging naar elke speler/ouder zonder account. Mensen die al geregistreerd of al uitgenodigd zijn, worden overgeslagen.",
     "inviteFailedLabel": "Verzenden mislukt",
     "inviteSuppressedSimple": "{{count}} uitnodiging(en) geblokkeerd: adres is onderdrukt (bounce, spam of afmelding). Pas de e-mail aan of neem contact op met support.",
-    "photoUploadFailed": "Foto uploaden mislukt: {{message}}"
+    "photoUploadFailed": "Foto uploaden mislukt: {{message}}",
+    "inviteFailedReason": "Reden: {{reason}}",
+    "inviteWholeTeam": "Uitnodigen ({{count}})"
   },
   "events": {
     "isOfficial": "Officiële wedstrijd",
@@ -1194,7 +1198,9 @@
     "response": "Reactie",
     "showLess": "Laat minder zien",
     "toConfirm": "Te bevestigen",
-    "calledUp": "Opgeroepen"
+    "calledUp": "Opgeroepen",
+    "pendingShort": "{{count}} in afwachting",
+    "showAll": "Alle {{count}} spelers tonen"
   },
   "stats": {
     "title": "Statistieken",
@@ -1737,7 +1743,8 @@
       "placeholder": "Privébericht aan de staff van dit team…",
       "audienceLocked": "Alleen zichtbaar voor teamstaff en clubadmins.",
       "badgeTitle": "Privébericht aan teamstaff",
-      "badge": "Teamstaff"
+      "badge": "Teamstaff",
+      "badgeWithTeam": "Staf {{team}}"
     },
     "errorNoSession": "Je sessie is verlopen. Log opnieuw in en probeer het nog eens.",
     "errorNotMember": "Je bent geen lid meer van deze club. Wissel van actieve club en probeer opnieuw.",
@@ -1755,7 +1762,9 @@
     "pin": "Vastzetten",
     "pinned": "Vastgezet",
     "commentDeleted": "Reactie verwijderd",
-    "newPostTitle": "{{name}} heeft op de muur geplaatst"
+    "newPostTitle": "{{name}} heeft op de muur geplaatst",
+    "viewOn": "Bekijk op {{network}}",
+    "readBy": "Gelezen door {{n}}/{{total}}"
   },
   "chat": {
     "title": "Evenementchat",
@@ -2822,7 +2831,8 @@
     "meetingSummary": {
       "subtitle": "Mensen die de uitnodiging zullen ontvangen",
       "empty": "Geen overeenkomende mensen gevonden.",
-      "title": "Opgeroepen · {{count}}"
+      "title": "Opgeroepen · {{count}}",
+      "andOthers": "… en nog {{count}}"
     },
     "homeSubtitle": "Thuiswedstrijd",
     "awaySubtitle": "Uitwedstrijd",
@@ -3193,7 +3203,9 @@
       "title": "Beschikbaarheidsconflict",
       "body": "Deze coach heeft een conflict op dit slot. Doorgaan?"
     },
-    "assignNow": "Wijs een coach aan"
+    "assignNow": "Wijs een coach aan",
+    "absentOn": "Afwezig op {{d}}",
+    "absentRange": "Afwezig van {{s}} tot {{e}}"
   },
   "support": {
     "fab": "Support",
@@ -3233,7 +3245,10 @@
     "cancelled": "Onbeschikbaarheid verwijderd",
     "subtitle": "Perioden waarin je niet beschikbaar bent om je teams te begeleiden.",
     "declareCta": "Onbeschikbaarheid melden",
-    "empty": "Geen aankomende onbeschikbaarheid gemeld."
+    "empty": "Geen aankomende onbeschikbaarheid gemeld.",
+    "certaintyLabel": "Zekerheid",
+    "visibilityStaff": "Clubstaf",
+    "visibilityAdminsOnly": "Alleen beheerders"
   },
   "registrations": {
     "csv": {

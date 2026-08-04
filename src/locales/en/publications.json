@@ -41,7 +41,8 @@
     "answerSingle": "Single answer",
     "answerSingleDesc": "Each voter picks one option.",
     "answerMultiple": "Multiple answers",
-    "answerMultipleDesc": "Each voter can select several options."
+    "answerMultipleDesc": "Each voter can select several options.",
+    "publishError": "Publication created, but it could not be opened"
   },
   "detail": {
     "notFound": "Publication not found",
@@ -77,7 +78,9 @@
     "roleDirigeant": "Board member",
     "roleParentSelf": "Parent (own vote)",
     "nonVoters": "Who hasn't answered yet",
-    "nonVotersEmpty": "Everyone has answered 🎉"
+    "nonVotersEmpty": "Everyone has answered 🎉",
+    "currentResults": "Current results",
+    "voters": "{{count}} voters"
   },
   "type": {
     "message": "Message",
@@ -176,7 +179,8 @@
     "groupsHint": "Cross-cutting groups created in club admin",
     "selectedTitle": "Selected recipients",
     "teamsBlock": "Teams",
-    "teamsHint": "Choose players and/or parents per team"
+    "teamsHint": "Choose players and/or parents per team",
+    "staff": "Staff"
   },
   "form": {
     "titleLabel": "Title",

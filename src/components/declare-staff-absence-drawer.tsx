@@ -265,7 +265,7 @@ export function DeclareStaffAbsenceDrawer({ open, onOpenChange, onCreated, avail
 
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1.5">
-              <Label>{t("staffAvailability.certainty", { defaultValue: "Certitude" })}</Label>
+              <Label>{t("staffAvailability.certaintyLabel")}</Label>
               <Select value={certainty} onValueChange={(v) => setCertainty(v as Certainty)}>
                 <SelectTrigger>
                   <SelectValue />
@@ -296,17 +296,13 @@ export function DeclareStaffAbsenceDrawer({ open, onOpenChange, onCreated, avail
                   <SelectItem value="staff">
                     <span className="inline-flex items-center gap-2">
                       <Eye className="h-3.5 w-3.5 opacity-70" />
-                      {t("staffAvailability.visibility.staff", {
-                        defaultValue: "Staff du club",
-                      })}
+                      {t("staffAvailability.visibilityStaff")}
                     </span>
                   </SelectItem>
                   <SelectItem value="admins_only">
                     <span className="inline-flex items-center gap-2">
                       <EyeOff className="h-3.5 w-3.5 opacity-70" />
-                      {t("staffAvailability.visibility.admins_only", {
-                        defaultValue: "Admins uniquement",
-                      })}
+                      {t("staffAvailability.visibilityAdminsOnly")}
                     </span>
                   </SelectItem>
                 </SelectContent>
