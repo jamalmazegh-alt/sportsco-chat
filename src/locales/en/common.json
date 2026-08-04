@@ -859,7 +859,10 @@
       "enabled": "Public profile enabled",
       "disabled": "Public profile disabled",
       "title": "Public profile",
-      "help": "Share a public link to this player's achievements, seasons and timeline. Only public-tagged items are shown."
+      "help": "Share a public link to this player's achievements, seasons and timeline. Only public-tagged items are shown.",
+      "notFound": "Profile not found",
+      "notFoundBody": "This player profile is either private or no longer available.",
+      "goHome": "Go to Clubero"
     },
     "suppressionBounce": "permanent bounce (invalid address or mailbox doesn't exist)",
     "suppressionComplaint": "spam complaint",
@@ -2575,7 +2578,31 @@
       "wholeClub": "Whole club",
       "teams": "Teams",
       "players": "Players",
-      "noTeams": "No teams."
+      "noTeams": "No teams.",
+      "type": "Type",
+      "noPlayers": "No players.",
+      "createAndAssign": "Create and assign",
+      "clubAssignHint": "An obligation will be created for every active player in the club."
+    },
+    "season": "Season",
+    "allSeasons": "All",
+    "noTransactions": "No transactions.",
+    "itemTypes": {
+      "membership": "Membership",
+      "license": "License",
+      "equipment": "Equipment",
+      "trip": "Trip",
+      "tournament": "Tournament",
+      "fundraising": "Fundraiser",
+      "other": "Other"
+    },
+    "providers": {
+      "cash": "Cash",
+      "cheque": "Cheque",
+      "bank_transfer": "Bank transfer",
+      "manual": "Manual",
+      "stripe": "Stripe",
+      "helloasso": "HelloAsso"
     }
   },
   "tournamentToClub": {
@@ -3981,7 +4008,24 @@
     "lookingForClub": "I'm looking for a club",
     "submit": "Create my profile",
     "parentalRequired": "A parent must approve the public profile.",
-    "successToast": "Profile created!"
+    "successToast": "Profile created!",
+    "countries": {
+      "france": "France",
+      "belgium": "Belgium",
+      "switzerland": "Switzerland",
+      "canada": "Canada",
+      "luxembourg": "Luxembourg",
+      "morocco": "Morocco",
+      "tunisia": "Tunisia",
+      "algeria": "Algeria",
+      "coteIvoire": "Côte d'Ivoire",
+      "senegal": "Senegal",
+      "reunion": "Réunion",
+      "guadeloupe": "Guadeloupe",
+      "martinique": "Martinique",
+      "frenchPolynesia": "French Polynesia",
+      "newCaledonia": "New Caledonia"
+    }
   },
   "destructiveConfirm": {
     "typeToUnlock": "Type {{word}} to unlock"

@@ -203,7 +203,8 @@
   },
   "errors": {
     "forbidden": "Ação reservada à equipa técnica.",
-    "generic": "Ocorreu um erro."
+    "generic": "Ocorreu um erro.",
+    "eventNotFound": "Evento não encontrado."
   },
   "records": {
     "new": "Novo recorde!"

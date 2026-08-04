@@ -293,7 +293,11 @@
       "ageMismatch": "Das Alter des Kindes passt nicht zur gewählten Kategorie.",
       "generic": "Ein Fehler ist aufgetreten. Bitte erneut versuchen.",
       "network": "Netzwerkfehler. Prüfe deine Verbindung.",
-      "duplicate": "Dieses Kind ist bereits für dieses Camp angemeldet. Bitte prüfen Sie die erhaltene E-Mail."
+      "duplicate": "Dieses Kind ist bereits für dieses Camp angemeldet. Bitte prüfen Sie die erhaltene E-Mail.",
+      "loadFailed": "Dieses Camp konnte nicht geladen werden.",
+      "notFound": "Camp nicht gefunden",
+      "notFoundBody": "Dieses Camp ist nicht verfügbar oder noch nicht veröffentlicht.",
+      "formLoadFailed": "Das Formular konnte nicht geladen werden."
     },
     "full": "Ausgebucht — Anmeldung auf Warteliste möglich",
     "lastSpots": "Letzte Plätze (noch {{count}})",

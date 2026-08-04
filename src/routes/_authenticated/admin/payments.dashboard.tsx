@@ -157,13 +157,13 @@ function PaymentsDashboardPage() {
       <Card>
         <CardContent className="pt-4 grid grid-cols-1 sm:grid-cols-3 gap-3">
           <div>
-            <Label className="text-xs">Saison</Label>
+            <Label className="text-xs">{t("fundraising.season")}</Label>
             <Select value={seasonId} onValueChange={(v) => setSeasonId(v as string)}>
               <SelectTrigger>
-                <SelectValue placeholder="Toutes" />
+                <SelectValue placeholder={t("fundraising.allSeasons")} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">Toutes</SelectItem>
+                <SelectItem value="all">{t("fundraising.allSeasons")}</SelectItem>
                 {seasonsQ.data?.seasons.map((s) => (
                   <SelectItem key={s.id} value={s.id}>
                     {s.label}
@@ -173,11 +173,11 @@ function PaymentsDashboardPage() {
             </Select>
           </div>
           <div>
-            <Label className="text-xs">Du</Label>
+            <Label className="text-xs">{t("events.dateFrom")}</Label>
             <Input type="date" value={from} onChange={(e) => setFrom(e.target.value)} />
           </div>
           <div>
-            <Label className="text-xs">Au</Label>
+            <Label className="text-xs">{t("events.dateTo")}</Label>
             <Input type="date" value={to} onChange={(e) => setTo(e.target.value)} />
           </div>
         </CardContent>
@@ -351,7 +351,7 @@ function PaymentsDashboardPage() {
                   <Loader2 className="h-5 w-5 animate-spin text-primary" />
                 </div>
               ) : (txQ.data?.transactions ?? []).length === 0 ? (
-                <p className="text-sm text-muted-foreground">Aucune transaction.</p>
+                <p className="text-sm text-muted-foreground">{t("fundraising.noTransactions")}</p>
               ) : (
                 <div className="space-y-2">
                   {txQ.data!.transactions.map((tx) => (

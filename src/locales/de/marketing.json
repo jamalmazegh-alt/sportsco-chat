@@ -518,7 +518,8 @@
     "mockFeedbackTagStrong": "Vision",
     "mockFeedbackTagWork": "Finition",
     "mockAiBadge": "KI-Zusammenfassung",
-    "mockAiBody": "Konstante Saison, deutlicher Fortschritt im Spielaufbau. Empfehlung: Abschlussübungen mit dem schwachen Fuß."
+    "mockAiBody": "Konstante Saison, deutlicher Fortschritt im Spielaufbau. Empfehlung: Abschlussübungen mit dem schwachen Fuß.",
+    "mockSeasonLabel": "Saison"
   },
   "coachAssist": {
     "chip": "Für Trainer",
@@ -767,7 +768,8 @@
       "b1": "Rotierendes Sponsoren-Banner auf der Vereins-Startseite",
       "b2": "Automatisches Impressions- und Klick-Tracking",
       "b3": "Mehrere Partner, Reihenfolge und Logos im Admin verwaltet",
-      "cta": "Sponsorenverwaltung entdecken"
+      "cta": "Sponsorenverwaltung entdecken",
+      "demoName": "Ihr Partner"
     },
     "future": {
       "badge": "Demnächst",

@@ -293,7 +293,11 @@
       "ageMismatch": "De leeftijd van het kind past niet bij de gekozen categorie.",
       "generic": "Er is een fout opgetreden. Probeer het opnieuw.",
       "network": "Netwerkfout. Controleer je verbinding.",
-      "duplicate": "Dit kind is al ingeschreven voor deze stage. Raadpleeg de ontvangen e-mail om het dossier te volgen."
+      "duplicate": "Dit kind is al ingeschreven voor deze stage. Raadpleeg de ontvangen e-mail om het dossier te volgen.",
+      "loadFailed": "Deze stage kon niet worden geladen.",
+      "notFound": "Stage niet gevonden",
+      "notFoundBody": "Deze stage is niet beschikbaar of nog niet gepubliceerd.",
+      "formLoadFailed": "Het formulier kon niet worden geladen."
     },
     "full": "Vol — inschrijving mogelijk op wachtlijst",
     "lastSpots": "Laatste plaatsen (nog {{count}})",

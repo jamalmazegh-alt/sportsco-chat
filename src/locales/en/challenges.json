@@ -203,7 +203,8 @@
   },
   "errors": {
     "forbidden": "Staff-only action.",
-    "generic": "Something went wrong."
+    "generic": "Something went wrong.",
+    "eventNotFound": "Event not found."
   },
   "records": {
     "new": "New record!"

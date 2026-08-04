@@ -518,7 +518,8 @@
     "mockFeedbackTagStrong": "Vision",
     "mockFeedbackTagWork": "Finishing",
     "mockAiBadge": "AI summary",
-    "mockAiBody": "Steady season, clear progress on playmaking. Recommendation: weak-foot finishing drills."
+    "mockAiBody": "Steady season, clear progress on playmaking. Recommendation: weak-foot finishing drills.",
+    "mockSeasonLabel": "Season"
   },
   "coachAssist": {
     "chip": "Coach side",
@@ -767,7 +768,8 @@
       "b1": "Rotating sponsor banner on the club home",
       "b2": "Automatic impression & click tracking",
       "b3": "Multiple partners, order and logos managed from admin",
-      "cta": "See sponsor management"
+      "cta": "See sponsor management",
+      "demoName": "Your Partner"
     },
     "future": {
       "badge": "Coming soon",

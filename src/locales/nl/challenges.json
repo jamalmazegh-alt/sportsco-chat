@@ -203,7 +203,8 @@
   },
   "errors": {
     "forbidden": "Actie voorbehouden aan de staf.",
-    "generic": "Er is een fout opgetreden."
+    "generic": "Er is een fout opgetreden.",
+    "eventNotFound": "Evenement niet gevonden."
   },
   "records": {
     "new": "Nieuw record!"

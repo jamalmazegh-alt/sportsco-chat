@@ -180,12 +180,10 @@ function PublicPlayerProfile() {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background px-5">
         <div className="text-center max-w-md">
-          <h1 className="text-2xl font-semibold mb-2">Profile not found</h1>
-          <p className="text-muted-foreground text-sm">
-            This player profile is either private or no longer available.
-          </p>
+          <h1 className="text-2xl font-semibold mb-2">{t("players.publicProfile.notFound")}</h1>
+          <p className="text-muted-foreground text-sm">{t("players.publicProfile.notFoundBody")}</p>
           <a href="/" className="inline-block mt-6 text-sm text-primary underline">
-            Go to Clubero
+            {t("players.publicProfile.goHome")}
           </a>
         </div>
       </div>

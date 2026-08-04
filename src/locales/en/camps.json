@@ -293,7 +293,11 @@
       "ageMismatch": "The child's age does not match the chosen category.",
       "generic": "An error occurred. Please try again.",
       "network": "Network error. Check your connection.",
-      "duplicate": "This child is already registered for this camp. Check the email you received to follow the file."
+      "duplicate": "This child is already registered for this camp. Check the email you received to follow the file.",
+      "loadFailed": "Unable to load this camp.",
+      "notFound": "Camp not found",
+      "notFoundBody": "This camp is unavailable or has not been published yet.",
+      "formLoadFailed": "Unable to load the form."
     },
     "full": "Full — waiting list registration available",
     "lastSpots": "Last spots ({{count}} left)",

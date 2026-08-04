@@ -859,7 +859,10 @@
       "enabled": "Profil public activé",
       "disabled": "Profil public désactivé",
       "title": "Profil public",
-      "help": "Partagez un lien public vers les achievements, saisons et timeline de ce joueur. Seuls les éléments marqués publics sont visibles."
+      "help": "Partagez un lien public vers les achievements, saisons et timeline de ce joueur. Seuls les éléments marqués publics sont visibles.",
+      "notFound": "Profil introuvable",
+      "notFoundBody": "Ce profil joueur est privé ou n'est plus disponible.",
+      "goHome": "Aller sur Clubero"
     },
     "suppressionBounce": "rebond permanent (adresse invalide ou boîte inexistante)",
     "suppressionComplaint": "plainte pour spam",
@@ -2575,7 +2578,31 @@
       "wholeClub": "Tout le club",
       "teams": "Équipes",
       "players": "Joueurs",
-      "noTeams": "Aucune équipe."
+      "noTeams": "Aucune équipe.",
+      "type": "Type",
+      "noPlayers": "Aucun joueur.",
+      "createAndAssign": "Créer et assigner",
+      "clubAssignHint": "Une obligation sera créée pour chaque joueur actif du club."
+    },
+    "season": "Saison",
+    "allSeasons": "Toutes",
+    "noTransactions": "Aucune transaction.",
+    "itemTypes": {
+      "membership": "Adhésion",
+      "license": "Licence",
+      "equipment": "Équipement",
+      "trip": "Déplacement",
+      "tournament": "Tournoi",
+      "fundraising": "Collecte",
+      "other": "Autre"
+    },
+    "providers": {
+      "cash": "Espèces",
+      "cheque": "Chèque",
+      "bank_transfer": "Virement",
+      "manual": "Manuel",
+      "stripe": "Stripe",
+      "helloasso": "HelloAsso"
     }
   },
   "tournamentToClub": {
@@ -3981,7 +4008,24 @@
     "lookingForClub": "Je recherche un club",
     "submit": "Créer mon profil",
     "parentalRequired": "Un parent doit approuver le profil public.",
-    "successToast": "Profil créé !"
+    "successToast": "Profil créé !",
+    "countries": {
+      "france": "France",
+      "belgium": "Belgique",
+      "switzerland": "Suisse",
+      "canada": "Canada",
+      "luxembourg": "Luxembourg",
+      "morocco": "Maroc",
+      "tunisia": "Tunisie",
+      "algeria": "Algérie",
+      "coteIvoire": "Côte d'Ivoire",
+      "senegal": "Sénégal",
+      "reunion": "Réunion",
+      "guadeloupe": "Guadeloupe",
+      "martinique": "Martinique",
+      "frenchPolynesia": "Polynésie française",
+      "newCaledonia": "Nouvelle-Calédonie"
+    }
   },
   "destructiveConfirm": {
     "typeToUnlock": "Tape {{word}} pour débloquer"

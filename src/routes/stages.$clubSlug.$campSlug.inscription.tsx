@@ -16,6 +16,7 @@ import {
   CAMP_UPLOAD_MAX_BYTES,
   type PublicCampBundle,
 } from "@/lib/public-camps.types";
+import i18n from "@/lib/i18n";
 
 const publicCampQuery = (clubSlug: string, campSlug: string) =>
   queryOptions({
@@ -48,15 +49,17 @@ export const Route = createFileRoute("/stages/$clubSlug/$campSlug/inscription")(
   errorComponent: () => (
     <div className="min-h-screen flex items-center justify-center px-6 text-center">
       <div>
-        <h1 className="text-2xl font-bold">Erreur</h1>
-        <p className="mt-2 text-muted-foreground">Impossible de charger le formulaire.</p>
+        <h1 className="text-2xl font-bold">{i18n.t("common.error")}</h1>
+        <p className="mt-2 text-muted-foreground">
+          {i18n.t("public.errors.formLoadFailed", { ns: "camps" })}
+        </p>
       </div>
     </div>
   ),
   notFoundComponent: () => (
     <div className="min-h-screen flex items-center justify-center px-6 text-center">
       <div>
-        <h1 className="text-2xl font-bold">Stage introuvable</h1>
+        <h1 className="text-2xl font-bold">{i18n.t("public.errors.notFound", { ns: "camps" })}</h1>
       </div>
     </div>
   ),

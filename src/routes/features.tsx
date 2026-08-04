@@ -151,7 +151,9 @@ function SponsorsFeatureSection() {
               <span className="text-[10px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
                 {t("features.sponsors.kicker")}
               </span>
-              <span className="text-lg font-bold text-foreground">Your Partner</span>
+              <span className="text-lg font-bold text-foreground">
+                {t("features.sponsors.demoName")}
+              </span>
               <span className="text-xs text-muted-foreground">clubero.app</span>
             </div>
           </div>

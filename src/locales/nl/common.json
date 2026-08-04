@@ -859,7 +859,10 @@
       "enabled": "Openbaar profiel ingeschakeld",
       "disabled": "Openbaar profiel uitgeschakeld",
       "title": "Openbaar profiel",
-      "help": "Deel een openbare link naar de prestaties, seizoenen en tijdlijn van deze speler. Alleen als openbaar gemarkeerde items worden getoond."
+      "help": "Deel een openbare link naar de prestaties, seizoenen en tijdlijn van deze speler. Alleen als openbaar gemarkeerde items worden getoond.",
+      "notFound": "Profiel niet gevonden",
+      "notFoundBody": "Dit spelersprofiel is privé of niet meer beschikbaar.",
+      "goHome": "Naar Clubero"
     },
     "suppressionBounce": "permanente bounce (ongeldig adres of mailbox bestaat niet)",
     "suppressionComplaint": "spamklacht",
@@ -2575,7 +2578,31 @@
       "wholeClub": "Hele club",
       "teams": "Teams",
       "players": "Spelers",
-      "noTeams": "Geen teams."
+      "noTeams": "Geen teams.",
+      "type": "Type",
+      "noPlayers": "Geen spelers.",
+      "createAndAssign": "Aanmaken en toewijzen",
+      "clubAssignHint": "Er wordt een verplichting aangemaakt voor elke actieve speler van de club."
+    },
+    "season": "Seizoen",
+    "allSeasons": "Alle",
+    "noTransactions": "Geen transacties.",
+    "itemTypes": {
+      "membership": "Lidmaatschap",
+      "license": "Licentie",
+      "equipment": "Uitrusting",
+      "trip": "Verplaatsing",
+      "tournament": "Toernooi",
+      "fundraising": "Inzameling",
+      "other": "Overig"
+    },
+    "providers": {
+      "cash": "Contant",
+      "cheque": "Cheque",
+      "bank_transfer": "Overschrijving",
+      "manual": "Handmatig",
+      "stripe": "Stripe",
+      "helloasso": "HelloAsso"
     }
   },
   "tournamentToClub": {
@@ -3981,7 +4008,24 @@
     "lookingForClub": "Ik zoek een club",
     "submit": "Mijn profiel maken",
     "parentalRequired": "Een ouder moet het openbare profiel goedkeuren.",
-    "successToast": "Profiel aangemaakt!"
+    "successToast": "Profiel aangemaakt!",
+    "countries": {
+      "france": "Frankrijk",
+      "belgium": "België",
+      "switzerland": "Zwitserland",
+      "canada": "Canada",
+      "luxembourg": "Luxemburg",
+      "morocco": "Marokko",
+      "tunisia": "Tunesië",
+      "algeria": "Algerije",
+      "coteIvoire": "Ivoorkust",
+      "senegal": "Senegal",
+      "reunion": "Réunion",
+      "guadeloupe": "Guadeloupe",
+      "martinique": "Martinique",
+      "frenchPolynesia": "Frans-Polynesië",
+      "newCaledonia": "Nieuw-Caledonië"
+    }
   },
   "destructiveConfirm": {
     "typeToUnlock": "Typ {{word}} om te ontgrendelen"

@@ -154,7 +154,8 @@ function EventChallengesPage() {
   if (loadingEvent) {
     return <FullscreenLoader />;
   }
-  if (!eventInfo) return <div className="p-4 text-sm text-muted-foreground">Event not found.</div>;
+  if (!eventInfo)
+    return <div className="p-4 text-sm text-muted-foreground">{t("errors.eventNotFound")}</div>;
 
   const challenges = challengesData?.challenges ?? [];
   const entryCounts = countsData?.counts ?? {};

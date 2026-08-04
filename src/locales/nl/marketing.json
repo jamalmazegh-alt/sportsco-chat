@@ -518,7 +518,8 @@
     "mockFeedbackTagStrong": "Visie",
     "mockFeedbackTagWork": "Afwerking",
     "mockAiBadge": "AI-samenvatting",
-    "mockAiBody": "Consistent seizoen, duidelijke vooruitgang in de opbouw van het spel. Aanbeveling: afwerkingsoefeningen met de zwakke voet."
+    "mockAiBody": "Consistent seizoen, duidelijke vooruitgang in de opbouw van het spel. Aanbeveling: afwerkingsoefeningen met de zwakke voet.",
+    "mockSeasonLabel": "Seizoen"
   },
   "coachAssist": {
     "chip": "Voor Coaches",
@@ -767,7 +768,8 @@
       "b1": "Roterende sponsorbanner op de clubhome",
       "b2": "Automatische tracking van impressies en klikken",
       "b3": "Meerdere partners, volgorde en logo's beheerd vanuit de admin",
-      "cta": "Ontdek sponsorbeheer"
+      "cta": "Ontdek sponsorbeheer",
+      "demoName": "Jouw partner"
     },
     "future": {
       "badge": "Binnenkort",

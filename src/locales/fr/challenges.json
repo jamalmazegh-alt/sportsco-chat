@@ -203,7 +203,8 @@
   },
   "errors": {
     "forbidden": "Action réservée au staff.",
-    "generic": "Une erreur est survenue."
+    "generic": "Une erreur est survenue.",
+    "eventNotFound": "Événement introuvable."
   },
   "records": {
     "new": "Nouveau record !"

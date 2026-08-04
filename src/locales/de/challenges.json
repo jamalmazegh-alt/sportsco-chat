@@ -203,7 +203,8 @@
   },
   "errors": {
     "forbidden": "Aktion nur für das Trainerteam.",
-    "generic": "Ein Fehler ist aufgetreten."
+    "generic": "Ein Fehler ist aufgetreten.",
+    "eventNotFound": "Ereignis nicht gefunden."
   },
   "records": {
     "new": "Neuer Rekord!"

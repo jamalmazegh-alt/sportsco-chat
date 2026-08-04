@@ -518,7 +518,8 @@
     "mockFeedbackTagStrong": "Visión",
     "mockFeedbackTagWork": "Definición",
     "mockAiBadge": "Resumen de IA",
-    "mockAiBody": "Temporada constante, progreso significativo en la construcción del juego. Recomendación: ejercicios de finalización con el pie menos hábil."
+    "mockAiBody": "Temporada constante, progreso significativo en la construcción del juego. Recomendación: ejercicios de finalización con el pie menos hábil.",
+    "mockSeasonLabel": "Temporada"
   },
   "coachAssist": {
     "chip": "Para entrenadores",
@@ -767,7 +768,8 @@
       "b1": "Banner de patrocinador rotativo en el inicio del club",
       "b2": "Seguimiento automático de impresiones y clics",
       "b3": "Varios socios, orden y logos gestionados desde el admin",
-      "cta": "Descubrir la gestión de patrocinadores"
+      "cta": "Descubrir la gestión de patrocinadores",
+      "demoName": "Tu partner"
     },
     "future": {
       "badge": "Próximamente",
