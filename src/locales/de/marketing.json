@@ -349,7 +349,9 @@
         "s2": "Eltern bleiben informiert",
         "s3": "Trainer werden sichtbar",
         "s4": "Vereine gewinnen an Reichweite",
-        "showcase": "Jeder Verein hat seine eigene öffentliche Schaufensterseite."
+        "showcase": "Jeder Verein hat seine eigene öffentliche Schaufensterseite.",
+        "soonBadge": "Demnächst",
+        "soonNote": "Soziale Funktionen werden bald eingeführt."
       },
       "forwho": {
         "title": "Für wen?",
@@ -1058,7 +1060,10 @@
           }
         ]
       }
-    }
+    },
+    "learnMore": "Mehr erfahren",
+    "modulesCount": "Module",
+    "includedV1": "In V1 enthalten"
   },
   "faq": {
     "metaTitle": "FAQ — Clubero",

@@ -195,9 +195,9 @@
     "manageClub": "Gerir Clube",
     "manageClubSubtitle": "Configurações, membros, assinatura",
     "viewStats": "Ver estatísticas",
-    "players": "Players",
+    "players": "Jogadores",
     "tournament": "Torneio",
-    "signup": "Sign up"
+    "signup": "Registar"
   },
   "auth": {
     "playerSignupLink": "É Jogador? Crie o seu perfil aqui →",
@@ -279,7 +279,9 @@
     "teamJoinHint": "Estas informações criam a ficha do jogador. O clube poderá completá-las depois.",
     "parentPhone": "O seu telefone (pai/mãe)",
     "showPassword": "Mostrar palavra-passe",
-    "hidePassword": "Ocultar palavra-passe"
+    "hidePassword": "Ocultar palavra-passe",
+    "inviteExpired": "Este convite expirou.",
+    "inviteUsed": "Este convite já foi utilizado."
   },
   "common": {
     "save": "Guardar",
@@ -337,7 +339,7 @@
     "invalidImage": "Formato de imagem não suportado",
     "copyFailed": "Não foi possível copiar",
     "copy": "Cópia",
-    "moreActions": "More actions"
+    "moreActions": "Mais ações"
   },
   "notFound": {
     "code": "404",
@@ -2967,7 +2969,7 @@
     "deleteConfirm": "Excluir este grupo? Os membros associados serão removidos.",
     "name": "Nome",
     "namePlaceholder": "Por exemplo Conselho, Voluntários",
-    "description": "Description",
+    "description": "Descrição",
     "descriptionPlaceholder": "Opcional",
     "active": "Ativo",
     "inactive": "Inativo",
@@ -3126,19 +3128,19 @@
     "other": "Evento"
   },
   "search": {
-    "open": "Search",
-    "placeholder": "Search players, teams, events…",
-    "empty": "No results."
+    "open": "Pesquisar",
+    "placeholder": "Pesquisar jogadores, equipas, eventos…",
+    "empty": "Sem resultados."
   },
   "position": {
-    "placeholder": "Position",
+    "placeholder": "Posição",
     "search": "Pesquise ou digite…",
     "empty": "Nenhuma sugestão",
-    "suggested": "Suggestions",
+    "suggested": "Sugestões",
     "custom": "Personalizado",
     "use": "Usar"
   },
-  "fab": "Support",
+  "fab": "Suporte",
   "voice": {
     "permissionDenied": "Microfone negado",
     "error": "Erro de ditado de voz",
@@ -3250,7 +3252,7 @@
       "confirmDocReject": "Rejeitar documento",
       "currentReason": "Motivo da rejeição",
       "trackingLink": "Vínculo familiar",
-      "participant": "Participant",
+      "participant": "Participante",
       "firstName": "Primeiro nome",
       "lastName": "Sobrenome",
       "birthDate": "Data de nascimento",
@@ -3313,7 +3315,7 @@
       "allDossier": "Todos os arquivos"
     },
     "col": {
-      "participant": "Participant",
+      "participant": "Participante",
       "guardian": "Guardião",
       "requested": "Solicitar",
       "regStatus": "Cadastro",
@@ -3569,7 +3571,7 @@
     "venueHint": "Você pode pular esta etapa e adicioná-la mais tarde.",
     "ageGroupsEmpty": "É necessária pelo menos uma categoria para publicar. Você pode adicionar mais posteriormente.",
     "summary": {
-      "deadline": "deadline",
+      "deadline": "prazo",
       "places": "manchas",
       "venueSet": "Conjunto de local",
       "ageGroups": "Categorias",
@@ -3620,7 +3622,7 @@
     "slug": "Slug (URL)",
     "slugLocked": "O slug é bloqueado após a publicação.",
     "slugHint": "Letras, números e hífens. Editável enquanto o acampamento é um rascunho.",
-    "description": "Description",
+    "description": "Descrição",
     "cover": "Imagem da capa",
     "currency": "Moeda",
     "paymentInstructions": "Instruções de pagamento",
@@ -3660,7 +3662,7 @@
     "addTitle": "Adicionar um documento",
     "titlePlaceholder": "Exibir título (opcional – nome do arquivo por padrão)",
     "upload": "Carregar (PDF, JPG, PNG)",
-    "maxHint": "15 MB max"
+    "maxHint": "15 MB máx."
   },
   "program": {
     "empty": "Ainda não há itens de programa.",
@@ -3677,7 +3679,7 @@
     "editTitle": "Editar documento",
     "addTitle": "Novo documento obrigatório",
     "titlePlaceholder": "Por exemplo Atestado médico com menos de 3 meses",
-    "type": "Type",
+    "type": "Tipo",
     "mandatory": "Obrigatório",
     "sensitive": "Dados confidenciais",
     "sensitiveForced": "Forçado para documentos médicos: criptografia e retenção limitada.",
@@ -3707,12 +3709,12 @@
   "cockpit": {
     "alerts": {
       "heading": "Alertas",
-      "finalsNotGenerated": "Fase final não gerada – fase de grupos concluída",
+      "finalsNotGenerated": "Fase final não gerada — a fase de grupos terminou",
       "missingReferee": "Árbitro em falta (começa em {{minutes}} min)",
       "title": "{{count}} assunto a resolver"
     },
     "next": "Seguinte",
-    "estimatedEnd": "Fim estimado"
+    "estimatedEnd": "Fim previsto"
   },
   "controlCenter": {
     "nextAction": "Próxima ação",

@@ -195,9 +195,9 @@
     "manageClub": "Verein verwalten",
     "manageClubSubtitle": "Einstellungen, Mitglieder, Abo",
     "viewStats": "Statistiken ansehen",
-    "players": "Players",
+    "players": "Spieler",
     "tournament": "Turnier",
-    "signup": "Sign up"
+    "signup": "Registrieren"
   },
   "auth": {
     "playerSignupLink": "Du bist Spieler? Erstelle hier dein Profil →",
@@ -279,7 +279,9 @@
     "teamJoinHint": "Diese Angaben erstellen das Spielerprofil. Der Verein kann sie später ergänzen.",
     "parentPhone": "Dein Telefon (Elternteil)",
     "showPassword": "Passwort anzeigen",
-    "hidePassword": "Passwort verbergen"
+    "hidePassword": "Passwort verbergen",
+    "inviteExpired": "Diese Einladung ist abgelaufen.",
+    "inviteUsed": "Diese Einladung wurde bereits verwendet."
   },
   "common": {
     "save": "Speichern",
@@ -337,7 +339,7 @@
     "invalidImage": "Nicht unterstütztes Bildformat",
     "copyFailed": "Kopieren nicht möglich",
     "copy": "Kopie",
-    "moreActions": "More actions"
+    "moreActions": "Weitere Aktionen"
   },
   "notFound": {
     "code": "404",
@@ -2972,7 +2974,7 @@
     "deleteConfirm": "Diese Gruppe löschen? Assoziierte Mitglieder werden entfernt.",
     "name": "Name",
     "namePlaceholder": "Z.B. Vorstand, Freiwillige",
-    "description": "Description",
+    "description": "Beschreibung",
     "descriptionPlaceholder": "Optional",
     "active": "Aktiv",
     "inactive": "Inaktiv",
@@ -3131,15 +3133,15 @@
     "other": "Ereignis"
   },
   "search": {
-    "open": "Search",
-    "placeholder": "Search players, teams, events…",
-    "empty": "No results."
+    "open": "Suche",
+    "placeholder": "Spieler, Teams, Ereignisse suchen…",
+    "empty": "Keine Ergebnisse."
   },
   "position": {
     "placeholder": "Position",
     "search": "Suchen oder eingeben…",
     "empty": "Keine Vorschläge",
-    "suggested": "Suggestions",
+    "suggested": "Vorschläge",
     "custom": "Brauch",
     "use": "Verwenden"
   },
@@ -3255,7 +3257,7 @@
       "confirmDocReject": "Dokument ablehnen",
       "currentReason": "Ablehnungsgrund",
       "trackingLink": "Familienanbindung",
-      "participant": "Participant",
+      "participant": "Teilnehmer",
       "firstName": "Vorname",
       "lastName": "Nachname",
       "birthDate": "Geburtsdatum",
@@ -3318,7 +3320,7 @@
       "allDossier": "Alle Dateien"
     },
     "col": {
-      "participant": "Participant",
+      "participant": "Teilnehmer",
       "guardian": "Wächter",
       "requested": "Anfrage",
       "regStatus": "Anmeldung",
@@ -3574,7 +3576,7 @@
     "venueHint": "Sie können diesen Schritt überspringen und ihn später hinzufügen.",
     "ageGroupsEmpty": "Für die Veröffentlichung ist mindestens eine Kategorie erforderlich. Sie können später weitere hinzufügen.",
     "summary": {
-      "deadline": "deadline",
+      "deadline": "Frist",
       "places": "Flecken",
       "venueSet": "Veranstaltungsort festgelegt",
       "ageGroups": "Kategorien",
@@ -3625,7 +3627,7 @@
     "slug": "Slug (URL)",
     "slugLocked": "Der Slug ist nach der Veröffentlichung gesperrt.",
     "slugHint": "Buchstaben, Zahlen und Bindestriche. Bearbeitbar, während das Camps ein Entwurf ist.",
-    "description": "Description",
+    "description": "Beschreibung",
     "cover": "Titelbild",
     "currency": "Währung",
     "paymentInstructions": "Zahlungsanweisungen",
@@ -3665,7 +3667,7 @@
     "addTitle": "Fügen Sie ein Dokument hinzu",
     "titlePlaceholder": "Titel anzeigen (optional – standardmäßig Dateiname)",
     "upload": "Hochladen (PDF, JPG, PNG)",
-    "maxHint": "15 MB max"
+    "maxHint": "max. 15 MB"
   },
   "program": {
     "empty": "Noch keine Programmpunkte.",
@@ -3682,7 +3684,7 @@
     "editTitle": "Dokument bearbeiten",
     "addTitle": "Neues erforderliches Dokument",
     "titlePlaceholder": "Z.B. Ärztliches Attest, das weniger als 3 Monate alt ist",
-    "type": "Type",
+    "type": "Typ",
     "mandatory": "Pflicht",
     "sensitive": "Sensible Daten",
     "sensitiveForced": "Für medizinische Dokumente erzwungen: Verschlüsselung und begrenzte Aufbewahrung.",
@@ -3711,12 +3713,12 @@
   },
   "cockpit": {
     "alerts": {
-      "heading": "Hinweise",
-      "finalsNotGenerated": "Die Finalphase wurde nicht generiert – die Gruppenphase ist beendet",
+      "heading": "Warnungen",
+      "finalsNotGenerated": "Endrunde nicht erzeugt — Gruppenphase ist beendet",
       "missingReferee": "Schiedsrichter fehlt (Start in {{minutes}} Min.)",
       "title": "{{count}} Punkt zu klären"
     },
-    "next": "Weiter",
+    "next": "Als Nächstes",
     "estimatedEnd": "Voraussichtliches Ende"
   },
   "controlCenter": {

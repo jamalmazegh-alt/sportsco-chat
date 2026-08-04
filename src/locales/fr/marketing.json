@@ -349,7 +349,9 @@
         "s2": "Les parents restent informés",
         "s3": "Les éducateurs valorisent leur travail",
         "s4": "Les clubs gagnent en visibilité",
-        "showcase": "Chaque club dispose de sa propre vitrine publique."
+        "showcase": "Chaque club dispose de sa propre vitrine publique.",
+        "soonBadge": "Bientôt",
+        "soonNote": "Fonctionnalités sociales en cours de déploiement."
       },
       "forwho": {
         "title": "Pour qui ?",
@@ -1058,7 +1060,10 @@
           }
         ]
       }
-    }
+    },
+    "learnMore": "En savoir plus",
+    "modulesCount": "modules",
+    "includedV1": "Inclus dans V1"
   },
   "faq": {
     "metaTitle": "FAQ — Clubero",

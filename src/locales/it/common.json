@@ -195,9 +195,9 @@
     "manageClub": "Gestisci Club",
     "manageClubSubtitle": "Impostazioni, membri, abbonamento",
     "viewStats": "Visualizza statistiche",
-    "players": "Players",
+    "players": "Giocatori",
     "tournament": "Torneo",
-    "signup": "Sign up"
+    "signup": "Registrati"
   },
   "auth": {
     "playerSignupLink": "Sei un Giocatore? Crea qui il tuo profilo →",
@@ -279,7 +279,9 @@
     "teamJoinHint": "Queste informazioni creano la scheda giocatore. Il club potrà completarle in seguito.",
     "parentPhone": "Il tuo telefono (genitore)",
     "showPassword": "Mostra password",
-    "hidePassword": "Nascondi password"
+    "hidePassword": "Nascondi password",
+    "inviteExpired": "Questo invito è scaduto.",
+    "inviteUsed": "Questo invito è già stato utilizzato."
   },
   "common": {
     "save": "Salva",
@@ -337,7 +339,7 @@
     "invalidImage": "Formato immagine non supportato",
     "copyFailed": "Impossibile copiare",
     "copy": "Copia",
-    "moreActions": "More actions"
+    "moreActions": "Altre azioni"
   },
   "notFound": {
     "code": "404",
@@ -2967,7 +2969,7 @@
     "deleteConfirm": "Eliminare questo gruppo? I membri associati verranno rimossi.",
     "name": "Nome",
     "namePlaceholder": "Per esempio. Consiglio, volontari",
-    "description": "Description",
+    "description": "Descrizione",
     "descriptionPlaceholder": "Facoltativo",
     "active": "Attivo",
     "inactive": "Inattivo",
@@ -3126,19 +3128,19 @@
     "other": "Evento"
   },
   "search": {
-    "open": "Search",
-    "placeholder": "Search players, teams, events…",
-    "empty": "No results."
+    "open": "Cerca",
+    "placeholder": "Cerca giocatori, squadre, eventi…",
+    "empty": "Nessun risultato."
   },
   "position": {
-    "placeholder": "Position",
+    "placeholder": "Ruolo",
     "search": "Cerca o digita...",
     "empty": "Nessun suggerimento",
-    "suggested": "Suggestions",
+    "suggested": "Suggerimenti",
     "custom": "Costume",
     "use": "Utilizzo"
   },
-  "fab": "Support",
+  "fab": "Supporto",
   "voice": {
     "permissionDenied": "Microfono negato",
     "error": "Errore di dettatura vocale",
@@ -3250,7 +3252,7 @@
       "confirmDocReject": "Rifiutare il documento",
       "currentReason": "Motivo del rifiuto",
       "trackingLink": "Collegamento familiare",
-      "participant": "Participant",
+      "participant": "Partecipante",
       "firstName": "Nome di battesimo",
       "lastName": "Cognome",
       "birthDate": "Data di nascita",
@@ -3313,7 +3315,7 @@
       "allDossier": "Tutti i file"
     },
     "col": {
-      "participant": "Participant",
+      "participant": "Partecipante",
       "guardian": "Custode",
       "requested": "Richiesta",
       "regStatus": "Registrazione",
@@ -3569,7 +3571,7 @@
     "venueHint": "Puoi saltare questo passaggio e aggiungerlo in seguito.",
     "ageGroupsEmpty": "Per pubblicare è necessaria almeno una categoria. Puoi aggiungerne altri in seguito.",
     "summary": {
-      "deadline": "deadline",
+      "deadline": "scadenza",
       "places": "macchie",
       "venueSet": "Insieme della sede",
       "ageGroups": "Categorie",
@@ -3620,7 +3622,7 @@
     "slug": "Slug (URL)",
     "slugLocked": "Lo slug viene bloccato dopo la pubblicazione.",
     "slugHint": "Lettere, numeri e trattini. Modificabile mentre il campo è una bozza.",
-    "description": "Description",
+    "description": "Descrizione",
     "cover": "Immagine di copertina",
     "currency": "Valuta",
     "paymentInstructions": "Istruzioni per il pagamento",
@@ -3677,7 +3679,7 @@
     "editTitle": "Modifica documento",
     "addTitle": "Nuovo documento richiesto",
     "titlePlaceholder": "Per esempio. Medical certificate less than 3 months old",
-    "type": "Type",
+    "type": "Tipo",
     "mandatory": "Obbligatorio",
     "sensitive": "Dati sensibili",
     "sensitiveForced": "Obbligazione per documenti medici: crittografia e conservazione limitata.",
@@ -3707,11 +3709,11 @@
   "cockpit": {
     "alerts": {
       "heading": "Avvisi",
-      "finalsNotGenerated": "Fase finale non generata: la fase a gironi è terminata",
+      "finalsNotGenerated": "Fase finale non generata — i gironi sono finiti",
       "missingReferee": "Arbitro mancante (inizio tra {{minutes}} min)",
       "title": "{{count}} cosa da sistemare"
     },
-    "next": "Avanti",
+    "next": "Prossimo",
     "estimatedEnd": "Fine prevista"
   },
   "controlCenter": {

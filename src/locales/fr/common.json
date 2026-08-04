@@ -195,9 +195,9 @@
     "manageClub": "Gérer le club",
     "manageClubSubtitle": "Paramètres, membres, abonnement",
     "viewStats": "Voir les statistiques",
-    "players": "Players",
+    "players": "Joueurs",
     "tournament": "Tournoi",
-    "signup": "Sign up"
+    "signup": "S'inscrire"
   },
   "auth": {
     "playerSignupLink": "Vous êtes joueur ? Créez votre profil ici →",
@@ -279,7 +279,9 @@
     "teamJoinHint": "Ces informations créent la fiche joueur. Le club pourra les compléter ensuite.",
     "parentPhone": "Votre téléphone (parent)",
     "showPassword": "Afficher le mot de passe",
-    "hidePassword": "Masquer le mot de passe"
+    "hidePassword": "Masquer le mot de passe",
+    "inviteExpired": "Cette invitation a expiré.",
+    "inviteUsed": "Cette invitation a déjà été utilisée."
   },
   "common": {
     "save": "Enregistrer",
@@ -337,7 +339,7 @@
     "invalidImage": "Format d'image non supporté",
     "copyFailed": "Impossible de copier",
     "copy": "Copier",
-    "moreActions": "More actions"
+    "moreActions": "Plus d'actions"
   },
   "notFound": {
     "code": "404",
@@ -1744,12 +1746,12 @@
       "tapToRemove": "Appuyez pour supprimer",
       "count": "{{count}} réaction(s)"
     },
-    "postDeleted": "Post deleted",
+    "postDeleted": "Publication supprimée",
     "emptyHint": "Aucune annonce pour l'instant. Les coachs et admins peuvent en publier ici.",
     "unpin": "Désépingler",
     "pin": "Épingler",
     "pinned": "Épinglé",
-    "commentDeleted": "Comment deleted",
+    "commentDeleted": "Commentaire supprimé",
     "newPostTitle": "{{name}} a publié sur le mur"
   },
   "chat": {
@@ -3126,12 +3128,12 @@
     "other": "Événement"
   },
   "search": {
-    "open": "Search",
-    "placeholder": "Search players, teams, events…",
-    "empty": "No results."
+    "open": "Recherche",
+    "placeholder": "Rechercher joueurs, équipes, événements…",
+    "empty": "Aucun résultat."
   },
   "position": {
-    "placeholder": "Position",
+    "placeholder": "Poste",
     "search": "Rechercher ou saisir…",
     "empty": "Aucune suggestion",
     "suggested": "Suggestions",
@@ -3569,7 +3571,7 @@
     "venueHint": "Tu peux passer cette étape et l'ajouter plus tard.",
     "ageGroupsEmpty": "Au moins une catégorie est requise pour publier. Tu pourras en ajouter d'autres après.",
     "summary": {
-      "deadline": "deadline",
+      "deadline": "date limite",
       "places": "places",
       "venueSet": "Lieu défini",
       "ageGroups": "Catégories",
@@ -3660,7 +3662,7 @@
     "addTitle": "Ajouter un document",
     "titlePlaceholder": "Titre affiché (facultatif — nom du fichier par défaut)",
     "upload": "Téléverser (PDF, JPG, PNG)",
-    "maxHint": "15 MB max"
+    "maxHint": "15 Mo max"
   },
   "program": {
     "empty": "Aucun élément de programme pour l'instant.",

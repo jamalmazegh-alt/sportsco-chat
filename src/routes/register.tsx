@@ -342,9 +342,9 @@ function RegisterPage() {
   if (hasInvite && inviteValidation && !inviteValidation.valid) {
     const message =
       inviteValidation.reason === "expired"
-        ? t("auth.inviteExpired") || "This invitation has expired."
+        ? t("auth.inviteExpired")
         : inviteValidation.reason === "used"
-          ? t("auth.inviteUsed") || "This invitation has already been used."
+          ? t("auth.inviteUsed")
           : t("auth.inviteInvalid");
     return (
       <div className="min-h-screen bg-background flex items-center justify-center px-5 py-10">

@@ -73,7 +73,7 @@ export function TeamRosterDialog({ tournamentTeamId, teamName, sport, onClose }:
         <div className="flex gap-2 justify-end">
           <Button size="sm" variant="outline" onClick={() => setBulkOpen(true)}>
             <Upload className="h-4 w-4" />
-            {t("roster.import")}
+            {t("roster.import.button")}
           </Button>
           <Button size="sm" onClick={() => setAdding(true)}>
             <Plus className="h-4 w-4" />

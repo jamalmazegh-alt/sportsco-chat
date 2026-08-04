@@ -349,7 +349,9 @@
         "s2": "Los padres se mantienen informados",
         "s3": "Los entrenadores ganan visibilidad",
         "s4": "Los clubes ganan presencia",
-        "showcase": "Cada club tiene su propio escaparate público."
+        "showcase": "Cada club tiene su propio escaparate público.",
+        "soonBadge": "Próximamente",
+        "soonNote": "Las funciones sociales se desplegarán pronto."
       },
       "forwho": {
         "title": "¿Para quién?",
@@ -1058,7 +1060,10 @@
           }
         ]
       }
-    }
+    },
+    "learnMore": "Saber más",
+    "modulesCount": "módulos",
+    "includedV1": "Incluido en V1"
   },
   "faq": {
     "metaTitle": "Preguntas frecuentes — Clubero",

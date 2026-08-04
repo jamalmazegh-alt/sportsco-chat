@@ -279,7 +279,9 @@
     "teamJoinHint": "This information creates the player profile. The club can complete it later.",
     "parentPhone": "Your phone (parent)",
     "showPassword": "Show password",
-    "hidePassword": "Hide password"
+    "hidePassword": "Hide password",
+    "inviteExpired": "This invitation has expired.",
+    "inviteUsed": "This invitation has already been used."
   },
   "common": {
     "save": "Save",
@@ -3707,12 +3709,12 @@
   "cockpit": {
     "alerts": {
       "heading": "Alerts",
-      "finalsNotGenerated": "Finals phase not generated — group stages are finished",
+      "finalsNotGenerated": "Finals not generated — group stage is complete",
       "missingReferee": "Missing referee (starts in {{minutes}} min)",
       "title": "{{count}} item to resolve"
     },
     "next": "Next",
-    "estimatedEnd": "Estimated end"
+    "estimatedEnd": "Expected end"
   },
   "controlCenter": {
     "nextAction": "Next action",
