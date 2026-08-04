@@ -178,7 +178,7 @@ function PlayerRow({ p }: { p: ClubRosterRow }) {
           ) : p.player_user_id ? (
             <StatusBadge tone="warn">{t("superadmin.roster.neverLoggedIn")}</StatusBadge>
           ) : p.player_last_invite_at ? (
-            <StatusBadge tone="info">invité</StatusBadge>
+            <StatusBadge tone="info">{t("superadmin.roster.invited")}</StatusBadge>
           ) : (
             <StatusBadge tone="muted">{t("superadmin.roster.noAccount")}</StatusBadge>
           )}
@@ -208,7 +208,9 @@ function PlayerRow({ p }: { p: ClubRosterRow }) {
               ) : par.account_active ? (
                 <StatusBadge tone="warn">{t("superadmin.roster.neverLoggedIn")}</StatusBadge>
               ) : par.last_invite_at ? (
-                <StatusBadge tone="info">invité {fmt(par.last_invite_at)}</StatusBadge>
+                <StatusBadge tone="info">
+                  {t("superadmin.roster.invitedAt", { date: fmt(par.last_invite_at) })}
+                </StatusBadge>
               ) : (
                 <StatusBadge tone="muted">{t("superadmin.roster.noAccount")}</StatusBadge>
               )}

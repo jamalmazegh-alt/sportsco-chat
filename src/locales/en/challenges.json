@@ -171,7 +171,12 @@
     "custom_name_label": "Name",
     "custom_name_placeholder": "e.g. Long pass accuracy",
     "create": "Create",
-    "creating": "Creating…"
+    "creating": "Creating…",
+    "all_added": "All available activities are already added to this team.",
+    "popular": "Popular",
+    "already_in_session": "Already in the session",
+    "selected": "Selected",
+    "cancel": "Cancel"
   },
   "entry": {
     "title": "Log results",

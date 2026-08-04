@@ -4292,7 +4292,9 @@
       "eyebrow": "Roster",
       "subtitle": "Account activation status for each player and each parent.",
       "backToClub": "← Back to club",
-      "empty": "No results."
+      "empty": "No results.",
+      "invited": "eingeladen",
+      "invitedAt": "eingeladen {{date}}"
     },
     "invites": {
       "title": "Invitations",
@@ -4588,7 +4590,30 @@
       "exemptionRemoved": "Exemption removed",
       "exemptionUpdated": "Exemption updated",
       "failed": "Failed",
-      "createFailed": "Creation failed"
+      "createFailed": "Creation failed",
+      "channelPhone": "Telefon",
+      "channelEmail": "E-Mail",
+      "channelInPerson": "Persönlich",
+      "channelOther": "Sonstiges",
+      "statusWarning": "Warnung",
+      "statusOk": "ok",
+      "recomputeFailed": "Neuberechnung fehlgeschlagen",
+      "recomputeTitle": "FFF-Kategorien neu berechnen",
+      "recomputeBody": "Berechnet die Alterskategorien (U6 → Senior) der Spieler des Clubs für die gewählte Saison neu. Standardmäßig werden nur Zeilen ohne Kategorie ausgefüllt (nicht destruktiv).",
+      "seasonOptional": "Saison (optional)",
+      "seasonPlaceholder": "Aktuelle Saison standardmäßig (z. B. 2024-2025)",
+      "overwriteLabel": "Bereits erfasste Kategorien <strong>überschreiben</strong>, <danger>einschließlich manueller Aufstufungen</danger>.",
+      "recomputeRunning": "Neuberechnung läuft…",
+      "recomputeAction": "Neu berechnen",
+      "recomputeResult": "Ergebnis — Saison {{season}}",
+      "statTotal": "Total",
+      "statUpdated": "Aktualisiert",
+      "statSkipped": "Übersprungen",
+      "statMissingDob": "Ohne Geburtsdatum",
+      "overwriteConfirmTitle": "Bestehende Kategorien überschreiben?",
+      "overwriteConfirmDesc": "Alle bereits erfassten Kategorien der ausgewählten Saison werden durch die automatische FFF-Berechnung <strong>ersetzt</strong>.",
+      "overwriteConsequence": "Manuelle <strong>Aufstufungen</strong> (z. B. ein U14 in U15) gehen verloren.",
+      "overwriteConfirmAction": "Überschreiben und neu berechnen"
     }
   },
   "supportView": {

@@ -4287,7 +4287,9 @@
       "eyebrow": "Roster",
       "subtitle": "Statut d'activation du compte pour chaque joueur et chaque parent.",
       "backToClub": "← Retour au club",
-      "empty": "Aucun résultat."
+      "empty": "Aucun résultat.",
+      "invited": "invité",
+      "invitedAt": "invité {{date}}"
     },
     "invites": {
       "title": "Invitations",
@@ -4583,7 +4585,30 @@
       "exemptionRemoved": "Exemption retirée",
       "exemptionUpdated": "Exemption mise à jour",
       "failed": "Échec",
-      "createFailed": "Échec de création"
+      "createFailed": "Échec de création",
+      "channelPhone": "Téléphone",
+      "channelEmail": "Email",
+      "channelInPerson": "En personne",
+      "channelOther": "Autre",
+      "statusWarning": "avertissement",
+      "statusOk": "ok",
+      "recomputeFailed": "Échec du recalcul",
+      "recomputeTitle": "Recalcul des catégories FFF",
+      "recomputeBody": "Recalcule les catégories d'âge (U6 → Senior) des joueurs du club pour la saison choisie. Par défaut, seules les lignes sans catégorie sont remplies (non destructif).",
+      "seasonOptional": "Saison (optionnel)",
+      "seasonPlaceholder": "Saison courante par défaut (ex. 2024-2025)",
+      "overwriteLabel": "<strong>Écraser</strong> les catégories déjà saisies, <danger>y compris les surclassements manuels</danger>.",
+      "recomputeRunning": "Recalcul en cours…",
+      "recomputeAction": "Recalculer",
+      "recomputeResult": "Résultat — saison {{season}}",
+      "statTotal": "Total",
+      "statUpdated": "Mises à jour",
+      "statSkipped": "Ignorées",
+      "statMissingDob": "Sans date de naissance",
+      "overwriteConfirmTitle": "Écraser les catégories existantes ?",
+      "overwriteConfirmDesc": "Toutes les catégories déjà saisies pour la saison sélectionnée seront <strong>remplacées</strong> par le calcul FFF automatique.",
+      "overwriteConsequence": "Les <strong>surclassements manuels</strong> (ex. un U14 jouant en U15) seront perdus.",
+      "overwriteConfirmAction": "Écraser et recalculer"
     }
   },
   "supportView": {

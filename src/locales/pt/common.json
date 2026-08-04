@@ -4287,7 +4287,9 @@
       "eyebrow": "Roster",
       "subtitle": "Status de ativação da conta para cada jogador e cada pai.",
       "backToClub": "← Voltar ao clube",
-      "empty": "Sem resultados."
+      "empty": "Sem resultados.",
+      "invited": "convidado",
+      "invitedAt": "convidado {{date}}"
     },
     "invites": {
       "title": "Invitations",
@@ -4583,7 +4585,30 @@
       "exemptionRemoved": "Isenção removida",
       "exemptionUpdated": "Exemption updated",
       "failed": "Failed",
-      "createFailed": "Creation failed"
+      "createFailed": "Creation failed",
+      "channelPhone": "Telefone",
+      "channelEmail": "Email",
+      "channelInPerson": "Presencial",
+      "channelOther": "Outro",
+      "statusWarning": "aviso",
+      "statusOk": "ok",
+      "recomputeFailed": "Falha no recálculo",
+      "recomputeTitle": "Recalcular categorias FFF",
+      "recomputeBody": "Recalcula as categorias etárias (U6 → Sénior) dos jogadores do clube para a época escolhida. Por predefinição, só são preenchidas as linhas sem categoria (não destrutivo).",
+      "seasonOptional": "Época (opcional)",
+      "seasonPlaceholder": "Época atual por predefinição (ex. 2024-2025)",
+      "overwriteLabel": "<strong>Substituir</strong> as categorias já introduzidas, <danger>incluindo as subidas manuais</danger>.",
+      "recomputeRunning": "A recalcular…",
+      "recomputeAction": "Recalcular",
+      "recomputeResult": "Resultado — época {{season}}",
+      "statTotal": "Total",
+      "statUpdated": "Atualizadas",
+      "statSkipped": "Ignoradas",
+      "statMissingDob": "Sem data de nascimento",
+      "overwriteConfirmTitle": "Substituir as categorias existentes?",
+      "overwriteConfirmDesc": "Todas as categorias já introduzidas para a época selecionada serão <strong>substituídas</strong> pelo cálculo FFF automático.",
+      "overwriteConsequence": "As <strong>subidas manuais</strong> (ex. um U14 a jogar em U15) serão perdidas.",
+      "overwriteConfirmAction": "Substituir e recalcular"
     }
   },
   "supportView": {

@@ -5,7 +5,10 @@
     "cancel": "Annulla",
     "delete": "Elimina",
     "save": "Salva",
-    "copied": "Copied"
+    "copied": "Copied",
+    "refresh": "Aggiorna",
+    "copyFailed": "Impossibile copiare",
+    "copy": "Copia"
   },
   "chooser": {
     "title": "Nuovo camp",
@@ -139,7 +142,14 @@
     "facilityPlaceholder": "Opzionale",
     "facilityNone": "— Nessuna —",
     "save": "Salva",
-    "saved": "Modifiche salvate"
+    "saved": "Modifiche salvate",
+    "venueModeHome": "Sedi del club",
+    "venueModeHomeHint": "Campo, palestra, sala...",
+    "venueModeExternal": "Indirizzo esterno",
+    "venueModeExternalHint": "Un'altra location, fuori dal club",
+    "externalAddress": "Indirizzo",
+    "externalAddressPlaceholder": "Per esempio. 12 Via dello Stadio, 75001 Parigi",
+    "externalAddressHint": "Indirizzo in formato libero: mostrato agli iscritti e cliccabile su Google Maps."
   },
   "ageGroups": {
     "empty": "Nessuna categoria per il momento.",
@@ -150,7 +160,9 @@
     "quickAdd": "Aggiunta rapida",
     "pickPreset": "Scegli U6 – U19",
     "allAdded": "Tutte aggiunte",
-    "addCustom": "+ Categoria personalizzata"
+    "addCustom": "+ Categoria personalizzata",
+    "selectAll": "Seleziona le categorie interessate",
+    "customs": "Categorie personalizzate"
   },
   "cover": {
     "empty": "Nessuna immagine di copertina",
@@ -168,7 +180,9 @@
     "archive": "Archivia",
     "archived": "Camp archiviato",
     "publicUrl": "Link pubblico",
-    "publicUrlSoon": "pagina pubblica in arrivo"
+    "publicUrlSoon": "pagina pubblica in arrivo",
+    "openPublic": "Visualizza la pagina pubblica",
+    "publicUrlCopied": "Link copiato"
   },
   "duplicate": {
     "action": "Duplica",
@@ -283,7 +297,41 @@
     },
     "full": "Completo — iscrizione possibile in lista d'attesa",
     "lastSpots": "Ultimi posti ({{count}} rimasti)",
-    "registerWaitlistCta": "Iscriviti in lista d'attesa"
+    "registerWaitlistCta": "Iscriviti in lista d'attesa",
+    "tracking": {
+      "invalidTitle": "Link non valido o scaduto",
+      "invalidBody": "Questo link di monitoraggio non è valido. Controlla il link ricevuto via email.",
+      "title": "Monitoraggio iscrizione",
+      "participant": "Partecipante",
+      "bornOn": "Nato/a il {{date}}",
+      "campDates": "Date dello stage: {{dates}}",
+      "reason": "Motivo: {{reason}}",
+      "noDocs": "Nessun documento richiesto.",
+      "personalLink": "Link personale — non condividerlo. Dà accesso al tuo fascicolo e ai documenti.",
+      "status": {
+        "pending": "In attesa di validazione",
+        "under_review": "In esame",
+        "approved": "Approvata",
+        "rejected": "Rifiutata",
+        "cancelled": "Annullata",
+        "waitlisted": "Lista d'attesa"
+      },
+      "docMissing": "Documento da fornire",
+      "docPending": "In attesa di esame",
+      "docApproved": "Approvata",
+      "docRejected": "Rifiutata",
+      "download": "Scarica",
+      "upload": "Invia",
+      "replace": "Sostituisci",
+      "errors": {
+        "downloadUnavailable": "Download non disponibile.",
+        "fileTooLarge": "File troppo grande (max 15 MB).",
+        "invalidMime": "Formato non supportato (PDF, JPG, PNG).",
+        "rateLimited": "Troppi tentativi.",
+        "uploadFailed": "Invio impossibile."
+      },
+      "uploadSuccess": "Documento inviato. Stato: in attesa."
+    }
   },
   "registrations": {
     "status": {
@@ -367,7 +415,19 @@
       "capacityFullTitle": "Camp full",
       "capacityFullHelp": "The camp has reached capacity. Do you want to place this family on the waitlist?",
       "placeOnWaitlist": "Place on waitlist",
-      "emailsHint": "Automatic emails to families will be added in the next step (Phase 3, step 3)."
+      "emailsHint": "Automatic emails to families will be added in the next step (Phase 3, step 3).",
+      "paymentUpdated": "Pagamento aggiornato",
+      "paymentSection": "Pagamento",
+      "paymentNotRequired": "Nessun pagamento richiesto per questo campo.",
+      "paymentPrice": "Camp price: {{price}} {{currency}}",
+      "paymentReceived": "Received: {{amount}} {{currency}}",
+      "paymentRemaining": "Balance due: {{amount}} {{currency}}",
+      "markPaid": "Contrassegna come pagato",
+      "markUnpaid": "Contrassegna come non pagato",
+      "markRefunded": "Contrassegna come rimborsato",
+      "markPartialTitle": "Registra un pagamento parziale",
+      "markPartial": "Contrassegna come parziale",
+      "partialRemainingPreview": "Balance due: {{amount}} {{currency}}"
     },
     "csv": {
       "cta": "Export CSV",
@@ -388,6 +448,40 @@
       "dossierStatus": "Documents status",
       "amountPaid": "Amount paid",
       "requestedAt": "Request date"
-    }
+    },
+    "age": "{{age}} years",
+    "extend": {
+      "done": "Prenotazione prorogata di 72 h."
+    },
+    "stats": {
+      "capacity": "Capienza",
+      "approved": "Approvate",
+      "reserved": "Riservato (72h)",
+      "remaining": "Posti rimanenti",
+      "pending": "Richieste in sospeso",
+      "expiredHint": "{{count}} 72 h reservation(s) expired — use “Extend” to hold the spot."
+    },
+    "searchPlaceholder": "Cerca (nome, email...)",
+    "col": {
+      "participant": "Participant",
+      "guardian": "Custode",
+      "requested": "Richiesta",
+      "regStatus": "Registrazione",
+      "payment": "Pagamento",
+      "dossier": "File",
+      "actions": ""
+    },
+    "empty": "Nessuna registrazione da visualizzare.",
+    "reservationExpired": "Prenotazione scaduta",
+    "reservationUntil": "Until {{date}}",
+    "docsSummary": "{{ok}}/{{total}} documents",
+    "noRequiredDocs": "Nessun documento richiesto",
+    "rejected": "respinto",
+    "extendCta": "Prolungare 72 ore",
+    "draftHint": "Le registrazioni appariranno qui dopo la pubblicazione del campo."
+  },
+  "tabs": {
+    "edit": "Modifica",
+    "registrations": "Registrazioni"
   }
 }

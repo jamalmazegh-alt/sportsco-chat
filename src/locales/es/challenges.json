@@ -171,7 +171,12 @@
     "custom_name_label": "Nombre",
     "custom_name_placeholder": "Ej. Precisión de pase largo",
     "create": "Crear",
-    "creating": "Creando…"
+    "creating": "Creando…",
+    "all_added": "Todas las actividades disponibles ya están agregadas a este equipo.",
+    "popular": "Popular",
+    "already_in_session": "Ya en la sesión",
+    "selected": "Seleccionado",
+    "cancel": "Cancelar"
   },
   "entry": {
     "title": "Registro",

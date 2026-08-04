@@ -4287,7 +4287,9 @@
       "eyebrow": "Roster",
       "subtitle": "Account activation status for each player and each parent.",
       "backToClub": "← Back to club",
-      "empty": "No results."
+      "empty": "No results.",
+      "invited": "invitado",
+      "invitedAt": "invitado {{date}}"
     },
     "invites": {
       "title": "Invitations",
@@ -4583,7 +4585,30 @@
       "exemptionRemoved": "Exemption removed",
       "exemptionUpdated": "Exemption updated",
       "failed": "Failed",
-      "createFailed": "Creation failed"
+      "createFailed": "Creation failed",
+      "channelPhone": "Teléfono",
+      "channelEmail": "Email",
+      "channelInPerson": "En persona",
+      "channelOther": "Otro",
+      "statusWarning": "aviso",
+      "statusOk": "ok",
+      "recomputeFailed": "Error al recalcular",
+      "recomputeTitle": "Recalcular categorías FFF",
+      "recomputeBody": "Recalcula las categorías de edad (U6 → Senior) de los jugadores del club para la temporada elegida. Por defecto, solo se completan las filas sin categoría (no destructivo).",
+      "seasonOptional": "Temporada (opcional)",
+      "seasonPlaceholder": "Temporada actual por defecto (p. ej. 2024-2025)",
+      "overwriteLabel": "<strong>Sobrescribir</strong> las categorías ya introducidas, <danger>incluidos los saltos de categoría manuales</danger>.",
+      "recomputeRunning": "Recalculando…",
+      "recomputeAction": "Recalcular",
+      "recomputeResult": "Resultado — temporada {{season}}",
+      "statTotal": "Total",
+      "statUpdated": "Actualizadas",
+      "statSkipped": "Omitidas",
+      "statMissingDob": "Sin fecha de nacimiento",
+      "overwriteConfirmTitle": "¿Sobrescribir las categorías existentes?",
+      "overwriteConfirmDesc": "Todas las categorías ya introducidas para la temporada seleccionada serán <strong>reemplazadas</strong> por el cálculo FFF automático.",
+      "overwriteConsequence": "Los <strong>saltos de categoría manuales</strong> (p. ej. un U14 en U15) se perderán.",
+      "overwriteConfirmAction": "Sobrescribir y recalcular"
     }
   },
   "supportView": {

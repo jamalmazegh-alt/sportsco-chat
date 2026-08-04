@@ -253,10 +253,12 @@ export function CreateTicketOnBehalfDialog({
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="phone">Téléphone</SelectItem>
-                  <SelectItem value="email">Email</SelectItem>
-                  <SelectItem value="in_person">En personne</SelectItem>
-                  <SelectItem value="other">Autre</SelectItem>
+                  <SelectItem value="phone">{t("superadmin.components.channelPhone")}</SelectItem>
+                  <SelectItem value="email">{t("superadmin.components.channelEmail")}</SelectItem>
+                  <SelectItem value="in_person">
+                    {t("superadmin.components.channelInPerson")}
+                  </SelectItem>
+                  <SelectItem value="other">{t("superadmin.components.channelOther")}</SelectItem>
                 </SelectContent>
               </Select>
             </div>

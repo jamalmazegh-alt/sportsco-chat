@@ -51,16 +51,17 @@ interface TrackingBundle {
   submitted_documents: SubmittedDoc[];
 }
 
-const NotFoundBlock = () => (
-  <div className="min-h-screen flex items-center justify-center px-6 text-center">
-    <div>
-      <h1 className="text-2xl font-bold">Lien invalide ou expiré</h1>
-      <p className="mt-2 text-muted-foreground">
-        Ce lien de suivi n'est pas valide. Vérifiez le lien reçu par email.
-      </p>
+const NotFoundBlock = () => {
+  const { t } = useTranslation("camps");
+  return (
+    <div className="min-h-screen flex items-center justify-center px-6 text-center">
+      <div>
+        <h1 className="text-2xl font-bold">{t("public.tracking.invalidTitle")}</h1>
+        <p className="mt-2 text-muted-foreground">{t("public.tracking.invalidBody")}</p>
+      </div>
     </div>
-  </div>
-);
+  );
+};
 
 const trackingQuery = (token: string) =>
   queryOptions({
@@ -101,7 +102,7 @@ function TrackingPage() {
   const { clubSlug, campSlug, token } = Route.useParams();
   const { data } = useSuspenseQuery(trackingQuery(token));
   const qc = useQueryClient();
-  const { t: _t } = useTranslation("camps");
+  const { t, i18n } = useTranslation("camps");
 
   if (!data) return <NotFoundBlock />;
 
@@ -113,9 +114,10 @@ function TrackingPage() {
     if (!submittedByReq.has(s.required_document_id)) submittedByReq.set(s.required_document_id, s);
   }
 
-  const dateRange = `${new Date(camp.start_date).toLocaleDateString("fr-FR")} → ${new Date(
+  const locale = i18n.language || "fr-FR";
+  const dateRange = `${new Date(camp.start_date).toLocaleDateString(locale)} → ${new Date(
     camp.end_date,
-  ).toLocaleDateString("fr-FR")}`;
+  ).toLocaleDateString(locale)}`;
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-primary/5 to-background">
@@ -124,12 +126,12 @@ function TrackingPage() {
           <Button asChild variant="ghost" size="sm">
             <Link to="/stages/$clubSlug/$campSlug" params={{ clubSlug, campSlug }}>
               <ArrowLeft className="mr-1 h-4 w-4" />
-              Retour au stage
+              {t("public.backToCamp")}
             </Link>
           </Button>
         </div>
 
-        <h1 className="text-2xl font-bold md:text-3xl">Suivi de l'inscription</h1>
+        <h1 className="text-2xl font-bold md:text-3xl">{t("public.tracking.title")}</h1>
         <p className="mt-1 text-sm text-muted-foreground">
           {camp.title} · {club.name}
         </p>
@@ -137,28 +139,32 @@ function TrackingPage() {
         <section className="mt-6 rounded-2xl border border-border/60 bg-card p-6">
           <div className="flex flex-wrap items-start justify-between gap-3">
             <div>
-              <p className="text-sm text-muted-foreground">Participant</p>
+              <p className="text-sm text-muted-foreground">{t("public.tracking.participant")}</p>
               <p className="text-lg font-semibold">
                 {registration.participant_first_name} {registration.participant_last_name}
               </p>
               <p className="text-xs text-muted-foreground mt-1">
-                Né(e) le {new Date(registration.birth_date).toLocaleDateString("fr-FR")}
+                {t("public.tracking.bornOn", {
+                  date: new Date(registration.birth_date).toLocaleDateString(locale),
+                })}
               </p>
-              <p className="text-xs text-muted-foreground mt-1">Dates du stage : {dateRange}</p>
+              <p className="text-xs text-muted-foreground mt-1">
+                {t("public.tracking.campDates", { dates: dateRange })}
+              </p>
             </div>
             <StatusBadge status={registration.registration_status} />
           </div>
           {registration.registration_status === "rejected" && registration.rejection_reason && (
             <div className="mt-4 rounded-md bg-destructive/10 px-3 py-2 text-sm text-destructive">
-              Motif : {registration.rejection_reason}
+              {t("public.tracking.reason", { reason: registration.rejection_reason })}
             </div>
           )}
         </section>
 
         <section className="mt-6 rounded-2xl border border-border/60 bg-card p-6">
-          <h2 className="text-lg font-semibold">Pièces à fournir</h2>
+          <h2 className="text-lg font-semibold">{t("public.requiredDocs")}</h2>
           {required_documents.length === 0 ? (
-            <p className="mt-3 text-sm text-muted-foreground">Aucune pièce demandée.</p>
+            <p className="mt-3 text-sm text-muted-foreground">{t("public.tracking.noDocs")}</p>
           ) : (
             <ul className="mt-4 space-y-3">
               {required_documents.map((rd) => {
@@ -177,33 +183,41 @@ function TrackingPage() {
           )}
         </section>
 
-        <p className="mt-6 text-xs text-muted-foreground">
-          Lien personnel — ne le partagez pas. Il donne accès à votre dossier et à vos pièces.
-        </p>
+        <p className="mt-6 text-xs text-muted-foreground">{t("public.tracking.personalLink")}</p>
       </div>
     </div>
   );
 }
 
 function StatusBadge({ status }: { status: string }) {
-  const map: Record<string, { label: string; cls: string }> = {
+  const { t } = useTranslation("camps");
+  const map: Record<string, { labelKey: string; cls: string }> = {
     pending: {
-      label: "En attente de validation",
+      labelKey: "public.tracking.status.pending",
       cls: "bg-amber-100 text-amber-800",
     },
     under_review: {
-      label: "En cours d'examen",
+      labelKey: "public.tracking.status.under_review",
       cls: "bg-blue-100 text-blue-800",
     },
-    approved: { label: "Validée", cls: "bg-emerald-100 text-emerald-800" },
-    rejected: { label: "Refusée", cls: "bg-destructive/10 text-destructive" },
-    cancelled: { label: "Annulée", cls: "bg-slate-100 text-slate-700" },
-    waitlisted: { label: "Liste d'attente", cls: "bg-purple-100 text-purple-800" },
+    approved: {
+      labelKey: "public.tracking.status.approved",
+      cls: "bg-emerald-100 text-emerald-800",
+    },
+    rejected: {
+      labelKey: "public.tracking.status.rejected",
+      cls: "bg-destructive/10 text-destructive",
+    },
+    cancelled: { labelKey: "public.tracking.status.cancelled", cls: "bg-slate-100 text-slate-700" },
+    waitlisted: {
+      labelKey: "public.tracking.status.waitlisted",
+      cls: "bg-purple-100 text-purple-800",
+    },
   };
-  const meta = map[status] ?? { label: status, cls: "bg-slate-100 text-slate-700" };
-  return (
-    <span className={`rounded-full px-3 py-1 text-xs font-medium ${meta.cls}`}>{meta.label}</span>
-  );
+  const meta = map[status];
+  const label = meta ? t(meta.labelKey) : status;
+  const cls = meta?.cls ?? "bg-slate-100 text-slate-700";
+  return <span className={`rounded-full px-3 py-1 text-xs font-medium ${cls}`}>{label}</span>;
 }
 
 function DocRow({
@@ -217,6 +231,7 @@ function DocRow({
   submitted?: SubmittedDoc;
   onDone: () => void;
 }) {
+  const { t } = useTranslation("camps");
   const [downloading, setDownloading] = useState(false);
   const [replacing, setReplacing] = useState(false);
 
@@ -235,7 +250,7 @@ function DocRow({
       });
       const json = await res.json().catch(() => ({}) as any);
       if (!res.ok || !json.url) {
-        toast.error("Téléchargement indisponible.");
+        toast.error(t("public.tracking.errors.downloadUnavailable"));
         return;
       }
       void openExternalUrl(json.url);
@@ -260,13 +275,13 @@ function DocRow({
       const json = await res.json().catch(() => ({}) as any);
       if (!res.ok) {
         const code = json?.error ?? "unknown";
-        if (code === "file_too_large") toast.error("Fichier trop volumineux (15 Mo max).");
-        else if (code === "invalid_mime") toast.error("Format non supporté (PDF, JPG, PNG).");
-        else if (code === "rate_limited") toast.error("Trop de tentatives.");
-        else toast.error("Envoi impossible.");
+        if (code === "file_too_large") toast.error(t("public.tracking.errors.fileTooLarge"));
+        else if (code === "invalid_mime") toast.error(t("public.tracking.errors.invalidMime"));
+        else if (code === "rate_limited") toast.error(t("public.tracking.errors.rateLimited"));
+        else toast.error(t("public.tracking.errors.uploadFailed"));
         return;
       }
-      toast.success("Pièce envoyée. Statut : en attente.");
+      toast.success(t("public.tracking.uploadSuccess"));
       onDone();
     } finally {
       setReplacing(false);
@@ -285,27 +300,29 @@ function DocRow({
           <div className="mt-1 flex items-center gap-2 text-xs">
             {isMissing && (
               <span className="inline-flex items-center gap-1 text-amber-700">
-                <Upload className="h-3.5 w-3.5" /> Pièce à fournir
+                <Upload className="h-3.5 w-3.5" /> {t("public.tracking.docMissing")}
               </span>
             )}
             {status === "pending" && (
               <span className="inline-flex items-center gap-1 text-blue-700">
-                <Clock className="h-3.5 w-3.5" /> En attente d'examen
+                <Clock className="h-3.5 w-3.5" /> {t("public.tracking.docPending")}
               </span>
             )}
             {status === "approved" && (
               <span className="inline-flex items-center gap-1 text-emerald-700">
-                <CheckCircle2 className="h-3.5 w-3.5" /> Validée
+                <CheckCircle2 className="h-3.5 w-3.5" /> {t("public.tracking.docApproved")}
               </span>
             )}
             {isRejected && (
               <span className="inline-flex items-center gap-1 text-destructive">
-                <XCircle className="h-3.5 w-3.5" /> Refusée
+                <XCircle className="h-3.5 w-3.5" /> {t("public.tracking.docRejected")}
               </span>
             )}
           </div>
           {isRejected && submitted?.rejection_reason && (
-            <p className="mt-2 text-xs text-destructive">Motif : {submitted.rejection_reason}</p>
+            <p className="mt-2 text-xs text-destructive">
+              {t("public.tracking.reason", { reason: submitted.rejection_reason })}
+            </p>
           )}
         </div>
         <div className="flex flex-wrap items-center gap-2">
@@ -316,7 +333,7 @@ function DocRow({
               ) : (
                 <Download className="mr-1 h-3.5 w-3.5" />
               )}
-              Télécharger
+              {t("public.tracking.download")}
             </Button>
           )}
           {status !== "approved" && (
@@ -338,7 +355,7 @@ function DocRow({
                 ) : (
                   <Upload className="h-3.5 w-3.5" />
                 )}
-                {isMissing ? "Envoyer" : "Remplacer"}
+                {isMissing ? t("public.tracking.upload") : t("public.tracking.replace")}
               </span>
             </label>
           )}

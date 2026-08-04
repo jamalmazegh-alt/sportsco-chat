@@ -4287,7 +4287,9 @@
       "eyebrow": "Roster",
       "subtitle": "Account activation status for each player and each parent.",
       "backToClub": "← Back to club",
-      "empty": "No results."
+      "empty": "No results.",
+      "invited": "invited",
+      "invitedAt": "invited {{date}}"
     },
     "invites": {
       "title": "Invitations",
@@ -4583,7 +4585,30 @@
       "exemptionRemoved": "Exemption removed",
       "exemptionUpdated": "Exemption updated",
       "failed": "Failed",
-      "createFailed": "Creation failed"
+      "createFailed": "Creation failed",
+      "channelPhone": "Phone",
+      "channelEmail": "Email",
+      "channelInPerson": "In person",
+      "channelOther": "Other",
+      "statusWarning": "warn",
+      "statusOk": "ok",
+      "recomputeFailed": "Recompute failed",
+      "recomputeTitle": "Recompute FFF categories",
+      "recomputeBody": "Recomputes age categories (U6 → Senior) for the club's players for the selected season. By default, only rows without a category are filled (non-destructive).",
+      "seasonOptional": "Season (optional)",
+      "seasonPlaceholder": "Current season by default (e.g. 2024-2025)",
+      "overwriteLabel": "<strong>Overwrite</strong> categories already set, <danger>including manual upgrades</danger>.",
+      "recomputeRunning": "Recomputing…",
+      "recomputeAction": "Recompute",
+      "recomputeResult": "Result — season {{season}}",
+      "statTotal": "Total",
+      "statUpdated": "Updated",
+      "statSkipped": "Skipped",
+      "statMissingDob": "Missing date of birth",
+      "overwriteConfirmTitle": "Overwrite existing categories?",
+      "overwriteConfirmDesc": "All categories already set for the selected season will be <strong>replaced</strong> by the automatic FFF calculation.",
+      "overwriteConsequence": "Manual <strong>age upgrades</strong> (e.g. a U14 playing in U15) will be lost.",
+      "overwriteConfirmAction": "Overwrite and recompute"
     }
   },
   "supportView": {

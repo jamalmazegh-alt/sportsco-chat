@@ -206,15 +206,16 @@ function KPI({
 }
 
 function InviteRow({ row }: { row: ClubInviteStatusRow }) {
+  const { t } = useTranslation();
   const name = [row.firstName, row.lastName].filter(Boolean).join(" ").trim() || row.email || "—";
   const inviteBadge = row.usedAt ? (
-    <StatusBadge tone="success">Acceptée</StatusBadge>
+    <StatusBadge tone="success">{t("superadmin.invites.acceptedStatus")}</StatusBadge>
   ) : row.hasActiveAccount ? (
-    <StatusBadge tone="success">Compte actif</StatusBadge>
+    <StatusBadge tone="success">{t("superadmin.invites.activeAccount")}</StatusBadge>
   ) : row.isExpired ? (
-    <StatusBadge tone="danger">Expirée</StatusBadge>
+    <StatusBadge tone="danger">{t("superadmin.invites.expired")}</StatusBadge>
   ) : (
-    <StatusBadge tone="warn">En attente</StatusBadge>
+    <StatusBadge tone="warn">{t("superadmin.invites.pending")}</StatusBadge>
   );
 
   return (

@@ -4287,7 +4287,9 @@
       "eyebrow": "Roster",
       "subtitle": "Accountactiveringsstatus voor elke speler en elke ouder.",
       "backToClub": "← Terug naar club",
-      "empty": "Geen resultaten."
+      "empty": "Geen resultaten.",
+      "invited": "uitgenodigd",
+      "invitedAt": "uitgenodigd {{date}}"
     },
     "invites": {
       "title": "Invitations",
@@ -4583,7 +4585,30 @@
       "exemptionRemoved": "Exemption removed",
       "exemptionUpdated": "Exemption updated",
       "failed": "Failed",
-      "createFailed": "Creation failed"
+      "createFailed": "Creation failed",
+      "channelPhone": "Telefoon",
+      "channelEmail": "Email",
+      "channelInPerson": "Persoonlijk",
+      "channelOther": "Overig",
+      "statusWarning": "waarschuwing",
+      "statusOk": "ok",
+      "recomputeFailed": "Herberekening mislukt",
+      "recomputeTitle": "FFF-categorieën herberekenen",
+      "recomputeBody": "Herkent de leeftijdscategorieën (U6 → Senior) van de spelers van de club voor het gekozen seizoen. Standaard worden alleen rijen zonder categorie ingevuld (niet-destructief).",
+      "seasonOptional": "Seizoen (optioneel)",
+      "seasonPlaceholder": "Huidig seizoen standaard (bijv. 2024-2025)",
+      "overwriteLabel": "Reeds ingevoerde categorieën <strong>overschrijven</strong>, <danger>inclusief handmatige opwaarderingen</danger>.",
+      "recomputeRunning": "Herberekenen…",
+      "recomputeAction": "Herberekenen",
+      "recomputeResult": "Resultaat — seizoen {{season}}",
+      "statTotal": "Total",
+      "statUpdated": "Bijgewerkt",
+      "statSkipped": "Overgeslagen",
+      "statMissingDob": "Zonder geboortedatum",
+      "overwriteConfirmTitle": "Bestaande categorieën overschrijven?",
+      "overwriteConfirmDesc": "Alle reeds ingevoerde categorieën voor het geselecteerde seizoen worden <strong>vervangen</strong> door de automatische FFF-berekening.",
+      "overwriteConsequence": "Handmatige <strong>opwaarderingen</strong> (bijv. een U14 in U15) gaan verloren.",
+      "overwriteConfirmAction": "Overschrijven en herberekenen"
     }
   },
   "supportView": {

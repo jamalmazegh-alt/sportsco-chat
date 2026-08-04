@@ -4287,7 +4287,9 @@
       "eyebrow": "Roster",
       "subtitle": "Account activation status for each player and each parent.",
       "backToClub": "← Back to club",
-      "empty": "No results."
+      "empty": "No results.",
+      "invited": "invitato",
+      "invitedAt": "invitato {{date}}"
     },
     "invites": {
       "title": "Invitations",
@@ -4583,7 +4585,30 @@
       "exemptionRemoved": "Exemption removed",
       "exemptionUpdated": "Exemption updated",
       "failed": "Failed",
-      "createFailed": "Creation failed"
+      "createFailed": "Creation failed",
+      "channelPhone": "Telefono",
+      "channelEmail": "Email",
+      "channelInPerson": "Di persona",
+      "channelOther": "Altro",
+      "statusWarning": "avviso",
+      "statusOk": "ok",
+      "recomputeFailed": "Ricalcolo non riuscito",
+      "recomputeTitle": "Ricalcolo categorie FFF",
+      "recomputeBody": "Ricalcola le categorie d'età (U6 → Senior) dei giocatori del club per la stagione scelta. Per impostazione predefinita, vengono compilate solo le righe senza categoria (non distruttivo).",
+      "seasonOptional": "Stagione (opzionale)",
+      "seasonPlaceholder": "Stagione corrente per impostazione predefinita (es. 2024-2025)",
+      "overwriteLabel": "<strong>Sovrascrivi</strong> le categorie già inserite, <danger>compresi i salti di categoria manuali</danger>.",
+      "recomputeRunning": "Ricalcolo in corso…",
+      "recomputeAction": "Ricalcola",
+      "recomputeResult": "Risultato — stagione {{season}}",
+      "statTotal": "Total",
+      "statUpdated": "Aggiornate",
+      "statSkipped": "Ignorate",
+      "statMissingDob": "Senza data di nascita",
+      "overwriteConfirmTitle": "Sovrascrivere le categorie esistenti?",
+      "overwriteConfirmDesc": "Tutte le categorie già inserite per la stagione selezionata saranno <strong>sostituite</strong> dal calcolo FFF automatico.",
+      "overwriteConsequence": "I <strong>salti di categoria manuali</strong> (es. un U14 in U15) andranno persi.",
+      "overwriteConfirmAction": "Sovrascrivi e ricalcola"
     }
   },
   "supportView": {
