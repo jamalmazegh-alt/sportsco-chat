@@ -80,20 +80,15 @@ export function V2Waitlist() {
         <div className="text-center">
           <div className="inline-flex items-center gap-1.5 rounded-full bg-amber-500/15 px-3 py-1 text-[11px] font-bold uppercase tracking-wider text-amber-700 dark:text-amber-300">
             <Clock className="h-3 w-3" />
-            {t("waitlist.badge", { defaultValue: "À venir" })}
+            {t("waitlist.badge")}
           </div>
           <h2
             id="waitlist-title"
             className="mt-4 font-display text-3xl font-bold tracking-tight sm:text-4xl"
           >
-            {t("waitlist.title", { defaultValue: "Les prochaines fonctionnalités" })}
+            {t("waitlist.title")}
           </h2>
-          <p className="mt-3 text-muted-foreground">
-            {t("waitlist.subtitle", {
-              defaultValue:
-                "Laissez-nous votre email pour être prévenu dès qu'une fonctionnalité est disponible. Aucun engagement, aucun paiement.",
-            })}
-          </p>
+          <p className="mt-3 text-muted-foreground">{t("waitlist.subtitle")}</p>
         </div>
 
         {status === "success" ? (
@@ -103,11 +98,7 @@ export function V2Waitlist() {
             role="status"
           >
             <CheckCircle2 className="mx-auto h-10 w-10 text-[color:var(--victory)]" />
-            <p className="mt-4 text-base font-semibold">
-              {t("waitlist.success", {
-                defaultValue: "Merci ! On vous écrit dès que c'est prêt.",
-              })}
-            </p>
+            <p className="mt-4 text-base font-semibold">{t("waitlist.success")}</p>
           </div>
         ) : (
           <form
@@ -130,9 +121,7 @@ export function V2Waitlist() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="waitlist-email">
-                {t("waitlist.emailLabel", { defaultValue: "Votre email" })}
-              </Label>
+              <Label htmlFor="waitlist-email">{t("waitlist.emailLabel")}</Label>
               <div className="relative">
                 <Mail className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                 <Input
@@ -149,11 +138,7 @@ export function V2Waitlist() {
             </div>
 
             <fieldset className="space-y-3">
-              <legend className="text-sm font-medium">
-                {t("waitlist.featuresLabel", {
-                  defaultValue: "Fonctionnalités qui vous intéressent",
-                })}
-              </legend>
+              <legend className="text-sm font-medium">{t("waitlist.featuresLabel")}</legend>
               <div className="grid gap-2 sm:grid-cols-2">
                 {FEATURES.map((f) => (
                   <label
@@ -172,18 +157,14 @@ export function V2Waitlist() {
             </fieldset>
 
             <div className="space-y-2">
-              <Label htmlFor="waitlist-role">
-                {t("waitlist.roleLabel", { defaultValue: "Votre rôle" })}
-              </Label>
+              <Label htmlFor="waitlist-role">{t("waitlist.roleLabel")}</Label>
               <select
                 id="waitlist-role"
                 value={role}
                 onChange={(e) => setRole(e.target.value)}
                 className="h-10 w-full rounded-md border border-input bg-background px-3 text-sm"
               >
-                <option value="">
-                  {t("waitlist.rolePlaceholder", { defaultValue: "— Choisir —" })}
-                </option>
+                <option value="">{t("waitlist.rolePlaceholder")}</option>
                 {ROLES.map((r) => (
                   <option key={r} value={r}>
                     {t(`waitlist.roles.${r}`, { defaultValue: r })}
@@ -198,12 +179,7 @@ export function V2Waitlist() {
                 onCheckedChange={(v) => setConsent(Boolean(v))}
                 data-testid="waitlist-consent"
               />
-              <span className="text-muted-foreground">
-                {t("waitlist.consent", {
-                  defaultValue:
-                    "J'accepte de recevoir des nouvelles de Clubero sur les fonctionnalités à venir. Désinscription en un clic.",
-                })}
-              </span>
+              <span className="text-muted-foreground">{t("waitlist.consent")}</span>
             </label>
 
             <Button
@@ -213,9 +189,7 @@ export function V2Waitlist() {
               disabled={status === "loading" || !email || features.length === 0}
               data-testid="waitlist-submit"
             >
-              {status === "loading"
-                ? t("waitlist.submitting", { defaultValue: "Envoi…" })
-                : t("waitlist.submit", { defaultValue: "Être prévenu" })}
+              {status === "loading" ? t("waitlist.submitting") : t("waitlist.submit")}
             </Button>
 
             {status === "error" && (
@@ -224,9 +198,7 @@ export function V2Waitlist() {
                 role="alert"
                 data-testid="waitlist-error"
               >
-                {t("waitlist.error", {
-                  defaultValue: "Une erreur est survenue. Réessayez dans un instant.",
-                })}
+                {t("waitlist.error")}
               </p>
             )}
           </form>

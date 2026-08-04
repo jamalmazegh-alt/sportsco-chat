@@ -2079,5 +2079,10 @@
         "cta": "Bekijk de installatiegids"
       }
     }
+  },
+  "mock": {
+    "toDoCount": "3 te doen",
+    "attendance": "Aanwezigheid",
+    "u15Training": "U15 Training"
   }
 }

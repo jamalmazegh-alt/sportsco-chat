@@ -15,16 +15,10 @@ export function NotFoundPage() {
         </div>
         <div className="space-y-1">
           <p className="text-sm font-medium text-muted-foreground tracking-wider">
-            {t("notFound.code", { defaultValue: "404" })}
+            {t("notFound.code")}
           </p>
-          <h1 className="text-2xl font-semibold">
-            {t("notFound.title", { defaultValue: "Page introuvable" })}
-          </h1>
-          <p className="text-sm text-muted-foreground">
-            {t("notFound.subtitle", {
-              defaultValue: "La page que vous cherchez n'existe pas ou a été déplacée.",
-            })}
-          </p>
+          <h1 className="text-2xl font-semibold">{t("notFound.title")}</h1>
+          <p className="text-sm text-muted-foreground">{t("notFound.subtitle")}</p>
         </div>
         <div className="flex gap-2 justify-center pt-2">
           <Button variant="outline" onClick={() => router.history.back()}>
@@ -33,7 +27,7 @@ export function NotFoundPage() {
           <Button asChild>
             <Link to="/">
               <Home className="h-4 w-4 mr-1.5" />
-              {t("nav.home", { defaultValue: "Accueil" })}
+              {t("nav.home")}
             </Link>
           </Button>
         </div>

@@ -110,11 +110,7 @@ function TeamsPage() {
     e.preventDefault();
     if (!activeClubId) return;
     if (!isCanonicalTeamAgeCategory(ageGroup)) {
-      toast.error(
-        t("teams.ageGroupRequired", {
-          defaultValue: "Choisissez une catégorie d'âge dans la liste.",
-        }),
-      );
+      toast.error(t("teams.ageGroupRequired"));
       return;
     }
     setBusy(true);
@@ -350,9 +346,7 @@ function TeamsPage() {
               <BarChart3 className="h-5 w-5 text-primary" />
             </div>
             <div className="min-w-0 flex-1">
-              <p className="text-sm font-semibold">
-                {t("nav.viewStats", { defaultValue: "Voir les statistiques" })}
-              </p>
+              <p className="text-sm font-semibold">{t("nav.viewStats")}</p>
               <p className="text-xs text-muted-foreground">{t("nav.stats")}</p>
             </div>
             <ChevronRight className="h-4 w-4 text-muted-foreground shrink-0" />

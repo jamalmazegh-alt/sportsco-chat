@@ -111,10 +111,10 @@ export function MembersManager({ tournamentId, matches, teams }: Props) {
       });
       toast.success(
         res.linked
-          ? t("tournamentMembers.added", { defaultValue: "Membre ajouté" })
+          ? t("tournamentMembers.added")
           : res.offline
-            ? t("tournamentMembers.offlineAdded", { defaultValue: "Ajouté (sans compte)" })
-            : t("tournamentMembers.invited", { defaultValue: "Invitation créée" }),
+            ? t("tournamentMembers.offlineAdded")
+            : t("tournamentMembers.invited"),
       );
 
       const locale = (i18n.language?.startsWith("en") ? "en" : "fr") as "fr" | "en";
@@ -171,7 +171,7 @@ export function MembersManager({ tournamentId, matches, teams }: Props) {
     setRemoveId(null);
     try {
       await removeFn({ data: { tournament_id: tournamentId, member_id: memberId } });
-      toast.success(t("tournamentMembers.removed", { defaultValue: "Membre retiré" }));
+      toast.success(t("tournamentMembers.removed"));
       qc.invalidateQueries({ queryKey: ["tournament-members", tournamentId] });
       qc.invalidateQueries({ queryKey: ["tournament-referees", tournamentId] });
     } catch (err: any) {
@@ -199,7 +199,7 @@ export function MembersManager({ tournamentId, matches, teams }: Props) {
   function copyInviteLink(token: string) {
     const url = `${getPublicOrigin()}/tournament-invite/${token}`;
     void copyText(url);
-    toast.success(t("tournamentMembers.linkCopied", { defaultValue: "Lien copié" }));
+    toast.success(t("tournamentMembers.linkCopied"));
   }
 
   async function onConvert(e: FormEvent) {
@@ -246,7 +246,7 @@ export function MembersManager({ tournamentId, matches, teams }: Props) {
           },
         }).catch((err) => console.error("convert/invite email failed", err));
       }
-      toast.success(t("tournamentMembers.invited", { defaultValue: "Invitation créée" }));
+      toast.success(t("tournamentMembers.invited"));
       setConvertMember(null);
       setConvertEmail("");
       qc.invalidateQueries({ queryKey: ["tournament-members", tournamentId] });
@@ -261,9 +261,7 @@ export function MembersManager({ tournamentId, matches, teams }: Props) {
   return (
     <div className="space-y-4">
       <header className="flex items-center justify-between">
-        <h3 className="text-sm font-semibold">
-          {t("tournamentMembers.title", { defaultValue: "Membres du tournoi" })}
-        </h3>
+        <h3 className="text-sm font-semibold">{t("tournamentMembers.title")}</h3>
         <ResponsiveFormDialog
           open={open}
           onOpenChange={(o) => {
@@ -273,28 +271,22 @@ export function MembersManager({ tournamentId, matches, teams }: Props) {
           trigger={
             <Button size="sm" className="h-9">
               <UserPlus className="h-4 w-4" />
-              {t("tournamentMembers.invite", { defaultValue: "Inviter" })}
+              {t("tournamentMembers.invite")}
             </Button>
           }
-          title={t("tournamentMembers.inviteTitle", { defaultValue: "Inviter un membre" })}
+          title={t("tournamentMembers.inviteTitle")}
         >
           <form onSubmit={onInvite} className="space-y-4 mt-4 pb-6">
             <div className="space-y-1.5">
-              <Label>{t("tournamentMembers.role", { defaultValue: "Rôle" })}</Label>
+              <Label>{t("tournamentMembers.role")}</Label>
               <Select value={role} onValueChange={(v) => setRole(v as TournamentRole)}>
                 <SelectTrigger>
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="tournament_admin">
-                    {t("roles.tournament_admin", { defaultValue: "Admin du tournoi" })}
-                  </SelectItem>
-                  <SelectItem value="staff">
-                    {t("roles.staff", { defaultValue: "Staff" })}
-                  </SelectItem>
-                  <SelectItem value="referee">
-                    {t("roles.referee", { defaultValue: "Arbitre" })}
-                  </SelectItem>
+                  <SelectItem value="tournament_admin">{t("roles.tournament_admin")}</SelectItem>
+                  <SelectItem value="staff">{t("roles.staff")}</SelectItem>
+                  <SelectItem value="referee">{t("roles.referee")}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -318,15 +310,12 @@ export function MembersManager({ tournamentId, matches, teams }: Props) {
               <Label>
                 {t("players.email")}{" "}
                 <span className="text-muted-foreground text-xs font-normal">
-                  ({t("common.optional", { defaultValue: "optionnel" })})
+                  ({t("common.optional")})
                 </span>
               </Label>
               <Input type="email" value={email} onChange={(e) => setEmail(e.target.value)} />
               <p className="text-[11px] text-muted-foreground leading-snug">
-                {t("tournamentMembers.emailHint", {
-                  defaultValue:
-                    "Laissez vide pour ajouter sans compte. Vous pourrez l'inviter plus tard.",
-                })}
+                {t("tournamentMembers.emailHint")}
               </p>
             </div>
             <Button type="submit" className="w-full h-11" disabled={busy}>
@@ -335,7 +324,7 @@ export function MembersManager({ tournamentId, matches, teams }: Props) {
               ) : (
                 <>
                   <Mail className="h-4 w-4" />
-                  {t("tournamentMembers.sendInvite", { defaultValue: "Envoyer l'invitation" })}
+                  {t("tournamentMembers.sendInvite")}
                 </>
               )}
             </Button>
@@ -349,7 +338,7 @@ export function MembersManager({ tournamentId, matches, teams }: Props) {
         </div>
       ) : (data?.members ?? []).length === 0 ? (
         <div className="rounded-2xl border border-dashed border-border bg-card p-8 text-center text-sm text-muted-foreground">
-          {t("tournamentMembers.empty", { defaultValue: "Aucun membre pour le moment." })}
+          {t("tournamentMembers.empty")}
         </div>
       ) : (
         <ul className="rounded-2xl border border-border bg-card divide-y divide-border overflow-hidden">
@@ -374,12 +363,12 @@ export function MembersManager({ tournamentId, matches, teams }: Props) {
                       </span>
                       {!m.email && (
                         <span className="text-[10px] font-medium px-1.5 py-0.5 rounded-full bg-muted text-muted-foreground border border-border">
-                          {t("tournamentMembers.offline", { defaultValue: "Sans compte" })}
+                          {t("tournamentMembers.offline")}
                         </span>
                       )}
                       {m.email && !m.joined_at && (
                         <span className="text-[10px] font-medium px-1.5 py-0.5 rounded-full bg-amber-500/15 text-amber-700 dark:text-amber-300">
-                          {t("tournamentMembers.pending", { defaultValue: "En attente" })}
+                          {t("tournamentMembers.pending")}
                         </span>
                       )}
                     </div>
@@ -394,12 +383,10 @@ export function MembersManager({ tournamentId, matches, teams }: Props) {
                           setConvertMember(m);
                           setConvertEmail("");
                         }}
-                        title={t("tournamentMembers.inviteOffline", {
-                          defaultValue: "Inviter par email",
-                        })}
+                        title={t("tournamentMembers.inviteOffline")}
                       >
                         <Mail className="h-3.5 w-3.5" />
-                        {t("tournamentMembers.invite", { defaultValue: "Inviter" })}
+                        {t("tournamentMembers.invite")}
                       </Button>
                     )}
                     {m.email && !m.joined_at && m.invite_token && (
@@ -407,7 +394,7 @@ export function MembersManager({ tournamentId, matches, teams }: Props) {
                         size="icon"
                         variant="ghost"
                         onClick={() => copyInviteLink(m.invite_token)}
-                        title={t("tournamentMembers.copyLink", { defaultValue: "Copier le lien" })}
+                        title={t("tournamentMembers.copyLink")}
                       >
                         <Copy className="h-4 w-4" />
                       </Button>
@@ -426,10 +413,7 @@ export function MembersManager({ tournamentId, matches, teams }: Props) {
                 {m.role === "referee" && matches.length > 0 && (
                   <details className="text-xs">
                     <summary className="cursor-pointer text-muted-foreground hover:text-foreground">
-                      {t("tournamentMembers.assignMatches", {
-                        defaultValue: "Affecter à des matchs",
-                      })}{" "}
-                      ({assigned.length})
+                      {t("tournamentMembers.assignMatches")} ({assigned.length})
                     </summary>
                     <div className="mt-2 grid gap-1 max-h-64 overflow-y-auto pr-1">
                       {matches.map((mt) => {
@@ -470,23 +454,18 @@ export function MembersManager({ tournamentId, matches, teams }: Props) {
       >
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>
-              {t("tournamentMembers.confirmRemoveTitle", { defaultValue: "Retirer ce membre ?" })}
-            </AlertDialogTitle>
+            <AlertDialogTitle>{t("tournamentMembers.confirmRemoveTitle")}</AlertDialogTitle>
             <AlertDialogDescription>
-              {t("tournamentMembers.confirmRemoveDesc", {
-                defaultValue:
-                  "Cette personne n'aura plus accès au tournoi. Vous pourrez la réinviter plus tard.",
-              })}
+              {t("tournamentMembers.confirmRemoveDesc")}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>{t("common.cancel", { defaultValue: "Annuler" })}</AlertDialogCancel>
+            <AlertDialogCancel>{t("common.cancel")}</AlertDialogCancel>
             <AlertDialogAction
               onClick={confirmRemove}
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
             >
-              {t("tournamentMembers.confirmRemoveAction", { defaultValue: "Retirer" })}
+              {t("tournamentMembers.confirmRemoveAction")}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
@@ -500,14 +479,12 @@ export function MembersManager({ tournamentId, matches, teams }: Props) {
             setConvertEmail("");
           }
         }}
-        title={t("tournamentMembers.inviteTitle", { defaultValue: "Inviter un membre" })}
+        title={t("tournamentMembers.inviteTitle")}
       >
         <form onSubmit={onConvert} className="space-y-4 mt-4 pb-6">
           <p className="text-sm text-muted-foreground">
             {convertMember
               ? t("tournamentMembers.convertDesc", {
-                  defaultValue:
-                    "Envoyer une invitation par email à {{name}} pour qu'il/elle puisse se connecter et valider ses matchs.",
                   name: [convertMember.first_name, convertMember.last_name]
                     .filter(Boolean)
                     .join(" "),
@@ -533,7 +510,7 @@ export function MembersManager({ tournamentId, matches, teams }: Props) {
             ) : (
               <>
                 <Mail className="h-4 w-4" />
-                {t("tournamentMembers.sendInvite", { defaultValue: "Envoyer l'invitation" })}
+                {t("tournamentMembers.sendInvite")}
               </>
             )}
           </Button>

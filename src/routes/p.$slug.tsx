@@ -208,7 +208,7 @@ function PublicPlayerProfile() {
             href="/register"
             className="text-xs font-medium px-3 py-1.5 rounded-full bg-primary text-primary-foreground hover:opacity-90"
           >
-            {t("nav.signup", { defaultValue: "Sign up" })}
+            {t("nav.signup")}
           </a>
         </div>
       </header>
@@ -282,7 +282,7 @@ function PublicPlayerProfile() {
           <section>
             <h2 className="text-lg font-semibold mb-3 flex items-center gap-2">
               <Trophy className="h-5 w-5 text-primary" />
-              {t("journey.tab.achievements", { defaultValue: "Achievements" })}
+              {t("journey.tab.achievements")}
             </h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               {achievements.map((a) => (
@@ -305,7 +305,7 @@ function PublicPlayerProfile() {
           <section>
             <h2 className="text-lg font-semibold mb-3 flex items-center gap-2">
               <CalendarDays className="h-5 w-5 text-primary" />
-              {t("journey.tab.season", { defaultValue: "Seasons" })}
+              {t("journey.tab.season")}
             </h2>
             <div className="space-y-2">
               {seasons.map((s) => (
@@ -328,7 +328,7 @@ function PublicPlayerProfile() {
           <section>
             <h2 className="text-lg font-semibold mb-3 flex items-center gap-2">
               <History className="h-5 w-5 text-primary" />
-              {t("journey.tab.timeline", { defaultValue: "Timeline" })}
+              {t("journey.tab.timeline")}
             </h2>
             <ol className="relative border-l-2 border-border/60 pl-5 space-y-4">
               {timeline.map((e) => (

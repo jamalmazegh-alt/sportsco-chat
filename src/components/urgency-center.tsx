@@ -176,11 +176,7 @@ export function UrgencyCenter({ className }: Props) {
       >
         <div className="flex items-center gap-2 min-w-0">
           <AlertTriangle className="h-3.5 w-3.5 text-[#f59e0b] shrink-0" strokeWidth={2.4} />
-          <span className="font-medium truncate">
-            {t("urgency.error.checkFailed", {
-              defaultValue: "Impossible de vérifier les alertes",
-            })}
-          </span>
+          <span className="font-medium truncate">{t("urgency.error.checkFailed")}</span>
         </div>
         <button
           type="button"
@@ -188,7 +184,7 @@ export function UrgencyCenter({ className }: Props) {
           className="inline-flex items-center gap-1 text-[11px] font-bold text-foreground hover:text-primary transition-colors shrink-0"
         >
           <RefreshCw className="h-3 w-3" strokeWidth={2.6} />
-          {t("common.retry", { defaultValue: "Réessayer" })}
+          {t("common.retry")}
         </button>
       </section>
     );
@@ -206,11 +202,7 @@ export function UrgencyCenter({ className }: Props) {
         aria-live="polite"
       >
         <span className="inline-flex h-2 w-2 rounded-full bg-primary" aria-hidden />
-        <span className="font-medium">
-          {t("urgency.empty.status", {
-            defaultValue: "Tout est sous contrôle · aucune action urgente",
-          })}
-        </span>
+        <span className="font-medium">{t("urgency.empty.status")}</span>
       </section>
     );
   }
@@ -235,7 +227,7 @@ export function UrgencyCenter({ className }: Props) {
         },
       });
     } catch (e) {
-      toast.error(t("common.errorOccurred", { defaultValue: "Une erreur est survenue" }));
+      toast.error(t("common.errorOccurred"));
     } finally {
       setBusyIds((s) => {
         const n = new Set(s);
@@ -264,17 +256,13 @@ export function UrgencyCenter({ className }: Props) {
       if (error) {
         const raw = (error.message || "").toLowerCase();
         if (raw.includes("past_event_locked")) {
-          toast.error(
-            t("attendance.errorPastEventLocked", {
-              defaultValue: "L'événement est passé — les réponses ne peuvent plus être modifiées.",
-            }),
-          );
+          toast.error(t("attendance.errorPastEventLocked"));
         } else {
           toast.error(error.message);
         }
         return;
       }
-      toast.success(t("attendance.responseRecorded", { defaultValue: "Réponse enregistrée" }));
+      toast.success(t("attendance.responseRecorded"));
       // Fire-and-forget push + email — same as events/$eventId.tsx flow.
       void dispatchResponsePushFn({ data: { convocationId, isChange } }).catch(() => {});
       if (status === "absent" || status === "uncertain" || isChange) {
@@ -324,9 +312,7 @@ export function UrgencyCenter({ className }: Props) {
                     user_id: uid,
                     type: "convocation_response",
                     title: `${playerName} : ${t(`attendance.${status}`)}${
-                      isChange
-                        ? ` (${t("attendance.responseChanged", { defaultValue: "réponse modifiée" })})`
-                        : ""
+                      isChange ? ` (${t("attendance.responseChanged")})` : ""
                     }`,
                     body,
                     link: `/events/${ev.id}`,
@@ -347,7 +333,7 @@ export function UrgencyCenter({ className }: Props) {
       qc.invalidateQueries({ queryKey: ["my-convocs-home"], exact: false });
       qc.invalidateQueries({ queryKey: ["upcoming"], exact: false });
     } catch (e) {
-      toast.error(t("common.errorOccurred", { defaultValue: "Une erreur est survenue" }));
+      toast.error(t("common.errorOccurred"));
     } finally {
       setBusyIds((s) => {
         const n = new Set(s);
@@ -364,12 +350,10 @@ export function UrgencyCenter({ className }: Props) {
     try {
       if (choice === "available") {
         await applyNeedFn({ data: { need_id: needId } });
-        toast.success(t("needs:insight.appliedToast", { defaultValue: "Candidature envoyée" }));
+        toast.success(t("needs:insight.appliedToast"));
       } else {
         await declareUnavailableFn({ data: { need_id: needId } });
-        toast.success(
-          t("needs:insight.unavailableToast", { defaultValue: "Indisponibilité enregistrée" }),
-        );
+        toast.success(t("needs:insight.unavailableToast"));
       }
       dismissItem(item.id);
       qc.invalidateQueries({ queryKey: ["urgency"], exact: false });
@@ -377,7 +361,7 @@ export function UrgencyCenter({ className }: Props) {
       const msg = e instanceof Error ? e.message : "";
       toast.error(
         t(`needs:errors.${msg}`, {
-          defaultValue: t("common.errorOccurred", { defaultValue: "Une erreur est survenue" }),
+          defaultValue: t("common.errorOccurred"),
         }),
       );
     } finally {
@@ -416,7 +400,6 @@ export function UrgencyCenter({ className }: Props) {
           >
             {t("urgency.deck.showMore", {
               count: hiddenCount,
-              defaultValue: "+ {{count}} autres échéances",
             })}
           </button>
         ) : null
@@ -527,7 +510,7 @@ function UrgencyDeck({
             <Sparkles className="h-4 w-4 text-white" strokeWidth={2.4} />
           </div>
           <h2 className="text-[12px] font-black text-foreground uppercase tracking-[0.16em]">
-            {t("urgency.deck.title", { defaultValue: "Insights" })}
+            {t("urgency.deck.title")}
           </h2>
           <span
             className="text-[10px] font-black h-5 min-w-[20px] px-1.5 flex items-center justify-center rounded-full text-white tabular-nums shadow-[0_1px_3px_rgba(15,74,38,0.3)]"
@@ -545,7 +528,7 @@ function UrgencyDeck({
           className="inline-flex items-center gap-1.5 text-[11px] font-bold text-foreground bg-card border-[1.5px] border-border rounded-full px-3 py-1.5 hover:border-primary hover:text-primary transition-colors"
         >
           <RefreshCw className="h-3 w-3" strokeWidth={2.6} />
-          {t("common.refresh", { defaultValue: "Actualiser" })}
+          {t("common.refresh")}
         </button>
       </div>
 
@@ -553,12 +536,7 @@ function UrgencyDeck({
         <div className="flex items-start gap-2 rounded-[10px] border-[1.5px] border-[#fcd34d] bg-[#fffbeb] px-3 py-2 text-[11px] font-semibold text-[#92400e]">
           <AlertTriangle className="h-3.5 w-3.5 shrink-0 mt-0.5" strokeWidth={2.4} />
           <div className="space-y-0.5">
-            <div>
-              {t("urgency.partialError", {
-                defaultValue:
-                  "Certaines sources sont indisponibles, la liste peut être incomplète.",
-              })}
-            </div>
+            <div>{t("urgency.partialError")}</div>
             <div className="font-mono text-[10px] opacity-80">
               debug: {failedSourcesDebug ?? "n/a"}
             </div>
@@ -665,7 +643,7 @@ function UrgencyDeck({
                                 ) : (
                                   <Check className="h-3.5 w-3.5" strokeWidth={2.6} />
                                 )}
-                                {t("attendance.present", { defaultValue: "Présent" })}
+                                {t("attendance.present")}
                               </Button>
                               <Button
                                 size="sm"
@@ -679,7 +657,7 @@ function UrgencyDeck({
                                 className="h-8 px-2.5 border-[1.5px]"
                               >
                                 <HelpCircle className="h-3.5 w-3.5" strokeWidth={2.4} />
-                                {t("attendance.uncertain", { defaultValue: "Incertain" })}
+                                {t("attendance.uncertain")}
                               </Button>
                               <Button
                                 size="sm"
@@ -693,7 +671,7 @@ function UrgencyDeck({
                                 className="h-8 px-2.5 border-[1.5px] text-[#b91c1c] hover:text-[#b91c1c]"
                               >
                                 <XCircle className="h-3.5 w-3.5" strokeWidth={2.4} />
-                                {t("attendance.absent", { defaultValue: "Absent" })}
+                                {t("attendance.absent")}
                               </Button>
                             </div>
                           ) : item.primaryAction.kind === "open-need" ? (
@@ -717,7 +695,7 @@ function UrgencyDeck({
                                 ) : (
                                   <ThumbsUp className="h-3.5 w-3.5" strokeWidth={2.6} />
                                 )}
-                                {t("needs:insight.available", { defaultValue: "Dispo" })}
+                                {t("needs:insight.available")}
                               </Button>
                               <Button
                                 size="sm"
@@ -731,7 +709,7 @@ function UrgencyDeck({
                                 className="h-8 px-2.5 border-[1.5px] text-[#b91c1c] hover:text-[#b91c1c]"
                               >
                                 <ThumbsDown className="h-3.5 w-3.5" strokeWidth={2.4} />
-                                {t("needs:insight.unavailable", { defaultValue: "Pas dispo" })}
+                                {t("needs:insight.unavailable")}
                               </Button>
                               <Button
                                 size="sm"
@@ -744,7 +722,7 @@ function UrgencyDeck({
                                 disabled={busy || !isTop}
                                 className="h-8 px-2 text-[11px]"
                               >
-                                {t("urgency.cta.open", { defaultValue: "Ouvrir" })}
+                                {t("urgency.cta.open")}
                               </Button>
                             </div>
                           ) : (
@@ -768,14 +746,12 @@ function UrgencyDeck({
                                 <ActionIcon kind={item.primaryAction.kind} />
                               )}
                               {item.primaryAction.kind === "remind-all"
-                                ? t("attendance.remindAll", { defaultValue: "Envoyer un rappel" })
+                                ? t("attendance.remindAll")
                                 : item.primaryAction.kind === "respond"
-                                  ? t("urgency.cta.respond", { defaultValue: "Répondre" })
+                                  ? t("urgency.cta.respond")
                                   : item.primaryAction.kind === "open-team-availability"
-                                    ? t("urgency.cta.openCalendar", {
-                                        defaultValue: "Voir le calendrier",
-                                      })
-                                    : t("urgency.cta.open", { defaultValue: "Ouvrir" })}
+                                    ? t("urgency.cta.openCalendar")
+                                    : t("urgency.cta.open")}
                             </Button>
                           )}
                         </div>
@@ -786,12 +762,10 @@ function UrgencyDeck({
                         onClick={(e) => {
                           e.stopPropagation();
                           onDismiss(item.id);
-                          toast.success(
-                            t("urgency.dismissed", { defaultValue: "Carte masquée pour 24 h" }),
-                          );
+                          toast.success(t("urgency.dismissed"));
                           setTopIdx((idx) => idx + 1);
                         }}
-                        aria-label={t("common.dismiss", { defaultValue: "Masquer" })}
+                        aria-label={t("common.dismiss")}
                         className="shrink-0 h-7 w-7 rounded-full flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
                       >
                         <X className="h-4 w-4" strokeWidth={2.4} />
@@ -806,7 +780,7 @@ function UrgencyDeck({
       </div>
       {total > 1 && (
         <p className="text-center text-[10px] font-semibold text-muted-foreground">
-          {position}/{total} · {t("urgency.deck.hint", { defaultValue: "Swipe pour passer" })}
+          {position}/{total} · {t("urgency.deck.hint")}
         </p>
       )}
       {footer}

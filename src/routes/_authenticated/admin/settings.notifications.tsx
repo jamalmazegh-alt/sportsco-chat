@@ -16,15 +16,11 @@ export const Route = createFileRoute("/_authenticated/admin/settings/notificatio
   head: () => ({
     meta: [
       {
-        title: i18nInstance.t("meta.adminNotifications.title", {
-          defaultValue: "Notifications — Clubero",
-        }),
+        title: i18nInstance.t("meta.adminNotifications.title"),
       },
       {
         name: "description",
-        content: i18nInstance.t("meta.adminNotifications.description", {
-          defaultValue: "Choisissez les notifications push envoyées aux membres de votre club.",
-        }),
+        content: i18nInstance.t("meta.adminNotifications.description"),
       },
     ],
   }),

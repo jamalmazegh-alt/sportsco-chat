@@ -112,15 +112,13 @@ export function CreateTicketOnBehalfDialog({
     >
       <DialogContent className="max-w-lg">
         <DialogHeader>
-          <DialogTitle>Nouveau ticket au nom d'un utilisateur</DialogTitle>
-          <DialogDescription>
-            Utilisé pour logger une demande reçue par téléphone, email ou en personne.
-          </DialogDescription>
+          <DialogTitle>{t("superadmin.createTicket.title")}</DialogTitle>
+          <DialogDescription>{t("superadmin.createTicket.description")}</DialogDescription>
         </DialogHeader>
 
         <div className="space-y-4">
           <div>
-            <Label className="text-xs">Utilisateur</Label>
+            <Label className="text-xs">{t("superadmin.createTicket.user")}</Label>
             {selected ? (
               <div className="mt-1 flex items-center justify-between rounded-md border bg-muted/30 px-3 py-2">
                 <div className="flex items-center gap-2 min-w-0">
@@ -137,7 +135,7 @@ export function CreateTicketOnBehalfDialog({
                   </div>
                 </div>
                 <Button variant="ghost" size="sm" onClick={() => setSelected(null)}>
-                  Changer
+                  {t("superadmin.createTicket.changeUser")}
                 </Button>
               </div>
             ) : (
@@ -146,7 +144,7 @@ export function CreateTicketOnBehalfDialog({
                   <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                   <Input
                     autoFocus
-                    placeholder="Rechercher par nom ou téléphone…"
+                    placeholder={t("superadmin.createTicket.searchPlaceholder")}
                     value={search}
                     onChange={(e) => setSearch(e.target.value)}
                     className="pl-8"
@@ -156,7 +154,8 @@ export function CreateTicketOnBehalfDialog({
                   <div className="mt-1 max-h-48 overflow-y-auto rounded-md border bg-card">
                     {isFetching ? (
                       <div className="flex items-center gap-2 px-3 py-2 text-xs text-muted-foreground">
-                        <Loader2 className="h-3 w-3 animate-spin" /> Recherche…
+                        <Loader2 className="h-3 w-3 animate-spin" />{" "}
+                        {t("superadmin.createTicket.searching")}
                       </div>
                     ) : searchResult?.items.length ? (
                       <ul className="divide-y">
@@ -180,7 +179,9 @@ export function CreateTicketOnBehalfDialog({
                         ))}
                       </ul>
                     ) : (
-                      <div className="px-3 py-2 text-xs text-muted-foreground">Aucun résultat</div>
+                      <div className="px-3 py-2 text-xs text-muted-foreground">
+                        {t("superadmin.createTicket.noResults")}
+                      </div>
                     )}
                   </div>
                 )}
@@ -190,26 +191,26 @@ export function CreateTicketOnBehalfDialog({
 
           <div>
             <Label className="text-xs" htmlFor="ob-subject">
-              Sujet
+              {t("superadmin.createTicket.subject")}
             </Label>
             <Input
               id="ob-subject"
               value={subject}
               onChange={(e) => setSubject(e.target.value)}
-              placeholder="Résumé de la demande"
+              placeholder={t("superadmin.createTicket.subjectPlaceholder")}
               maxLength={200}
             />
           </div>
 
           <div>
             <Label className="text-xs" htmlFor="ob-desc">
-              Description
+              {t("superadmin.createTicket.descriptionLabel")}
             </Label>
             <Textarea
               id="ob-desc"
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              placeholder="Ce que l'utilisateur a rapporté…"
+              placeholder={t("superadmin.createTicket.descriptionPlaceholder")}
               rows={5}
               maxLength={10000}
             />
@@ -217,7 +218,7 @@ export function CreateTicketOnBehalfDialog({
 
           <div className="grid grid-cols-3 gap-2">
             <div>
-              <Label className="text-xs">Catégorie</Label>
+              <Label className="text-xs">{t("superadmin.createTicket.category")}</Label>
               <Select value={category} onValueChange={setCategory}>
                 <SelectTrigger>
                   <SelectValue />
@@ -232,7 +233,7 @@ export function CreateTicketOnBehalfDialog({
               </Select>
             </div>
             <div>
-              <Label className="text-xs">Priorité</Label>
+              <Label className="text-xs">{t("superadmin.createTicket.priority")}</Label>
               <Select value={priority} onValueChange={setPriority}>
                 <SelectTrigger>
                   <SelectValue />
@@ -247,7 +248,7 @@ export function CreateTicketOnBehalfDialog({
               </Select>
             </div>
             <div>
-              <Label className="text-xs">Canal</Label>
+              <Label className="text-xs">{t("superadmin.createTicket.channel")}</Label>
               <Select value={channel} onValueChange={setChannel}>
                 <SelectTrigger>
                   <SelectValue />
@@ -271,17 +272,17 @@ export function CreateTicketOnBehalfDialog({
               onChange={(e) => setNotifyUser(e.target.checked)}
               className="h-4 w-4"
             />
-            Notifier l'utilisateur par email
+            {t("superadmin.createTicket.notifyUser")}
           </label>
         </div>
 
         <DialogFooter>
           <Button variant="outline" onClick={() => onOpenChange(false)}>
-            Annuler
+            {t("superadmin.createTicket.cancel")}
           </Button>
           <Button disabled={!canSubmit} onClick={() => mutation.mutate()}>
             {mutation.isPending && <Loader2 className="h-4 w-4 animate-spin mr-2" />}
-            Créer le ticket
+            {t("superadmin.createTicket.create")}
           </Button>
         </DialogFooter>
       </DialogContent>

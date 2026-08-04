@@ -597,9 +597,7 @@ function NewPublicationPage() {
                   <div className="rounded-lg border-[2.5px] border-emerald-500 bg-background p-3 shadow-[0_4px_18px_-6px_rgba(16,163,74,0.35)]">
                     <Label className="text-[11px] uppercase tracking-wide text-emerald-700 dark:text-emerald-300 flex items-center gap-1.5 font-semibold">
                       <UserCheck className="h-3.5 w-3.5" />
-                      {t("publications:audience.selectedTitle", {
-                        defaultValue: "Destinataires sélectionnés",
-                      })}
+                      {t("publications:audience.selectedTitle")}
                       <span className="ml-1 rounded-full bg-emerald-100 dark:bg-emerald-900/40 text-emerald-800 dark:text-emerald-200 px-1.5 py-0.5 text-[10px] font-bold">
                         {chips.length + (manualPlayers.length > 0 ? 1 : 0)}
                       </span>
@@ -653,14 +651,12 @@ function NewPublicationPage() {
                         <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-100 dark:bg-emerald-900/30 text-emerald-800 dark:text-emerald-200 px-2.5 py-1 text-[11px] font-semibold">
                           {t("publications:audience.recipientsCount", {
                             count: preview.count,
-                            defaultValue: "{{count}} destinataires",
                           })}
                           <span className="opacity-80 font-normal">
                             {" · "}
                             {t("publications:audience.recipientsBreakdown", {
                               players: preview.playerCount,
                               users: preview.userCount,
-                              defaultValue: "{{players}} joueurs · {{users}} utilisateurs",
                             })}
                           </span>
                         </span>
@@ -675,12 +671,10 @@ function NewPublicationPage() {
                 <div className="rounded-lg border-2 border-sky-500/40 bg-sky-500/5 p-3">
                   <Label className="text-[11px] uppercase tracking-wide font-semibold text-sky-700 dark:text-sky-300 flex items-center gap-1.5">
                     <Trophy className="h-3.5 w-3.5" />
-                    {t("publications:audience.teamsBlock", { defaultValue: "Équipes" })}
+                    {t("publications:audience.teamsBlock")}
                   </Label>
                   <p className="text-[11px] text-muted-foreground mt-0.5">
-                    {t("publications:audience.teamsHint", {
-                      defaultValue: "Choisissez joueurs et/ou parents par équipe",
-                    })}
+                    {t("publications:audience.teamsHint")}
                   </p>
                   <div className="mt-2 space-y-1.5">
                     {teams.map((tm) => {
@@ -788,14 +782,10 @@ function NewPublicationPage() {
                 <div className="rounded-lg border-2 border-fuchsia-500/40 bg-fuchsia-500/5 p-3">
                   <Label className="text-[11px] uppercase tracking-wide font-semibold text-fuchsia-700 dark:text-fuchsia-300 flex items-center gap-1.5">
                     <UsersRound className="h-3.5 w-3.5" />
-                    {t("publications:audience.groupsBlock", {
-                      defaultValue: "Groupes personnalisés",
-                    })}
+                    {t("publications:audience.groupsBlock")}
                   </Label>
                   <p className="text-[11px] text-muted-foreground mt-0.5">
-                    {t("publications:audience.groupsHint", {
-                      defaultValue: "Groupes transversaux créés dans l'admin du club",
-                    })}
+                    {t("publications:audience.groupsHint")}
                   </p>
                   <div className="mt-2 flex flex-wrap gap-1.5">
                     {groups.map((g) => {

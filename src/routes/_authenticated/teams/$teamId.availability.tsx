@@ -183,7 +183,7 @@ function TeamAvailabilityCalendar() {
         <Button variant="ghost" size="sm" asChild>
           <Link to="/teams/$teamId" params={{ teamId }}>
             <ArrowLeft className="h-4 w-4 mr-1" />
-            {t("common.back", { defaultValue: "Retour" })}
+            {t("common.back")}
           </Link>
         </Button>
       </div>
@@ -192,7 +192,7 @@ function TeamAvailabilityCalendar() {
         <div>
           <h1 className="text-xl font-semibold flex items-center gap-2">
             <CalendarDays className="h-5 w-5" />
-            {t("availability.calendar.title", { defaultValue: "Calendrier des absences" })}
+            {t("availability.calendar.title")}
           </h1>
           {team?.name && <p className="text-sm text-muted-foreground">{team.name}</p>}
         </div>
@@ -224,7 +224,7 @@ function TeamAvailabilityCalendar() {
               setCursor(new Date(d.getFullYear(), d.getMonth(), 1));
             }}
           >
-            {t("common.today", { defaultValue: "Aujourd'hui" })}
+            {t("common.today")}
           </Button>
           <Button
             size="sm"
@@ -236,7 +236,7 @@ function TeamAvailabilityCalendar() {
             }}
           >
             <Plus className="h-4 w-4 mr-1" />
-            {t("availability.declare", { defaultValue: "Déclarer une absence" })}
+            {t("availability.declare")}
           </Button>
         </div>
       </div>
@@ -246,9 +246,7 @@ function TeamAvailabilityCalendar() {
         <Card className="border-primary/40">
           <CardContent className="p-3 flex items-end gap-2">
             <div className="flex-1 space-y-1.5">
-              <label className="text-xs font-medium">
-                {t("availability.calendar.pickPlayer", { defaultValue: "Joueur concerné" })}
-              </label>
+              <label className="text-xs font-medium">{t("availability.calendar.pickPlayer")}</label>
               <Select value={absencePlayerId} onValueChange={setAbsencePlayerId}>
                 <SelectTrigger>
                   <SelectValue placeholder="—" />
@@ -270,10 +268,10 @@ function TeamAvailabilityCalendar() {
                 setAbsenceOpen(true);
               }}
             >
-              {t("common.continue", { defaultValue: "Continuer" })}
+              {t("common.continue")}
             </Button>
             <Button size="sm" variant="ghost" onClick={() => setPickerOpen(false)}>
-              {t("common.cancel", { defaultValue: "Annuler" })}
+              {t("common.cancel")}
             </Button>
           </CardContent>
         </Card>
@@ -293,15 +291,13 @@ function TeamAvailabilityCalendar() {
       <Card>
         <CardHeader className="pb-2">
           <CardTitle className="text-sm text-muted-foreground">
-            {players.length} {t("teams.players", { defaultValue: "joueurs" })}
+            {players.length} {t("teams.players")}
           </CardTitle>
         </CardHeader>
         <CardContent className="p-0 overflow-x-auto">
           {players.length === 0 ? (
             <div className="p-6 text-sm text-center text-muted-foreground">
-              {t("availability.calendar.noPlayers", {
-                defaultValue: "Aucun joueur dans cette équipe.",
-              })}
+              {t("availability.calendar.noPlayers")}
             </div>
           ) : (
             <div className="min-w-max">
@@ -311,7 +307,7 @@ function TeamAvailabilityCalendar() {
                 style={{ gridTemplateColumns: `180px repeat(${daysInMonth}, 28px)` }}
               >
                 <div className="px-3 py-2 text-xs font-semibold text-muted-foreground border-r">
-                  {t("teams.player", { defaultValue: "Joueur" })}
+                  {t("teams.player")}
                 </div>
                 {days.map((d) => {
                   const isWeekend = d.getDay() === 0 || d.getDay() === 6;
@@ -425,9 +421,7 @@ function TeamAvailabilityCalendar() {
 
       {/* Legend */}
       <div className="flex flex-wrap gap-2 items-center text-xs">
-        <span className="text-muted-foreground mr-2">
-          {t("availability.calendar.legend", { defaultValue: "Légende" })} :
-        </span>
+        <span className="text-muted-foreground mr-2">{t("availability.calendar.legend")} :</span>
         {(
           [
             "vacation",
@@ -444,9 +438,7 @@ function TeamAvailabilityCalendar() {
       </div>
 
       {isLoading && (
-        <div className="text-center text-sm text-muted-foreground">
-          {t("common.loading", { defaultValue: "Chargement..." })}
-        </div>
+        <div className="text-center text-sm text-muted-foreground">{t("common.loading")}</div>
       )}
     </div>
   );

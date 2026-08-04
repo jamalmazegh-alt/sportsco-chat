@@ -707,7 +707,8 @@
       "clubMismatch": "Ce championnat n'appartient pas à ce club",
       "archived": "Ce championnat est archivé",
       "notFound": "Championnat introuvable"
-    }
+    },
+    "levelPlaceholder": "Départemental 1"
   },
   "club": {
     "logo": "Logo du club",
@@ -874,7 +875,9 @@
     "parentNotOnPlatform": "Pas encore inscrit",
     "parentContactsHidden": "Coordonnées confidentielles",
     "inviteWholeTeamHint": "Envoie une invitation à chaque joueur/parent sans compte. Les personnes déjà inscrites ou déjà invitées sont ignorées.",
-    "inviteFailedLabel": "Envoi échoué"
+    "inviteFailedLabel": "Envoi échoué",
+    "inviteSuppressedSimple": "{{count}} invitation(s) bloquée(s) : l'adresse est en suppression (bounce, spam ou désinscription). Corrigez l'e-mail ou contactez le support.",
+    "photoUploadFailed": "Échec de l'envoi de la photo : {{message}}"
   },
   "events": {
     "isOfficial": "Match officiel",
@@ -1039,7 +1042,8 @@
       "updatesBadge": "{{count}} màj",
       "lineupNotIncluded": "Non incluse",
       "lineupPublished": "Publiée",
-      "buttonAll": "Renvoyer la convocation à tous les joueurs"
+      "buttonAll": "Renvoyer la convocation à tous les joueurs",
+      "buttonWithChangesAll": "Renvoyer à tous les joueurs ({{count}} mise(s) à jour)"
     },
     "fields": {
       "title": "Titre",
@@ -1106,7 +1110,8 @@
     "scheduleTitle": "Horaires",
     "commCard": {
       "cancelledHint": "Lien d'annulation",
-      "invitePlayersFirstTitle": "Inviter les joueurs"
+      "invitePlayersFirstTitle": "Inviter les joueurs",
+      "subtitle": "{{count}} joueurs convoqués"
     },
     "scoreDisabledCancelled": "Événement annulé — édition du score et des faits de match désactivée."
   },
@@ -1736,14 +1741,16 @@
     "reactions": {
       "error": "Réaction impossible",
       "add": "Réagir",
-      "tapToRemove": "Appuyez pour supprimer"
+      "tapToRemove": "Appuyez pour supprimer",
+      "count": "{{count}} réaction(s)"
     },
     "postDeleted": "Post deleted",
     "emptyHint": "Aucune annonce pour l'instant. Les coachs et admins peuvent en publier ici.",
     "unpin": "Désépingler",
     "pin": "Épingler",
     "pinned": "Épinglé",
-    "commentDeleted": "Comment deleted"
+    "commentDeleted": "Comment deleted",
+    "newPostTitle": "{{name}} a publié sur le mur"
   },
   "chat": {
     "title": "Chat de l'événement",
@@ -1883,7 +1890,10 @@
     "updateCardTitle": "Changer la carte bancaire",
     "updateCardDescription": "Votre nouvelle carte remplacera l'actuelle pour les prochains prélèvements.",
     "errorCardSetup": "Impossible de préparer la mise à jour",
-    "errorSaveCard": "Erreur lors de l'enregistrement de la carte"
+    "errorSaveCard": "Erreur lors de l'enregistrement de la carte",
+    "exemptTitle": "Accès offert",
+    "exemptBody": "Votre club bénéficie d'un accès gratuit à toutes les fonctionnalités Clubero.",
+    "exemptReason": "Raison : {{reason}}"
   },
   "feedback": {
     "coachTab": "Retours coach",
@@ -2064,7 +2074,8 @@
     "offlineAdded": "Ajouté (sans compte)",
     "emailHint": "Laissez vide pour ajouter sans compte. Vous pourrez l'inviter plus tard.",
     "offline": "Sans compte",
-    "inviteOffline": "Inviter par email"
+    "inviteOffline": "Inviter par email",
+    "convertDesc": "Envoyer une invitation par email à {{name}} pour qu'il/elle puisse se connecter et valider ses matchs."
   },
   "insights": {
     "title": "Insights",
@@ -2535,7 +2546,35 @@
     "emptyDashboard": "Aucune collecte de fonds.",
     "menuTitle": "Collectes de fonds",
     "menuHint": "Cotisations, licences, équipements, déplacements",
-    "exportDownloaded": "Export CSV téléchargé"
+    "exportDownloaded": "Export CSV téléchargé",
+    "kpiCollected": "Encaissé",
+    "kpiNet": "Net (frais déduits)",
+    "kpiDue": "Dû total",
+    "kpiRate": "Taux d'encaissement",
+    "kpiFees": "Frais : {{amount}}",
+    "kpiRemaining": "Reste {{amount}}",
+    "kpiTxCount": "{{count}} transactions",
+    "kpiObligations": "{{count}} obligations",
+    "emptyMethods": "Aucun encaissement.",
+    "emptyMonthly": "Aucune donnée.",
+    "tabTransactions": "Transactions",
+    "netLabel": "Net : {{amount}}",
+    "itemRollupLine": "{{total}} ciblés • {{paid}} payés • {{partial}} partiels • {{pending}} en attente",
+    "form": {
+      "defaultProvider": "Mode de paiement par défaut",
+      "title": "Intitulé",
+      "description": "Description (optionnel)",
+      "descriptionPlaceholder": "Détails ou conditions",
+      "amount": "Montant (EUR)",
+      "dueDate": "Échéance (optionnel)",
+      "partial": "Paiement partiel",
+      "partialAllowed": "Autorisé",
+      "assignTo": "Affecter à",
+      "wholeClub": "Tout le club",
+      "teams": "Équipes",
+      "players": "Joueurs",
+      "noTeams": "Aucune équipe."
+    }
   },
   "tournamentToClub": {
     "title": "Gérez votre club toute l'année",
@@ -2748,11 +2787,13 @@
     "meetingPreview": {
       "loading": "Calcul en cours…",
       "reviewOnSummary": "Aperçu détaillé à l'étape finale",
-      "notice": "En créant la réunion, les invitations seront envoyées automatiquement (notification, push et e-mail) aux personnes convoquées."
+      "notice": "En créant la réunion, les invitations seront envoyées automatiquement (notification, push et e-mail) aux personnes convoquées.",
+      "countShort": "{{count}} personne(s) sélectionnée(s)"
     },
     "meetingSummary": {
       "subtitle": "Personnes qui recevront l'invitation",
-      "empty": "Aucune personne correspondante trouvée."
+      "empty": "Aucune personne correspondante trouvée.",
+      "title": "Convoqués · {{count}}"
     },
     "homeSubtitle": "On reçoit",
     "awaySubtitle": "On se déplace",
@@ -2801,7 +2842,8 @@
       "reducedSquadSubtitle_other": "{{count}} joueurs indisponibles sur 14j",
       "staffUncovered": "Aucun coach disponible",
       "staffUncoveredTeam": "Aucun coach disponible — {{team}}",
-      "staffUncoveredFallback": "Événement"
+      "staffUncoveredFallback": "Événement",
+      "reducedSquadTitleTeam": "Effectif réduit — {{team}}"
     },
     "self": {
       "convocationSilence": "Tu n'as pas répondu"
@@ -2898,7 +2940,8 @@
       "facilityPlaceholder": "Choisir un terrain",
       "noFacilitiesHint": "Aucun terrain configuré pour ce site.",
       "noFacilityOption": "Aucun terrain"
-    }
+    },
+    "surfacePlaceholder": "Gazon, synthétique, parquet…"
   },
   "callUpList": {
     "masked": "Liste masquée",
@@ -3072,7 +3115,8 @@
   },
   "heatmap": {
     "title": "Carte de présence",
-    "noEvent": "Pas d'événement"
+    "noEvent": "Pas d'événement",
+    "lastWeeks": "{{n}} dernières semaines"
   },
   "eventType": {
     "match": "Match",
@@ -3150,10 +3194,7 @@
       "confirmed": "Confirmée",
       "tentative": "Possible"
     },
-    "visibility": {
-      "staff": "Staff du club",
-      "admins_only": "Admins uniquement"
-    },
+    "visibility": "Visibilité",
     "commentHint": "Le motif et le commentaire ne sont visibles que par les admins (ou tout le staff selon la visibilité choisie).",
     "title": "Mes indisponibilités",
     "menuSubtitle": "Déclare tes absences pour toutes tes équipes",
@@ -3183,7 +3224,8 @@
       "amountPaid": "Montant payé",
       "requestedAt": "Date de demande",
       "hint": "Exporte les inscriptions visibles selon les filtres. Ne contient aucun document.",
-      "cta": "Exporter CSV"
+      "cta": "Exporter CSV",
+      "done": "Export CSV téléchargé ({{count}} lignes)."
     },
     "detail": {
       "statusChanged": "Statut mis à jour",
@@ -3239,7 +3281,13 @@
       "markUnpaid": "Marquer non payé",
       "markRefunded": "Marquer remboursé",
       "markPartialTitle": "Enregistrer un paiement partiel",
-      "markPartial": "Marquer comme partiel"
+      "markPartial": "Marquer comme partiel",
+      "capacityLine": "Capacité : {{approved}}/{{capacity}} confirmées · {{remaining}} places restantes",
+      "createdAt": "Reçue le {{date}}",
+      "partialRemainingPreview": "Reste dû : {{amount}} {{currency}}",
+      "paymentReceived": "Reçu : {{amount}} {{currency}}",
+      "paymentRemaining": "Reste dû : {{amount}} {{currency}}",
+      "reservedUntil": "Place réservée jusqu'au {{date}}"
     },
     "dossier": {
       "complete": "Complet",
@@ -3255,7 +3303,8 @@
       "approved": "Validées",
       "reserved": "Réservées (72h)",
       "remaining": "Places restantes",
-      "pending": "Demandes en attente"
+      "pending": "Demandes en attente",
+      "expiredHint": "{{count}} réservation(s) 72 h expirée(s) — utilisez « Prolonger » pour retenir la place."
     },
     "searchPlaceholder": "Rechercher (nom, email…)",
     "filters": {
@@ -3302,7 +3351,8 @@
       "title": "Les inscriptions en ligne sont désactivées",
       "body": "Aucun bouton « S'inscrire » n'apparaît sur la page publique. Active-les pour recevoir des candidatures."
     },
-    "draftHint": "Les inscriptions apparaîtront ici après publication du stage."
+    "draftHint": "Les inscriptions apparaîtront ici après publication du stage.",
+    "docsSummary": "{{ok}}/{{total}} pièces"
   },
   "features": {
     "learnMore": "En savoir plus",
@@ -3440,7 +3490,9 @@
       "orPaste": "Ou collez le contenu CSV :",
       "append": "Ajouter à l'effectif",
       "replace": "Remplacer l'effectif",
-      "confirm": "Importer"
+      "confirm": "Importer",
+      "blocked": "Import bloqué : {{total}} joueurs dépassent la limite de {{max}}. Réduisez le fichier ou choisissez « Remplacer ».",
+      "ok": "{{n}} joueur(s) importé(s)"
     },
     "logo": {
       "none": "Pas de logo",
@@ -3457,7 +3509,8 @@
     "empty": "Aucun joueur pour le moment. Cliquez sur Ajouter ou Importer CSV.",
     "captain": "Capitaine",
     "setCaptain": "Définir capitaine",
-    "save": "Enregistrer"
+    "save": "Enregistrer",
+    "tooMany": "Effectif limité à {{max}} joueurs."
   },
   "finalStandings": {
     "title": "Classement final",
@@ -3524,7 +3577,8 @@
     },
     "footerReady": "Tout est prêt",
     "create": "Créer le stage",
-    "next": "Suivant"
+    "next": "Suivant",
+    "footerProgress": "Étape {{current}} sur {{total}}"
   },
   "list": {
     "newTitle": "Nouveau stage",
@@ -3653,7 +3707,9 @@
   "cockpit": {
     "alerts": {
       "heading": "Alertes",
-      "finalsNotGenerated": "Phase finale non générée — les poules sont terminées"
+      "finalsNotGenerated": "Phase finale non générée — les poules sont terminées",
+      "missingReferee": "Arbitre manquant (démarrage dans {{minutes}} min)",
+      "title": "{{count}} chose à régler"
     },
     "next": "Prochain",
     "estimatedEnd": "Fin prévue"
@@ -3709,7 +3765,8 @@
       "clean": "Brackets nets",
       "customize": "Personnaliser",
       "back": "Retour",
-      "save": "Enregistrer les Flights"
+      "save": "Enregistrer les Flights",
+      "distribution": "Répartition ({{n}} équipes)"
     },
     "rulesCount": "règles",
     "thirdPlace": "3e place",
@@ -3720,7 +3777,9 @@
     "public": {
       "empty": "Aucun flight n'a encore été configuré pour ce tournoi.",
       "noMatches": "Les matchs de ce flight seront générés après la phase de poules."
-    }
+    },
+    "draftRulesSummary": "{{n}} règle(s) de qualification configurée(s)",
+    "generatedToast": "{{n}} matchs créés"
   },
   "matches": {
     "allMatches": "Tous les matchs",
@@ -4469,7 +4528,17 @@
       "statusFailed": "Échec",
       "statusDlq": "DLQ",
       "statusBounced": "Rejeté",
-      "statusComplained": "Plainte"
+      "statusComplained": "Plainte",
+      "matchOn": "match le {{date}}",
+      "template": "template",
+      "retryFailures_one": "Relancer l'échec ({{count}})",
+      "retryFailures_other": "Relancer les échecs ({{count}})",
+      "autoRefreshInProgress": "En cours — rafraîchissement auto toutes les 5 s",
+      "suppressedCount_one": "{{count}} supprimé",
+      "suppressedCount_other": "{{count}} supprimés",
+      "noRecipientsMatch": "Aucun destinataire ne correspond aux filtres.",
+      "mismatch": "mismatch {{count}}",
+      "retry": "Relancer"
     },
     "inviteBatches": {
       "eyebrow": "Invitations",
@@ -4609,6 +4678,131 @@
       "overwriteConfirmDesc": "Toutes les catégories déjà saisies pour la saison sélectionnée seront <strong>remplacées</strong> par le calcul FFF automatique.",
       "overwriteConsequence": "Les <strong>surclassements manuels</strong> (ex. un U14 jouant en U15) seront perdus.",
       "overwriteConfirmAction": "Écraser et recalculer"
+    },
+    "createTicket": {
+      "title": "Nouveau ticket au nom d'un utilisateur",
+      "description": "Utilisé pour logger une demande reçue par téléphone, email ou en personne.",
+      "user": "Utilisateur",
+      "changeUser": "Changer",
+      "searchPlaceholder": "Rechercher par nom ou téléphone…",
+      "searching": "Recherche…",
+      "noResults": "Aucun résultat",
+      "subject": "Sujet",
+      "subjectPlaceholder": "Résumé de la demande",
+      "descriptionLabel": "Description",
+      "descriptionPlaceholder": "Ce que l'utilisateur a rapporté…",
+      "category": "Catégorie",
+      "priority": "Priorité",
+      "channel": "Canal",
+      "notifyUser": "Notifier l'utilisateur par email",
+      "cancel": "Annuler",
+      "create": "Créer le ticket"
+    },
+    "watchlist": {
+      "socialFailuresTitle": "Synchros réseaux sociaux en échec",
+      "socialFailuresEmpty": "Toutes les connexions sociales sont OK.",
+      "lastAttempt": "dernière tentative {{date}}",
+      "importFailuresTitle": "Imports échoués ou partiels",
+      "importFailuresEmpty": "Aucun import en échec.",
+      "importRows": "{{status}} — {{imported}}/{{total}} lignes · {{date}}",
+      "stalledOnboardingTitle": "Onboarding potentiellement bloqué",
+      "stalledOnboardingHint": "Signaux de friction — à interpréter, pas des erreurs certaines. Chargé à la demande.",
+      "signals": {
+        "clubNoTeam": "Club sans équipe",
+        "teamNoPlayer": "Équipe sans joueur",
+        "playersNoEvent": "Joueurs mais aucun event",
+        "eventNoConvocation": "Event sans convocation",
+        "inviteNotAccepted": "Invitation non acceptée"
+      },
+      "nothingToReport": "Rien à signaler.",
+      "since": "depuis {{time}}",
+      "extraItems_one": "+ {{count}} autre",
+      "extraItems_other": "+ {{count}} autres"
+    },
+    "observability": {
+      "title": "Activité & santé",
+      "recentErrors": "Erreurs récentes",
+      "recentErrorsEmpty": "Aucune erreur enregistrée.",
+      "errorCode": "code : {{code}}",
+      "byActor": "par {{actor}}",
+      "activeUsers": "Utilisateurs actifs (30 j)",
+      "activeUsersEmpty": "Aucune activité utilisateur ces 30 derniers jours.",
+      "lastActionAgo": "{{action}} · il y a {{time}}",
+      "featuresUsed": "Fonctionnalités utilisées (30 j)",
+      "featuresUsedEmpty": "Aucune activité mesurée.",
+      "socialConnections": "Connexions sociales",
+      "socialConnectionsEmpty": "Aucune connexion sociale.",
+      "active": "actif",
+      "inactive": "inactif",
+      "syncedAt": "synchro {{date}}",
+      "imports": "Imports",
+      "importsEmpty": "Aucun import.",
+      "importRows": "{{imported}}/{{total}} lignes · {{date}}",
+      "invitations": "Invitations",
+      "invitationsEmpty": "Aucune invitation.",
+      "supportTickets": "Tickets support",
+      "supportTicketsEmpty": "Aucun ticket support.",
+      "fullActivityFeed": "Fil d'activité complet"
+    },
+    "billingExemption": {
+      "actionGranted": "Exemption accordée",
+      "actionUpdated": "Exemption modifiée",
+      "actionRevoked": "Exemption retirée",
+      "reasons": {
+        "betaClub": "Club beta",
+        "partner": "Partenaire",
+        "internal": "Interne Clubero",
+        "other": "Autre"
+      },
+      "formats": {
+        "date": "d MMM yyyy",
+        "dateTime": "d MMM yyyy 'à' HH:mm",
+        "shortDateTime": "d MMM, HH:mm"
+      },
+      "title": "Exemption de facturation",
+      "clubExempt": "Club exempté",
+      "noActiveExemption": "Aucune exemption active",
+      "exemptBadge": "Exempté",
+      "intro": "Accordez un accès gratuit à ce club pour la phase bêta, un partenariat ou un test interne. Le club accède à toutes les fonctionnalités sans passer par Stripe.",
+      "grant": "Accorder une exemption",
+      "reason": "Raison",
+      "endDate": "Date de fin",
+      "noLimit": "Sans limite",
+      "grantedAt": "Accordé le",
+      "grantedBy": "Accordé par",
+      "edit": "Modifier l'exemption",
+      "revoke": "Retirer l'exemption",
+      "auditTitle": "Historique exemption",
+      "auditEmpty": "Aucune action enregistrée.",
+      "byActor": "par {{actor}}",
+      "untilDate": "jusqu'au {{date}}",
+      "dialogDescription": "Ce club accèdera à toutes les features sans abonnement Stripe.",
+      "reasonPlaceholder": "Sélectionner une raison",
+      "endDateOptional": "Date de fin d'exemption (optionnel)",
+      "clearDate": "Effacer la date",
+      "expiryHint": "Si définie, l'exemption expirera automatiquement à cette date.",
+      "summaryUntil": "<strong>{{clubName}}</strong> aura accès gratuit jusqu'au {{date}}.",
+      "summaryNoLimit": "<strong>{{clubName}}</strong> aura accès gratuit sans limite de temps.",
+      "cancel": "Annuler",
+      "save": "Enregistrer",
+      "confirm": "Confirmer l'exemption",
+      "revokeTitle": "Retirer l'exemption ?",
+      "revokeDescription": "Le club <strong>{{clubName}}</strong> perdra son accès gratuit. S'il n'a pas d'abonnement Stripe actif, il sera redirigé vers le tunnel d'abonnement à la prochaine connexion."
+    },
+    "privacyRequests": {
+      "loading": "Chargement des demandes de confidentialité…",
+      "confirmHardDelete": "Suppression DURE confirmée ? Action irréversible.",
+      "confirmAnonymize": "Anonymiser ce compte ?",
+      "confirmRejectDeletion": "Rejeter cette demande de suppression ?",
+      "title": "Privacy / RGPD ({{count}} en attente)",
+      "refresh": "Rafraîchir",
+      "empty": "Aucune demande.",
+      "link": "Lien",
+      "process": "Traiter",
+      "deletions": "Suppressions de compte ({{count}})",
+      "deadline": "échéance {{date}}",
+      "anonymize": "Anonymiser",
+      "hardDelete": "Suppr. dure"
     }
   },
   "supportView": {
@@ -4636,5 +4830,18 @@
     "bannerAs": "en tant que {{name}} · {{club}} · {{persona}}",
     "userFallback": "utilisateur",
     "clubFallback": "club"
+  },
+  "coach": {
+    "unavailableTitle": "Profil indisponible",
+    "unavailableBody": "Ce profil coach est privé ou n'existe pas."
+  },
+  "languages": {
+    "fr": "Français",
+    "en": "Anglais",
+    "de": "Allemand",
+    "es": "Espagnol",
+    "it": "Italien",
+    "nl": "Néerlandais",
+    "pt": "Portugais"
   }
 }

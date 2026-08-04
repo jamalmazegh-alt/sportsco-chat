@@ -707,7 +707,8 @@
       "clubMismatch": "This championship does not belong to this club",
       "archived": "This championship is archived",
       "notFound": "Championship not found"
-    }
+    },
+    "levelPlaceholder": "Division 1"
   },
   "club": {
     "logo": "Club logo",
@@ -874,7 +875,9 @@
     "parentNotOnPlatform": "Not registered yet",
     "parentContactsHidden": "Confidential contact details",
     "inviteWholeTeamHint": "Send an invitation to each player/parent without an account. People already registered or already invited are skipped.",
-    "inviteFailedLabel": "Send failed"
+    "inviteFailedLabel": "Send failed",
+    "inviteSuppressedSimple": "{{count}} invitation(s) blocked: the address is suppressed (bounce, spam, or unsubscribe). Fix the email or contact support.",
+    "photoUploadFailed": "Photo upload failed: {{message}}"
   },
   "events": {
     "isOfficial": "Official match",
@@ -1039,7 +1042,8 @@
       "updatesBadge": "{{count}} update(s)",
       "lineupNotIncluded": "Not included",
       "lineupPublished": "Published",
-      "buttonAll": "Resend call-up to all players"
+      "buttonAll": "Resend call-up to all players",
+      "buttonWithChangesAll": "Resend to all players ({{count}} update(s))"
     },
     "fields": {
       "title": "Title",
@@ -1106,7 +1110,8 @@
     "scheduleTitle": "Schedule",
     "commCard": {
       "cancelledHint": "Cancellation link",
-      "invitePlayersFirstTitle": "Invite players"
+      "invitePlayersFirstTitle": "Invite players",
+      "subtitle": "{{count}} players called up"
     },
     "scoreDisabledCancelled": "Event cancelled — score and match facts editing disabled."
   },
@@ -1736,14 +1741,16 @@
     "reactions": {
       "error": "Unable to react",
       "add": "React",
-      "tapToRemove": "Tap to remove"
+      "tapToRemove": "Tap to remove",
+      "count": "{{count}} reaction(s)"
     },
     "postDeleted": "Post deleted",
     "emptyHint": "No announcements yet. Coaches and admins can publish here.",
     "unpin": "Unpin",
     "pin": "Pin",
     "pinned": "Pinned",
-    "commentDeleted": "Comment deleted"
+    "commentDeleted": "Comment deleted",
+    "newPostTitle": "{{name}} posted on the wall"
   },
   "chat": {
     "title": "Event chat",
@@ -1883,7 +1890,10 @@
     "updateCardTitle": "Update bank card",
     "updateCardDescription": "Your new card will replace the current one for future charges.",
     "errorCardSetup": "Unable to prepare the card update",
-    "errorSaveCard": "Error saving the card"
+    "errorSaveCard": "Error saving the card",
+    "exemptTitle": "Complimentary access",
+    "exemptBody": "Your club has free access to all Clubero features.",
+    "exemptReason": "Reason: {{reason}}"
   },
   "feedback": {
     "coachTab": "Coach feedback",
@@ -2064,7 +2074,8 @@
     "offlineAdded": "Added (no account)",
     "emailHint": "Leave empty to add without an account. You can invite them later.",
     "offline": "No account",
-    "inviteOffline": "Invite by email"
+    "inviteOffline": "Invite by email",
+    "convertDesc": "Send an email invitation to {{name}} so they can sign in and validate their matches."
   },
   "insights": {
     "title": "Insights",
@@ -2535,7 +2546,35 @@
     "emptyDashboard": "No payment collection.",
     "menuTitle": "Payment collections",
     "menuHint": "Memberships, licenses, gear, trips",
-    "exportDownloaded": "CSV export downloaded"
+    "exportDownloaded": "CSV export downloaded",
+    "kpiCollected": "Collected",
+    "kpiNet": "Net (fees deducted)",
+    "kpiDue": "Total due",
+    "kpiRate": "Collection rate",
+    "kpiFees": "Fees: {{amount}}",
+    "kpiRemaining": "{{amount}} left",
+    "kpiTxCount": "{{count}} transactions",
+    "kpiObligations": "{{count}} obligations",
+    "emptyMethods": "No collections yet.",
+    "emptyMonthly": "No data.",
+    "tabTransactions": "Transactions",
+    "netLabel": "Net: {{amount}}",
+    "itemRollupLine": "{{total}} targeted • {{paid}} paid • {{partial}} partial • {{pending}} pending",
+    "form": {
+      "defaultProvider": "Default payment method",
+      "title": "Title",
+      "description": "Description (optional)",
+      "descriptionPlaceholder": "Details or terms",
+      "amount": "Amount (EUR)",
+      "dueDate": "Due date (optional)",
+      "partial": "Partial payment",
+      "partialAllowed": "Allowed",
+      "assignTo": "Assign to",
+      "wholeClub": "Whole club",
+      "teams": "Teams",
+      "players": "Players",
+      "noTeams": "No teams."
+    }
   },
   "tournamentToClub": {
     "title": "Manage your club all year long",
@@ -2748,11 +2787,13 @@
     "meetingPreview": {
       "loading": "Calculating…",
       "reviewOnSummary": "Detailed preview on the final step",
-      "notice": "When creating the meeting, invitations will be sent automatically (notification, push and email) to the people called up."
+      "notice": "When creating the meeting, invitations will be sent automatically (notification, push and email) to the people called up.",
+      "countShort": "{{count}} person(s) selected"
     },
     "meetingSummary": {
       "subtitle": "People who will receive the invitation",
-      "empty": "No matching people found."
+      "empty": "No matching people found.",
+      "title": "Invitees · {{count}}"
     },
     "homeSubtitle": "We're hosting",
     "awaySubtitle": "We're away",
@@ -2801,7 +2842,8 @@
       "reducedSquadSubtitle_other": "{{count}} players unavailable in 14d",
       "staffUncovered": "No coach available",
       "staffUncoveredTeam": "No coach available — {{team}}",
-      "staffUncoveredFallback": "Event"
+      "staffUncoveredFallback": "Event",
+      "reducedSquadTitleTeam": "Reduced squad — {{team}}"
     },
     "self": {
       "convocationSilence": "You haven't replied"
@@ -2898,7 +2940,8 @@
       "facilityPlaceholder": "Pick a field",
       "noFacilitiesHint": "No field configured for this site.",
       "noFacilityOption": "No court"
-    }
+    },
+    "surfacePlaceholder": "Grass, synthetic, parquet…"
   },
   "callUpList": {
     "masked": "List hidden",
@@ -3072,7 +3115,8 @@
   },
   "heatmap": {
     "title": "Attendance map",
-    "noEvent": "No event"
+    "noEvent": "No event",
+    "lastWeeks": "Last {{n}} weeks"
   },
   "eventType": {
     "match": "Match",
@@ -3150,10 +3194,7 @@
       "confirmed": "Confirmed",
       "tentative": "Possible"
     },
-    "visibility": {
-      "staff": "Club staff",
-      "admins_only": "Admins only"
-    },
+    "visibility": "Visibility",
     "commentHint": "The reason and comment are only visible to admins (or all staff depending on the chosen visibility).",
     "title": "My unavailabilities",
     "menuSubtitle": "Declare your absences for all your teams",
@@ -3183,7 +3224,8 @@
       "amountPaid": "Amount paid",
       "requestedAt": "Request date",
       "hint": "Exports registrations visible with current filters. Contains no documents.",
-      "cta": "Export CSV"
+      "cta": "Export CSV",
+      "done": "CSV export downloaded ({{count}} rows)."
     },
     "detail": {
       "statusChanged": "Status updated",
@@ -3239,7 +3281,13 @@
       "markUnpaid": "Mark as unpaid",
       "markRefunded": "Mark as refunded",
       "markPartialTitle": "Record a partial payment",
-      "markPartial": "Mark as partial"
+      "markPartial": "Mark as partial",
+      "capacityLine": "Capacity: {{approved}}/{{capacity}} confirmed · {{remaining}} spots left",
+      "createdAt": "Received on {{date}}",
+      "partialRemainingPreview": "Balance due: {{amount}} {{currency}}",
+      "paymentReceived": "Received: {{amount}} {{currency}}",
+      "paymentRemaining": "Balance due: {{amount}} {{currency}}",
+      "reservedUntil": "Spot reserved until {{date}}"
     },
     "dossier": {
       "complete": "Complete",
@@ -3255,7 +3303,8 @@
       "approved": "Approved",
       "reserved": "Reserved (72h)",
       "remaining": "Spots remaining",
-      "pending": "Pending requests"
+      "pending": "Pending requests",
+      "expiredHint": "{{count}} 72h reservation(s) expired — use “Extend” to keep the spot."
     },
     "searchPlaceholder": "Search (name, email…)",
     "filters": {
@@ -3302,7 +3351,8 @@
       "title": "Online registrations are disabled",
       "body": "No “Register” button appears on the public page. Enable registrations to receive applications."
     },
-    "draftHint": "Registrations will appear here after the camp is published."
+    "draftHint": "Registrations will appear here after the camp is published.",
+    "docsSummary": "{{ok}}/{{total}} documents"
   },
   "features": {
     "learnMore": "Learn more",
@@ -3440,7 +3490,9 @@
       "orPaste": "Or paste CSV content:",
       "append": "Add to roster",
       "replace": "Replace roster",
-      "confirm": "Import"
+      "confirm": "Import",
+      "blocked": "Import blocked: {{total}} players exceed the limit of {{max}}. Reduce the file or choose “Replace”.",
+      "ok": "{{n}} player(s) imported"
     },
     "logo": {
       "none": "No logo",
@@ -3457,7 +3509,8 @@
     "empty": "No players yet. Click Add or Import CSV.",
     "captain": "Captain",
     "setCaptain": "Set captain",
-    "save": "Save"
+    "save": "Save",
+    "tooMany": "Roster limited to {{max}} players."
   },
   "finalStandings": {
     "title": "Final standings",
@@ -3524,7 +3577,8 @@
     },
     "footerReady": "Everything is ready",
     "create": "Create camp",
-    "next": "Next"
+    "next": "Next",
+    "footerProgress": "Step {{current}} of {{total}}"
   },
   "list": {
     "newTitle": "New camp",
@@ -3653,7 +3707,9 @@
   "cockpit": {
     "alerts": {
       "heading": "Alerts",
-      "finalsNotGenerated": "Finals phase not generated — group stages are finished"
+      "finalsNotGenerated": "Finals phase not generated — group stages are finished",
+      "missingReferee": "Missing referee (starts in {{minutes}} min)",
+      "title": "{{count}} item to resolve"
     },
     "next": "Next",
     "estimatedEnd": "Estimated end"
@@ -3709,7 +3765,8 @@
       "clean": "Clean brackets",
       "customize": "Customize",
       "back": "Back",
-      "save": "Save Flights"
+      "save": "Save Flights",
+      "distribution": "Distribution ({{n}} teams)"
     },
     "rulesCount": "rules",
     "thirdPlace": "3rd place",
@@ -3720,7 +3777,9 @@
     "public": {
       "empty": "No flight has been configured for this tournament yet.",
       "noMatches": "Matches for this flight will be generated after the group stage."
-    }
+    },
+    "draftRulesSummary": "{{n}} qualification rule(s) configured",
+    "generatedToast": "{{n}} matches created"
   },
   "matches": {
     "allMatches": "All matches",
@@ -4469,7 +4528,17 @@
       "statusFailed": "Failed",
       "statusDlq": "DLQ",
       "statusBounced": "Bounced",
-      "statusComplained": "Complaint"
+      "statusComplained": "Complaint",
+      "matchOn": "match on {{date}}",
+      "template": "template",
+      "retryFailures_one": "Retry failure ({{count}})",
+      "retryFailures_other": "Retry failures ({{count}})",
+      "autoRefreshInProgress": "In progress — auto-refresh every 5 s",
+      "suppressedCount_one": "{{count}} suppressed",
+      "suppressedCount_other": "{{count}} suppressed",
+      "noRecipientsMatch": "No recipient matches the filters.",
+      "mismatch": "mismatch {{count}}",
+      "retry": "Retry"
     },
     "inviteBatches": {
       "eyebrow": "Invitations",
@@ -4609,6 +4678,131 @@
       "overwriteConfirmDesc": "All categories already set for the selected season will be <strong>replaced</strong> by the automatic FFF calculation.",
       "overwriteConsequence": "Manual <strong>age upgrades</strong> (e.g. a U14 playing in U15) will be lost.",
       "overwriteConfirmAction": "Overwrite and recompute"
+    },
+    "createTicket": {
+      "title": "New ticket on behalf of a user",
+      "description": "Used to log a request received by phone, email, or in person.",
+      "user": "User",
+      "changeUser": "Change",
+      "searchPlaceholder": "Search by name or phone…",
+      "searching": "Searching…",
+      "noResults": "No results",
+      "subject": "Subject",
+      "subjectPlaceholder": "Request summary",
+      "descriptionLabel": "Description",
+      "descriptionPlaceholder": "What the user reported…",
+      "category": "Category",
+      "priority": "Priority",
+      "channel": "Channel",
+      "notifyUser": "Notify the user by email",
+      "cancel": "Cancel",
+      "create": "Create ticket"
+    },
+    "watchlist": {
+      "socialFailuresTitle": "Failed social network syncs",
+      "socialFailuresEmpty": "All social connections are OK.",
+      "lastAttempt": "last attempt {{date}}",
+      "importFailuresTitle": "Failed or partial imports",
+      "importFailuresEmpty": "No failed imports.",
+      "importRows": "{{status}} — {{imported}}/{{total}} rows · {{date}}",
+      "stalledOnboardingTitle": "Potentially stalled onboarding",
+      "stalledOnboardingHint": "Friction signals — interpret them, they are not definite errors. Loaded on demand.",
+      "signals": {
+        "clubNoTeam": "Club without a team",
+        "teamNoPlayer": "Team without players",
+        "playersNoEvent": "Players but no event",
+        "eventNoConvocation": "Event without call-up",
+        "inviteNotAccepted": "Invitation not accepted"
+      },
+      "nothingToReport": "Nothing to report.",
+      "since": "since {{time}}",
+      "extraItems_one": "+ {{count}} other",
+      "extraItems_other": "+ {{count}} others"
+    },
+    "observability": {
+      "title": "Activity & health",
+      "recentErrors": "Recent errors",
+      "recentErrorsEmpty": "No errors recorded.",
+      "errorCode": "code: {{code}}",
+      "byActor": "by {{actor}}",
+      "activeUsers": "Active users (30 d)",
+      "activeUsersEmpty": "No user activity in the last 30 days.",
+      "lastActionAgo": "{{action}} · {{time}} ago",
+      "featuresUsed": "Features used (30 d)",
+      "featuresUsedEmpty": "No measured activity.",
+      "socialConnections": "Social connections",
+      "socialConnectionsEmpty": "No social connection.",
+      "active": "active",
+      "inactive": "inactive",
+      "syncedAt": "sync {{date}}",
+      "imports": "Imports",
+      "importsEmpty": "No import.",
+      "importRows": "{{imported}}/{{total}} rows · {{date}}",
+      "invitations": "Invitations",
+      "invitationsEmpty": "No invitation.",
+      "supportTickets": "Support tickets",
+      "supportTicketsEmpty": "No support ticket.",
+      "fullActivityFeed": "Full activity feed"
+    },
+    "billingExemption": {
+      "actionGranted": "Exemption granted",
+      "actionUpdated": "Exemption updated",
+      "actionRevoked": "Exemption revoked",
+      "reasons": {
+        "betaClub": "Beta club",
+        "partner": "Partner",
+        "internal": "Clubero internal",
+        "other": "Other"
+      },
+      "formats": {
+        "date": "MMM d, yyyy",
+        "dateTime": "MMM d, yyyy 'at' HH:mm",
+        "shortDateTime": "MMM d, HH:mm"
+      },
+      "title": "Billing exemption",
+      "clubExempt": "Club exempt",
+      "noActiveExemption": "No active exemption",
+      "exemptBadge": "Exempt",
+      "intro": "Grant this club free access for the beta phase, a partnership, or internal testing. The club can access all features without going through Stripe.",
+      "grant": "Grant an exemption",
+      "reason": "Reason",
+      "endDate": "End date",
+      "noLimit": "No limit",
+      "grantedAt": "Granted on",
+      "grantedBy": "Granted by",
+      "edit": "Edit exemption",
+      "revoke": "Revoke exemption",
+      "auditTitle": "Exemption history",
+      "auditEmpty": "No action recorded.",
+      "byActor": "by {{actor}}",
+      "untilDate": "until {{date}}",
+      "dialogDescription": "This club will access all features without a Stripe subscription.",
+      "reasonPlaceholder": "Select a reason",
+      "endDateOptional": "Exemption end date (optional)",
+      "clearDate": "Clear date",
+      "expiryHint": "If set, the exemption will expire automatically on this date.",
+      "summaryUntil": "<strong>{{clubName}}</strong> will have free access until {{date}}.",
+      "summaryNoLimit": "<strong>{{clubName}}</strong> will have free access with no time limit.",
+      "cancel": "Cancel",
+      "save": "Save",
+      "confirm": "Confirm exemption",
+      "revokeTitle": "Revoke exemption?",
+      "revokeDescription": "The club <strong>{{clubName}}</strong> will lose its free access. If it has no active Stripe subscription, it will be redirected to the subscription flow on next login."
+    },
+    "privacyRequests": {
+      "loading": "Loading privacy requests…",
+      "confirmHardDelete": "Confirm HARD deletion? This action is irreversible.",
+      "confirmAnonymize": "Anonymize this account?",
+      "confirmRejectDeletion": "Reject this deletion request?",
+      "title": "Privacy / GDPR ({{count}} pending)",
+      "refresh": "Refresh",
+      "empty": "No request.",
+      "link": "Link",
+      "process": "Process",
+      "deletions": "Account deletions ({{count}})",
+      "deadline": "deadline {{date}}",
+      "anonymize": "Anonymize",
+      "hardDelete": "Hard delete"
     }
   },
   "supportView": {
@@ -4636,5 +4830,18 @@
     "bannerAs": "as {{name}} · {{club}} · {{persona}}",
     "userFallback": "user",
     "clubFallback": "club"
+  },
+  "coach": {
+    "unavailableTitle": "Profile unavailable",
+    "unavailableBody": "This coach profile is private or does not exist."
+  },
+  "languages": {
+    "fr": "French",
+    "en": "English",
+    "de": "German",
+    "es": "Spanish",
+    "it": "Italian",
+    "nl": "Dutch",
+    "pt": "Portuguese"
   }
 }

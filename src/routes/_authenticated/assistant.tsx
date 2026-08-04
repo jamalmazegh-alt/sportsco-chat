@@ -102,9 +102,7 @@ function AssistantPage() {
     transport,
     onError: (err) => {
       console.error(err);
-      toast.error(
-        err.message || t("assistant.error", { defaultValue: "Une erreur est survenue." }),
-      );
+      toast.error(err.message || t("assistant.error"));
     },
   });
 
@@ -164,14 +162,8 @@ function AssistantPage() {
             <Bot className="h-5 w-5 text-primary" />
           </div>
           <div>
-            <h1 className="text-lg font-semibold leading-tight">
-              {t("assistant.title", { defaultValue: "Assistant Clubero" })}
-            </h1>
-            <p className="text-xs text-muted-foreground">
-              {t("assistant.subtitle", {
-                defaultValue: "Assistant IA · vérifie les informations importantes",
-              })}
-            </p>
+            <h1 className="text-lg font-semibold leading-tight">{t("assistant.title")}</h1>
+            <p className="text-xs text-muted-foreground">{t("assistant.subtitle")}</p>
           </div>
         </div>
         <div className="flex items-center gap-1">
@@ -180,12 +172,7 @@ function AssistantPage() {
               <Trash2 className="h-4 w-4" />
             </Button>
           )}
-          <Button
-            asChild
-            variant="ghost"
-            size="icon-sm"
-            aria-label={t("assistant.close", { defaultValue: "Close" })}
-          >
+          <Button asChild variant="ghost" size="icon-sm" aria-label={t("assistant.close")}>
             <Link to="/home">
               <X className="h-4 w-4" />
             </Link>
@@ -198,10 +185,8 @@ function AssistantPage() {
           {messages.length === 0 ? (
             <ConversationEmptyState
               icon={<Bot className="h-8 w-8 text-primary" />}
-              title={t("assistant.emptyTitle", { defaultValue: "Comment puis-je t'aider ?" })}
-              description={t("assistant.emptyHint", {
-                defaultValue: "Je connais ton club, tes équipes et tes prochains événements.",
-              })}
+              title={t("assistant.emptyTitle")}
+              description={t("assistant.emptyHint")}
             >
               <div className="grid gap-2 mt-4 w-full max-w-md">
                 {suggestions.map((s) => (
@@ -272,7 +257,7 @@ function AssistantPage() {
                         if (state === "output-error") {
                           return (
                             <p key={idx} className="my-1 text-xs text-destructive/80">
-                              {t("assistant.toolError", { defaultValue: "Une action a échoué." })}
+                              {t("assistant.toolError")}
                             </p>
                           );
                         }
@@ -282,9 +267,7 @@ function AssistantPage() {
                             className="my-1 flex items-center gap-2 text-xs text-muted-foreground"
                           >
                             <Wrench className="h-3 w-3 animate-pulse" />
-                            <Shimmer>
-                              {t("assistant.searching", { defaultValue: "Recherche..." })}
-                            </Shimmer>
+                            <Shimmer>{t("assistant.searching")}</Shimmer>
                           </div>
                         );
                       }
@@ -298,7 +281,7 @@ function AssistantPage() {
           {status === "submitted" && (
             <Message from="assistant">
               <MessageContent className="bg-transparent p-0">
-                <Shimmer>{t("assistant.thinking", { defaultValue: "Réflexion..." })}</Shimmer>
+                <Shimmer>{t("assistant.thinking")}</Shimmer>
               </MessageContent>
             </Message>
           )}
@@ -310,7 +293,7 @@ function AssistantPage() {
         <PromptInput onSubmit={handleSubmit}>
           <PromptInputTextarea
             ref={textareaRef}
-            placeholder={t("assistant.placeholder", { defaultValue: "Pose ta question..." })}
+            placeholder={t("assistant.placeholder")}
             disabled={!authToken || !user}
           />
           <PromptInputFooter className="justify-end gap-1">

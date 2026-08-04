@@ -182,7 +182,7 @@ export function RecurringTrainingPlanner({
       return;
     }
     if (occurrences.length === 0) {
-      toast.error(t("events.series.noOccurrences", { defaultValue: "Aucune séance générée" }));
+      toast.error(t("events.series.noOccurrences"));
       return;
     }
     setBusy(true);
@@ -220,29 +220,19 @@ export function RecurringTrainingPlanner({
   return (
     <div className="space-y-4 rounded-xl border border-border bg-card/40 p-3">
       <div className="space-y-1.5">
-        <Label className="text-sm">{t("events.series.period", { defaultValue: "Période" })}</Label>
+        <Label className="text-sm">{t("events.series.period")}</Label>
         <div className="flex gap-2">
-          <DateField
-            label={t("events.series.startDate", { defaultValue: "Début" })}
-            value={startsOn}
-            onChange={setStartsOn}
-          />
-          <DateField
-            label={t("events.series.endDate", { defaultValue: "Fin" })}
-            value={endsOn}
-            onChange={setEndsOn}
-          />
+          <DateField label={t("events.series.startDate")} value={startsOn} onChange={setStartsOn} />
+          <DateField label={t("events.series.endDate")} value={endsOn} onChange={setEndsOn} />
         </div>
       </div>
 
       <div className="space-y-2">
         <div className="flex items-center justify-between">
-          <Label className="text-sm">
-            {t("events.series.slots", { defaultValue: "Créneaux hebdomadaires" })}
-          </Label>
+          <Label className="text-sm">{t("events.series.slots")}</Label>
           <Button type="button" size="sm" variant="outline" onClick={addSlot}>
             <Plus className="h-4 w-4" />
-            {t("events.series.addSlot", { defaultValue: "Ajouter" })}
+            {t("events.series.addSlot")}
           </Button>
         </div>
         <div className="space-y-2">
@@ -266,9 +256,7 @@ export function RecurringTrainingPlanner({
               </div>
               <div className="grid grid-cols-2 gap-2">
                 <div className="col-span-2">
-                  <Label className="text-xs">
-                    {t("events.series.weekday", { defaultValue: "Jour" })}
-                  </Label>
+                  <Label className="text-xs">{t("events.series.weekday")}</Label>
                   <Select
                     value={String(s.weekday)}
                     onValueChange={(v) => updateSlot(s.uid, { weekday: Number(v) })}
@@ -323,14 +311,8 @@ export function RecurringTrainingPlanner({
       </div>
 
       <div className="space-y-1.5">
-        <Label className="text-sm">
-          {t("events.series.preview", { defaultValue: "Prévisualisation" })}
-        </Label>
-        <p className="text-xs text-muted-foreground">
-          {t("events.series.previewHint", {
-            defaultValue: "Cliquez sur une date pour l'exclure / la réintégrer",
-          })}
-        </p>
+        <Label className="text-sm">{t("events.series.preview")}</Label>
+        <p className="text-xs text-muted-foreground">{t("events.series.previewHint")}</p>
         <div className="rounded-lg border border-border bg-background p-1 flex justify-center">
           <Calendar
             mode="single"
@@ -351,20 +333,14 @@ export function RecurringTrainingPlanner({
       </div>
 
       <div className="space-y-2">
-        <Label className="text-sm">
-          {t("events.series.excludedDates", { defaultValue: "Dates exclues" })}
-        </Label>
+        <Label className="text-sm">{t("events.series.excludedDates")}</Label>
         <div className="flex gap-2 items-end">
           <DateField
-            label={t("events.series.rangeFrom", { defaultValue: "Du" })}
+            label={t("events.series.rangeFrom")}
             value={rangeFrom}
             onChange={setRangeFrom}
           />
-          <DateField
-            label={t("events.series.rangeTo", { defaultValue: "Au" })}
-            value={rangeTo}
-            onChange={setRangeTo}
-          />
+          <DateField label={t("events.series.rangeTo")} value={rangeTo} onChange={setRangeTo} />
           <Button
             type="button"
             size="sm"
@@ -397,7 +373,6 @@ export function RecurringTrainingPlanner({
         {excludedDates.length > 0 && (
           <p className="text-[11px] text-muted-foreground">
             {t("events.series.excludedDatesCount", {
-              defaultValue: "{{count}} date(s) exclue(s) manuellement",
               count: excludedDates.length,
             })}
           </p>
@@ -405,9 +380,7 @@ export function RecurringTrainingPlanner({
       </div>
 
       <div className="rounded-lg border border-border bg-background p-2.5 text-xs space-y-1">
-        <div className="font-semibold">
-          {t("events.series.summary", { defaultValue: "Récapitulatif" })}
-        </div>
+        <div className="font-semibold">{t("events.series.summary")}</div>
         <ul className="text-muted-foreground space-y-0.5">
           {Object.entries(byWd)
             .sort(([a], [b]) => Number(a) - Number(b))
@@ -419,7 +392,6 @@ export function RecurringTrainingPlanner({
         </ul>
         <div className="pt-1 font-medium text-foreground">
           {t("events.series.totalSessions", {
-            defaultValue: "Total : {{count}} séances",
             count: occurrences.length,
           })}
         </div>
@@ -431,11 +403,7 @@ export function RecurringTrainingPlanner({
         onClick={submit}
         disabled={busy || occurrences.length === 0}
       >
-        {busy ? (
-          <Loader2 className="h-4 w-4 animate-spin" />
-        ) : (
-          t("events.series.createSeries", { defaultValue: "Créer la série" })
-        )}
+        {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : t("events.series.createSeries")}
       </Button>
     </div>
   );

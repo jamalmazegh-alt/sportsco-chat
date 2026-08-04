@@ -2083,5 +2083,10 @@
         "cta": "Voir le guide d'installation"
       }
     }
+  },
+  "mock": {
+    "toDoCount": "3 à faire",
+    "attendance": "Présence",
+    "u15Training": "U15 Entraînement"
   }
 }

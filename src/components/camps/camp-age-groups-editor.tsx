@@ -174,9 +174,7 @@ export function CampAgeGroupsEditor({
       {/* Preset grid U6 → U19: toggleable checkboxes */}
       <div>
         <Label className="mb-2 block text-xs uppercase tracking-wide text-muted-foreground">
-          {t("ageGroups.selectAll", {
-            defaultValue: "Sélectionne les catégories concernées",
-          })}
+          {t("ageGroups.selectAll")}
         </Label>
         <div className="grid grid-cols-3 gap-2 sm:grid-cols-5 md:grid-cols-7">
           {presets.map((p) => {
@@ -210,7 +208,7 @@ export function CampAgeGroupsEditor({
       {customGroups.length > 0 && (
         <div className="space-y-2">
           <Label className="text-xs uppercase tracking-wide text-muted-foreground">
-            {t("ageGroups.customs", { defaultValue: "Catégories personnalisées" })}
+            {t("ageGroups.customs")}
           </Label>
           <ul className="space-y-2">
             {customGroups.map((g) => (
@@ -223,9 +221,7 @@ export function CampAgeGroupsEditor({
                     <Input
                       value={editDraft.label}
                       onChange={(e) => setEditDraft({ ...editDraft, label: e.target.value })}
-                      placeholder={t("ageGroups.labelPlaceholder", {
-                        defaultValue: "Label (ex. Loisirs)",
-                      })}
+                      placeholder={t("ageGroups.labelPlaceholder")}
                     />
                     <Input
                       type="number"
@@ -233,7 +229,7 @@ export function CampAgeGroupsEditor({
                       onChange={(e) =>
                         setEditDraft({ ...editDraft, birth_year_min: e.target.value })
                       }
-                      placeholder={t("ageGroups.yearMin", { defaultValue: "Année min" })}
+                      placeholder={t("ageGroups.yearMin")}
                     />
                     <Input
                       type="number"
@@ -241,7 +237,7 @@ export function CampAgeGroupsEditor({
                       onChange={(e) =>
                         setEditDraft({ ...editDraft, birth_year_max: e.target.value })
                       }
-                      placeholder={t("ageGroups.yearMax", { defaultValue: "Année max" })}
+                      placeholder={t("ageGroups.yearMax")}
                     />
                   </div>
                 ) : (
@@ -310,34 +306,32 @@ export function CampAgeGroupsEditor({
           disabled={disabled}
           className="text-xs font-medium text-primary hover:underline disabled:opacity-50"
         >
-          {t("ageGroups.addCustom", { defaultValue: "+ Ajouter une catégorie personnalisée" })}
+          {t("ageGroups.addCustom")}
         </button>
       ) : (
         <div className="rounded-lg border border-dashed border-border p-3 space-y-2">
           <Label className="text-xs uppercase tracking-wide text-muted-foreground">
-            {t("ageGroups.addTitle", { defaultValue: "Nouvelle catégorie" })}
+            {t("ageGroups.addTitle")}
           </Label>
           <div className="grid gap-2 sm:grid-cols-[1fr_100px_100px_auto]">
             <Input
               value={draft.label}
               onChange={(e) => setDraft({ ...draft, label: e.target.value })}
-              placeholder={t("ageGroups.labelPlaceholder", {
-                defaultValue: "Label (ex. Loisirs)",
-              })}
+              placeholder={t("ageGroups.labelPlaceholder")}
               disabled={disabled}
             />
             <Input
               type="number"
               value={draft.birth_year_min}
               onChange={(e) => setDraft({ ...draft, birth_year_min: e.target.value })}
-              placeholder={t("ageGroups.yearMin", { defaultValue: "Année min" })}
+              placeholder={t("ageGroups.yearMin")}
               disabled={disabled}
             />
             <Input
               type="number"
               value={draft.birth_year_max}
               onChange={(e) => setDraft({ ...draft, birth_year_max: e.target.value })}
-              placeholder={t("ageGroups.yearMax", { defaultValue: "Année max" })}
+              placeholder={t("ageGroups.yearMax")}
               disabled={disabled}
             />
             <div className="flex gap-1">

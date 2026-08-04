@@ -237,9 +237,7 @@ export function TournamentAIAssistant({ clubId, defaultSport, onOpenExpert, onSi
   function confirmCustomPause() {
     const n = parseInt(customPause, 10);
     if (!Number.isFinite(n) || n < 0 || n > 60) {
-      toast.error(
-        t("aiAssistant.errors.invalidPause", { defaultValue: "Pause invalide (0-60 min)" }),
-      );
+      toast.error(t("aiAssistant.errors.invalidPause"));
       return;
     }
     patch({ pauseMin: n });
@@ -864,7 +862,7 @@ function QuestionView(p: QuestionViewProps) {
             {/* --- Pause entre matchs --- */}
             <div className="space-y-2">
               <Label className="text-[12.5px] font-bold uppercase tracking-wider text-muted-foreground">
-                {t("aiAssistant.opts.pauseLabel", { defaultValue: "Pause entre matchs (min)" })}
+                {t("aiAssistant.opts.pauseLabel")}
               </Label>
               <OptGrid cols={4}>
                 {PAUSE_PRESETS.map((n) => (
@@ -888,9 +886,7 @@ function QuestionView(p: QuestionViewProps) {
                   type="number"
                   min={0}
                   max={60}
-                  placeholder={t("aiAssistant.opts.customPausePlaceholder", {
-                    defaultValue: "Autre…",
-                  })}
+                  placeholder={t("aiAssistant.opts.customPausePlaceholder")}
                   value={customPause}
                   onChange={(e) => setCustomPause(e.target.value)}
                 />
@@ -903,7 +899,7 @@ function QuestionView(p: QuestionViewProps) {
             {/* --- Pause déjeuner --- */}
             <div className="space-y-2 border-t border-dashed border-border pt-4">
               <Label className="text-[12.5px] font-bold uppercase tracking-wider text-muted-foreground">
-                {t("aiAssistant.opts.lunchLabel", { defaultValue: "Pause déjeuner" })}
+                {t("aiAssistant.opts.lunchLabel")}
               </Label>
               <div className="flex items-center gap-2">
                 <button
@@ -916,7 +912,7 @@ function QuestionView(p: QuestionViewProps) {
                       : "border-border bg-white text-foreground hover:border-[hsl(149_50%_36%)]",
                   )}
                 >
-                  {t("aiAssistant.opts.lunch0", { defaultValue: "Sans" })}
+                  {t("aiAssistant.opts.lunch0")}
                 </button>
                 {config.lunchDurationMin > 0 && (
                   <span className="text-[11.5px] text-muted-foreground">
@@ -931,13 +927,13 @@ function QuestionView(p: QuestionViewProps) {
                   className="w-full"
                   onClick={() => patch({ lunchDurationMin: 45 })}
                 >
-                  {t("aiAssistant.opts.lunchAdd", { defaultValue: "+ Ajouter une plage déjeuner" })}
+                  {t("aiAssistant.opts.lunchAdd")}
                 </Button>
               ) : (
                 <div className="grid grid-cols-2 gap-2">
                   <div className="space-y-1">
                     <Label className="text-[11px] text-muted-foreground">
-                      {t("aiAssistant.opts.lunchStart", { defaultValue: "Début" })}
+                      {t("aiAssistant.opts.lunchStart")}
                     </Label>
                     <Input
                       type="time"
@@ -947,7 +943,7 @@ function QuestionView(p: QuestionViewProps) {
                   </div>
                   <div className="space-y-1">
                     <Label className="text-[11px] text-muted-foreground">
-                      {t("aiAssistant.opts.lunchEnd", { defaultValue: "Fin" })}
+                      {t("aiAssistant.opts.lunchEnd")}
                     </Label>
                     <Input
                       type="time"
@@ -1075,7 +1071,7 @@ function QuestionView(p: QuestionViewProps) {
               ))}
             </div>
             <Label className="text-[11.5px] text-muted-foreground">
-              {t("aiAssistant.opts.priceCustom", { defaultValue: "Ou un autre montant :" })}
+              {t("aiAssistant.opts.priceCustom")}
             </Label>
             <div className="flex gap-2">
               <Input
@@ -1266,21 +1262,17 @@ function SummaryView({
           onEdit={() => onEdit("scheduleFormat")}
         />
         <SRow
-          k={t("aiAssistant.summary.matchDuration", { defaultValue: "Durée d'un match" })}
+          k={t("aiAssistant.summary.matchDuration")}
           v={`${config.matchDurationMin} min`}
           onEdit={() => onEdit("matchDuration")}
         />
         <SRow
-          k={t("aiAssistant.summary.pause", { defaultValue: "Pause entre matchs" })}
-          v={
-            config.pauseMin > 0
-              ? `${config.pauseMin} min`
-              : t("aiAssistant.opts.none", { defaultValue: "Aucune" })
-          }
+          k={t("aiAssistant.summary.pause")}
+          v={config.pauseMin > 0 ? `${config.pauseMin} min` : t("aiAssistant.opts.none")}
           onEdit={() => onEdit("breaks")}
         />
         <SRow
-          k={t("aiAssistant.summary.terrains", { defaultValue: "Terrains" })}
+          k={t("aiAssistant.summary.terrains")}
           v={String(config.terrains)}
           onEdit={() => onEdit("terrains")}
         />

@@ -710,7 +710,6 @@ export function WallFeed({
         user_id: uid,
         type: "wall_mention",
         title: t("wall.mentionTitle", {
-          defaultValue: "{{name}} vous a mentionné",
           name: authorName,
         }),
         body: snippet.slice(0, 140),
@@ -747,11 +746,7 @@ export function WallFeed({
               ? null
               : audience;
     if (isStaffPick && (audienceForInsert === null || audienceForInsert.length === 0)) {
-      toast.error(
-        t("wall.staff.pickTeamRequired", {
-          defaultValue: "Choisis au moins une équipe pour cibler son staff.",
-        }),
-      );
+      toast.error(t("wall.staff.pickTeamRequired"));
       return;
     }
     if (
@@ -762,11 +757,7 @@ export function WallFeed({
       audienceForInsert === null &&
       audience !== null
     ) {
-      toast.error(
-        t("wall.audienceRequired", {
-          defaultValue: "Choisissez au moins une équipe ou « Tout le club ».",
-        }),
-      );
+      toast.error(t("wall.audienceRequired"));
       return;
     }
 
@@ -828,24 +819,11 @@ export function WallFeed({
       const code = (error as any).code as string | undefined;
       const isRls = code === "42501" || /row-level security/i.test(error.message);
       if (isRls && !sess.session) {
-        toast.error(
-          t("wall.errorNoSession", {
-            defaultValue: "Ta session a expiré. Reconnecte-toi puis recommence.",
-          }),
-        );
+        toast.error(t("wall.errorNoSession"));
       } else if (isRls && !memberRow) {
-        toast.error(
-          t("wall.errorNotMember", {
-            defaultValue: "Tu n'es plus membre de ce club. Change de club actif puis recommence.",
-          }),
-        );
+        toast.error(t("wall.errorNotMember"));
       } else if (isRls) {
-        toast.error(
-          t("wall.errorNoPermission", {
-            defaultValue:
-              "Tu n'as pas les droits pour publier ici. Vérifie ton club actif et l'équipe sélectionnée.",
-          }),
-        );
+        toast.error(t("wall.errorNoPermission"));
       } else {
         toast.error(error.message);
       }
@@ -961,14 +939,12 @@ export function WallFeed({
 
       const recipients = Array.from(recipientSet);
       if (recipients.length) {
-        const snippet =
-          body.trim() || t("wall.newAttachment", { defaultValue: "Nouvelle pièce jointe" });
+        const snippet = body.trim() || t("wall.newAttachment");
         await supabase.from("notifications").insert(
           recipients.map((uid) => ({
             user_id: uid,
             type: "wall_post",
             title: t("wall.newPostTitle", {
-              defaultValue: "{{name}} a publié sur le mur",
               name: authorName,
             }),
             body: snippet.slice(0, 140),
@@ -1044,7 +1020,7 @@ export function WallFeed({
           .from("wall_post_reactions")
           .upsert({ post_id: p.id, user_id: uid, emoji }, { onConflict: "post_id,user_id" });
     if (error) {
-      toast.error(t("wall.reactions.error", { defaultValue: "Réaction impossible" }));
+      toast.error(t("wall.reactions.error"));
       load({ silent: true });
       return;
     }
@@ -1100,7 +1076,7 @@ export function WallFeed({
             { onConflict: "comment_id,user_id" },
           );
     if (error) {
-      toast.error(t("wall.reactions.error", { defaultValue: "Réaction impossible" }));
+      toast.error(t("wall.reactions.error"));
       load({ silent: true });
       return;
     }
@@ -1115,9 +1091,9 @@ export function WallFeed({
       toast.error(error.message);
       return;
     }
-    toast(t("wall.postDeleted", { defaultValue: "Post deleted" }), {
+    toast(t("wall.postDeleted"), {
       action: {
-        label: t("common.undo", { defaultValue: "Undo" }),
+        label: t("common.undo"),
         onClick: async () => {
           const { error: e2 } = await supabase.rpc("restore_entity", {
             _kind: "wall_post",
@@ -1176,21 +1152,13 @@ export function WallFeed({
             clubId={clubId}
             value={body}
             onChange={setBody}
-            placeholder={
-              isStaffMode
-                ? t("wall.staff.placeholder", {
-                    defaultValue: "Message privé au staff de cette équipe…",
-                  })
-                : t("wall.placeholder")
-            }
+            placeholder={isStaffMode ? t("wall.staff.placeholder") : t("wall.placeholder")}
             rows={3}
           />
           {isStaffMode ? (
             <p className="text-[11px] text-muted-foreground inline-flex items-center gap-1">
               <Lock className="h-3 w-3" />
-              {t("wall.staff.audienceLocked", {
-                defaultValue: "Visible uniquement par le staff de l'équipe et les admins du club.",
-              })}
+              {t("wall.staff.audienceLocked")}
             </p>
           ) : (
             <AudiencePicker
@@ -1234,34 +1202,26 @@ export function WallFeed({
               checked={sendEmail}
               onChange={(e) => setSendEmail(e.target.checked)}
             />
-            {t("wall.compose.alsoEmail", { defaultValue: "Envoyer une copie par e-mail" })}
+            {t("wall.compose.alsoEmail")}
           </label>
           {!isStaffMode && (
             <div className="flex flex-wrap items-center gap-2 pt-1 border-t border-border/50">
               <Button asChild size="sm" variant="outline">
                 <Link to="/publications/new">
                   <BarChart3 className="h-4 w-4 mr-1.5" />
-                  {t("wall.compose.newPoll", { defaultValue: "Nouveau sondage" })}
+                  {t("wall.compose.newPoll")}
                 </Link>
               </Button>
               <Button asChild size="sm" variant="ghost">
-                <Link to="/publications">
-                  {t("publications:seeAllPolls", { defaultValue: "Voir tous les sondages" })}
-                </Link>
+                <Link to="/publications">{t("publications:seeAllPolls")}</Link>
               </Button>
             </div>
           )}
           <div className="flex items-center justify-between gap-2">
             {audienceMissing ? (
-              <p className="text-xs text-destructive">
-                {t("wall.audienceRequired", { defaultValue: "Choisissez au moins une équipe." })}
-              </p>
+              <p className="text-xs text-destructive">{t("wall.audienceRequired")}</p>
             ) : labelMissing ? (
-              <p className="text-xs text-destructive">
-                {t("attachments.labelRequired", {
-                  defaultValue: "Donnez un nom à chaque document avant de publier.",
-                })}
-              </p>
+              <p className="text-xs text-destructive">{t("attachments.labelRequired")}</p>
             ) : (
               <span />
             )}
@@ -1380,7 +1340,7 @@ function AudiencePicker({
       {/* "Tout le club" quick toggle at the top */}
       <div className="flex flex-wrap items-center gap-1.5">
         <span className="text-xs font-medium text-muted-foreground mr-1">
-          {t("wall.audienceTo", { defaultValue: "À :" })}
+          {t("wall.audienceTo")}
         </span>
         {canPickClubWide && (
           <button
@@ -1397,7 +1357,7 @@ function AudiencePicker({
                 : "bg-background text-foreground border-border hover:bg-accent",
             )}
           >
-            {t("wall.scope.allClub", { defaultValue: "Tout le club" })}
+            {t("wall.scope.allClub")}
           </button>
         )}
       </div>
@@ -1415,7 +1375,7 @@ function AudiencePicker({
           <div className="flex items-center gap-1.5 mb-1.5">
             <Users className="h-3 w-3 text-sky-700 dark:text-sky-300" />
             <span className="text-[10px] uppercase tracking-wider font-semibold text-sky-700 dark:text-sky-300">
-              {t("wall.scope.teamsBlock", { defaultValue: "Équipes (joueurs + parents)" })}
+              {t("wall.scope.teamsBlock")}
             </span>
           </div>
           <div className="flex flex-wrap gap-1.5">
@@ -1454,12 +1414,10 @@ function AudiencePicker({
           <div className="flex items-center gap-1.5 mb-1.5">
             <Lock className="h-3 w-3 text-violet-700 dark:text-violet-300" />
             <span className="text-[10px] uppercase tracking-wider font-semibold text-violet-700 dark:text-violet-300">
-              {t("wall.scope.staffTeamsBlock", { defaultValue: "Staff d'équipes" })}
+              {t("wall.scope.staffTeamsBlock")}
             </span>
             <span className="text-[10px] text-violet-700/80 dark:text-violet-300/80">
-              {t("wall.scope.staffTeamsHint", {
-                defaultValue: "Coachs et dirigeants uniquement",
-              })}
+              {t("wall.scope.staffTeamsHint")}
             </span>
           </div>
           <div className="flex flex-wrap gap-1.5">
@@ -1499,7 +1457,7 @@ function AudiencePicker({
           <div className="flex items-center gap-1.5 mb-1.5">
             <Users className="h-3 w-3 text-amber-700 dark:text-amber-300" />
             <span className="text-[10px] uppercase tracking-wider font-semibold text-amber-700 dark:text-amber-300">
-              {t("wall.compose.targetGroup", { defaultValue: "Groupes" })}
+              {t("wall.compose.targetGroup")}
             </span>
           </div>
           <div className="flex flex-wrap gap-1.5">
@@ -1552,21 +1510,20 @@ function AudienceBadge({
       .filter((x): x is Group => !!x);
     let gLabel: string;
     if (liveG.length === 0) {
-      gLabel = t("wall.scope.group", { defaultValue: "Groupe" });
+      gLabel = t("wall.scope.group");
     } else if (liveG.length === 1) {
       gLabel = liveG[0].name;
     } else if (liveG.length === 2) {
       gLabel = `${liveG[0].name} + ${liveG[1].name}`;
     } else {
       gLabel = t("wall.scope.plusOthers", {
-        defaultValue: "{{first}} + {{n}} autres",
         first: liveG[0].name,
         n: liveG.length - 1,
       });
     }
     const gTooltip = liveG.length
       ? liveG.map((g) => g.name).join(" · ")
-      : t("wall.scope.groupTooltip", { defaultValue: "Audience : groupe personnalisé" });
+      : t("wall.scope.groupTooltip");
     return (
       <span
         className="inline-flex items-center gap-1 text-[10px] font-medium uppercase tracking-wider px-1.5 py-0.5 rounded border border-dashed shrink-0 bg-amber-500/10 text-amber-700 dark:text-amber-300 border-amber-500/40"
@@ -1586,13 +1543,12 @@ function AudienceBadge({
     else if (liveT.length === 2) teamLabel = `${liveT[0].name} + ${liveT[1].name}`;
     else if (liveT.length > 2)
       teamLabel = t("wall.scope.plusOthers", {
-        defaultValue: "{{first}} + {{n}} autres",
         first: liveT[0].name,
         n: liveT.length - 1,
       });
     const tooltip = liveT.length
-      ? `${t("wall.staff.badgeTitle", { defaultValue: "Message privé au staff de l'équipe" })} · ${liveT.map((x) => x.name).join(" · ")}`
-      : t("wall.staff.badgeTitle", { defaultValue: "Message privé au staff de l'équipe" });
+      ? `${t("wall.staff.badgeTitle")} · ${liveT.map((x) => x.name).join(" · ")}`
+      : t("wall.staff.badgeTitle");
     return (
       <span
         className="inline-flex items-center gap-1 text-[10px] font-medium uppercase tracking-wider px-1.5 py-0.5 rounded border shrink-0 bg-violet-500/10 text-violet-700 dark:text-violet-300 border-violet-500/40"
@@ -1601,14 +1557,14 @@ function AudienceBadge({
         <Lock className="h-2.5 w-2.5" />
         {teamLabel
           ? t("wall.staff.badgeWithTeam", { defaultValue: "Staff {{team}}", team: teamLabel })
-          : t("wall.staff.badge", { defaultValue: "Staff équipe" })}
+          : t("wall.staff.badge")}
       </span>
     );
   }
   if (post.audience_team_ids === null) {
     return (
       <span className="text-[10px] font-medium uppercase tracking-wider px-1.5 py-0.5 rounded border shrink-0 bg-primary/10 text-primary border-primary/30">
-        {t("wall.scope.allClub", { defaultValue: "Tout le club" })}
+        {t("wall.scope.allClub")}
       </span>
     );
   }
@@ -1617,12 +1573,9 @@ function AudienceBadge({
     return (
       <span
         className="text-[10px] font-medium uppercase tracking-wider px-1.5 py-0.5 rounded border shrink-0 bg-muted text-muted-foreground border-border"
-        title={t("wall.scope.restrictedTitle", {
-          defaultValue:
-            "Toutes les équipes ciblées ont été supprimées — visible des admins uniquement.",
-        })}
+        title={t("wall.scope.restrictedTitle")}
       >
-        {t("wall.scope.restricted", { defaultValue: "Audience restreinte" })}
+        {t("wall.scope.restricted")}
       </span>
     );
   }
@@ -1631,7 +1584,6 @@ function AudienceBadge({
   else if (live.length === 2) label = `${live[0].name} + ${live[1].name}`;
   else
     label = t("wall.scope.plusOthers", {
-      defaultValue: "{{first}} + {{n}} autres",
       first: live[0].name,
       n: live.length - 1,
     });
@@ -1701,12 +1653,11 @@ function WallGrouped({
     const { error } = await onMuteUser(muteTarget.userId);
     setMuting(false);
     if (error) {
-      toast.error(t("common.error", { defaultValue: "Une erreur est survenue" }));
+      toast.error(t("common.error"));
       return;
     }
     toast.success(
       t("mutes.muted", {
-        defaultValue: "Les contenus de {{name}} sont masqués.",
         name: muteTarget.name,
       }),
     );
@@ -1740,10 +1691,7 @@ function WallGrouped({
       <EmptyState
         icon={<MegaphoneIcon className="h-6 w-6" />}
         title={t("wall.empty")}
-        description={t("wall.emptyHint", {
-          defaultValue:
-            "Aucune annonce pour l'instant. Les coachs et admins peuvent en publier ici.",
-        })}
+        description={t("wall.emptyHint")}
       />
     );
   }
@@ -1811,16 +1759,8 @@ function WallGrouped({
                 <button
                   onClick={() => onTogglePin(p.id, !p.is_pinned)}
                   className="text-muted-foreground hover:text-primary p-1 -m-1 rounded-md hover:bg-primary/10 transition-colors"
-                  aria-label={
-                    p.is_pinned
-                      ? t("wall.unpin", { defaultValue: "Désépingler" })
-                      : t("wall.pin", { defaultValue: "Épingler" })
-                  }
-                  title={
-                    p.is_pinned
-                      ? t("wall.unpin", { defaultValue: "Désépingler" })
-                      : t("wall.pin", { defaultValue: "Épingler" })
-                  }
+                  aria-label={p.is_pinned ? t("wall.unpin") : t("wall.pin")}
+                  title={p.is_pinned ? t("wall.unpin") : t("wall.pin")}
                 >
                   {p.is_pinned ? <PinOff className="h-4 w-4" /> : <Pin className="h-4 w-4" />}
                 </button>
@@ -1837,8 +1777,8 @@ function WallGrouped({
                     })
                   }
                   className="text-muted-foreground hover:text-amber-600 p-1 -m-1 rounded-md hover:bg-amber-500/10 transition-colors"
-                  aria-label={t("wall.report.action", { defaultValue: "Signaler" })}
-                  title={t("wall.report.action", { defaultValue: "Signaler" })}
+                  aria-label={t("wall.report.action")}
+                  title={t("wall.report.action")}
                 >
                   <Flag className="h-4 w-4" />
                 </button>
@@ -1852,8 +1792,8 @@ function WallGrouped({
                       setMuteTarget({ userId: p.author_user_id as string, name: authorLabel })
                     }
                     className="text-muted-foreground hover:text-destructive p-1 -m-1 rounded-md hover:bg-destructive/10 transition-colors"
-                    aria-label={t("mutes.action", { defaultValue: "Masquer cette personne" })}
-                    title={t("mutes.action", { defaultValue: "Masquer cette personne" })}
+                    aria-label={t("mutes.action")}
+                    title={t("mutes.action")}
                   >
                     <UserX className="h-4 w-4" />
                   </button>
@@ -1871,9 +1811,7 @@ function WallGrouped({
           {p.hidden_at && (
             <p className="mb-1.5 inline-flex items-center gap-1 rounded-md bg-destructive/10 px-2 py-0.5 text-[11px] font-medium text-destructive">
               <Flag className="h-3 w-3" />
-              {t("wall.moderation.hiddenBadge", {
-                defaultValue: "Masqué par la modération — visible par les responsables uniquement",
-              })}
+              {t("wall.moderation.hiddenBadge")}
             </p>
           )}
           {p.body && <RenderWithMentions text={p.body} className="text-sm" />}
@@ -1962,7 +1900,7 @@ function WallGrouped({
       {pinned.length > 0 && (
         <section className="space-y-3">
           <h2 className="text-xs font-semibold uppercase tracking-[0.18em] text-primary flex items-center gap-1.5">
-            <Pin className="h-3 w-3" /> {t("wall.pinned", { defaultValue: "Épinglé" })}
+            <Pin className="h-3 w-3" /> {t("wall.pinned")}
           </h2>
           <ul className="space-y-2.5">{pinned.map(renderItem)}</ul>
         </section>
@@ -1986,7 +1924,7 @@ function WallGrouped({
       {(polls.length > 0 || posts.length > 0) && (
         <div className="pt-2 text-center">
           <Link to="/publications" className="text-xs text-primary hover:underline">
-            {t("publications:seeAllPolls", { defaultValue: "Voir tous les sondages" })}
+            {t("publications:seeAllPolls")}
           </Link>
         </div>
       )}
@@ -2004,21 +1942,15 @@ function WallGrouped({
           <AlertDialogHeader>
             <AlertDialogTitle>
               {t("mutes.confirmTitle", {
-                defaultValue: "Masquer les contenus de {{name}} ?",
                 name: muteTarget?.name ?? "",
               })}
             </AlertDialogTitle>
-            <AlertDialogDescription>
-              {t("mutes.confirmBody", {
-                defaultValue:
-                  "Vous ne verrez plus ses publications, commentaires, réactions et messages. Les communications officielles (convocations, événements, notifications) restent visibles. Vous pourrez la réafficher à tout moment depuis Profil → Confidentialité.",
-              })}
-            </AlertDialogDescription>
+            <AlertDialogDescription>{t("mutes.confirmBody")}</AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>{t("common.cancel", { defaultValue: "Annuler" })}</AlertDialogCancel>
+            <AlertDialogCancel>{t("common.cancel")}</AlertDialogCancel>
             <AlertDialogAction onClick={confirmMute} disabled={muting}>
-              {t("mutes.confirm", { defaultValue: "Masquer" })}
+              {t("mutes.confirm")}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
@@ -2083,14 +2015,12 @@ function PollCard({ poll, teamsById }: { poll: PollItem; teamsById: Map<string, 
         <header className="flex items-center gap-1.5 mb-1.5 flex-wrap">
           <span className="text-[10px] font-medium uppercase tracking-wider px-1.5 py-0.5 rounded border bg-primary/10 text-primary border-primary/30 inline-flex items-center gap-1">
             <BarChart3 className="h-3 w-3" />
-            {t("publications:card.tagPoll", { defaultValue: "Sondage" })}
+            {t("publications:card.tagPoll")}
           </span>
           {staffLabel && (
             <span
               className="inline-flex items-center gap-1 text-[10px] font-medium uppercase tracking-wider px-1.5 py-0.5 rounded border bg-violet-500/10 text-violet-700 dark:text-violet-300 border-violet-500/40"
-              title={t("wall.staff.badgeTitle", {
-                defaultValue: "Message privé au staff de l'équipe",
-              })}
+              title={t("wall.staff.badgeTitle")}
             >
               <Lock className="h-2.5 w-2.5" />
               {staffLabel}
@@ -2109,13 +2039,13 @@ function PollCard({ poll, teamsById }: { poll: PollItem; teamsById: Map<string, 
 
           {isAnonymous && (
             <span className="text-[10px] font-medium uppercase tracking-wider px-1.5 py-0.5 rounded border bg-muted text-muted-foreground border-border">
-              {t("publications:card.anonymous", { defaultValue: "Anonyme" })}
+              {t("publications:card.anonymous")}
             </span>
           )}
           {isClosed && (
             <span className="text-[10px] font-medium uppercase tracking-wider px-1.5 py-0.5 rounded border bg-muted text-muted-foreground border-border inline-flex items-center gap-1">
               <Lock className="h-3 w-3" />
-              {t("publications:card.closed", { defaultValue: "Fermé" })}
+              {t("publications:card.closed")}
             </span>
           )}
         </header>
@@ -2133,9 +2063,7 @@ function PollCard({ poll, teamsById }: { poll: PollItem; teamsById: Map<string, 
             if (belowThreshold) {
               return (
                 <p className="text-[11px] text-muted-foreground mt-2 italic">
-                  {t("publications:poll.belowThreshold", {
-                    defaultValue: "Pas assez de réponses pour afficher les résultats",
-                  })}
+                  {t("publications:poll.belowThreshold")}
                 </p>
               );
             }
@@ -2174,15 +2102,14 @@ function PollCard({ poll, teamsById }: { poll: PollItem; teamsById: Map<string, 
         <div className="flex items-center gap-3 mt-2 flex-wrap">
           <span className="text-[11px] text-muted-foreground tabular-nums">
             {t("publications:card.voters", {
-              defaultValue: "{{count}} votants",
               count: poll.voter_count ?? 0,
             })}
           </span>
           <Button asChild size="sm" variant={isClosed || !poll.can_vote ? "outline" : "default"}>
             <Link to="/publications/$publicationId" params={{ publicationId: poll.id }}>
               {isClosed || !poll.can_vote
-                ? t("publications:card.viewResults", { defaultValue: "Voir les résultats" })
-                : t("publications:card.vote", { defaultValue: "Voter" })}
+                ? t("publications:card.viewResults")
+                : t("publications:card.vote")}
             </Link>
           </Button>
         </div>
@@ -2235,7 +2162,6 @@ function CommentBlock({
           user_id: uid,
           type: "wall_mention",
           title: t("wall.mentionTitle", {
-            defaultValue: "{{name}} vous a mentionné",
             name: authorName,
           }),
           body: text.trim().slice(0, 140),
@@ -2258,9 +2184,9 @@ function CommentBlock({
       toast.error(error.message);
       return;
     }
-    toast(t("wall.commentDeleted", { defaultValue: "Comment deleted" }), {
+    toast(t("wall.commentDeleted"), {
       action: {
-        label: t("common.undo", { defaultValue: "Undo" }),
+        label: t("common.undo"),
         onClick: async () => {
           const { error: e2 } = await supabase.rpc("restore_entity", {
             _kind: "wall_comment",
@@ -2285,7 +2211,7 @@ function CommentBlock({
             {c.hidden_at && (
               <p className="mt-0.5 inline-flex items-center gap-1 rounded-md bg-destructive/10 px-1.5 py-0.5 text-[10px] font-medium text-destructive">
                 <Flag className="h-2.5 w-2.5" />
-                {t("wall.moderation.hiddenBadgeShort", { defaultValue: "Masqué" })}
+                {t("wall.moderation.hiddenBadgeShort")}
               </p>
             )}
             <p className="text-[10px] text-muted-foreground">{fmt(c.created_at, "d MMM HH:mm")}</p>
@@ -2306,8 +2232,8 @@ function CommentBlock({
                 })
               }
               className="shrink-0 inline-flex h-8 w-8 items-center justify-center rounded-full text-muted-foreground hover:bg-amber-500/10 hover:text-amber-600"
-              aria-label={t("wall.report.action", { defaultValue: "Signaler" })}
-              title={t("wall.report.action", { defaultValue: "Signaler" })}
+              aria-label={t("wall.report.action")}
+              title={t("wall.report.action")}
             >
               <Flag className="h-4 w-4" />
             </button>
@@ -2317,8 +2243,8 @@ function CommentBlock({
               type="button"
               onClick={() => onMuteAuthor(c.author_user_id, c.author?.full_name ?? "—")}
               className="shrink-0 inline-flex h-8 w-8 items-center justify-center rounded-full text-muted-foreground hover:bg-destructive/10 hover:text-destructive"
-              aria-label={t("mutes.action", { defaultValue: "Masquer cette personne" })}
-              title={t("mutes.action", { defaultValue: "Masquer cette personne" })}
+              aria-label={t("mutes.action")}
+              title={t("mutes.action")}
             >
               <UserX className="h-4 w-4" />
             </button>

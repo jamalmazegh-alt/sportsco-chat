@@ -61,13 +61,11 @@ export const Route = createFileRoute("/_authenticated/admin/settings/sponsors")(
   head: () => ({
     meta: [
       {
-        title: i18nInstance.t("meta.adminSponsors.title", { defaultValue: "Sponsors – Clubero" }),
+        title: i18nInstance.t("meta.adminSponsors.title"),
       },
       {
         name: "description",
-        content: i18nInstance.t("meta.adminSponsors.description", {
-          defaultValue: "Gérez les partenaires affichés dans l'app de votre club.",
-        }),
+        content: i18nInstance.t("meta.adminSponsors.description"),
       },
     ],
   }),
@@ -203,14 +201,14 @@ function SponsorsSettingsPage() {
       }
     },
     onSuccess: () => {
-      toast.success(t("sponsor.admin.saved", { defaultValue: "Partenaire enregistré" }));
+      toast.success(t("sponsor.admin.saved"));
       qc.invalidateQueries({ queryKey: ["admin-sponsors", activeClubId] });
       qc.invalidateQueries({ queryKey: ["sponsors-home", activeClubId] });
       setDialogOpen(false);
       setEditing(null);
     },
     onError: (e: Error) => {
-      toast.error(e.message || t("sponsor.admin.saveError", { defaultValue: "Erreur" }));
+      toast.error(e.message || t("sponsor.admin.saveError"));
     },
   });
 
@@ -220,7 +218,7 @@ function SponsorsSettingsPage() {
       await deleteFn({ data: { sponsorId: id, clubId: activeClubId } });
     },
     onSuccess: () => {
-      toast.success(t("sponsor.admin.deleted", { defaultValue: "Partenaire supprimé" }));
+      toast.success(t("sponsor.admin.deleted"));
       qc.invalidateQueries({ queryKey: ["admin-sponsors", activeClubId] });
       qc.invalidateQueries({ queryKey: ["sponsors-home", activeClubId] });
     },
@@ -230,11 +228,7 @@ function SponsorsSettingsPage() {
     if (!editing || !activeClubId) return;
     const allowed = ["image/png", "image/jpeg", "image/webp"];
     if (!allowed.includes(file.type)) {
-      toast.error(
-        t("sponsor.admin.unsupportedFormat", {
-          defaultValue: "Format non supporté (PNG/JPG/WebP)",
-        }),
-      );
+      toast.error(t("sponsor.admin.unsupportedFormat"));
       return;
     }
     // Immediate local preview URL (revoked on cleanup / new file / dialog close).
@@ -249,11 +243,7 @@ function SponsorsSettingsPage() {
         img.src = localPreviewUrl;
       });
       if (dims.w > 0 && Math.abs(dims.w / dims.h - 4) > 0.6) {
-        toast.warning(
-          t("sponsor.admin.ratioWarning", {
-            defaultValue: "Le logo risque d'être rogné/étiré, format 4:1 recommandé.",
-          }),
-        );
+        toast.warning(t("sponsor.admin.ratioWarning"));
       }
     } catch {
       /* ignore */
@@ -279,13 +269,10 @@ function SponsorsSettingsPage() {
         if (current.logoPreviewUrl) revokeLocalUrl(current.logoPreviewUrl);
         return { ...current, logoPath: path, logoPreviewUrl: localPreviewUrl };
       });
-      toast.success(t("sponsor.admin.logoUploaded", { defaultValue: "Logo téléversé" }));
+      toast.success(t("sponsor.admin.logoUploaded"));
     } catch (e: unknown) {
       revokeLocalUrl(localPreviewUrl);
-      toast.error(
-        (e as Error)?.message ??
-          t("sponsor.admin.uploadError", { defaultValue: "Échec du téléversement" }),
-      );
+      toast.error((e as Error)?.message ?? t("sponsor.admin.uploadError"));
     }
   }
 
@@ -299,14 +286,14 @@ function SponsorsSettingsPage() {
       ctr: `${(s.ctr ?? 0).toFixed(2)}%`,
     }));
     const csv = toCsv(rows, [
-      { key: "sponsor", header: t("sponsor.admin.colSponsor", { defaultValue: "Sponsor" }) },
-      { key: "period", header: t("sponsor.admin.colPeriod", { defaultValue: "Période" }) },
+      { key: "sponsor", header: t("sponsor.admin.colSponsor") },
+      { key: "period", header: t("sponsor.admin.colPeriod") },
       {
         key: "impressions",
-        header: t("sponsor.admin.colImpressions", { defaultValue: "Impressions" }),
+        header: t("sponsor.admin.colImpressions"),
       },
-      { key: "clicks", header: t("sponsor.admin.colClicks", { defaultValue: "Clics" }) },
-      { key: "ctr", header: t("sponsor.admin.colCtr", { defaultValue: "Taux de clic (%)" }) },
+      { key: "clicks", header: t("sponsor.admin.colClicks") },
+      { key: "ctr", header: t("sponsor.admin.colCtr") },
     ]);
     const slug = (club?.name ?? activeClubId ?? "club")
       .toString()
@@ -321,10 +308,8 @@ function SponsorsSettingsPage() {
   return (
     <div className="px-5 py-4 space-y-6">
       <SettingsSubHeader
-        title={t("sponsor.admin.title", { defaultValue: "Sponsors" })}
-        description={t("sponsor.admin.subtitle", {
-          defaultValue: "Affichez vos partenaires en haut de la page d'accueil.",
-        })}
+        title={t("sponsor.admin.title")}
+        description={t("sponsor.admin.subtitle")}
       />
 
       <div className="flex justify-end">
@@ -342,7 +327,7 @@ function SponsorsSettingsPage() {
           }}
         >
           <Plus className="mr-2 h-4 w-4" />
-          {t("sponsor.admin.add", { defaultValue: "Ajouter un partenaire" })}
+          {t("sponsor.admin.add")}
         </Button>
       </div>
 
@@ -382,7 +367,7 @@ function SponsorsSettingsPage() {
                   </a>
                 ) : (
                   <p className="mt-0.5 truncate text-xs italic text-muted-foreground">
-                    {t("sponsor.admin.noUrl", { defaultValue: "Pas de lien" })}
+                    {t("sponsor.admin.noUrl")}
                   </p>
                 )}
               </div>
@@ -425,13 +410,7 @@ function SponsorsSettingsPage() {
                 variant="ghost"
                 size="icon"
                 onClick={() => {
-                  if (
-                    confirm(
-                      t("sponsor.admin.confirmDelete", {
-                        defaultValue: "Supprimer ce partenaire ?",
-                      }),
-                    )
-                  ) {
+                  if (confirm(t("sponsor.admin.confirmDelete"))) {
                     deleteMutation.mutate(s.id);
                   }
                 }}
@@ -443,45 +422,31 @@ function SponsorsSettingsPage() {
         </ul>
       ) : (
         <p className="rounded-2xl border border-dashed border-border p-6 text-center text-sm text-muted-foreground">
-          {t("sponsor.admin.empty", { defaultValue: "Aucun partenaire pour le moment." })}
+          {t("sponsor.admin.empty")}
         </p>
       )}
 
       {/* Stats section */}
       <section className="rounded-2xl border border-border bg-card p-4 space-y-4">
         <div className="flex flex-wrap items-center justify-between gap-3">
-          <h2 className="text-base font-semibold">
-            {t("sponsor.admin.statsTitle", { defaultValue: "Statistiques" })}
-          </h2>
+          <h2 className="text-base font-semibold">{t("sponsor.admin.statsTitle")}</h2>
           <div className="flex items-center gap-2">
             <Select value={range} onValueChange={(v) => setRange(v as Range)}>
               <SelectTrigger className="w-[180px]">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="today">
-                  {t("sponsor.admin.rangeToday", { defaultValue: "Aujourd'hui" })}
-                </SelectItem>
-                <SelectItem value="7d">
-                  {t("sponsor.admin.range7d", { defaultValue: "7 derniers jours" })}
-                </SelectItem>
-                <SelectItem value="30d">
-                  {t("sponsor.admin.range30d", { defaultValue: "30 derniers jours" })}
-                </SelectItem>
-                <SelectItem value="month">
-                  {t("sponsor.admin.rangeMonth", { defaultValue: "Mois en cours" })}
-                </SelectItem>
-                <SelectItem value="season">
-                  {t("sponsor.admin.rangeSeason", { defaultValue: "Saison en cours" })}
-                </SelectItem>
-                <SelectItem value="custom">
-                  {t("sponsor.admin.rangeCustom", { defaultValue: "Période personnalisée" })}
-                </SelectItem>
+                <SelectItem value="today">{t("sponsor.admin.rangeToday")}</SelectItem>
+                <SelectItem value="7d">{t("sponsor.admin.range7d")}</SelectItem>
+                <SelectItem value="30d">{t("sponsor.admin.range30d")}</SelectItem>
+                <SelectItem value="month">{t("sponsor.admin.rangeMonth")}</SelectItem>
+                <SelectItem value="season">{t("sponsor.admin.rangeSeason")}</SelectItem>
+                <SelectItem value="custom">{t("sponsor.admin.rangeCustom")}</SelectItem>
               </SelectContent>
             </Select>
             <Button variant="outline" size="sm" onClick={exportCsv} disabled={!stats}>
               <Download className="mr-1.5 h-4 w-4" />
-              {t("sponsor.admin.exportCsv", { defaultValue: "Exporter (CSV)" })}
+              {t("sponsor.admin.exportCsv")}
             </Button>
           </div>
         </div>
@@ -489,7 +454,7 @@ function SponsorsSettingsPage() {
           <div className="flex flex-col gap-2 sm:flex-row">
             <div className="flex-1 space-y-1">
               <Label className="text-xs text-muted-foreground" htmlFor="sponsor-from">
-                {t("sponsor.admin.fromDate", { defaultValue: "Du" })}
+                {t("sponsor.admin.fromDate")}
               </Label>
               <Input
                 id="sponsor-from"
@@ -507,7 +472,7 @@ function SponsorsSettingsPage() {
             </div>
             <div className="flex-1 space-y-1">
               <Label className="text-xs text-muted-foreground" htmlFor="sponsor-to">
-                {t("sponsor.admin.toDate", { defaultValue: "Au" })}
+                {t("sponsor.admin.toDate")}
               </Label>
               <Input
                 id="sponsor-to"
@@ -530,18 +495,10 @@ function SponsorsSettingsPage() {
           <table className="w-full text-sm">
             <thead>
               <tr className="text-left text-xs text-muted-foreground">
-                <th className="py-2">
-                  {t("sponsor.admin.colSponsor", { defaultValue: "Sponsor" })}
-                </th>
-                <th className="py-2 text-right">
-                  {t("sponsor.admin.colImpressions", { defaultValue: "Impressions" })}
-                </th>
-                <th className="py-2 text-right">
-                  {t("sponsor.admin.colClicks", { defaultValue: "Clics" })}
-                </th>
-                <th className="py-2 text-right">
-                  {t("sponsor.admin.colCtr", { defaultValue: "Taux de clic (%)" })}
-                </th>
+                <th className="py-2">{t("sponsor.admin.colSponsor")}</th>
+                <th className="py-2 text-right">{t("sponsor.admin.colImpressions")}</th>
+                <th className="py-2 text-right">{t("sponsor.admin.colClicks")}</th>
+                <th className="py-2 text-right">{t("sponsor.admin.colCtr")}</th>
               </tr>
             </thead>
             <tbody>
@@ -556,7 +513,7 @@ function SponsorsSettingsPage() {
               {(!stats || stats.length === 0) && (
                 <tr>
                   <td colSpan={4} className="py-6 text-center text-muted-foreground">
-                    {t("sponsor.admin.noStats", { defaultValue: "Aucune donnée sur la période." })}
+                    {t("sponsor.admin.noStats")}
                   </td>
                 </tr>
               )}
@@ -569,15 +526,13 @@ function SponsorsSettingsPage() {
         <DialogContent>
           <DialogHeader>
             <DialogTitle>
-              {editing?.id
-                ? t("sponsor.admin.editTitle", { defaultValue: "Modifier le partenaire" })
-                : t("sponsor.admin.addTitle", { defaultValue: "Nouveau partenaire" })}
+              {editing?.id ? t("sponsor.admin.editTitle") : t("sponsor.admin.addTitle")}
             </DialogTitle>
           </DialogHeader>
           {editing && (
             <div className="space-y-4">
               <div>
-                <Label>{t("sponsor.admin.name", { defaultValue: "Nom" })}</Label>
+                <Label>{t("sponsor.admin.name")}</Label>
                 <Input
                   value={editing.name}
                   onChange={(e) => setEditing({ ...editing, name: e.target.value })}
@@ -585,11 +540,7 @@ function SponsorsSettingsPage() {
                 />
               </div>
               <div>
-                <Label>
-                  {t("sponsor.admin.targetUrlOptional", {
-                    defaultValue: "URL du site (optionnel)",
-                  })}
-                </Label>
+                <Label>{t("sponsor.admin.targetUrlOptional")}</Label>
                 <Input
                   type="url"
                   value={editing.targetUrl}
@@ -598,9 +549,7 @@ function SponsorsSettingsPage() {
                 />
               </div>
               <div>
-                <Label>
-                  {t("sponsor.admin.logo", { defaultValue: "Logo (PNG/JPG/WebP, 4:1 recommandé)" })}
-                </Label>
+                <Label>{t("sponsor.admin.logo")}</Label>
                 <Input
                   type="file"
                   accept="image/png,image/jpeg,image/webp"
@@ -610,30 +559,20 @@ function SponsorsSettingsPage() {
                   }}
                 />
                 <p className="mt-1 text-xs text-muted-foreground">
-                  {t("sponsor.admin.logoContrastHint", {
-                    defaultValue:
-                      "Logo lisible sur fond clair (foncé ou couleur, éviter le blanc).",
-                  })}
+                  {t("sponsor.admin.logoContrastHint")}
                 </p>
               </div>
 
               {editing.logoPreviewUrl && (
                 <div className="space-y-3">
                   <Label className="text-xs uppercase tracking-wide text-muted-foreground">
-                    {t("sponsor.admin.previewTitle", {
-                      defaultValue: "Aperçu sur la page d'accueil",
-                    })}
+                    {t("sponsor.admin.previewTitle")}
                   </Label>
                   <div className="overflow-hidden rounded-lg border border-border bg-background">
                     <SponsorBannerFrame label={t("sponsor.thanksLabel")}>
                       <SponsorLogo
                         src={editing.logoPreviewUrl}
-                        alt={
-                          editing.name ||
-                          t("sponsor.admin.previewAlt", {
-                            defaultValue: "Aperçu du logo du partenaire",
-                          })
-                        }
+                        alt={editing.name || t("sponsor.admin.previewAlt")}
                         maxHeight={
                           SPONSOR_LOGO_MAX_HEIGHT * clampSponsorLogoScale(editing.logoScale)
                         }
@@ -644,13 +583,10 @@ function SponsorsSettingsPage() {
 
                   <div className="space-y-2">
                     <div className="flex items-center justify-between">
-                      <Label className="text-sm">
-                        {t("sponsor.admin.logoSize", { defaultValue: "Taille du logo" })}
-                      </Label>
+                      <Label className="text-sm">{t("sponsor.admin.logoSize")}</Label>
                       <span className="text-xs tabular-nums text-muted-foreground">
                         {t("sponsor.admin.logoSizePercent", {
                           percent: Math.round(editing.logoScale * 100),
-                          defaultValue: "{{percent}} %",
                         })}
                       </span>
                     </div>
@@ -693,9 +629,7 @@ function SponsorsSettingsPage() {
                       }
                     />
                     <p className="text-xs text-muted-foreground">
-                      {t("sponsor.admin.logoSizeHint", {
-                        defaultValue: "Ajustez la taille telle qu'elle apparaîtra aux membres.",
-                      })}
+                      {t("sponsor.admin.logoSizeHint")}
                     </p>
                   </div>
                 </div>
@@ -705,13 +639,13 @@ function SponsorsSettingsPage() {
                   checked={editing.isActive}
                   onCheckedChange={(v) => setEditing({ ...editing, isActive: v })}
                 />
-                <Label>{t("sponsor.admin.active", { defaultValue: "Actif" })}</Label>
+                <Label>{t("sponsor.admin.active")}</Label>
               </div>
             </div>
           )}
           <DialogFooter>
             <Button variant="ghost" onClick={() => setDialogOpen(false)}>
-              {t("common.cancel", { defaultValue: "Annuler" })}
+              {t("common.cancel")}
             </Button>
             <Button
               onClick={() => {
@@ -726,7 +660,7 @@ function SponsorsSettingsPage() {
               disabled={!editing || !editing.name.trim() || saveMutation.isPending}
             >
               {saveMutation.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              {t("sponsor.admin.save", { defaultValue: "Enregistrer" })}
+              {t("sponsor.admin.save")}
             </Button>
           </DialogFooter>
         </DialogContent>

@@ -482,7 +482,7 @@ function CreateItemDialog({
               </Select>
             </div>
             <div className="space-y-1.5">
-              <Label className="text-xs">Mode de paiement par défaut</Label>
+              <Label className="text-xs">{t("fundraising.form.defaultProvider")}</Label>
               <Select value={provider} onValueChange={(v) => setProvider(v as typeof provider)}>
                 <SelectTrigger>
                   <SelectValue />
@@ -499,7 +499,7 @@ function CreateItemDialog({
           </div>
 
           <div className="space-y-1.5">
-            <Label className="text-xs">Intitulé</Label>
+            <Label className="text-xs">{t("fundraising.form.title")}</Label>
             <Input
               value={title}
               onChange={(e) => setTitle(e.target.value)}
@@ -508,18 +508,18 @@ function CreateItemDialog({
           </div>
 
           <div className="space-y-1.5">
-            <Label className="text-xs">Description (optionnel)</Label>
+            <Label className="text-xs">{t("fundraising.form.description")}</Label>
             <Textarea
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               rows={2}
-              placeholder="Détails ou conditions"
+              placeholder={t("fundraising.form.descriptionPlaceholder")}
             />
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
             <div className="space-y-1.5">
-              <Label className="text-xs">Montant (EUR)</Label>
+              <Label className="text-xs">{t("fundraising.form.amount")}</Label>
               <Input
                 type="number"
                 min={0}
@@ -529,45 +529,49 @@ function CreateItemDialog({
               />
             </div>
             <div className="space-y-1.5">
-              <Label className="text-xs">Échéance (optionnel)</Label>
+              <Label className="text-xs">{t("fundraising.form.dueDate")}</Label>
               <Input type="date" value={dueDate} onChange={(e) => setDueDate(e.target.value)} />
             </div>
             <div className="space-y-1.5 flex flex-col">
-              <Label className="text-xs">Paiement partiel</Label>
+              <Label className="text-xs">{t("fundraising.form.partial")}</Label>
               <div className="flex items-center gap-2 h-9">
                 <Switch checked={allowPartial} onCheckedChange={setAllowPartial} />
-                <span className="text-xs text-muted-foreground">Autorisé</span>
+                <span className="text-xs text-muted-foreground">
+                  {t("fundraising.form.partialAllowed")}
+                </span>
               </div>
             </div>
           </div>
 
           <div className="space-y-2 pt-2 border-t border-border">
-            <Label className="text-xs font-semibold">Affecter à</Label>
+            <Label className="text-xs font-semibold">{t("fundraising.form.assignTo")}</Label>
             <div className="grid grid-cols-3 gap-2">
               <TargetButton
                 active={targetKind === "club"}
                 onClick={() => setTargetKind("club")}
                 icon={<Building2 className="h-4 w-4" />}
-                label="Tout le club"
+                label={t("fundraising.form.wholeClub")}
               />
               <TargetButton
                 active={targetKind === "team"}
                 onClick={() => setTargetKind("team")}
                 icon={<Users className="h-4 w-4" />}
-                label="Équipes"
+                label={t("fundraising.form.teams")}
               />
               <TargetButton
                 active={targetKind === "player"}
                 onClick={() => setTargetKind("player")}
                 icon={<User className="h-4 w-4" />}
-                label="Joueurs"
+                label={t("fundraising.form.players")}
               />
             </div>
 
             {targetKind === "team" && (
               <div className="rounded-md border border-border max-h-48 overflow-y-auto divide-y divide-border">
                 {teamsQ.data?.length === 0 && (
-                  <p className="text-xs text-muted-foreground p-3">Aucune équipe.</p>
+                  <p className="text-xs text-muted-foreground p-3">
+                    {t("fundraising.form.noTeams")}
+                  </p>
                 )}
                 {teamsQ.data?.map((tm) => (
                   <CheckboxRow

@@ -171,7 +171,12 @@
     },
     "recipientsBreakdown": "({{players}} jogadores · {{users}} utilizadores)",
     "none": "0 destinatários",
-    "previewError": "Pré-visualização indisponível"
+    "previewError": "Pré-visualização indisponível",
+    "groupsBlock": "Grupos personalizados",
+    "groupsHint": "Grupos transversais criados na admin do clube",
+    "selectedTitle": "Destinatários selecionados",
+    "teamsBlock": "Equipas",
+    "teamsHint": "Escolha jogadores e/ou encarregados por equipa"
   },
   "form": {
     "titleLabel": "Título",

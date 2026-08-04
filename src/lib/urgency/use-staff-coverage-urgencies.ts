@@ -259,14 +259,9 @@ export function useStaffCoverageUrgencies(): UrgencyCollectorResult & { isPendin
           teamName
             ? t("urgency.coach.staffUncoveredTeam", {
                 team: teamName,
-                defaultValue: "Aucun coach disponible — {{team}}",
               })
-            : t("urgency.coach.staffUncovered", {
-                defaultValue: "Aucun coach disponible",
-              }),
-        fallbackTitle: t("urgency.coach.staffUncoveredFallback", {
-          defaultValue: "Événement",
-        }),
+            : t("urgency.coach.staffUncovered"),
+        fallbackTitle: t("urgency.coach.staffUncoveredFallback"),
       });
     },
   });

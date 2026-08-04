@@ -140,7 +140,7 @@ export function TournamentPassButton({
         </div>
       )}
       <div className="space-y-2">
-        <Label>{t("pass.quantityLabel", { defaultValue: "Nombre de pass" })}</Label>
+        <Label>{t("pass.quantityLabel")}</Label>
         <QuantityStepper value={quantity} onChange={setQuantity} disabled={busy} />
         <p className="text-xs text-muted-foreground">
           {t("pass.unitPriceHint", {

@@ -18,7 +18,7 @@ interface CommonProps {
  */
 export function BackLink({ label, className, ...linkProps }: CommonProps & LinkProps) {
   const { t } = useTranslation();
-  const text = label ?? t("common.back", { defaultValue: "Retour" });
+  const text = label ?? t("common.back");
   return (
     <Link
       {...(linkProps as React.ComponentProps<typeof Link>)}
@@ -43,7 +43,7 @@ export function BackButton({
   type?: "button" | "submit";
 }) {
   const { t } = useTranslation();
-  const text = label ?? t("common.back", { defaultValue: "Retour" });
+  const text = label ?? t("common.back");
   return (
     <button type={type} onClick={onClick} aria-label={text} className={cn(backClasses, className)}>
       <span className={chevronWrapClasses}>

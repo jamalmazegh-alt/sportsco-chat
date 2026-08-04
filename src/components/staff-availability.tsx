@@ -143,27 +143,15 @@ export function StaffAvailabilityForEvent({
           <Users className="h-4 w-4" />
         </div>
         <div>
-          <h3 className="text-sm font-semibold">
-            {t("staffAvailability.eventTitle", { defaultValue: "Disponibilité du staff" })}
-          </h3>
-          <p className="text-[11px] text-muted-foreground">
-            {t("staffAvailability.eventHint", {
-              defaultValue: "Statut des coachs de l'équipe sur ce créneau (visible staff/admins).",
-            })}
-          </p>
+          <h3 className="text-sm font-semibold">{t("staffAvailability.eventTitle")}</h3>
+          <p className="text-[11px] text-muted-foreground">{t("staffAvailability.eventHint")}</p>
         </div>
       </div>
 
       {isLoading ? (
-        <p className="text-xs text-muted-foreground">
-          {t("common.loading", { defaultValue: "Chargement..." })}
-        </p>
+        <p className="text-xs text-muted-foreground">{t("common.loading")}</p>
       ) : coaches.length === 0 ? (
-        <p className="text-xs text-muted-foreground">
-          {t("staffAvailability.noCoaches", {
-            defaultValue: "Aucun coach rattaché à cette équipe.",
-          })}
-        </p>
+        <p className="text-xs text-muted-foreground">{t("staffAvailability.noCoaches")}</p>
       ) : (
         <ul className="divide-y divide-border">
           {coaches.map((c) => {
@@ -185,8 +173,8 @@ export function StaffAvailabilityForEvent({
                   <div className="text-sm font-medium truncate">{c.full_name}</div>
                   <div className="text-[11px] text-muted-foreground">
                     {c.role === "assistant_coach"
-                      ? t("teams.role.assistant_coach", { defaultValue: "Coach adjoint" })
-                      : t("teams.role.coach", { defaultValue: "Coach" })}
+                      ? t("teams.role.assistant_coach")
+                      : t("teams.role.coach")}
                   </div>
                 </div>
                 <StaffStatusPill status={status} />
@@ -208,7 +196,7 @@ function StaffStatusPill({ status }: { status: Status }) {
     return (
       <span className="inline-flex items-center gap-1 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-2 py-0.5 text-[10px] font-medium text-emerald-700 dark:text-emerald-400">
         <CheckCircle2 className="h-3 w-3" />
-        {t("staffAvailability.status.available", { defaultValue: "Disponible" })}
+        {t("staffAvailability.status.available")}
       </span>
     );
   }
@@ -216,14 +204,14 @@ function StaffStatusPill({ status }: { status: Status }) {
     return (
       <span className="inline-flex items-center gap-1 rounded-full border border-amber-500/30 bg-amber-500/10 px-2 py-0.5 text-[10px] font-medium text-amber-700 dark:text-amber-400">
         <CircleDashed className="h-3 w-3" />
-        {t("staffAvailability.status.tentative", { defaultValue: "Incertain" })}
+        {t("staffAvailability.status.tentative")}
       </span>
     );
   }
   return (
     <span className="inline-flex items-center gap-1 rounded-full border border-destructive/30 bg-destructive/10 px-2 py-0.5 text-[10px] font-medium text-destructive">
       <MinusCircle className="h-3 w-3" />
-      {t("staffAvailability.status.unavailable", { defaultValue: "Indisponible" })}
+      {t("staffAvailability.status.unavailable")}
     </span>
   );
 }
@@ -274,11 +262,9 @@ export function StaffAvailabilityForTeamMonth({
     <div className="rounded-2xl border border-border bg-card overflow-x-auto">
       <div className="px-4 pt-3 pb-1 flex items-center gap-2">
         <Users className="h-4 w-4 text-muted-foreground" />
-        <h3 className="text-sm font-semibold">
-          {t("staffAvailability.teamTitle", { defaultValue: "Disponibilités du staff" })}
-        </h3>
+        <h3 className="text-sm font-semibold">{t("staffAvailability.teamTitle")}</h3>
         <span className="text-[11px] text-muted-foreground">
-          · {coaches.length} {t("teams.coaches", { defaultValue: "coach(s)" })}
+          · {coaches.length} {t("teams.coaches")}
         </span>
       </div>
 
@@ -289,7 +275,7 @@ export function StaffAvailabilityForTeamMonth({
           style={{ gridTemplateColumns: `180px repeat(${daysInMonth}, 28px)` }}
         >
           <div className="px-3 py-2 text-xs font-semibold text-muted-foreground border-r">
-            {t("teams.coach", { defaultValue: "Coach" })}
+            {t("teams.coach")}
           </div>
           {days.map((d) => {
             const isWeekend = d.getDay() === 0 || d.getDay() === 6;
@@ -374,7 +360,7 @@ export function StaffAvailabilityForTeamMonth({
                 const label =
                   r.can_view_reason && r.reason
                     ? t(`availability.reason.${r.reason}`, { defaultValue: r.reason })
-                    : t("staffAvailability.masked", { defaultValue: "Indisponible" });
+                    : t("staffAvailability.masked");
                 return (
                   <div
                     key={r.id}
@@ -386,7 +372,7 @@ export function StaffAvailabilityForTeamMonth({
                     style={{ left, width }}
                     title={`${label} · ${r.start_date} → ${r.end_date}${
                       r.can_view_reason && r.comment ? ` · ${r.comment}` : ""
-                    }${r.certainty === "tentative" ? ` · ${t("staffAvailability.status.tentative", { defaultValue: "Incertain" })}` : ""}`}
+                    }${r.certainty === "tentative" ? ` · ${t("staffAvailability.status.tentative")}` : ""}`}
                   >
                     {label}
                   </div>
@@ -397,9 +383,7 @@ export function StaffAvailabilityForTeamMonth({
         })}
 
         {isLoading && (
-          <div className="p-3 text-center text-xs text-muted-foreground">
-            {t("common.loading", { defaultValue: "Chargement..." })}
-          </div>
+          <div className="p-3 text-center text-xs text-muted-foreground">{t("common.loading")}</div>
         )}
       </div>
     </div>

@@ -77,24 +77,22 @@ function DossierBadge({ status, t }: { status: DossierStatus; t: (k: string, o?:
   const map: Record<DossierStatus, { className: string; label: string; emoji: string }> = {
     complete: {
       className: "bg-emerald-500/10 text-emerald-700 border-emerald-500/30",
-      label: t("registrations.dossier.complete", { defaultValue: "Complet" }),
+      label: t("registrations.dossier.complete"),
       emoji: "🟢",
     },
     payment_missing: {
       className: "bg-amber-500/10 text-amber-800 border-amber-500/30",
-      label: t("registrations.dossier.paymentMissing", { defaultValue: "Paiement manquant" }),
+      label: t("registrations.dossier.paymentMissing"),
       emoji: "🟠",
     },
     documents_pending: {
       className: "bg-blue-500/10 text-blue-700 border-blue-500/30",
-      label: t("registrations.dossier.documentsPending", {
-        defaultValue: "En attente de vérification",
-      }),
+      label: t("registrations.dossier.documentsPending"),
       emoji: "🔵",
     },
     documents_missing: {
       className: "bg-red-500/10 text-red-700 border-red-500/30",
-      label: t("registrations.dossier.documentsMissing", { defaultValue: "Documents manquants" }),
+      label: t("registrations.dossier.documentsMissing"),
       emoji: "🔴",
     },
   };
@@ -133,9 +131,7 @@ export function CampRegistrationsPanel({ campId }: { campId: string }) {
   const extendMut = useMutation({
     mutationFn: (registrationId: string) => extendFn({ data: { registrationId } }),
     onSuccess: () => {
-      toast.success(
-        t("registrations.extend.done", { defaultValue: "Réservation prolongée de 72 h." }),
-      );
+      toast.success(t("registrations.extend.done"));
       qc.invalidateQueries({ queryKey: ["camp-registrations", campId] });
       qc.invalidateQueries({ queryKey: ["camp-registration-stats", campId] });
     },
@@ -164,36 +160,28 @@ export function CampRegistrationsPanel({ campId }: { campId: string }) {
     <div className="space-y-5">
       {/* Compteurs */}
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
+        <StatCard label={t("registrations.stats.capacity")} value={stats?.capacity ?? "—"} />
         <StatCard
-          label={t("registrations.stats.capacity", { defaultValue: "Capacité" })}
-          value={stats?.capacity ?? "—"}
-        />
-        <StatCard
-          label={t("registrations.stats.approved", { defaultValue: "Validées" })}
+          label={t("registrations.stats.approved")}
           value={stats?.approved ?? "—"}
           className="text-emerald-700"
         />
         <StatCard
-          label={t("registrations.stats.reserved", { defaultValue: "Réservées (72h)" })}
+          label={t("registrations.stats.reserved")}
           value={stats?.reserved ?? "—"}
           className="text-amber-700"
         />
         <StatCard
-          label={t("registrations.stats.remaining", { defaultValue: "Places restantes" })}
+          label={t("registrations.stats.remaining")}
           value={stats?.remaining ?? "—"}
           className="text-primary"
         />
-        <StatCard
-          label={t("registrations.stats.pending", { defaultValue: "Demandes en attente" })}
-          value={stats?.pending ?? "—"}
-        />
+        <StatCard label={t("registrations.stats.pending")} value={stats?.pending ?? "—"} />
       </div>
       {stats && stats.expired_reservations > 0 && (
         <div className="flex items-center gap-2 rounded-md border border-amber-500/30 bg-amber-500/5 px-3 py-2 text-sm text-amber-800">
           <AlertTriangle className="h-4 w-4" />
           {t("registrations.stats.expiredHint", {
-            defaultValue:
-              "{{count}} réservation(s) 72 h expirée(s) — utilisez « Prolonger » pour retenir la place.",
             count: stats.expired_reservations,
           })}
         </div>
@@ -205,9 +193,7 @@ export function CampRegistrationsPanel({ campId }: { campId: string }) {
           <Search className="pointer-events-none absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
           <Input
             className="pl-8"
-            placeholder={t("registrations.searchPlaceholder", {
-              defaultValue: "Rechercher (nom, email…)",
-            })}
+            placeholder={t("registrations.searchPlaceholder")}
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />
@@ -215,7 +201,7 @@ export function CampRegistrationsPanel({ campId }: { campId: string }) {
         <FilterSelect
           value={regFilter}
           onValueChange={(v) => setRegFilter(v as any)}
-          allLabel={t("registrations.filters.allReg", { defaultValue: "Toutes les inscriptions" })}
+          allLabel={t("registrations.filters.allReg")}
           options={REGISTRATION_STATUSES.map((s) => ({
             value: s,
             label: t(`registrations.status.${s}`, { defaultValue: s }),
@@ -224,7 +210,7 @@ export function CampRegistrationsPanel({ campId }: { campId: string }) {
         <FilterSelect
           value={payFilter}
           onValueChange={(v) => setPayFilter(v as any)}
-          allLabel={t("registrations.filters.allPay", { defaultValue: "Tous les paiements" })}
+          allLabel={t("registrations.filters.allPay")}
           options={PAYMENT_STATUSES.map((s) => ({
             value: s,
             label: t(`registrations.payment.${s}`, { defaultValue: s }),
@@ -233,7 +219,7 @@ export function CampRegistrationsPanel({ campId }: { campId: string }) {
         <FilterSelect
           value={dossierFilter}
           onValueChange={(v) => setDossierFilter(v as any)}
-          allLabel={t("registrations.filters.allDossier", { defaultValue: "Tous les dossiers" })}
+          allLabel={t("registrations.filters.allDossier")}
           options={DOSSIER_STATUSES.map((s) => ({
             value: s,
             label: t(`registrations.dossier.${statusKey(s)}`, {
@@ -250,7 +236,7 @@ export function CampRegistrationsPanel({ campId }: { campId: string }) {
           }}
         >
           <RefreshCw className="h-4 w-4 mr-1" />
-          {t("common.refresh", { defaultValue: "Actualiser" })}
+          {t("common.refresh")}
         </Button>
         <Button
           variant="outline"
@@ -260,18 +246,14 @@ export function CampRegistrationsPanel({ campId }: { campId: string }) {
             downloadRegistrationsCsv(filtered, { t, campSlug: campId });
             toast.success(
               t("registrations.csv.done", {
-                defaultValue: "Export CSV téléchargé ({{count}} lignes).",
                 count: filtered.length,
               }),
             );
           }}
-          title={t("registrations.csv.hint", {
-            defaultValue:
-              "Exporte les inscriptions visibles selon les filtres. Ne contient aucun document.",
-          })}
+          title={t("registrations.csv.hint")}
         >
           <Download className="h-4 w-4 mr-1" />
-          {t("registrations.csv.cta", { defaultValue: "Exporter CSV" })}
+          {t("registrations.csv.cta")}
         </Button>
       </div>
 
@@ -280,13 +262,13 @@ export function CampRegistrationsPanel({ campId }: { campId: string }) {
         <table className="min-w-full text-sm">
           <thead className="bg-muted/40 text-xs uppercase text-muted-foreground">
             <tr>
-              <Th>{t("registrations.col.participant", { defaultValue: "Participant" })}</Th>
-              <Th>{t("registrations.col.guardian", { defaultValue: "Responsable" })}</Th>
-              <Th>{t("registrations.col.requested", { defaultValue: "Demande" })}</Th>
-              <Th>{t("registrations.col.regStatus", { defaultValue: "Inscription" })}</Th>
-              <Th>{t("registrations.col.payment", { defaultValue: "Paiement" })}</Th>
-              <Th>{t("registrations.col.dossier", { defaultValue: "Dossier" })}</Th>
-              <Th className="text-right">{t("registrations.col.actions", { defaultValue: "" })}</Th>
+              <Th>{t("registrations.col.participant")}</Th>
+              <Th>{t("registrations.col.guardian")}</Th>
+              <Th>{t("registrations.col.requested")}</Th>
+              <Th>{t("registrations.col.regStatus")}</Th>
+              <Th>{t("registrations.col.payment")}</Th>
+              <Th>{t("registrations.col.dossier")}</Th>
+              <Th className="text-right">{t("registrations.col.actions")}</Th>
             </tr>
           </thead>
           <tbody>
@@ -300,7 +282,7 @@ export function CampRegistrationsPanel({ campId }: { campId: string }) {
             {!listQ.isLoading && filtered.length === 0 && (
               <tr>
                 <td colSpan={7} className="py-10 text-center text-muted-foreground">
-                  {t("registrations.empty", { defaultValue: "Aucune inscription à afficher." })}
+                  {t("registrations.empty")}
                 </td>
               </tr>
             )}
@@ -437,7 +419,7 @@ function RegistrationRow({
           >
             <Clock className="h-3 w-3" />
             {row.reservation_expired
-              ? t("registrations.reservationExpired", { defaultValue: "Réservation expirée" })
+              ? t("registrations.reservationExpired")
               : t("registrations.reservationUntil", {
                   defaultValue: "Jusqu'au {{date}}",
                   date: new Date(row.reserved_until).toLocaleString(undefined, {
@@ -463,15 +445,13 @@ function RegistrationRow({
         <div className="mt-1 text-xs text-muted-foreground">
           {row.required_total > 0
             ? t("registrations.docsSummary", {
-                defaultValue: "{{ok}}/{{total}} pièces",
                 ok: row.documents_approved,
                 total: row.required_total,
               })
-            : t("registrations.noRequiredDocs", { defaultValue: "Aucune pièce requise" })}
+            : t("registrations.noRequiredDocs")}
           {row.documents_rejected > 0 && (
             <span className="ml-1 text-red-700">
-              · {row.documents_rejected}{" "}
-              {t("registrations.rejected", { defaultValue: "refusée(s)" })}
+              · {row.documents_rejected} {t("registrations.rejected")}
             </span>
           )}
         </div>
@@ -492,7 +472,7 @@ function RegistrationRow({
             ) : (
               <Clock className="h-3 w-3 mr-1" />
             )}
-            {t("registrations.extendCta", { defaultValue: "Prolonger 72 h" })}
+            {t("registrations.extendCta")}
           </Button>
         )}
       </td>

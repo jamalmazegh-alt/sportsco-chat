@@ -47,9 +47,9 @@ export function RegistrationSettingsPanel({ tournamentId, tournamentSlug, settin
   const copyLink = async () => {
     try {
       if (!(await copyText(registerUrl))) throw new Error("copy failed");
-      toast.success(t("registrationSettings.linkCopied", { defaultValue: "Lien copié" }));
+      toast.success(t("registrationSettings.linkCopied"));
     } catch {
-      toast.error(t("common.error", { defaultValue: "Erreur" }));
+      toast.error(t("common.error"));
     }
   };
 
@@ -57,22 +57,14 @@ export function RegistrationSettingsPanel({ tournamentId, tournamentSlug, settin
     <div className="space-y-4">
       <Card>
         <CardHeader>
-          <CardTitle className="text-base">
-            {t("registrationSettings.title", { defaultValue: "Inscriptions en ligne" })}
-          </CardTitle>
+          <CardTitle className="text-base">{t("registrationSettings.title")}</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="flex items-start justify-between gap-4 rounded-lg border bg-muted/30 p-3">
             <div className="min-w-0">
-              <Label className="text-sm">
-                {t("registrationSettings.enableLabel", {
-                  defaultValue: "Ouvrir les inscriptions au public",
-                })}
-              </Label>
+              <Label className="text-sm">{t("registrationSettings.enableLabel")}</Label>
               <p className="text-xs text-muted-foreground mt-1">
-                {t("registrationSettings.enableHint", {
-                  defaultValue: "Active un bouton « S'inscrire » sur la page publique du tournoi.",
-                })}
+                {t("registrationSettings.enableHint")}
               </p>
             </div>
             <Switch
@@ -90,9 +82,7 @@ export function RegistrationSettingsPanel({ tournamentId, tournamentSlug, settin
             <>
               <div className="rounded-lg border border-dashed p-3 space-y-2">
                 <p className="text-xs font-medium text-muted-foreground">
-                  {t("registrationSettings.publicLink", {
-                    defaultValue: "Lien public d'inscription",
-                  })}
+                  {t("registrationSettings.publicLink")}
                 </p>
                 <div className="flex items-center gap-2">
                   <code className="text-xs bg-background border rounded px-2 py-1.5 flex-1 truncate">

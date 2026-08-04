@@ -132,7 +132,7 @@ export function MarketingFooter() {
                   params={{ kind: "child_safety" }}
                   className="hover:text-foreground"
                 >
-                  {t("footer.childSafety", { defaultValue: "Sécurité des enfants" })}
+                  {t("footer.childSafety")}
                 </Link>
               </li>
             </ul>

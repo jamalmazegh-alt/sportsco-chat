@@ -707,7 +707,8 @@
       "clubMismatch": "Deze competitie hoort niet bij deze club",
       "archived": "Deze competitie is gearchiveerd",
       "notFound": "Competitie niet gevonden"
-    }
+    },
+    "levelPlaceholder": "1e klasse"
   },
   "club": {
     "logo": "Clublogo",
@@ -874,7 +875,9 @@
     "parentNotOnPlatform": "Nog niet geregistreerd",
     "parentContactsHidden": "Vertrouwelijke contactgegevens",
     "inviteWholeTeamHint": "Stuur een uitnodiging naar elke speler/ouder zonder account. Mensen die al geregistreerd of al uitgenodigd zijn, worden overgeslagen.",
-    "inviteFailedLabel": "Verzenden mislukt"
+    "inviteFailedLabel": "Verzenden mislukt",
+    "inviteSuppressedSimple": "{{count}} uitnodiging(en) geblokkeerd: adres is onderdrukt (bounce, spam of afmelding). Pas de e-mail aan of neem contact op met support.",
+    "photoUploadFailed": "Foto uploaden mislukt: {{message}}"
   },
   "events": {
     "isOfficial": "Officiële wedstrijd",
@@ -1039,7 +1042,8 @@
       "updatesBadge": "{{count}} wijz.",
       "lineupNotIncluded": "Niet inbegrepen",
       "lineupPublished": "Gepubliceerd",
-      "buttonAll": "Stuur de oproep opnieuw naar alle spelers"
+      "buttonAll": "Stuur de oproep opnieuw naar alle spelers",
+      "buttonWithChangesAll": "Opnieuw sturen naar alle spelers ({{count}} update(s))"
     },
     "fields": {
       "title": "Titel",
@@ -1106,7 +1110,8 @@
     "scheduleTitle": "Schema",
     "commCard": {
       "cancelledHint": "Annuleringslink",
-      "invitePlayersFirstTitle": "Nodig spelers uit"
+      "invitePlayersFirstTitle": "Nodig spelers uit",
+      "subtitle": "{{count}} spelers opgeroepen"
     },
     "scoreDisabledCancelled": "Evenement geannuleerd: bewerken van scores en wedstrijdgegevens uitgeschakeld."
   },
@@ -1736,14 +1741,16 @@
     "reactions": {
       "error": "Reageren mislukt",
       "add": "Reageren",
-      "tapToRemove": "Tik om te verwijderen"
+      "tapToRemove": "Tik om te verwijderen",
+      "count": "{{count}} reactie(s)"
     },
     "postDeleted": "Bericht verwijderd",
     "emptyHint": "Nog geen aankondigingen. Coaches en admins kunnen hier publiceren.",
     "unpin": "Losmaken",
     "pin": "Vastzetten",
     "pinned": "Vastgezet",
-    "commentDeleted": "Reactie verwijderd"
+    "commentDeleted": "Reactie verwijderd",
+    "newPostTitle": "{{name}} heeft op de muur geplaatst"
   },
   "chat": {
     "title": "Evenementchat",
@@ -1883,7 +1890,10 @@
     "updateCardTitle": "Bankkaart wijzigen",
     "updateCardDescription": "Je nieuwe kaart vervangt de huidige voor toekomstige afschrijvingen.",
     "errorCardSetup": "Kan de kaartupdate niet voorbereiden",
-    "errorSaveCard": "Fout bij het opslaan van de kaart"
+    "errorSaveCard": "Fout bij het opslaan van de kaart",
+    "exemptTitle": "Gratis toegang",
+    "exemptBody": "Jouw club heeft gratis toegang tot alle Clubero-functies.",
+    "exemptReason": "Reden: {{reason}}"
   },
   "feedback": {
     "coachTab": "Coachfeedback",
@@ -2064,7 +2074,8 @@
     "offlineAdded": "Toegevoegd (geen account)",
     "emailHint": "Laat leeg om toe te voegen zonder account. Je kunt ze later uitnodigen.",
     "offline": "Geen rekening",
-    "inviteOffline": "Uitnodigen per e-mail"
+    "inviteOffline": "Uitnodigen per e-mail",
+    "convertDesc": "Stuur {{name}} een e-mailuitnodiging zodat hij/zij kan inloggen en wedstrijden kan valideren."
   },
   "insights": {
     "title": "Inzichten",
@@ -2535,7 +2546,35 @@
     "emptyDashboard": "Geen inzameling.",
     "menuTitle": "Inzamelingen",
     "menuHint": "Contributies, licenties, materiaal, verplaatsingen",
-    "exportDownloaded": "CSV-export gedownload"
+    "exportDownloaded": "CSV-export gedownload",
+    "kpiCollected": "Ontvangen",
+    "kpiNet": "Netto (kosten afgetrokken)",
+    "kpiDue": "Totaal verschuldigd",
+    "kpiRate": "Incassopercentage",
+    "kpiFees": "Kosten: {{amount}}",
+    "kpiRemaining": "Nog {{amount}}",
+    "kpiTxCount": "{{count}} transacties",
+    "kpiObligations": "{{count}} verplichtingen",
+    "emptyMethods": "Nog geen incasso's.",
+    "emptyMonthly": "Geen gegevens.",
+    "tabTransactions": "Transacties",
+    "netLabel": "Netto: {{amount}}",
+    "itemRollupLine": "{{total}} toegewezen • {{paid}} betaald • {{partial}} deels • {{pending}} openstaand",
+    "form": {
+      "defaultProvider": "Standaard betaalmethode",
+      "title": "Titel",
+      "description": "Beschrijving (optioneel)",
+      "descriptionPlaceholder": "Details of voorwaarden",
+      "amount": "Bedrag (EUR)",
+      "dueDate": "Vervaldatum (optioneel)",
+      "partial": "Gedeeltelijke betaling",
+      "partialAllowed": "Toegestaan",
+      "assignTo": "Toewijzen aan",
+      "wholeClub": "Hele club",
+      "teams": "Teams",
+      "players": "Spelers",
+      "noTeams": "Geen teams."
+    }
   },
   "tournamentToClub": {
     "title": "Beheer uw club het hele jaar",
@@ -2748,11 +2787,13 @@
     "meetingPreview": {
       "loading": "Berekenen…",
       "reviewOnSummary": "Gedetailleerd voorbeeld van de laatste stap",
-      "notice": "Bij het aanmaken van de vergadering worden er automatisch uitnodigingen verzonden (notificatie, push en e-mail) naar de opgeroepen personen."
+      "notice": "Bij het aanmaken van de vergadering worden er automatisch uitnodigingen verzonden (notificatie, push en e-mail) naar de opgeroepen personen.",
+      "countShort": "{{count}} persoon/personen geselecteerd"
     },
     "meetingSummary": {
       "subtitle": "Mensen die de uitnodiging zullen ontvangen",
-      "empty": "Geen overeenkomende mensen gevonden."
+      "empty": "Geen overeenkomende mensen gevonden.",
+      "title": "Opgeroepen · {{count}}"
     },
     "homeSubtitle": "Thuiswedstrijd",
     "awaySubtitle": "Uitwedstrijd",
@@ -2801,7 +2842,8 @@
       "reducedSquadSubtitle_other": "{{count}} spelers niet beschikbaar in 14d",
       "staffUncovered": "Geen coach beschikbaar",
       "staffUncoveredTeam": "Geen coach beschikbaar — {{team}}",
-      "staffUncoveredFallback": "Evenement"
+      "staffUncoveredFallback": "Evenement",
+      "reducedSquadTitleTeam": "Verminderde selectie — {{team}}"
     },
     "self": {
       "convocationSilence": "Je hebt niet geantwoord"
@@ -2898,7 +2940,8 @@
       "facilityPlaceholder": "Kies een veld",
       "noFacilitiesHint": "Geen veld geconfigureerd.",
       "noFacilityOption": "Geen rechtbank"
-    }
+    },
+    "surfacePlaceholder": "Gras, kunstgras, parket…"
   },
   "callUpList": {
     "masked": "Lijst verborgen",
@@ -3072,7 +3115,8 @@
   },
   "heatmap": {
     "title": "Aanwezigheidskaart",
-    "noEvent": "Geen evenement"
+    "noEvent": "Geen evenement",
+    "lastWeeks": "Laatste {{n}} weken"
   },
   "eventType": {
     "match": "Match",
@@ -3150,10 +3194,7 @@
       "confirmed": "Bevestigd",
       "tentative": "Mogelijk"
     },
-    "visibility": {
-      "staff": "Clubstaff",
-      "admins_only": "Alleen admins"
-    },
+    "visibility": "Zichtbaarheid",
     "commentHint": "Reden en opmerking zijn alleen zichtbaar voor admins (of voor alle staff afhankelijk van de gekozen zichtbaarheid).",
     "title": "Mijn onbeschikbaarheden",
     "menuSubtitle": "Meld je afwezigheden voor al je teams",
@@ -3183,7 +3224,8 @@
       "amountPaid": "Bedrag betaald",
       "requestedAt": "Datum van aanvraag",
       "hint": "Exporteert registraties zichtbaar met huidige filters. Bevat geen documenten.",
-      "cta": "CSV exporteren"
+      "cta": "CSV exporteren",
+      "done": "CSV-export gedownload ({{count}} rijen)."
     },
     "detail": {
       "statusChanged": "Status bijgewerkt",
@@ -3239,7 +3281,13 @@
       "markUnpaid": "Markeer als onbetaald",
       "markRefunded": "Markeer als terugbetaald",
       "markPartialTitle": "Registreer een gedeeltelijke betaling",
-      "markPartial": "Markeer als gedeeltelijk"
+      "markPartial": "Markeer als gedeeltelijk",
+      "capacityLine": "Capaciteit: {{approved}}/{{capacity}} bevestigd · {{remaining}} plaatsen over",
+      "createdAt": "Ontvangen op {{date}}",
+      "partialRemainingPreview": "Nog te betalen: {{amount}} {{currency}}",
+      "paymentReceived": "Ontvangen: {{amount}} {{currency}}",
+      "paymentRemaining": "Nog te betalen: {{amount}} {{currency}}",
+      "reservedUntil": "Plaats gereserveerd tot {{date}}"
     },
     "dossier": {
       "complete": "Compleet",
@@ -3255,7 +3303,8 @@
       "approved": "Goedgekeurd",
       "reserved": "Gereserveerd (72u)",
       "remaining": "Resterende plekken",
-      "pending": "In behandeling zijnde verzoeken"
+      "pending": "In behandeling zijnde verzoeken",
+      "expiredHint": "{{count}} 72u-reservering(en) verlopen — gebruik « Verlengen » om de plaats te behouden."
     },
     "searchPlaceholder": "Zoeken (naam, e-mail…)",
     "filters": {
@@ -3302,7 +3351,8 @@
       "title": "Online registraties zijn uitgeschakeld",
       "body": "Er verschijnt geen knop “Registreren” op de openbare pagina. Schakel registraties in om aanvragen te ontvangen."
     },
-    "draftHint": "Inschrijvingen verschijnen hier nadat het kamp is gepubliceerd."
+    "draftHint": "Inschrijvingen verschijnen hier nadat het kamp is gepubliceerd.",
+    "docsSummary": "{{ok}}/{{total}} documenten"
   },
   "features": {
     "learnMore": "Meer informatie",
@@ -3440,7 +3490,9 @@
       "orPaste": "Of plak CSV-inhoud:",
       "append": "Toevoegen aan rooster",
       "replace": "Rooster vervangen",
-      "confirm": "Importeren"
+      "confirm": "Importeren",
+      "blocked": "Import geblokkeerd: {{total}} spelers overschrijden de limiet van {{max}}. Verklein het bestand of kies « Vervangen ».",
+      "ok": "{{n}} speler(s) geïmporteerd"
     },
     "logo": {
       "none": "Geen embleem",
@@ -3457,7 +3509,8 @@
     "empty": "Nog geen spelers. Klik op CSV toevoegen of importeren.",
     "captain": "Kapitein",
     "setCaptain": "Kapitein instellen",
-    "save": "Opslaan"
+    "save": "Opslaan",
+    "tooMany": "Selectie beperkt tot {{max}} spelers."
   },
   "finalStandings": {
     "title": "Eindstand",
@@ -3524,7 +3577,8 @@
     },
     "footerReady": "Alles is klaar",
     "create": "Kamp creëren",
-    "next": "Volgende"
+    "next": "Volgende",
+    "footerProgress": "Stap {{current}} van {{total}}"
   },
   "list": {
     "newTitle": "Nieuw kamp",
@@ -3653,7 +3707,9 @@
   "cockpit": {
     "alerts": {
       "heading": "Meldingen",
-      "finalsNotGenerated": "Finalefase niet gegenereerd — groepsfase is voltooid"
+      "finalsNotGenerated": "Finalefase niet gegenereerd — groepsfase is voltooid",
+      "missingReferee": "Scheidsrechter ontbreekt (start over {{minutes}} min)",
+      "title": "{{count}} ding om te regelen"
     },
     "next": "Volgende",
     "estimatedEnd": "Geschat einde"
@@ -3709,7 +3765,8 @@
       "clean": "Schone beugels",
       "customize": "Pas aan",
       "back": "Terug",
-      "save": "Bespaar vluchten"
+      "save": "Bespaar vluchten",
+      "distribution": "Verdeling ({{n}} teams)"
     },
     "rulesCount": "regels",
     "thirdPlace": "3e plaats",
@@ -3720,7 +3777,9 @@
     "public": {
       "empty": "Er is nog geen vlucht geconfigureerd voor dit toernooi.",
       "noMatches": "Wedstrijden voor deze vlucht worden na de groepsfase gegenereerd."
-    }
+    },
+    "draftRulesSummary": "{{n}} kwalificatieregel(s) geconfigureerd",
+    "generatedToast": "{{n}} wedstrijden aangemaakt"
   },
   "matches": {
     "allMatches": "Alle wedstrijden",
@@ -4469,7 +4528,17 @@
       "statusFailed": "Mislukt",
       "statusDlq": "DLQ",
       "statusBounced": "Gebounced",
-      "statusComplained": "Klacht"
+      "statusComplained": "Klacht",
+      "matchOn": "wedstrijd op {{date}}",
+      "template": "template",
+      "retryFailures_one": "Fout opnieuw proberen ({{count}})",
+      "retryFailures_other": "Fouten opnieuw proberen ({{count}})",
+      "autoRefreshInProgress": "Bezig — automatische vernieuwing elke 5 s",
+      "suppressedCount_one": "{{count}} onderdrukt",
+      "suppressedCount_other": "{{count}} onderdrukt",
+      "noRecipientsMatch": "Geen ontvanger komt overeen met de filters.",
+      "mismatch": "mismatch {{count}}",
+      "retry": "Opnieuw proberen"
     },
     "inviteBatches": {
       "eyebrow": "Invitations",
@@ -4609,6 +4678,131 @@
       "overwriteConfirmDesc": "Alle reeds ingevoerde categorieën voor het geselecteerde seizoen worden <strong>vervangen</strong> door de automatische FFF-berekening.",
       "overwriteConsequence": "Handmatige <strong>opwaarderingen</strong> (bijv. een U14 in U15) gaan verloren.",
       "overwriteConfirmAction": "Overschrijven en herberekenen"
+    },
+    "createTicket": {
+      "title": "Nieuw ticket namens een gebruiker",
+      "description": "Gebruikt om een verzoek te loggen dat telefonisch, per e-mail of persoonlijk is ontvangen.",
+      "user": "Gebruiker",
+      "changeUser": "Wijzigen",
+      "searchPlaceholder": "Zoeken op naam of telefoon…",
+      "searching": "Zoeken…",
+      "noResults": "Geen resultaten",
+      "subject": "Onderwerp",
+      "subjectPlaceholder": "Samenvatting van het verzoek",
+      "descriptionLabel": "Beschrijving",
+      "descriptionPlaceholder": "Wat de gebruiker heeft gemeld…",
+      "category": "Categorie",
+      "priority": "Prioriteit",
+      "channel": "Kanaal",
+      "notifyUser": "Gebruiker per e-mail informeren",
+      "cancel": "Annuleren",
+      "create": "Ticket maken"
+    },
+    "watchlist": {
+      "socialFailuresTitle": "Mislukte social syncs",
+      "socialFailuresEmpty": "Alle social verbindingen zijn OK.",
+      "lastAttempt": "laatste poging {{date}}",
+      "importFailuresTitle": "Mislukte of gedeeltelijke imports",
+      "importFailuresEmpty": "Geen mislukte imports.",
+      "importRows": "{{status}} — {{imported}}/{{total}} rijen · {{date}}",
+      "stalledOnboardingTitle": "Mogelijk geblokkeerde onboarding",
+      "stalledOnboardingHint": "Wrijvingssignalen — interpreteer ze, het zijn geen zekere fouten. Wordt op aanvraag geladen.",
+      "signals": {
+        "clubNoTeam": "Club zonder team",
+        "teamNoPlayer": "Team zonder speler",
+        "playersNoEvent": "Spelers maar geen event",
+        "eventNoConvocation": "Event zonder oproep",
+        "inviteNotAccepted": "Uitnodiging niet geaccepteerd"
+      },
+      "nothingToReport": "Niets te melden.",
+      "since": "sinds {{time}}",
+      "extraItems_one": "+ {{count}} andere",
+      "extraItems_other": "+ {{count}} andere"
+    },
+    "observability": {
+      "title": "Activiteit & gezondheid",
+      "recentErrors": "Recente fouten",
+      "recentErrorsEmpty": "Geen fouten geregistreerd.",
+      "errorCode": "code: {{code}}",
+      "byActor": "door {{actor}}",
+      "activeUsers": "Actieve gebruikers (30 d)",
+      "activeUsersEmpty": "Geen gebruikersactiviteit in de laatste 30 dagen.",
+      "lastActionAgo": "{{action}} · {{time}} geleden",
+      "featuresUsed": "Gebruikte functies (30 d)",
+      "featuresUsedEmpty": "Geen gemeten activiteit.",
+      "socialConnections": "Social verbindingen",
+      "socialConnectionsEmpty": "Geen social verbinding.",
+      "active": "actief",
+      "inactive": "inactief",
+      "syncedAt": "sync {{date}}",
+      "imports": "Imports",
+      "importsEmpty": "Geen import.",
+      "importRows": "{{imported}}/{{total}} rijen · {{date}}",
+      "invitations": "Uitnodigingen",
+      "invitationsEmpty": "Geen uitnodiging.",
+      "supportTickets": "Supporttickets",
+      "supportTicketsEmpty": "Geen supportticket.",
+      "fullActivityFeed": "Volledige activiteitenfeed"
+    },
+    "billingExemption": {
+      "actionGranted": "Vrijstelling toegekend",
+      "actionUpdated": "Vrijstelling gewijzigd",
+      "actionRevoked": "Vrijstelling ingetrokken",
+      "reasons": {
+        "betaClub": "Betaclub",
+        "partner": "Partner",
+        "internal": "Intern Clubero",
+        "other": "Overig"
+      },
+      "formats": {
+        "date": "d MMM yyyy",
+        "dateTime": "d MMM yyyy 'om' HH:mm",
+        "shortDateTime": "d MMM, HH:mm"
+      },
+      "title": "Factureringsvrijstelling",
+      "clubExempt": "Club vrijgesteld",
+      "noActiveExemption": "Geen actieve vrijstelling",
+      "exemptBadge": "Vrijgesteld",
+      "intro": "Geef deze club gratis toegang voor de betafase, een partnership of interne test. De club krijgt toegang tot alle functies zonder Stripe.",
+      "grant": "Vrijstelling toekennen",
+      "reason": "Reden",
+      "endDate": "Einddatum",
+      "noLimit": "Geen limiet",
+      "grantedAt": "Toegekend op",
+      "grantedBy": "Toegekend door",
+      "edit": "Vrijstelling bewerken",
+      "revoke": "Vrijstelling intrekken",
+      "auditTitle": "Vrijstellingsgeschiedenis",
+      "auditEmpty": "Geen actie geregistreerd.",
+      "byActor": "door {{actor}}",
+      "untilDate": "tot {{date}}",
+      "dialogDescription": "Deze club krijgt toegang tot alle functies zonder Stripe-abonnement.",
+      "reasonPlaceholder": "Selecteer een reden",
+      "endDateOptional": "Einddatum vrijstelling (optioneel)",
+      "clearDate": "Datum wissen",
+      "expiryHint": "Indien ingesteld verloopt de vrijstelling automatisch op deze datum.",
+      "summaryUntil": "<strong>{{clubName}}</strong> krijgt gratis toegang tot {{date}}.",
+      "summaryNoLimit": "<strong>{{clubName}}</strong> krijgt gratis toegang zonder tijdslimiet.",
+      "cancel": "Annuleren",
+      "save": "Opslaan",
+      "confirm": "Vrijstelling bevestigen",
+      "revokeTitle": "Vrijstelling intrekken?",
+      "revokeDescription": "De club <strong>{{clubName}}</strong> verliest gratis toegang. Als er geen actief Stripe-abonnement is, wordt de club bij de volgende login doorgestuurd naar de abonnementsflow."
+    },
+    "privacyRequests": {
+      "loading": "Privacyverzoeken laden…",
+      "confirmHardDelete": "HARDE verwijdering bevestigen? Deze actie is onomkeerbaar.",
+      "confirmAnonymize": "Dit account anonimiseren?",
+      "confirmRejectDeletion": "Dit verwijderverzoek afwijzen?",
+      "title": "Privacy / AVG ({{count}} in behandeling)",
+      "refresh": "Vernieuwen",
+      "empty": "Geen verzoek.",
+      "link": "Link",
+      "process": "Verwerken",
+      "deletions": "Accountverwijderingen ({{count}})",
+      "deadline": "deadline {{date}}",
+      "anonymize": "Anonimiseren",
+      "hardDelete": "Hard verwijderen"
     }
   },
   "supportView": {
@@ -4636,5 +4830,18 @@
     "bannerAs": "als {{name}} · {{club}} · {{persona}}",
     "userFallback": "gebruiker",
     "clubFallback": "club"
+  },
+  "coach": {
+    "unavailableTitle": "Profiel niet beschikbaar",
+    "unavailableBody": "Dit coachprofiel is privé of bestaat niet."
+  },
+  "languages": {
+    "fr": "Frans",
+    "en": "Engels",
+    "de": "Duits",
+    "es": "Spaans",
+    "it": "Italiaans",
+    "nl": "Nederlands",
+    "pt": "Portugees"
   }
 }

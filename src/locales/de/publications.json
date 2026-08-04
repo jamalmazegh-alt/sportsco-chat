@@ -171,7 +171,12 @@
     },
     "recipientsBreakdown": "({{players}} Spieler · {{users}} Nutzer)",
     "none": "0 Empfänger",
-    "previewError": "Vorschau nicht verfügbar"
+    "previewError": "Vorschau nicht verfügbar",
+    "groupsBlock": "Benutzerdefinierte Gruppen",
+    "groupsHint": "Übergreifende Gruppen aus der Club-Verwaltung",
+    "selectedTitle": "Ausgewählte Empfänger",
+    "teamsBlock": "Teams",
+    "teamsHint": "Spieler und/oder Eltern pro Team wählen"
   },
   "form": {
     "titleLabel": "Titel",

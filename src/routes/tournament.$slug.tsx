@@ -187,7 +187,7 @@ function PublicTournamentPage() {
       ? [
           {
             id: "flights" as Tab,
-            label: t("public.tabs.flights", { defaultValue: "Flights" }),
+            label: t("public.tabs.flights"),
             icon: Trophy,
           },
         ]
@@ -1212,9 +1212,7 @@ function PublishedRegistrationView({ slug, data }: { slug: string; data: any }) 
           </h2>
           <dl className="grid grid-cols-2 gap-3 text-sm">
             <div>
-              <dt className="text-xs text-muted-foreground">
-                {t("public.tabs.standings", { defaultValue: "Format" })}
-              </dt>
+              <dt className="text-xs text-muted-foreground">{t("public.tabs.standings")}</dt>
               <dd className="font-medium">
                 {t(
                   `wizard.format${tournament.format.charAt(0).toUpperCase()}${tournament.format.slice(1)}`,
@@ -1224,16 +1222,12 @@ function PublishedRegistrationView({ slug, data }: { slug: string; data: any }) 
             </div>
             {maxTeams != null && (
               <div>
-                <dt className="text-xs text-muted-foreground">
-                  {t("create.numTeams", { defaultValue: "Équipes max" })}
-                </dt>
+                <dt className="text-xs text-muted-foreground">{t("create.numTeams")}</dt>
                 <dd className="font-medium">{maxTeams}</dd>
               </div>
             )}
             <div>
-              <dt className="text-xs text-muted-foreground">
-                {t("common.match", { defaultValue: "Sport" })}
-              </dt>
+              <dt className="text-xs text-muted-foreground">{t("common.match")}</dt>
               <dd className="font-medium">{tournament.sport}</dd>
             </div>
             {tournament.location && googleMapsSearchUrl(tournament.location) && (
@@ -1271,7 +1265,7 @@ function PublishedRegistrationView({ slug, data }: { slug: string; data: any }) 
                 className="inline-flex items-center gap-2 rounded-lg border border-border bg-background px-4 py-2 text-sm font-medium hover:bg-muted transition"
               >
                 <FileDown className="h-4 w-4" />
-                {t("public.downloadRules", { defaultValue: "Télécharger le règlement (PDF)" })}
+                {t("public.downloadRules")}
               </a>
             )}
           </section>

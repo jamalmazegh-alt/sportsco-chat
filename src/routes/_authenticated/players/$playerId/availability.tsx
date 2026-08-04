@@ -113,8 +113,7 @@ function AvailabilityPage() {
   });
 
   async function cancel(row: Row) {
-    if (!confirm(t("availability.confirmCancel", { defaultValue: "Annuler cette absence ?" })))
-      return;
+    if (!confirm(t("availability.confirmCancel"))) return;
     const { error } = await supabase
       .from("player_availabilities")
       .update({ status: "cancelled" })
@@ -123,7 +122,7 @@ function AvailabilityPage() {
       toast.error(error.message);
       return;
     }
-    toast.success(t("availability.cancelled", { defaultValue: "Absence annulée" }));
+    toast.success(t("availability.cancelled"));
     qc.invalidateQueries({ queryKey: ["player-availabilities", playerId] });
     qc.invalidateQueries({ queryKey: ["upcoming-absences"] });
     qc.invalidateQueries({ queryKey: ["event-absences"] });
@@ -155,26 +154,22 @@ function AvailabilityPage() {
     <div className="space-y-4">
       <BackLink to="/players/$playerId" params={{ playerId }} />
       <div className="flex items-center justify-between gap-2">
-        <h1 className="text-lg font-semibold">
-          {t("availability.title", { defaultValue: "Disponibilités" })}
-        </h1>
+        <h1 className="text-lg font-semibold">{t("availability.title")}</h1>
         {canDeclare && (
           <Button size="sm" onClick={() => setOpen(true)}>
             <Plus className="h-4 w-4" />
-            {t("availability.declare", { defaultValue: "Déclarer une absence" })}
+            {t("availability.declare")}
           </Button>
         )}
       </div>
 
       {/* Consolidated view */}
       <section className="rounded-2xl border border-border bg-card p-4 space-y-2">
-        <h2 className="text-sm font-semibold">
-          {t("availability.consolidated", { defaultValue: "Disponibilité actuelle" })}
-        </h2>
+        <h2 className="text-sm font-semibold">{t("availability.consolidated")}</h2>
         {activeAbsences.length === 0 && activeSusp.length === 0 ? (
           <p className="text-sm text-emerald-600 inline-flex items-center gap-1">
             <CheckCircle2 className="h-4 w-4" />
-            {t("availability.allAvailable", { defaultValue: "Aucune indisponibilité déclarée" })}
+            {t("availability.allAvailable")}
           </p>
         ) : (
           <ul className="space-y-2">
@@ -205,18 +200,14 @@ function AvailabilityPage() {
       {/* History */}
       <section className="rounded-2xl border border-border bg-card overflow-hidden">
         <div className="px-4 py-3 border-b border-border">
-          <h2 className="text-sm font-semibold">
-            {t("availability.history", { defaultValue: "Historique" })}
-          </h2>
+          <h2 className="text-sm font-semibold">{t("availability.history")}</h2>
         </div>
         {isLoading ? (
           <div className="p-6 flex justify-center">
             <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
           </div>
         ) : rows.length === 0 ? (
-          <p className="p-6 text-sm text-muted-foreground text-center">
-            {t("availability.empty", { defaultValue: "Aucune absence enregistrée." })}
-          </p>
+          <p className="p-6 text-sm text-muted-foreground text-center">{t("availability.empty")}</p>
         ) : (
           <ul className="divide-y divide-border">
             {rows.map((r) => {
@@ -249,7 +240,7 @@ function AvailabilityPage() {
                   </div>
                   {canCancel && (
                     <Button size="sm" variant="ghost" onClick={() => cancel(r)}>
-                      {t("availability.cancel", { defaultValue: "Annuler" })}
+                      {t("availability.cancel")}
                     </Button>
                   )}
                 </li>

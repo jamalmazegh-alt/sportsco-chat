@@ -125,7 +125,7 @@ export function autoTitle(
     case "meeting":
       return `${t("events.types.meeting")} ${name}`.trim();
     default:
-      return name || t("events.types.other", { defaultValue: "Événement" });
+      return name || t("events.types.other");
   }
 }
 

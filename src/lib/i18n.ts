@@ -73,6 +73,14 @@ import ptPublications from "@/locales/pt/publications.json";
 import itPublications from "@/locales/it/publications.json";
 import nlPublications from "@/locales/nl/publications.json";
 
+import enMeetings from "@/locales/en/meetings.json";
+import frMeetings from "@/locales/fr/meetings.json";
+import deMeetings from "@/locales/de/meetings.json";
+import esMeetings from "@/locales/es/meetings.json";
+import ptMeetings from "@/locales/pt/meetings.json";
+import itMeetings from "@/locales/it/meetings.json";
+import nlMeetings from "@/locales/nl/meetings.json";
+
 export const SUPPORTED_LANGS = ["en", "fr", "de", "es", "pt", "it", "nl"] as const;
 export type SupportedLang = (typeof SUPPORTED_LANGS)[number];
 
@@ -116,6 +124,7 @@ if (!i18n.isInitialized) {
         camps: enCamps,
         needs: enNeeds,
         publications: enPublications,
+        meetings: enMeetings,
       },
       fr: {
         common: frCommon,
@@ -127,6 +136,7 @@ if (!i18n.isInitialized) {
         camps: frCamps,
         needs: frNeeds,
         publications: frPublications,
+        meetings: frMeetings,
       },
       de: {
         common: deCommon,
@@ -138,6 +148,7 @@ if (!i18n.isInitialized) {
         camps: deCamps,
         needs: deNeeds,
         publications: dePublications,
+        meetings: deMeetings,
       },
       es: {
         common: esCommon,
@@ -149,6 +160,7 @@ if (!i18n.isInitialized) {
         camps: esCamps,
         needs: esNeeds,
         publications: esPublications,
+        meetings: esMeetings,
       },
       pt: {
         common: ptCommon,
@@ -160,6 +172,7 @@ if (!i18n.isInitialized) {
         camps: ptCamps,
         needs: ptNeeds,
         publications: ptPublications,
+        meetings: ptMeetings,
       },
       it: {
         common: itCommon,
@@ -171,6 +184,7 @@ if (!i18n.isInitialized) {
         camps: itCamps,
         needs: itNeeds,
         publications: itPublications,
+        meetings: itMeetings,
       },
       nl: {
         common: nlCommon,
@@ -182,6 +196,7 @@ if (!i18n.isInitialized) {
         camps: nlCamps,
         needs: nlNeeds,
         publications: nlPublications,
+        meetings: nlMeetings,
       },
     },
     lng: initialLang,
@@ -198,6 +213,7 @@ if (!i18n.isInitialized) {
       "camps",
       "needs",
       "publications",
+      "meetings",
     ],
     interpolation: { escapeValue: false },
     react: { useSuspense: false },

@@ -148,10 +148,9 @@ export function useNeedUrgencies(): UrgencyCollectorResult & { isPending: boolea
           remaining > 1
             ? ` · ${t("needs:urgency.seatsRemaining", {
                 count: remaining,
-                defaultValue: "{{count}} places",
               })}`
             : "",
-        fallbackTitle: t("needs:urgency.fallbackTitle", { defaultValue: "Coup de main" }),
+        fallbackTitle: t("needs:urgency.fallbackTitle"),
       });
     },
   });

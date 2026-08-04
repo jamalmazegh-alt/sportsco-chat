@@ -193,32 +193,36 @@ function PaymentsDashboardPage() {
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
             <KpiCard
               icon={<Wallet className="h-5 w-5" />}
-              label="Encaissé"
+              label={t("fundraising.kpiCollected")}
               value={fmtCents(data.kpis.totalCollectedCents, currency)}
-              sub={`${data.kpis.transactionsCount} transactions`}
+              sub={t("fundraising.kpiTxCount", { count: data.kpis.transactionsCount })}
             />
             <KpiCard
               icon={<Receipt className="h-5 w-5" />}
-              label="Net (frais déduits)"
+              label={t("fundraising.kpiNet")}
               value={fmtCents(data.kpis.totalNetCents, currency)}
-              sub={`Frais : ${fmtCents(data.kpis.totalFeesCents, currency)}`}
+              sub={t("fundraising.kpiFees", {
+                amount: fmtCents(data.kpis.totalFeesCents, currency),
+              })}
             />
             <KpiCard
               icon={<Users className="h-5 w-5" />}
-              label="Dû total"
+              label={t("fundraising.kpiDue")}
               value={fmtCents(data.kpis.totalDueCents, currency)}
-              sub={`${data.kpis.obligationsCount} obligations`}
+              sub={t("fundraising.kpiObligations", { count: data.kpis.obligationsCount })}
             />
             <KpiCard
               icon={<TrendingUp className="h-5 w-5" />}
-              label="Taux d'encaissement"
+              label={t("fundraising.kpiRate")}
               value={`${(data.kpis.rate * 100).toFixed(1)} %`}
               sub={
                 data.kpis.totalDueCents > 0
-                  ? `Reste ${fmtCents(
-                      Math.max(0, data.kpis.totalDueCents - data.kpis.totalCollectedCents),
-                      currency,
-                    )}`
+                  ? t("fundraising.kpiRemaining", {
+                      amount: fmtCents(
+                        Math.max(0, data.kpis.totalDueCents - data.kpis.totalCollectedCents),
+                        currency,
+                      ),
+                    })
                   : "—"
               }
             />
@@ -239,7 +243,7 @@ function PaymentsDashboardPage() {
               <TabsTrigger value="items">{t("fundraising.byItem")}</TabsTrigger>
               <TabsTrigger value="methods">{t("fundraising.byMethod")}</TabsTrigger>
               <TabsTrigger value="monthly">{t("fundraising.byMonth")}</TabsTrigger>
-              <TabsTrigger value="tx">Transactions</TabsTrigger>
+              <TabsTrigger value="tx">{t("fundraising.tabTransactions")}</TabsTrigger>
             </TabsList>
 
             <TabsContent value="items" className="space-y-2 mt-4">
@@ -253,8 +257,12 @@ function PaymentsDashboardPage() {
                         <div className="min-w-0">
                           <p className="font-medium truncate">{it.title}</p>
                           <p className="text-xs text-muted-foreground">
-                            {it.total_count} ciblés • {it.paid_count} payés • {it.partial_count}{" "}
-                            partiels • {it.pending_count} en attente
+                            {t("fundraising.itemRollupLine", {
+                              total: it.total_count,
+                              paid: it.paid_count,
+                              partial: it.partial_count,
+                              pending: it.pending_count,
+                            })}
                           </p>
                         </div>
                         <div className="text-right shrink-0">
@@ -286,19 +294,21 @@ function PaymentsDashboardPage() {
 
             <TabsContent value="methods" className="space-y-2 mt-4">
               {Object.entries(data.byMethod).length === 0 ? (
-                <p className="text-sm text-muted-foreground">Aucun encaissement.</p>
+                <p className="text-sm text-muted-foreground">{t("fundraising.emptyMethods")}</p>
               ) : (
                 Object.entries(data.byMethod).map(([m, v]) => (
                   <Card key={m}>
                     <CardContent className="p-4 flex items-center justify-between">
                       <div>
                         <p className="font-medium">{methodLabel(m)}</p>
-                        <p className="text-xs text-muted-foreground">{v.count} transactions</p>
+                        <p className="text-xs text-muted-foreground">
+                          {t("fundraising.kpiTxCount", { count: v.count })}
+                        </p>
                       </div>
                       <div className="text-right">
                         <p className="text-sm font-semibold">{fmtCents(v.gross, currency)}</p>
                         <p className="text-xs text-muted-foreground">
-                          Net : {fmtCents(v.net, currency)}
+                          {t("fundraising.netLabel", { amount: fmtCents(v.net, currency) })}
                         </p>
                       </div>
                     </CardContent>
@@ -309,7 +319,7 @@ function PaymentsDashboardPage() {
 
             <TabsContent value="monthly" className="mt-4">
               {data.monthly.length === 0 ? (
-                <p className="text-sm text-muted-foreground">Aucune donnée.</p>
+                <p className="text-sm text-muted-foreground">{t("fundraising.emptyMonthly")}</p>
               ) : (
                 <Card>
                   <CardContent className="p-4 space-y-2">

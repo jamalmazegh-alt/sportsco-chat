@@ -115,12 +115,7 @@ export function MeetingAttendeesSection({
   const resendFn = useServerFn(resendMeetingConvocation);
   const resendOne = useMutation({
     mutationFn: (userId: string) => resendFn({ data: { event_id: eventId, user_ids: [userId] } }),
-    onSuccess: () =>
-      toast.success(
-        t("meetings:row.resend.success", {
-          defaultValue: "Convocation renvoyée",
-        }),
-      ),
+    onSuccess: () => toast.success(t("meetings:row.resend.success")),
     onError: (e: Error) => toast.error(e.message),
   });
 
@@ -129,11 +124,7 @@ export function MeetingAttendeesSection({
   const removeOne = useMutation({
     mutationFn: (userId: string) => removeFn({ data: { event_id: eventId, user_ids: [userId] } }),
     onSuccess: () => {
-      toast.success(
-        t("meetings:row.remove.success", {
-          defaultValue: "Convocation annulée",
-        }),
-      );
+      toast.success(t("meetings:row.remove.success"));
       setRemoveTarget(null);
       refresh();
     },
@@ -165,7 +156,7 @@ export function MeetingAttendeesSection({
               <div className="min-w-0 flex items-center gap-2">
                 <Users className="h-4 w-4 shrink-0 text-muted-foreground" />
                 <h2 className="text-base font-extrabold tracking-tight text-foreground">
-                  {t("meetings:section.title", { defaultValue: "Convocations réunion" })}
+                  {t("meetings:section.title")}
                 </h2>
               </div>
               {isStaff && (
@@ -188,11 +179,10 @@ export function MeetingAttendeesSection({
                 <div className="min-w-0 flex items-center gap-2 flex-wrap">
                   <Users className="h-4 w-4 shrink-0" />
                   <h2 className="text-sm font-extrabold tracking-tight">
-                    {t("meetings:section.title", { defaultValue: "Convocations réunion" })}
+                    {t("meetings:section.title")}
                   </h2>
                   <span className="inline-flex items-center rounded-full bg-white/15 ring-1 ring-white/25 px-2 py-0.5 text-[10px] font-semibold tracking-wide backdrop-blur-sm">
                     {t("meetings:section.count", {
-                      defaultValue: "{{count}} convoqué(s)",
                       count: total,
                     })}
                   </span>
@@ -216,16 +206,14 @@ export function MeetingAttendeesSection({
                     <span className="text-lg font-bold text-white/80">%</span>
                   </div>
                   <p className="text-[9px] uppercase tracking-[0.16em] text-white/70 font-bold mt-1">
-                    {t("attendance.responseRate", { defaultValue: "Taux de réponse" })}
+                    {t("attendance.responseRate")}
                   </p>
                 </div>
                 <div className="text-right leading-tight">
                   <p className="text-xs font-bold tabular-nums">
                     {respondedP}
                     <span className="text-white/65 font-medium">/{totalP}</span>{" "}
-                    <span className="text-white/85 font-semibold">
-                      {t("attendance.responded", { defaultValue: "réponses" })}
-                    </span>
+                    <span className="text-white/85 font-semibold">{t("attendance.responded")}</span>
                   </p>
                 </div>
               </div>
@@ -303,28 +291,19 @@ export function MeetingAttendeesSection({
         {listQuery.isLoading && (
           <div className="flex items-center gap-2 text-sm text-muted-foreground">
             <Loader2 className="h-4 w-4 animate-spin" />
-            {t("common.loading", { defaultValue: "Chargement…" })}
+            {t("common.loading")}
           </div>
         )}
 
         {!listQuery.isLoading && total === 0 && (
           <p className="text-sm text-muted-foreground">
-            {isStaff
-              ? t("meetings:empty.staff", {
-                  defaultValue:
-                    "Aucun convoqué — utilisez « Gérer les convoqués » pour inviter des groupes ou des personnes.",
-                })
-              : t("meetings:empty.member", {
-                  defaultValue: "Vous n'êtes pas convoqué à cette réunion.",
-                })}
+            {isStaff ? t("meetings:empty.staff") : t("meetings:empty.member")}
           </p>
         )}
 
         {!isStaff && data?.my_attendance && (
           <div className="flex items-center justify-between gap-2 rounded-2xl border border-border/70 bg-muted/30 p-3">
-            <span className="text-sm font-medium">
-              {t("meetings:self.prompt", { defaultValue: "Votre présence :" })}
-            </span>
+            <span className="text-sm font-medium">{t("meetings:self.prompt")}</span>
             <StatusButtons
               value={data.my_attendance.status as AttendanceStatus}
               onChange={(status) =>
@@ -341,8 +320,8 @@ export function MeetingAttendeesSection({
         {isStaff && attendees.length > 0 && (
           <>
             <div className="flex items-center justify-between text-[10px] font-bold uppercase tracking-[0.14em] text-muted-foreground px-1">
-              <span>{t("attendance.convokedHeader", { defaultValue: "Convoqués" })}</span>
-              <span>{t("attendance.responseHeader", { defaultValue: "Réponse" })}</span>
+              <span>{t("attendance.convokedHeader")}</span>
+              <span>{t("attendance.responseHeader")}</span>
             </div>
             <ul className="divide-y divide-border/70">
               {attendees.map((a) => {
@@ -355,7 +334,7 @@ export function MeetingAttendeesSection({
                     </Avatar>
                     <div className="min-w-0 flex-1">
                       <div className="truncate text-sm font-semibold">
-                        {a.full_name ?? t("common.unknown", { defaultValue: "Inconnu" })}
+                        {a.full_name ?? t("common.unknown")}
                       </div>
                       <div className="mt-0.5 flex flex-wrap items-center gap-1 text-xs text-muted-foreground">
                         {chips.map((chip) => (
@@ -364,11 +343,7 @@ export function MeetingAttendeesSection({
                             variant="outline"
                             className="text-[10px] font-normal"
                           >
-                            {chip.kind === "manual"
-                              ? t("meetings:source.manual", {
-                                  defaultValue: "ajouté manuellement",
-                                })
-                              : chip.label}
+                            {chip.kind === "manual" ? t("meetings:source.manual") : chip.label}
                           </Badge>
                         ))}
                       </div>
@@ -384,9 +359,7 @@ export function MeetingAttendeesSection({
                           size="icon"
                           variant="ghost"
                           className="h-8 w-8 shrink-0"
-                          aria-label={t("meetings:row.actions", {
-                            defaultValue: "Actions",
-                          })}
+                          aria-label={t("meetings:row.actions")}
                         >
                           <MoreVertical className="h-4 w-4" />
                         </Button>
@@ -397,18 +370,14 @@ export function MeetingAttendeesSection({
                           disabled={resendOne.isPending}
                         >
                           <Send className="mr-2 h-4 w-4" />
-                          {t("meetings:row.resend.cta", {
-                            defaultValue: "Relancer la convocation",
-                          })}
+                          {t("meetings:row.resend.cta")}
                         </DropdownMenuItem>
                         <DropdownMenuItem
                           className="text-destructive focus:text-destructive"
                           onClick={() => setRemoveTarget(a)}
                         >
                           <UserMinus className="mr-2 h-4 w-4" />
-                          {t("meetings:row.remove.cta", {
-                            defaultValue: "Annuler la convocation",
-                          })}
+                          {t("meetings:row.remove.cta")}
                         </DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>
@@ -426,22 +395,16 @@ export function MeetingAttendeesSection({
       >
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>
-              {t("meetings:row.remove.confirmTitle", {
-                defaultValue: "Annuler la convocation ?",
-              })}
-            </AlertDialogTitle>
+            <AlertDialogTitle>{t("meetings:row.remove.confirmTitle")}</AlertDialogTitle>
             <AlertDialogDescription>
               {t("meetings:row.remove.confirmDesc", {
-                defaultValue:
-                  "{{name}} sera retiré(e) de la réunion et recevra une notification de retrait.",
-                name: removeTarget?.full_name ?? t("common.unknown", { defaultValue: "Inconnu" }),
+                name: removeTarget?.full_name ?? t("common.unknown"),
               })}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel disabled={removeOne.isPending}>
-              {t("common.cancel", { defaultValue: "Annuler" })}
+              {t("common.cancel")}
             </AlertDialogCancel>
             <AlertDialogAction
               disabled={removeOne.isPending}
@@ -451,9 +414,7 @@ export function MeetingAttendeesSection({
               }}
             >
               {removeOne.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              {t("meetings:row.remove.confirmCta", {
-                defaultValue: "Retirer",
-              })}
+              {t("meetings:row.remove.confirmCta")}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
@@ -513,20 +474,13 @@ function ManageAttendeesDialog({
       <DialogTrigger asChild>
         <Button size="sm" variant="outline">
           <UserPlus className="mr-2 h-4 w-4" />
-          {t("meetings:manage.cta", { defaultValue: "Gérer les convoqués" })}
+          {t("meetings:manage.cta")}
         </Button>
       </DialogTrigger>
       <DialogContent className="max-h-[85vh] max-w-2xl overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>
-            {t("meetings:manage.title", { defaultValue: "Qui convoquer ?" })}
-          </DialogTitle>
-          <DialogDescription>
-            {t("meetings:manage.desc", {
-              defaultValue:
-                "Sélectionnez des groupes, des équipes ou des personnes. Chaque personne n'est convoquée qu'une fois.",
-            })}
-          </DialogDescription>
+          <DialogTitle>{t("meetings:manage.title")}</DialogTitle>
+          <DialogDescription>{t("meetings:manage.desc")}</DialogDescription>
         </DialogHeader>
 
         {open && (
@@ -598,7 +552,6 @@ function AttendeesEditor({
       qc.invalidateQueries({ queryKey: ["meeting-attendees", eventId] });
       toast.success(
         t("meetings:sync.success", {
-          defaultValue: "{{added}} ajouté(s), {{removed}} retiré(s)",
           added: r.added_count,
           removed: r.removed_count,
         }),
@@ -622,7 +575,7 @@ function AttendeesEditor({
       {ctxQuery.isLoading ? (
         <div className="flex items-center gap-2 text-sm text-muted-foreground">
           <Loader2 className="h-4 w-4 animate-spin" />
-          {t("common.loading", { defaultValue: "Chargement…" })}
+          {t("common.loading")}
         </div>
       ) : (
         <AudiencePickerBody
@@ -639,13 +592,11 @@ function AttendeesEditor({
 
       <DialogFooter>
         <Button variant="outline" onClick={onClose} disabled={sync.isPending}>
-          {t("common.cancel", { defaultValue: "Annuler" })}
+          {t("common.cancel")}
         </Button>
         <Button onClick={() => sync.mutate([])} disabled={!hasSelection || sync.isPending}>
           {sync.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-          {hasExistingAttendees
-            ? t("meetings:manage.save", { defaultValue: "Enregistrer" })
-            : t("meetings:manage.confirm", { defaultValue: "Convoquer" })}
+          {hasExistingAttendees ? t("meetings:manage.save") : t("meetings:manage.confirm")}
         </Button>
       </DialogFooter>
 
@@ -657,25 +608,14 @@ function AttendeesEditor({
       >
         <DialogContent className="max-w-lg">
           <DialogHeader>
-            <DialogTitle>
-              {t("meetings:confirmRemove.title", {
-                defaultValue: "Retirer des personnes ayant déjà répondu ?",
-              })}
-            </DialogTitle>
-            <DialogDescription>
-              {t("meetings:confirmRemove.desc", {
-                defaultValue:
-                  "Ces personnes ont déjà répondu ou été pointées. Les retirer supprimera aussi leur réponse et leur présence enregistrées. Elles restent convoquées tant que vous ne confirmez pas.",
-              })}
-            </DialogDescription>
+            <DialogTitle>{t("meetings:confirmRemove.title")}</DialogTitle>
+            <DialogDescription>{t("meetings:confirmRemove.desc")}</DialogDescription>
           </DialogHeader>
 
           <ul className="divide-y">
             {pendingConfirm.map((p) => (
               <li key={p.user_id} className="flex items-center justify-between gap-2 py-2">
-                <span className="text-sm">
-                  {p.full_name ?? t("common.unknown", { defaultValue: "Inconnu" })}
-                </span>
+                <span className="text-sm">{p.full_name ?? t("common.unknown")}</span>
                 {p.status && <AttendancePill status={p.status as AttendanceStatus} />}
               </li>
             ))}
@@ -687,7 +627,7 @@ function AttendeesEditor({
               onClick={() => setPendingConfirm([])}
               disabled={sync.isPending}
             >
-              {t("meetings:confirmRemove.keep", { defaultValue: "Les conserver" })}
+              {t("meetings:confirmRemove.keep")}
             </Button>
             <Button
               variant="destructive"
@@ -695,7 +635,7 @@ function AttendeesEditor({
               disabled={sync.isPending}
             >
               {sync.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              {t("meetings:confirmRemove.confirm", { defaultValue: "Retirer quand même" })}
+              {t("meetings:confirmRemove.confirm")}
             </Button>
           </DialogFooter>
         </DialogContent>

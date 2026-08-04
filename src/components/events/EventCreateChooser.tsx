@@ -105,33 +105,21 @@ export function EventCreateChooser({ teams, userId, open, onOpenChange, onSaved 
           {mode === "chooser" && (
             <>
               <DialogHeader>
-                <DialogTitle>
-                  {t("eventCreateChooser.title", { defaultValue: "Nouvel événement" })}
-                </DialogTitle>
-                <DialogDescription>
-                  {t("eventCreateChooser.subtitle", {
-                    defaultValue: "Comment veux-tu créer cet événement ?",
-                  })}
-                </DialogDescription>
+                <DialogTitle>{t("eventCreateChooser.title")}</DialogTitle>
+                <DialogDescription>{t("eventCreateChooser.subtitle")}</DialogDescription>
               </DialogHeader>
               <div className="grid gap-2 pt-2">
                 <DoorButton
                   icon={<Sparkles className="h-5 w-5" />}
-                  title={t("eventCreateChooser.assistant", {
-                    defaultValue: "Créer avec l'assistant",
-                  })}
-                  hint={t("eventCreateChooser.assistantHint", {
-                    defaultValue: "Guidé, question par question",
-                  })}
+                  title={t("eventCreateChooser.assistant")}
+                  hint={t("eventCreateChooser.assistantHint")}
                   primary
                   onClick={startWizard}
                 />
                 <DoorButton
                   icon={<Settings2 className="h-5 w-5" />}
-                  title={t("eventCreateChooser.classic", { defaultValue: "Création classique" })}
-                  hint={t("eventCreateChooser.classicHint", {
-                    defaultValue: "Le formulaire complet",
-                  })}
+                  title={t("eventCreateChooser.classic")}
+                  hint={t("eventCreateChooser.classicHint")}
                   onClick={openExpertEmpty}
                 />
               </div>
@@ -141,14 +129,8 @@ export function EventCreateChooser({ teams, userId, open, onOpenChange, onSaved 
           {mode === "wizard" && (
             <>
               <DialogHeader className="sr-only">
-                <DialogTitle>
-                  {t("eventWizard.title", { defaultValue: "Nouvel événement" })}
-                </DialogTitle>
-                <DialogDescription>
-                  {t("eventCreateChooser.assistantHint", {
-                    defaultValue: "Guidé, question par question",
-                  })}
-                </DialogDescription>
+                <DialogTitle>{t("eventWizard.title")}</DialogTitle>
+                <DialogDescription>{t("eventCreateChooser.assistantHint")}</DialogDescription>
               </DialogHeader>
               <EventWizard
                 teams={teams}
@@ -191,7 +173,7 @@ export function EventCreateChooser({ teams, userId, open, onOpenChange, onSaved 
               }
             : undefined
         }
-        backLabel={t("eventWizard.backToAssistant", { defaultValue: "Retour à l'assistant" })}
+        backLabel={t("eventWizard.backToAssistant")}
         onSaved={() => {
           clearDraft();
           onSaved();
@@ -211,23 +193,17 @@ export function EventCreateChooser({ teams, userId, open, onOpenChange, onSaved 
       >
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>
-              {t("eventWizard.confirmCloseTitle", { defaultValue: "Quitter sans enregistrer ?" })}
-            </AlertDialogTitle>
+            <AlertDialogTitle>{t("eventWizard.confirmCloseTitle")}</AlertDialogTitle>
             <AlertDialogDescription>
               {confirmCloseOpen === "expert"
-                ? t("eventWizard.expertAbandonConfirm", {
-                    defaultValue: "Tes modifications seront perdues.",
-                  })
-                : t("eventWizard.abandonConfirm", {
-                    defaultValue: "Tes réponses seront conservées comme brouillon.",
-                  })}
+                ? t("eventWizard.expertAbandonConfirm")
+                : t("eventWizard.abandonConfirm")}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>{t("common.cancel", { defaultValue: "Annuler" })}</AlertDialogCancel>
+            <AlertDialogCancel>{t("common.cancel")}</AlertDialogCancel>
             <AlertDialogAction onClick={() => reallyClose(confirmCloseOpen === "expert")}>
-              {t("common.confirm", { defaultValue: "Confirmer" })}
+              {t("common.confirm")}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

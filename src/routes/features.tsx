@@ -370,12 +370,12 @@ function ModuleBlock({
               href={deepDive.anchor}
               className={`inline-flex shrink-0 items-center gap-1.5 rounded-full border border-border bg-background/60 px-3.5 py-1.5 text-xs font-semibold text-foreground/80 transition hover:-translate-y-0.5 hover:shadow-sm ${cls.ring}`}
             >
-              {t("features.learnMore", { defaultValue: "En savoir plus" })}
+              {t("features.learnMore")}
               <ArrowRight className={`h-3.5 w-3.5 ${cls.icon}`} />
             </a>
           ) : (
             <span className="hidden shrink-0 text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground sm:inline">
-              {items.length} {t("features.modulesCount", { defaultValue: "fonctionnalités" })}
+              {items.length} {t("features.modulesCount")}
             </span>
           )}
         </div>
@@ -423,7 +423,7 @@ function ModuleBlock({
                 {isHero && (
                   <div className="mt-4 flex items-center gap-1.5 text-xs font-semibold text-foreground/70">
                     <CheckCircle2 className={`h-3.5 w-3.5 ${cls.icon}`} />
-                    {t("features.includedV1", { defaultValue: "Inclus dès la V1" })}
+                    {t("features.includedV1")}
                   </div>
                 )}
               </div>

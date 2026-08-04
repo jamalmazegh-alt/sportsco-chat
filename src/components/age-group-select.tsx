@@ -43,32 +43,26 @@ export function AgeGroupSelect({
       onValueChange={(v) => onValueChange(v === "__none__" ? "" : v)}
     >
       <SelectTrigger data-testid="age-group-select">
-        <SelectValue
-          placeholder={placeholder ?? t("teams.selectAgeGroup", { defaultValue: "Catégorie" })}
-        />
+        <SelectValue placeholder={placeholder ?? t("teams.selectAgeGroup")} />
       </SelectTrigger>
       <SelectContent className="max-h-72">
         {allowEmpty && (
           <>
-            <SelectItem value="__none__">
-              {t("teams.ageGroupNone", { defaultValue: "Non renseignée" })}
-            </SelectItem>
+            <SelectItem value="__none__">{t("teams.ageGroupNone")}</SelectItem>
             <SelectSeparator />
           </>
         )}
         {legacy && (
           <>
             <SelectGroup>
-              <SelectLabel>
-                {t("teams.ageGroupLegacy", { defaultValue: "Valeur actuelle" })}
-              </SelectLabel>
+              <SelectLabel>{t("teams.ageGroupLegacy")}</SelectLabel>
               <SelectItem value={legacy}>{legacy}</SelectItem>
             </SelectGroup>
             <SelectSeparator />
           </>
         )}
         <SelectGroup>
-          <SelectLabel>{t("teams.ageGroupYouth", { defaultValue: "Jeunes" })}</SelectLabel>
+          <SelectLabel>{t("teams.ageGroupYouth")}</SelectLabel>
           {YOUTH_AGE_CATEGORIES.map((c) => (
             <SelectItem key={c.code} value={c.code}>
               {c.code}
@@ -77,7 +71,7 @@ export function AgeGroupSelect({
         </SelectGroup>
         <SelectSeparator />
         <SelectGroup>
-          <SelectLabel>{t("teams.ageGroupAdult", { defaultValue: "Adultes" })}</SelectLabel>
+          <SelectLabel>{t("teams.ageGroupAdult")}</SelectLabel>
           {ADULT_AGE_CATEGORIES.map((c) => (
             <SelectItem key={c.code} value={c.code}>
               {c.code}

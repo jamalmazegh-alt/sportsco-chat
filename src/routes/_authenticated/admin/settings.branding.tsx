@@ -75,13 +75,13 @@ function BrandingSettingsPage() {
       storeTheme(key);
       qc.invalidateQueries({ queryKey: ["club-theme", activeClubId] });
       qc.invalidateQueries({ queryKey: ["club-branding", activeClubId] });
-      toast.success(t("admin.branding.saved", { defaultValue: "Couleur du club mise à jour" }));
+      toast.success(t("admin.branding.saved"));
     },
     onError: () => {
       // revert preview
       applyClubTheme(initial);
       setSelected(initial);
-      toast.error(t("admin.branding.saveError", { defaultValue: "Impossible de sauvegarder" }));
+      toast.error(t("admin.branding.saveError"));
     },
   });
 
@@ -100,11 +100,8 @@ function BrandingSettingsPage() {
   return (
     <div className="px-5 py-4 space-y-6">
       <SettingsSubHeader
-        title={t("admin.branding.title", { defaultValue: "Identité visuelle" })}
-        description={t("admin.branding.subtitle", {
-          defaultValue:
-            "Choisis la couleur principale de l'app. Elle s'applique partout, y compris la page de connexion.",
-        })}
+        title={t("admin.branding.title")}
+        description={t("admin.branding.subtitle")}
       />
 
       {/* Preview card */}
@@ -114,18 +111,14 @@ function BrandingSettingsPage() {
             <Palette className="h-5 w-5" />
           </div>
           <div>
-            <p className="text-sm font-semibold">
-              {t("admin.branding.previewTitle", { defaultValue: "Aperçu" })}
-            </p>
+            <p className="text-sm font-semibold">{t("admin.branding.previewTitle")}</p>
             <p className="text-xs text-muted-foreground">{CLUB_THEMES[selected].label}</p>
           </div>
         </div>
         <div className="flex flex-wrap items-center gap-2">
-          <Button size="sm">
-            {t("admin.branding.previewPrimary", { defaultValue: "Bouton principal" })}
-          </Button>
+          <Button size="sm">{t("admin.branding.previewPrimary")}</Button>
           <Button size="sm" variant="outline">
-            {t("admin.branding.previewSecondary", { defaultValue: "Secondaire" })}
+            {t("admin.branding.previewSecondary")}
           </Button>
           <span className="text-xs font-medium text-primary px-2 py-1 rounded-md bg-primary/10">
             Accent
@@ -181,7 +174,7 @@ function BrandingSettingsPage() {
             }}
             disabled={saveMutation.isPending}
           >
-            {t("common.cancel", { defaultValue: "Annuler" })}
+            {t("common.cancel")}
           </Button>
         )}
         <Button
@@ -190,7 +183,7 @@ function BrandingSettingsPage() {
           onClick={() => saveMutation.mutate(selected)}
         >
           {saveMutation.isPending && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
-          {t("common.save", { defaultValue: "Enregistrer" })}
+          {t("common.save")}
         </Button>
       </div>
     </div>

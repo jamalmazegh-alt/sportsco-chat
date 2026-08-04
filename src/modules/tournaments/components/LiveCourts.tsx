@@ -75,9 +75,9 @@ export function LiveCourts({
         matches={withField}
         teamMap={teamMap}
         onSelect={onSelect}
-        heading={t("controlCenter.byCourts", { defaultValue: "Par terrain" })}
-        liveLabel={t("controlCenter.liveBadge", { defaultValue: "LIVE" })}
-        nextLabel={t("cockpit.next", { defaultValue: "Prochain" })}
+        heading={t("controlCenter.byCourts")}
+        liveLabel={t("controlCenter.liveBadge")}
+        nextLabel={t("cockpit.next")}
       />
     );
   }
@@ -92,10 +92,7 @@ export function LiveCourts({
   rows = rows.slice(0, limit);
   if (rows.length === 0) return null;
 
-  const heading =
-    mode === "live"
-      ? t("controlCenter.liveCourts", { defaultValue: "En direct" })
-      : t("controlCenter.nextMatches", { defaultValue: "Prochains matchs" });
+  const heading = mode === "live" ? t("controlCenter.liveCourts") : t("controlCenter.nextMatches");
 
   return (
     <section aria-label={heading} className="space-y-2.5">
@@ -119,7 +116,7 @@ export function LiveCourts({
             m={m}
             teamMap={teamMap}
             onSelect={onSelect}
-            liveLabel={t("controlCenter.liveBadge", { defaultValue: "LIVE" })}
+            liveLabel={t("controlCenter.liveBadge")}
             isLive={m.status === "live"}
           />
         ))}

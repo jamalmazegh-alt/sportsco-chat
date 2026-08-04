@@ -1,0 +1,46 @@
+{
+  "section": {
+    "title": "Meeting-Einladungen",
+    "count": "{{count}} Eingeladene"
+  },
+  "empty": {
+    "staff": "Keine Eingeladenen — nutzen Sie „Eingeladene verwalten“, um Gruppen oder Personen einzuladen.",
+    "member": "Sie sind zu diesem Meeting nicht eingeladen."
+  },
+  "self": {
+    "prompt": "Ihre Anwesenheit:"
+  },
+  "source": {
+    "manual": "manuell hinzugefügt"
+  },
+  "row": {
+    "actions": "Aktionen",
+    "resend": {
+      "cta": "Einladung erneut senden",
+      "success": "Einladung erneut gesendet"
+    },
+    "remove": {
+      "cta": "Einladung stornieren",
+      "success": "Einladung storniert",
+      "confirmTitle": "Einladung stornieren?",
+      "confirmDesc": "{{name}} wird aus dem Meeting entfernt und erhält eine Benachrichtigung.",
+      "confirmCta": "Entfernen"
+    }
+  },
+  "manage": {
+    "cta": "Eingeladene verwalten",
+    "title": "Wen einladen?",
+    "desc": "Wählen Sie Gruppen, Teams oder Personen. Jede Person wird nur einmal eingeladen.",
+    "save": "Speichern",
+    "confirm": "Einladen"
+  },
+  "sync": {
+    "success": "{{added}} hinzugefügt, {{removed}} entfernt"
+  },
+  "confirmRemove": {
+    "title": "Personen entfernen, die bereits geantwortet haben?",
+    "desc": "Diese Personen haben bereits geantwortet oder wurden erfasst. Beim Entfernen werden auch Antwort und Anwesenheit gelöscht. Sie bleiben eingeladen, bis Sie bestätigen.",
+    "keep": "Behalten",
+    "confirm": "Trotzdem entfernen"
+  }
+}

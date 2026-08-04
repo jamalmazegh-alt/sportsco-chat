@@ -37,21 +37,21 @@ export function buildRegistrationsCsv(
 ): { filename: string; blob: Blob } {
   const { t } = opts;
   const header = [
-    t("registrations.csv.participantFirstName", { defaultValue: "Participant - Prénom" }),
-    t("registrations.csv.participantLastName", { defaultValue: "Participant - Nom" }),
-    t("registrations.csv.birthDate", { defaultValue: "Date de naissance" }),
-    t("registrations.csv.age", { defaultValue: "Âge" }),
-    t("registrations.csv.gender", { defaultValue: "Genre" }),
-    t("registrations.csv.clubName", { defaultValue: "Club actuel" }),
-    t("registrations.csv.guardianFirstName", { defaultValue: "Responsable - Prénom" }),
-    t("registrations.csv.guardianLastName", { defaultValue: "Responsable - Nom" }),
-    t("registrations.csv.email", { defaultValue: "E-mail" }),
-    t("registrations.csv.phone", { defaultValue: "Téléphone" }),
-    t("registrations.csv.registrationStatus", { defaultValue: "Statut inscription" }),
-    t("registrations.csv.paymentStatus", { defaultValue: "Statut paiement" }),
-    t("registrations.csv.dossierStatus", { defaultValue: "Statut dossier" }),
-    t("registrations.csv.amountPaid", { defaultValue: "Montant payé" }),
-    t("registrations.csv.requestedAt", { defaultValue: "Date de demande" }),
+    t("registrations.csv.participantFirstName"),
+    t("registrations.csv.participantLastName"),
+    t("registrations.csv.birthDate"),
+    t("registrations.csv.age"),
+    t("registrations.csv.gender"),
+    t("registrations.csv.clubName"),
+    t("registrations.csv.guardianFirstName"),
+    t("registrations.csv.guardianLastName"),
+    t("registrations.csv.email"),
+    t("registrations.csv.phone"),
+    t("registrations.csv.registrationStatus"),
+    t("registrations.csv.paymentStatus"),
+    t("registrations.csv.dossierStatus"),
+    t("registrations.csv.amountPaid"),
+    t("registrations.csv.requestedAt"),
   ];
 
   const lines: string[] = [];

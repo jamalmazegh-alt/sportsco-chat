@@ -618,11 +618,7 @@ export function EventFormSheet({
 
     if (isHomeMatch && !venueId) {
       setBusy(false);
-      toast.error(
-        t("events.homeVenueRequired", {
-          defaultValue: "Choisissez un site pour ce match à domicile.",
-        }),
-      );
+      toast.error(t("events.homeVenueRequired"));
       return;
     }
 
@@ -754,7 +750,7 @@ export function EventFormSheet({
             className="h-8 px-2 -ml-2"
             onClick={onBack}
           >
-            ← {backLabel ?? t("common.back", { defaultValue: "Retour" })}
+            ← {backLabel ?? t("common.back")}
           </Button>
         )}
         <div className="space-y-1.5">
@@ -848,15 +844,11 @@ export function EventFormSheet({
             )}
             {competitionType === "cup" && (
               <div className="space-y-1.5">
-                <Label>
-                  {t("eventWizard.competitionName", { defaultValue: "Nom de la compétition" })}
-                </Label>
+                <Label>{t("eventWizard.competitionName")}</Label>
                 <Input
                   value={competitionName ?? ""}
                   onChange={(e) => setCompetitionName(e.target.value)}
-                  placeholder={t("eventWizard.competitionNamePlaceholder", {
-                    defaultValue: "Ex: Coupe régionale…",
-                  })}
+                  placeholder={t("eventWizard.competitionNamePlaceholder")}
                 />
               </div>
             )}
@@ -937,19 +929,17 @@ export function EventFormSheet({
           <>
             {mode === "create" && (
               <div className="space-y-1.5">
-                <Label>{t("events.series.mode", { defaultValue: "Planification" })}</Label>
+                <Label>{t("events.series.mode")}</Label>
                 <div className="grid grid-cols-2 gap-2">
                   {(
                     [
                       {
                         v: false,
-                        label: t("events.series.modeSingle", { defaultValue: "Séance unique" }),
+                        label: t("events.series.modeSingle"),
                       },
                       {
                         v: true,
-                        label: t("events.series.modeRecurring", {
-                          defaultValue: "Planning récurrent",
-                        }),
+                        label: t("events.series.modeRecurring"),
                       },
                     ] as const
                   ).map((opt) => (
@@ -1010,7 +1000,6 @@ export function EventFormSheet({
                 onCreated={(res) => {
                   toast.success(
                     t("events.series.created", {
-                      defaultValue: "{{count}} séances créées",
                       count: res.createdCount,
                     }),
                   );
@@ -1021,9 +1010,7 @@ export function EventFormSheet({
             )}
             {mode === "create" && isRecurring && (!teamId || !title.trim()) && (
               <p className="text-xs text-muted-foreground rounded-lg border border-dashed border-border p-3">
-                {t("events.series.needsTitleAndTeam", {
-                  defaultValue: "Choisissez une équipe et donnez un nom pour configurer la série.",
-                })}
+                {t("events.series.needsTitleAndTeam")}
               </p>
             )}
           </>

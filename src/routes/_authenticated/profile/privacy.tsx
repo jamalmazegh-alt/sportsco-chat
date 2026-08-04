@@ -109,11 +109,11 @@ function PrivacyPage() {
   async function onUnmute(id: string) {
     const { error } = await unmute(id);
     if (error) {
-      toast.error(t("common.error", { defaultValue: "Une erreur est survenue" }));
+      toast.error(t("common.error"));
       return;
     }
     await qc.invalidateQueries({ queryKey: [USER_MUTES_QUERY_KEY] });
-    toast.success(t("mutes.unmuted", { defaultValue: "Contenus réaffichés." }));
+    toast.success(t("mutes.unmuted"));
   }
 
   // Children (players where current user is parent)
@@ -210,12 +210,7 @@ function PrivacyPage() {
       {/* Consents */}
       <section className="rounded-2xl border border-border bg-card p-4 space-y-3">
         <h2 className="text-sm font-semibold">{t("privacy.yourConsents")}</h2>
-        <p className="text-xs text-muted-foreground">
-          {t("privacy.consentsHint", {
-            defaultValue:
-              "L'interrupteur gère votre consentement. Utilisez « Lire le document » pour consulter chaque texte.",
-          })}
-        </p>
+        <p className="text-xs text-muted-foreground">{t("privacy.consentsHint")}</p>
         <div className="space-y-2">
           {status?.items.map((i) => {
             const legalKindFor = (
@@ -249,7 +244,7 @@ function PrivacyPage() {
                     onClick={() => setLegalKind(legalKindFor)}
                     className="inline-flex items-center gap-1 text-xs font-medium text-primary hover:underline"
                   >
-                    {t("privacy.readDocument", { defaultValue: "Lire le document" })}
+                    {t("privacy.readDocument")}
                     <ChevronRight className="h-3.5 w-3.5" />
                   </button>
                 )}
@@ -302,20 +297,11 @@ function PrivacyPage() {
       <section className="rounded-2xl border border-border bg-card p-4 space-y-3">
         <div className="flex items-center gap-2">
           <UserX className="h-4 w-4 text-muted-foreground" />
-          <h2 className="text-sm font-semibold">
-            {t("mutes.sectionTitle", { defaultValue: "Personnes masquées" })}
-          </h2>
+          <h2 className="text-sm font-semibold">{t("mutes.sectionTitle")}</h2>
         </div>
-        <p className="text-xs text-muted-foreground">
-          {t("mutes.sectionHint", {
-            defaultValue:
-              "Vous ne voyez plus les contenus publiés sur le mur et dans le chat par ces personnes. Les communications officielles restent visibles.",
-          })}
-        </p>
+        <p className="text-xs text-muted-foreground">{t("mutes.sectionHint")}</p>
         {!mutedPeople?.length ? (
-          <p className="text-xs text-muted-foreground">
-            {t("mutes.empty", { defaultValue: "Vous n'avez masqué personne." })}
-          </p>
+          <p className="text-xs text-muted-foreground">{t("mutes.empty")}</p>
         ) : (
           <div className="space-y-2">
             {mutedPeople.map((m) => (
@@ -328,7 +314,7 @@ function PrivacyPage() {
                   <p className="text-xs text-muted-foreground">{format(new Date(m.since), "PP")}</p>
                 </div>
                 <Button variant="outline" size="sm" onClick={() => onUnmute(m.id)}>
-                  {t("mutes.unmute", { defaultValue: "Réafficher" })}
+                  {t("mutes.unmute")}
                 </Button>
               </div>
             ))}

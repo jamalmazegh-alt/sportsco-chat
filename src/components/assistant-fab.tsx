@@ -23,7 +23,7 @@ export function AssistantFab() {
   return (
     <Link
       to="/assistant"
-      aria-label={t("assistant.open", { defaultValue: "Open assistant" })}
+      aria-label={t("assistant.open")}
       className={cn(
         "fixed right-4 z-30 h-12 w-12 rounded-full bg-primary text-primary-foreground shadow-lg",
         "flex items-center justify-center hover:scale-105 active:scale-95 transition-transform",

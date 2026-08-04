@@ -637,7 +637,6 @@ function LineupPage() {
                       {remaining && remaining > 0 ? (
                         <p
                           title={t("suspensions.warningTooltip", {
-                            defaultValue: "{{count}} match(s) restant(s) à purger",
                             count: remaining,
                           })}
                           className="text-[9px] text-center font-semibold text-amber-700 dark:text-amber-300 mt-0.5"

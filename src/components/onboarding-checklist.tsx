@@ -71,57 +71,43 @@ export function OnboardingChecklist({
     return [
       {
         id: "logo",
-        label: t("onboarding.steps.logo.label", { defaultValue: "Ajouter le logo du club" }),
-        hint: t("onboarding.steps.logo.hint", {
-          defaultValue: "Personnalise l'app pour vos joueurs et parents.",
-        }),
+        label: t("onboarding.steps.logo.label"),
+        hint: t("onboarding.steps.logo.hint"),
         done: hasLogo,
         to: "/profile",
-        cta: t("onboarding.cta.upload", { defaultValue: "Ajouter" }),
+        cta: t("onboarding.cta.upload"),
       },
       {
         id: "team",
-        label: t("onboarding.steps.team.label", { defaultValue: "Créer votre première équipe" }),
-        hint: t("onboarding.steps.team.hint", {
-          defaultValue: "U13, Seniors, Loisirs… donnez-lui un nom et une catégorie.",
-        }),
+        label: t("onboarding.steps.team.label"),
+        hint: t("onboarding.steps.team.hint"),
         done: c.teams > 0,
         to: "/teams",
-        cta: t("onboarding.cta.create", { defaultValue: "Créer" }),
+        cta: t("onboarding.cta.create"),
       },
       {
         id: "players",
-        label: t("onboarding.steps.players.label", { defaultValue: "Ajouter vos joueurs" }),
-        hint: t("onboarding.steps.players.hint", {
-          defaultValue: "Saisissez l'effectif d'au moins une équipe.",
-        }),
+        label: t("onboarding.steps.players.label"),
+        hint: t("onboarding.steps.players.hint"),
         done: c.players > 0,
         to: "/teams",
-        cta: t("onboarding.cta.add", { defaultValue: "Ajouter" }),
+        cta: t("onboarding.cta.add"),
       },
       {
         id: "invites",
-        label: t("onboarding.steps.invites.label", {
-          defaultValue: "Inviter parents et coachs",
-        }),
-        hint: t("onboarding.steps.invites.hint", {
-          defaultValue: "Ils répondent aux convocations en un tap.",
-        }),
+        label: t("onboarding.steps.invites.label"),
+        hint: t("onboarding.steps.invites.hint"),
         done: c.invites > 0,
         to: "/teams",
-        cta: t("onboarding.cta.invite", { defaultValue: "Inviter" }),
+        cta: t("onboarding.cta.invite"),
       },
       {
         id: "event",
-        label: t("onboarding.steps.event.label", {
-          defaultValue: "Publier votre premier événement",
-        }),
-        hint: t("onboarding.steps.event.hint", {
-          defaultValue: "Entraînement ou match — testez le flux complet.",
-        }),
+        label: t("onboarding.steps.event.label"),
+        hint: t("onboarding.steps.event.hint"),
         done: c.events > 0,
         onAction: onCreateEvent,
-        cta: t("onboarding.cta.publish", { defaultValue: "Publier" }),
+        cta: t("onboarding.cta.publish"),
       },
     ];
   }, [counts, hasLogo, onCreateEvent, t]);
@@ -144,7 +130,7 @@ export function OnboardingChecklist({
       <button
         type="button"
         onClick={dismiss}
-        aria-label={t("common.close", { defaultValue: "Fermer" })}
+        aria-label={t("common.close")}
         className="absolute top-3 right-3 text-muted-foreground hover:text-foreground transition-colors"
       >
         <X className="h-4 w-4" />
@@ -154,12 +140,9 @@ export function OnboardingChecklist({
           <Sparkles className="h-5 w-5 text-primary" />
         </div>
         <div className="min-w-0 pr-6">
-          <h2 className="text-sm font-semibold">
-            {t("onboarding.title", { defaultValue: "Premiers pas" })}
-          </h2>
+          <h2 className="text-sm font-semibold">{t("onboarding.title")}</h2>
           <p className="text-xs text-muted-foreground mt-0.5">
             {t("onboarding.subtitle", {
-              defaultValue: "Quelques étapes pour mettre votre club en route.",
               completed,
               total,
             })}{" "}
