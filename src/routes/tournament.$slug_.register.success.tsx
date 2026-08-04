@@ -75,11 +75,7 @@ function RegisterSuccessPage() {
         </div>
         <h1 className="text-2xl font-semibold">{t("register.success.title")}</h1>
         <p className="text-sm text-muted-foreground">
-          {settling && !settled
-            ? t("register.success.settling", {
-                defaultValue: "Paiement reçu — finalisation de votre inscription…",
-              })
-            : t("register.success.body")}
+          {settling && !settled ? t("register.success.settling") : t("register.success.body")}
         </p>
         <Link
           to="/tournament/$slug"

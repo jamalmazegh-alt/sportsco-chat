@@ -192,7 +192,7 @@ export function StaffAssignmentSection({
       return userId;
     },
     onSuccess: (userId) => {
-      toast.success(t("staffAssignment.assigned", { defaultValue: "Coach assigné" }));
+      toast.success(t("staffAssignment.assigned"));
       qc.invalidateQueries({ queryKey: ["event-staff-assignments", eventId] });
       qc.invalidateQueries({ queryKey: ["event", eventId] });
       dispatchStaffAssignmentPush({
@@ -205,14 +205,9 @@ export function StaffAssignmentSection({
     onError: (e: any) => {
       const msg = String(e?.message ?? "");
       if (msg.includes("row-level security") || msg.includes("check")) {
-        toast.error(
-          t("staffAssignment.notAssignableStaff", {
-            defaultValue:
-              "Assignation refusée : cette personne n'a pas de rôle d'encadrant (coach, adjoint, admin ou dirigeant) dans le club.",
-          }),
-        );
+        toast.error(t("staffAssignment.notAssignableStaff"));
       } else {
-        toast.error(msg || t("common.error", { defaultValue: "Erreur" }));
+        toast.error(msg || t("common.error"));
       }
     },
   });
@@ -228,7 +223,7 @@ export function StaffAssignmentSection({
       return userId;
     },
     onSuccess: (userId) => {
-      toast.success(t("staffAssignment.removed", { defaultValue: "Coach retiré" }));
+      toast.success(t("staffAssignment.removed"));
       qc.invalidateQueries({ queryKey: ["event-staff-assignments", eventId] });
       qc.invalidateQueries({ queryKey: ["event", eventId] });
       dispatchStaffAssignmentPush({
@@ -272,9 +267,7 @@ export function StaffAssignmentSection({
     const status = statusByUser.get(c.user_id) ?? "available";
     const absence = absenceByUser.get(c.user_id);
     const roleLabel =
-      c.role === "assistant_coach"
-        ? t("teams.role.assistant_coach", { defaultValue: "Adjoint" })
-        : t("teams.role.coach", { defaultValue: "Coach" });
+      c.role === "assistant_coach" ? t("teams.role.assistant_coach") : t("teams.role.coach");
     const baseMeta = [roleLabel, c.teamName].filter(Boolean).join(" · ");
     const absenceLabel = absence
       ? absence.start === absence.end
@@ -295,7 +288,7 @@ export function StaffAssignmentSection({
             <span className="truncate">{c.full_name}</span>
             {c.isReinforcement && (
               <span className="inline-flex items-center rounded-full border border-primary/40 bg-primary/10 px-1.5 py-0 text-[9px] font-medium uppercase text-primary shrink-0">
-                {t("staffAssignment.reinforcement", { defaultValue: "Renfort" })}
+                {t("staffAssignment.reinforcement")}
               </span>
             )}
           </div>
@@ -322,7 +315,7 @@ export function StaffAssignmentSection({
           onClick={() => unassignMutation.mutate(c.user_id)}
         >
           <UserMinus className="h-3.5 w-3.5" />
-          {t("staffAssignment.remove", { defaultValue: "Retirer" })}
+          {t("staffAssignment.remove")}
         </Button>
       </li>
     );
@@ -343,25 +336,14 @@ export function StaffAssignmentSection({
           <Users className="h-4 w-4" />
         </div>
         <div className="flex-1 min-w-0">
-          <h3 className="text-sm font-semibold">
-            {t("staffAssignment.title", { defaultValue: "Encadrement" })}
-          </h3>
-          <p className="text-[11px] text-muted-foreground">
-            {t("staffAssignment.hint", {
-              defaultValue:
-                "Assignez le staff de l'équipe ou un renfort du club pour cet événement.",
-            })}
-          </p>
+          <h3 className="text-sm font-semibold">{t("staffAssignment.title")}</h3>
+          <p className="text-[11px] text-muted-foreground">{t("staffAssignment.hint")}</p>
         </div>
         <StaffCoverageBadge state={coverageState} />
       </div>
 
       {assignedPeople.length === 0 ? (
-        <p className="text-xs text-muted-foreground">
-          {t("staffAssignment.noneAssigned", {
-            defaultValue: "Aucun coach assigné pour cet événement.",
-          })}
-        </p>
+        <p className="text-xs text-muted-foreground">{t("staffAssignment.noneAssigned")}</p>
       ) : (
         <ul className="divide-y divide-border">{assignedPeople.map(renderAssignedRow)}</ul>
       )}
@@ -377,14 +359,10 @@ export function StaffAssignmentSection({
             <span className="inline-flex items-center gap-2">
               <Plus className="h-3.5 w-3.5" />
               {people.length === 0
-                ? t("staffAssignment.noCoachInClub", {
-                    defaultValue: "Aucun coach dans ce club",
-                  })
+                ? t("staffAssignment.noCoachInClub")
                 : unassignedPeople.length === 0
-                  ? t("staffAssignment.allAssigned", {
-                      defaultValue: "Tous les coachs sont assignés",
-                    })
-                  : t("staffAssignment.addCoach", { defaultValue: "Assigner un coach" })}
+                  ? t("staffAssignment.allAssigned")
+                  : t("staffAssignment.addCoach")}
             </span>
             <ChevronsUpDown className="h-3.5 w-3.5 opacity-50" />
           </Button>
@@ -394,23 +372,17 @@ export function StaffAssignmentSection({
           align="start"
         >
           <Command>
-            <CommandInput
-              placeholder={t("staffAssignment.searchPlaceholder", {
-                defaultValue: "Rechercher un coach…",
-              })}
-            />
+            <CommandInput placeholder={t("staffAssignment.searchPlaceholder")} />
             <CommandList>
-              <CommandEmpty>
-                {t("staffAssignment.noResults", { defaultValue: "Aucun coach trouvé." })}
-              </CommandEmpty>
+              <CommandEmpty>{t("staffAssignment.noResults")}</CommandEmpty>
               <CommandGroup>
                 {unassignedPeople.map((c) => {
                   const status = statusByUser.get(c.user_id) ?? "available";
                   const absence = absenceByUser.get(c.user_id);
                   const roleLabel =
                     c.role === "assistant_coach"
-                      ? t("teams.role.assistant_coach", { defaultValue: "Adjoint" })
-                      : t("teams.role.coach", { defaultValue: "Coach" });
+                      ? t("teams.role.assistant_coach")
+                      : t("teams.role.coach");
                   const meta = [roleLabel, c.teamName].filter(Boolean).join(" · ");
                   const absenceLabel = absence
                     ? absence.start === absence.end
@@ -442,7 +414,7 @@ export function StaffAssignmentSection({
                           <span className="truncate">{c.full_name}</span>
                           {c.isReinforcement && (
                             <span className="inline-flex items-center rounded-full border border-primary/40 bg-primary/10 px-1.5 py-0 text-[9px] font-medium uppercase text-primary shrink-0">
-                              {t("staffAssignment.reinforcement", { defaultValue: "Renfort" })}
+                              {t("staffAssignment.reinforcement")}
                             </span>
                           )}
                         </div>
@@ -480,25 +452,19 @@ export function StaffAssignmentSection({
           <AlertDialogHeader>
             <AlertDialogTitle className="flex items-center gap-2">
               <AlertTriangle className="h-4 w-4 text-amber-500" />
-              {t("staffAssignment.conflict.title", {
-                defaultValue: "Conflit de disponibilité",
-              })}
+              {t("staffAssignment.conflict.title")}
             </AlertDialogTitle>
-            <AlertDialogDescription>
-              {t("staffAssignment.conflict.body", {
-                defaultValue: "Ce coach présente un conflit sur ce créneau. Continuer ?",
-              })}
-            </AlertDialogDescription>
+            <AlertDialogDescription>{t("staffAssignment.conflict.body")}</AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>{t("common.cancel", { defaultValue: "Annuler" })}</AlertDialogCancel>
+            <AlertDialogCancel>{t("common.cancel")}</AlertDialogCancel>
             <AlertDialogAction
               onClick={() => {
                 if (pendingConflict) assignMutation.mutate(pendingConflict.user_id);
                 setPendingConflict(null);
               }}
             >
-              {t("common.continue", { defaultValue: "Continuer" })}
+              {t("common.continue")}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
@@ -519,10 +485,10 @@ function StatusDot({ status }: { status: Status }) {
     status === "unavailable" ? MinusCircle : status === "tentative" ? CircleDashed : CheckCircle2;
   const label =
     status === "unavailable"
-      ? t("staffAvailability.status.unavailable", { defaultValue: "Indisponible" })
+      ? t("staffAvailability.status.unavailable")
       : status === "tentative"
-        ? t("staffAvailability.status.tentative", { defaultValue: "Incertain" })
-        : t("staffAvailability.status.available", { defaultValue: "Disponible" });
+        ? t("staffAvailability.status.tentative")
+        : t("staffAvailability.status.available");
   return (
     <span className={cn("inline-flex items-center gap-1 text-[11px]", cls)} title={label}>
       <Icon className="h-3.5 w-3.5" />

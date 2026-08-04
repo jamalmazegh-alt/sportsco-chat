@@ -475,7 +475,7 @@ function EventsPage() {
               {past && (
                 <span className="text-[10px] uppercase tracking-wider font-bold px-1.5 py-0.5 rounded-md border bg-amber-500/15 text-amber-700 border-amber-500/30 dark:text-amber-300 inline-flex items-center gap-1">
                   <Clock className="h-3 w-3" />
-                  {t("events.pastBadge", { defaultValue: "Passé" })}
+                  {t("events.pastBadge")}
                 </span>
               )}
               {isCancelled && (
@@ -535,9 +535,7 @@ function EventsPage() {
               {((e as any).convocations_sent || convocSentSet?.has(e.id)) && !isCancelled && (
                 <span
                   className="inline-flex items-center gap-1 rounded-full border border-emerald-500/20 bg-emerald-500/10 px-2 py-0.5 text-[10px] font-semibold text-emerald-700 dark:text-emerald-300"
-                  title={t("events.convocsSentTitle", {
-                    defaultValue: "Les convocations ont été envoyées pour cet événement",
-                  })}
+                  title={t("events.convocsSentTitle")}
                 >
                   <Send className="h-3 w-3" />
                   {t("events.convocationsSentShort")}
@@ -644,7 +642,7 @@ function EventsPage() {
             aria-pressed={view === "list"}
           >
             <List className="h-3.5 w-3.5" />
-            {t("events.viewList", { defaultValue: "Liste" })}
+            {t("events.viewList")}
           </button>
           <button
             type="button"
@@ -658,7 +656,7 @@ function EventsPage() {
             aria-pressed={view === "calendar"}
           >
             <CalendarDays className="h-3.5 w-3.5" />
-            {t("events.viewCalendar", { defaultValue: "Calendrier" })}
+            {t("events.viewCalendar")}
           </button>
         </div>
         <div className="flex flex-wrap items-center gap-2">
@@ -674,10 +672,10 @@ function EventsPage() {
                     ? "border-primary/40 bg-primary/10 text-primary hover:bg-primary/15"
                     : "border-border bg-card text-muted-foreground hover:text-foreground hover:bg-muted/50",
                 )}
-                title={t("events.hideTrainings", { defaultValue: "Masquer les entraînements" })}
+                title={t("events.hideTrainings")}
               >
                 <Dumbbell className="h-3.5 w-3.5" />
-                {t("events.hideTrainings", { defaultValue: "Masquer les entraînements" })}
+                {t("events.hideTrainings")}
               </button>
               <EventsFilterSheet
                 filters={filters}
@@ -700,9 +698,7 @@ function EventsPage() {
               type="search"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder={t("events.searchPlaceholder", {
-                defaultValue: "Rechercher un événement…",
-              })}
+              placeholder={t("events.searchPlaceholder")}
               className="pl-9"
             />
           </div>
@@ -730,25 +726,13 @@ function EventsPage() {
       ) : !visibleEvents || visibleEvents.length === 0 ? (
         <EmptyState
           icon={<Calendar className="h-6 w-6" />}
-          title={
-            searchQuery.trim()
-              ? t("events.noSearchResults", { defaultValue: "Aucun résultat" })
-              : t("events.noEvents")
-          }
+          title={searchQuery.trim() ? t("events.noSearchResults") : t("events.noEvents")}
           description={
             searchQuery.trim()
-              ? t("events.noSearchResultsHint", {
-                  defaultValue: "Aucun événement ne correspond à ta recherche.",
-                })
+              ? t("events.noSearchResultsHint")
               : isCoach
-                ? t("events.emptyHintCoach", {
-                    defaultValue:
-                      "Crée ton premier entraînement ou match — les joueurs seront convoqués automatiquement.",
-                  })
-                : t("events.emptyHintPlayer", {
-                    defaultValue:
-                      "Aucun événement prévu pour le moment. Tu seras notifié dès qu'un coach en programme un.",
-                  })
+                ? t("events.emptyHintCoach")
+                : t("events.emptyHintPlayer")
           }
           action={
             searchQuery.trim() ? (
@@ -758,7 +742,7 @@ function EventsPage() {
                 className="h-9"
                 onClick={() => setSearchQuery("")}
               >
-                {t("events.clearSearch", { defaultValue: "Effacer la recherche" })}
+                {t("events.clearSearch")}
               </Button>
             ) : isCoach && user ? (
               <Button size="sm" className="h-9" onClick={() => setOpen(true)}>
@@ -805,9 +789,7 @@ function EventsPage() {
             />
           </div>
           <p className="text-xs text-center text-muted-foreground pt-2">
-            {t("events.calendarHint", {
-              defaultValue: "Touche un jour avec une pastille pour voir les événements.",
-            })}
+            {t("events.calendarHint")}
           </p>
 
           <div className="flex flex-wrap justify-center gap-x-4 gap-y-1.5 pt-1">
@@ -843,7 +825,7 @@ function EventsPage() {
               <div className="px-5 py-4 max-h-[70vh] overflow-y-auto">
                 {selectedDayEvents.length === 0 ? (
                   <p className="text-sm text-muted-foreground py-6 text-center">
-                    {t("events.noEventsThisDay", { defaultValue: "Aucun événement ce jour." })}
+                    {t("events.noEventsThisDay")}
                   </p>
                 ) : (
                   <ul className="space-y-2.5" onClick={() => setDayDialogOpen(false)}>

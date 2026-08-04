@@ -60,9 +60,7 @@ export const Route = createFileRoute("/_authenticated/admin/camps/$campId")({
   head: () => ({
     meta: [
       {
-        title: i18nInstance.t("camps:meta.edit.title", {
-          defaultValue: "Édition d'un stage – Clubero",
-        }),
+        title: i18nInstance.t("camps:meta.edit.title"),
       },
     ],
   }),
@@ -180,7 +178,7 @@ function CampEditPage() {
         },
       }),
     onSuccess: () => {
-      toast.success(t("form.saved", { defaultValue: "Modifications enregistrées" }));
+      toast.success(t("form.saved"));
       qc.invalidateQueries({ queryKey: ["club-camp", campId] });
       qc.invalidateQueries({ queryKey: ["club-camps"] });
     },
@@ -190,7 +188,7 @@ function CampEditPage() {
   const publishMut = useMutation({
     mutationFn: () => publishFn({ data: { campId } }),
     onSuccess: () => {
-      toast.success(t("lifecycle.published", { defaultValue: "Stage publié" }));
+      toast.success(t("lifecycle.published"));
       qc.invalidateQueries({ queryKey: ["club-camp", campId] });
       qc.invalidateQueries({ queryKey: ["club-camps"] });
     },
@@ -200,7 +198,7 @@ function CampEditPage() {
   const closeMut = useMutation({
     mutationFn: () => closeFn({ data: { campId } }),
     onSuccess: () => {
-      toast.success(t("lifecycle.closed", { defaultValue: "Inscriptions fermées" }));
+      toast.success(t("lifecycle.closed"));
       qc.invalidateQueries({ queryKey: ["club-camp", campId] });
     },
     onError: (e: Error) => toast.error(mapErr(e.message, t)),
@@ -209,7 +207,7 @@ function CampEditPage() {
   const archiveMut = useMutation({
     mutationFn: () => archiveFn({ data: { campId } }),
     onSuccess: () => {
-      toast.success(t("lifecycle.archived", { defaultValue: "Stage archivé" }));
+      toast.success(t("lifecycle.archived"));
       qc.invalidateQueries({ queryKey: ["club-camps"] });
       navigate({ to: "/admin/camps" });
     },
@@ -228,7 +226,7 @@ function CampEditPage() {
   const duplicateMut = useMutation({
     mutationFn: () => duplicateFn({ data: { campId } }),
     onSuccess: (res) => {
-      toast.success(t("duplicate.done", { defaultValue: "Stage dupliqué" }));
+      toast.success(t("duplicate.done"));
       qc.invalidateQueries({ queryKey: ["club-camps"] });
       navigate({ to: "/admin/camps/$campId", params: { campId: res.id } });
     },
@@ -251,7 +249,7 @@ function CampEditPage() {
       <div className="flex items-center gap-2">
         <Button variant="ghost" size="sm" onClick={() => navigate({ to: "/admin/camps" })}>
           <ArrowLeft className="h-4 w-4 mr-1" />
-          {t("common.back", { defaultValue: "Retour" })}
+          {t("common.back")}
         </Button>
         <div className="ml-auto flex items-center gap-2">
           {camp.status !== "draft" && camp.club_slug && (
@@ -262,7 +260,7 @@ function CampEditPage() {
                 rel="noopener noreferrer"
               >
                 <ExternalLink className="h-4 w-4 mr-1.5" />
-                {t("lifecycle.openPublic", { defaultValue: "Voir la page publique" })}
+                {t("lifecycle.openPublic")}
               </a>
             </Button>
           )}
@@ -271,16 +269,14 @@ function CampEditPage() {
             size="sm"
             onClick={() => duplicateMut.mutate()}
             disabled={duplicateMut.isPending}
-            title={t("duplicate.hint", {
-              defaultValue: "Créer une copie en brouillon (sans les inscriptions).",
-            })}
+            title={t("duplicate.hint")}
           >
             {duplicateMut.isPending ? (
               <Loader2 className="h-4 w-4 mr-1.5 animate-spin" />
             ) : (
               <Copy className="h-4 w-4 mr-1.5" />
             )}
-            {t("duplicate.action", { defaultValue: "Dupliquer" })}
+            {t("duplicate.action")}
           </Button>
           <Badge variant="outline">
             {t(`status.${camp.status}`, { defaultValue: camp.status })}
@@ -290,19 +286,15 @@ function CampEditPage() {
 
       <Tabs defaultValue="edit" className="space-y-6">
         <TabsList>
-          <TabsTrigger value="edit">{t("tabs.edit", { defaultValue: "Édition" })}</TabsTrigger>
+          <TabsTrigger value="edit">{t("tabs.edit")}</TabsTrigger>
           <TabsTrigger value="registrations" disabled={camp.status === "draft"}>
-            {t("tabs.registrations", { defaultValue: "Inscriptions" })}
+            {t("tabs.registrations")}
           </TabsTrigger>
         </TabsList>
 
         <TabsContent value="registrations" className="space-y-6">
           {camp.status === "draft" ? (
-            <p className="text-sm text-muted-foreground">
-              {t("registrations.draftHint", {
-                defaultValue: "Les inscriptions apparaîtront ici après publication du stage.",
-              })}
-            </p>
+            <p className="text-sm text-muted-foreground">{t("registrations.draftHint")}</p>
           ) : (
             <CampRegistrationsPanel campId={campId} />
           )}
@@ -316,17 +308,17 @@ function CampEditPage() {
           {/* Section: Informations */}
           <section className="space-y-4 rounded-xl border border-border bg-card p-4">
             <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
-              {t("form.sectionInfo", { defaultValue: "Informations" })}
+              {t("form.sectionInfo")}
             </h2>
 
             <div className="space-y-1.5">
-              <Label>{t("form.title", { defaultValue: "Titre" })}</Label>
+              <Label>{t("form.title")}</Label>
               <Input value={form.title} onChange={(e) => onTitleChange(e.target.value)} />
             </div>
 
             <div className="space-y-1.5">
               <Label className="flex items-center gap-1.5">
-                {t("form.slug", { defaultValue: "Slug (URL)" })}
+                {t("form.slug")}
                 {slugLocked && <Lock className="h-3.5 w-3.5 text-muted-foreground" />}
               </Label>
               <Input
@@ -338,24 +330,13 @@ function CampEditPage() {
                 disabled={slugLocked}
               />
               <p className="text-xs text-muted-foreground">
-                {slugLocked
-                  ? t("form.slugLocked", {
-                      defaultValue: "Le slug est verrouillé après publication.",
-                    })
-                  : t("form.slugHint", {
-                      defaultValue:
-                        "Lettres, chiffres et tirets. Modifiable tant que le stage est en brouillon.",
-                    })}
+                {slugLocked ? t("form.slugLocked") : t("form.slugHint")}
               </p>
-              {slugInvalid && (
-                <p className="text-xs text-destructive">
-                  {t("errors.slugInvalid", { defaultValue: "Slug invalide" })}
-                </p>
-              )}
+              {slugInvalid && <p className="text-xs text-destructive">{t("errors.slugInvalid")}</p>}
             </div>
 
             <div className="space-y-1.5">
-              <Label>{t("form.description", { defaultValue: "Description" })}</Label>
+              <Label>{t("form.description")}</Label>
               <Textarea
                 rows={5}
                 value={form.description}
@@ -364,9 +345,7 @@ function CampEditPage() {
             </div>
 
             <div>
-              <Label className="mb-2 block">
-                {t("form.cover", { defaultValue: "Image de couverture" })}
-              </Label>
+              <Label className="mb-2 block">{t("form.cover")}</Label>
               <CampCoverUpload
                 campId={campId}
                 coverUrl={camp.cover_image_url}
@@ -376,7 +355,7 @@ function CampEditPage() {
 
             <div className="grid gap-4 sm:grid-cols-3">
               <div className="space-y-1.5">
-                <Label>{t("form.startDate", { defaultValue: "Début" })}</Label>
+                <Label>{t("form.startDate")}</Label>
                 <Input
                   type="date"
                   value={form.start_date}
@@ -384,7 +363,7 @@ function CampEditPage() {
                 />
               </div>
               <div className="space-y-1.5">
-                <Label>{t("form.endDate", { defaultValue: "Fin" })}</Label>
+                <Label>{t("form.endDate")}</Label>
                 <Input
                   type="date"
                   value={form.end_date}
@@ -392,7 +371,7 @@ function CampEditPage() {
                 />
               </div>
               <div className="space-y-1.5">
-                <Label>{t("form.deadline", { defaultValue: "Date limite d'inscription" })}</Label>
+                <Label>{t("form.deadline")}</Label>
                 <Input
                   type="date"
                   value={form.registration_deadline}
@@ -403,7 +382,7 @@ function CampEditPage() {
 
             <div className="grid gap-4 sm:grid-cols-3">
               <div className="space-y-1.5">
-                <Label>{t("form.price", { defaultValue: "Tarif indicatif" })}</Label>
+                <Label>{t("form.price")}</Label>
                 <Input
                   type="number"
                   min={0}
@@ -413,7 +392,7 @@ function CampEditPage() {
                 />
               </div>
               <div className="space-y-1.5">
-                <Label>{t("form.currency", { defaultValue: "Devise" })}</Label>
+                <Label>{t("form.currency")}</Label>
                 <Input
                   maxLength={3}
                   value={form.currency}
@@ -421,7 +400,7 @@ function CampEditPage() {
                 />
               </div>
               <div className="space-y-1.5">
-                <Label>{t("form.capacity", { defaultValue: "Capacité" })}</Label>
+                <Label>{t("form.capacity")}</Label>
                 <Input
                   type="number"
                   min={1}
@@ -432,23 +411,17 @@ function CampEditPage() {
             </div>
 
             <div className="space-y-1.5">
-              <Label>
-                {t("form.paymentInstructions", { defaultValue: "Modalités de paiement" })}
-              </Label>
+              <Label>{t("form.paymentInstructions")}</Label>
               <Textarea
                 rows={3}
                 value={form.payment_instructions}
                 onChange={(e) => setForm({ ...form, payment_instructions: e.target.value })}
-                placeholder={t("form.paymentInstructionsPlaceholder", {
-                  defaultValue: "Ex. paiement à l'inscription par CB, chèque ou espèces sur place.",
-                })}
+                placeholder={t("form.paymentInstructionsPlaceholder")}
               />
             </div>
 
             <div className="space-y-1.5 max-w-xs">
-              <Label>
-                {t("form.retention", { defaultValue: "Rétention des documents (mois)" })}
-              </Label>
+              <Label>{t("form.retention")}</Label>
               <Input
                 type="number"
                 min={1}
@@ -464,7 +437,7 @@ function CampEditPage() {
           {/* Section: Lieu */}
           <section className="space-y-4 rounded-xl border border-border bg-card p-4">
             <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
-              {t("form.sectionVenue", { defaultValue: "Lieu" })}
+              {t("form.sectionVenue")}
             </h2>
             <VenueFacilityPicker
               clubId={camp.club_id}
@@ -485,7 +458,7 @@ function CampEditPage() {
           {/* Section: Catégories d'âge */}
           <section className="space-y-4 rounded-xl border border-border bg-card p-4">
             <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
-              {t("form.sectionAgeGroups", { defaultValue: "Catégories d'âge" })}
+              {t("form.sectionAgeGroups")}
             </h2>
             <CampAgeGroupsEditor campId={campId} ageGroups={camp.age_groups} />
           </section>
@@ -493,41 +466,27 @@ function CampEditPage() {
           {/* Section: Programme */}
           <section className="space-y-4 rounded-xl border border-border bg-card p-4">
             <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
-              {t("form.sectionProgram", { defaultValue: "Programme" })}
+              {t("form.sectionProgram")}
             </h2>
-            <p className="text-xs text-muted-foreground">
-              {t("form.sectionProgramHint", {
-                defaultValue: "Détaille le déroulé du stage. Glisse-dépose pour réordonner.",
-              })}
-            </p>
+            <p className="text-xs text-muted-foreground">{t("form.sectionProgramHint")}</p>
             <CampProgramEditor campId={campId} />
           </section>
 
           {/* Section: Documents fournis */}
           <section className="space-y-4 rounded-xl border border-border bg-card p-4">
             <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
-              {t("form.sectionDocuments", { defaultValue: "Documents fournis" })}
+              {t("form.sectionDocuments")}
             </h2>
-            <p className="text-xs text-muted-foreground">
-              {t("form.sectionDocumentsHint", {
-                defaultValue:
-                  "Documents que le club met à disposition (règlement, planning PDF, plan d'accès…). Formats acceptés : PDF, JPG, PNG.",
-              })}
-            </p>
+            <p className="text-xs text-muted-foreground">{t("form.sectionDocumentsHint")}</p>
             <CampDocumentsEditor campId={campId} />
           </section>
 
           {/* Section: Pièces à fournir */}
           <section className="space-y-4 rounded-xl border border-border bg-card p-4">
             <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
-              {t("form.sectionRequired", { defaultValue: "Pièces à fournir" })}
+              {t("form.sectionRequired")}
             </h2>
-            <p className="text-xs text-muted-foreground">
-              {t("form.sectionRequiredHint", {
-                defaultValue:
-                  "Liste des documents que les inscrits devront téléverser (certificat médical, autorisation parentale…). Les pièces médicales sont automatiquement marquées « sensible ».",
-              })}
-            </p>
+            <p className="text-xs text-muted-foreground">{t("form.sectionRequiredHint")}</p>
             <CampRequiredDocumentsEditor campId={campId} />
           </section>
 
@@ -544,7 +503,7 @@ function CampEditPage() {
                   ) : (
                     <Save className="h-4 w-4 mr-1.5" />
                   )}
-                  {t("form.save", { defaultValue: "Enregistrer" })}
+                  {t("form.save")}
                 </Button>
 
                 {camp.status === "draft" && (
@@ -559,7 +518,7 @@ function CampEditPage() {
                     ) : (
                       <Rocket className="h-4 w-4 mr-1.5" />
                     )}
-                    {t("lifecycle.publish", { defaultValue: "Publier" })}
+                    {t("lifecycle.publish")}
                   </Button>
                 )}
 
@@ -570,7 +529,7 @@ function CampEditPage() {
                     disabled={closeMut.isPending}
                   >
                     <XCircle className="h-4 w-4 mr-1.5" />
-                    {t("lifecycle.close", { defaultValue: "Fermer les inscriptions" })}
+                    {t("lifecycle.close")}
                   </Button>
                 )}
               </div>
@@ -581,29 +540,21 @@ function CampEditPage() {
                     <AlertDialogTrigger asChild>
                       <Button variant="ghost" size="sm" className="text-destructive">
                         <Trash2 className="h-4 w-4 mr-1.5" />
-                        {t("common.delete", { defaultValue: "Supprimer" })}
+                        {t("common.delete")}
                       </Button>
                     </AlertDialogTrigger>
                     <AlertDialogContent>
                       <AlertDialogHeader>
-                        <AlertDialogTitle>
-                          {t("delete.title", { defaultValue: "Supprimer ce brouillon ?" })}
-                        </AlertDialogTitle>
-                        <AlertDialogDescription>
-                          {t("delete.desc", {
-                            defaultValue: "Cette action est définitive.",
-                          })}
-                        </AlertDialogDescription>
+                        <AlertDialogTitle>{t("delete.title")}</AlertDialogTitle>
+                        <AlertDialogDescription>{t("delete.desc")}</AlertDialogDescription>
                       </AlertDialogHeader>
                       <AlertDialogFooter>
-                        <AlertDialogCancel>
-                          {t("common.cancel", { defaultValue: "Annuler" })}
-                        </AlertDialogCancel>
+                        <AlertDialogCancel>{t("common.cancel")}</AlertDialogCancel>
                         <AlertDialogAction
                           onClick={() => deleteMut.mutate()}
                           className="bg-destructive text-destructive-foreground"
                         >
-                          {t("common.delete", { defaultValue: "Supprimer" })}
+                          {t("common.delete")}
                         </AlertDialogAction>
                       </AlertDialogFooter>
                     </AlertDialogContent>
@@ -617,7 +568,7 @@ function CampEditPage() {
                       disabled={archiveMut.isPending}
                     >
                       <Archive className="h-4 w-4 mr-1.5" />
-                      {t("lifecycle.archive", { defaultValue: "Archiver" })}
+                      {t("lifecycle.archive")}
                     </Button>
                   )
                 )}
@@ -632,40 +583,20 @@ function CampEditPage() {
 
 function mapErr(code: string, t: (k: string, o?: { defaultValue: string }) => string): string {
   const map: Record<string, string> = {
-    SLUG_TAKEN: t("errors.slugTaken", { defaultValue: "Ce slug est déjà utilisé." }),
-    SLUG_INVALID: t("errors.slugInvalid", { defaultValue: "Slug invalide." }),
-    SLUG_LOCKED: t("errors.slugLocked", {
-      defaultValue: "Le slug ne peut plus changer après publication.",
-    }),
-    DATES_INVALID: t("errors.datesInvalid", {
-      defaultValue: "La date de fin doit être postérieure au début.",
-    }),
-    NOT_DRAFT: t("errors.notDraft", { defaultValue: "Le stage n'est plus en brouillon." }),
-    DELETE_NOT_DRAFT: t("errors.deleteNotDraft", {
-      defaultValue: "Seul un brouillon peut être supprimé. Archivez-le plutôt.",
-    }),
-    PUBLISH_TITLE_REQUIRED: t("errors.publishTitleRequired", {
-      defaultValue: "Titre requis pour publier.",
-    }),
-    PUBLISH_DATES_REQUIRED: t("errors.publishDatesRequired", {
-      defaultValue: "Dates de début et de fin requises.",
-    }),
-    PUBLISH_DATES_ORDER: t("errors.publishDatesOrder", {
-      defaultValue: "La date de fin doit être après le début.",
-    }),
-    PUBLISH_DEADLINE_AFTER_START: t("errors.publishDeadlineAfterStart", {
-      defaultValue: "La deadline d'inscription doit être avant la date de début.",
-    }),
-    PUBLISH_CAPACITY_REQUIRED: t("errors.publishCapacityRequired", {
-      defaultValue: "Une capacité positive est requise.",
-    }),
-    PUBLISH_AGE_GROUP_REQUIRED: t("errors.publishAgeGroupRequired", {
-      defaultValue: "Ajoutez au moins une catégorie d'âge avant de publier.",
-    }),
-    COVER_TOO_LARGE: t("cover.tooLarge", { defaultValue: "Image trop volumineuse." }),
-    COVER_TYPE_UNSUPPORTED: t("cover.unsupported", {
-      defaultValue: "Format non supporté (JPG, PNG, WEBP).",
-    }),
+    SLUG_TAKEN: t("errors.slugTaken"),
+    SLUG_INVALID: t("errors.slugInvalid"),
+    SLUG_LOCKED: t("errors.slugLocked"),
+    DATES_INVALID: t("errors.datesInvalid"),
+    NOT_DRAFT: t("errors.notDraft"),
+    DELETE_NOT_DRAFT: t("errors.deleteNotDraft"),
+    PUBLISH_TITLE_REQUIRED: t("errors.publishTitleRequired"),
+    PUBLISH_DATES_REQUIRED: t("errors.publishDatesRequired"),
+    PUBLISH_DATES_ORDER: t("errors.publishDatesOrder"),
+    PUBLISH_DEADLINE_AFTER_START: t("errors.publishDeadlineAfterStart"),
+    PUBLISH_CAPACITY_REQUIRED: t("errors.publishCapacityRequired"),
+    PUBLISH_AGE_GROUP_REQUIRED: t("errors.publishAgeGroupRequired"),
+    COVER_TOO_LARGE: t("cover.tooLarge"),
+    COVER_TYPE_UNSUPPORTED: t("cover.unsupported"),
   };
   return map[code] ?? code;
 }
@@ -684,22 +615,17 @@ function PublicCampLinkCard({
   const copy = async () => {
     try {
       if (!(await copyText(url))) throw new Error("copy failed");
-      toast.success(t("lifecycle.publicUrlCopied", { defaultValue: "Lien copié" }));
+      toast.success(t("lifecycle.publicUrlCopied"));
     } catch {
-      toast.error(t("common.copyFailed", { defaultValue: "Impossible de copier" }));
+      toast.error(t("common.copyFailed"));
     }
   };
   return (
     <div className="rounded-lg border border-emerald-500/30 bg-emerald-500/5 p-3 text-sm space-y-2">
-      <div className="font-medium">{t("lifecycle.publicUrl", { defaultValue: "Lien public" })}</div>
+      <div className="font-medium">{t("lifecycle.publicUrl")}</div>
       <div className="flex items-center gap-2">
         <Input value={url} readOnly className="text-xs h-8" />
-        <Button
-          size="sm"
-          variant="outline"
-          onClick={copy}
-          title={t("common.copy", { defaultValue: "Copier" })}
-        >
+        <Button size="sm" variant="outline" onClick={copy} title={t("common.copy")}>
           <Copy className="h-4 w-4" />
         </Button>
         <Button size="sm" variant="outline" asChild>

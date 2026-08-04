@@ -85,9 +85,7 @@ export function ChampionshipPicker({
     return (
       <div className="space-y-1.5">
         <Label className={labelClassName}>{t("championships.championship")}</Label>
-        <div className="text-xs text-muted-foreground">
-          {t("common.loading", { defaultValue: "Chargement…" })}
-        </div>
+        <div className="text-xs text-muted-foreground">{t("common.loading")}</div>
       </div>
     );
   }

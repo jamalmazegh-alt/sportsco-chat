@@ -173,11 +173,7 @@ export function CampRequiredDocumentsEditor({
   return (
     <div className="space-y-3">
       {localOrder.length === 0 && !showForm && (
-        <p className="text-sm text-muted-foreground">
-          {t("required.empty", {
-            defaultValue: "Aucune pièce à fournir définie pour l'instant.",
-          })}
-        </p>
+        <p className="text-sm text-muted-foreground">{t("required.empty")}</p>
       )}
 
       {localOrder.length > 0 && (
@@ -205,21 +201,17 @@ export function CampRequiredDocumentsEditor({
       {showForm ? (
         <div className="rounded-lg border border-dashed border-border p-3 space-y-3">
           <Label className="text-xs uppercase tracking-wide text-muted-foreground">
-            {draft.id
-              ? t("required.editTitle", { defaultValue: "Modifier la pièce" })
-              : t("required.addTitle", { defaultValue: "Nouvelle pièce à fournir" })}
+            {draft.id ? t("required.editTitle") : t("required.addTitle")}
           </Label>
           <Input
             value={draft.title}
             onChange={(e) => setDraft({ ...draft, title: e.target.value })}
-            placeholder={t("required.titlePlaceholder", {
-              defaultValue: "Ex. Certificat médical de moins de 3 mois",
-            })}
+            placeholder={t("required.titlePlaceholder")}
             disabled={disabled}
           />
           <div className="grid gap-2 sm:grid-cols-2">
             <div className="space-y-1">
-              <Label className="text-xs">{t("required.type", { defaultValue: "Type" })}</Label>
+              <Label className="text-xs">{t("required.type")}</Label>
               <Select
                 value={draft.document_type}
                 onValueChange={(v) => setDraft({ ...draft, document_type: v })}
@@ -238,9 +230,7 @@ export function CampRequiredDocumentsEditor({
               </Select>
             </div>
             <div className="flex items-end justify-between rounded-md border border-border px-3 py-2">
-              <Label className="text-xs">
-                {t("required.mandatory", { defaultValue: "Obligatoire" })}
-              </Label>
+              <Label className="text-xs">{t("required.mandatory")}</Label>
               <Switch
                 checked={draft.required}
                 onCheckedChange={(v) => setDraft({ ...draft, required: v })}
@@ -252,19 +242,11 @@ export function CampRequiredDocumentsEditor({
           <div className="flex items-center justify-between rounded-md border border-border px-3 py-2">
             <div>
               <Label className="text-xs flex items-center gap-1.5">
-                {t("required.sensitive", { defaultValue: "Donnée sensible" })}
+                {t("required.sensitive")}
                 {typeIsSensitive && <Lock className="h-3 w-3 text-muted-foreground" />}
               </Label>
               <p className="text-[11px] text-muted-foreground">
-                {typeIsSensitive
-                  ? t("required.sensitiveForced", {
-                      defaultValue:
-                        "Forcé pour les documents médicaux : chiffrement et rétention limitée.",
-                    })
-                  : t("required.sensitiveHint", {
-                      defaultValue:
-                        "Active si la pièce contient des données personnelles sensibles.",
-                    })}
+                {typeIsSensitive ? t("required.sensitiveForced") : t("required.sensitiveHint")}
               </p>
             </div>
             <Switch
@@ -285,7 +267,7 @@ export function CampRequiredDocumentsEditor({
               ) : (
                 <Check className="h-4 w-4" />
               )}
-              <span className="ml-1.5">{t("common.save", { defaultValue: "Enregistrer" })}</span>
+              <span className="ml-1.5">{t("common.save")}</span>
             </Button>
             <Button
               type="button"
@@ -296,7 +278,7 @@ export function CampRequiredDocumentsEditor({
               }}
             >
               <X className="h-4 w-4 mr-1.5" />
-              {t("common.cancel", { defaultValue: "Annuler" })}
+              {t("common.cancel")}
             </Button>
           </div>
         </div>
@@ -312,7 +294,7 @@ export function CampRequiredDocumentsEditor({
           disabled={disabled}
         >
           <Plus className="h-4 w-4 mr-1.5" />
-          {t("required.add", { defaultValue: "Ajouter une pièce" })}
+          {t("required.add")}
         </Button>
       )}
     </div>
@@ -367,17 +349,17 @@ function SortableRequiredRow({
           )}
           {doc.required ? (
             <Badge variant="secondary" className="text-[10px] py-0 px-1.5">
-              {t("required.mandatoryTag", { defaultValue: "Obligatoire" })}
+              {t("required.mandatoryTag")}
             </Badge>
           ) : (
             <Badge variant="outline" className="text-[10px] py-0 px-1.5">
-              {t("required.optionalTag", { defaultValue: "Facultatif" })}
+              {t("required.optionalTag")}
             </Badge>
           )}
           {doc.is_sensitive && (
             <Badge className="text-[10px] py-0 px-1.5 bg-amber-500/15 text-amber-700 dark:text-amber-300 border-amber-500/30">
               <Lock className="h-2.5 w-2.5 mr-0.5" />
-              {t("required.sensitiveTag", { defaultValue: "Sensible" })}
+              {t("required.sensitiveTag")}
             </Badge>
           )}
         </div>

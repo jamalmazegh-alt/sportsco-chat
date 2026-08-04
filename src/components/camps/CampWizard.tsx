@@ -189,45 +189,39 @@ export function CampWizard({ clubId, onClose, onCreated }: Props) {
     { eyebrow: string; title: string; hint: string; icon: React.ElementType }
   > = {
     title: {
-      eyebrow: t("wizard.eyebrow.title", { defaultValue: "Étape 1" }),
-      title: t("wizard.step.title.title", { defaultValue: "Nom du stage" }),
-      hint: t("wizard.step.title.hint", { defaultValue: "Ce que verront les familles" }),
+      eyebrow: t("wizard.eyebrow.title"),
+      title: t("wizard.step.title.title"),
+      hint: t("wizard.step.title.hint"),
       icon: Tent,
     },
     dates: {
-      eyebrow: t("wizard.eyebrow.dates", { defaultValue: "Étape 2" }),
-      title: t("wizard.step.dates.title", { defaultValue: "Quand ?" }),
-      hint: t("wizard.step.dates.hint", { defaultValue: "Début, fin et deadline d'inscription" }),
+      eyebrow: t("wizard.eyebrow.dates"),
+      title: t("wizard.step.dates.title"),
+      hint: t("wizard.step.dates.hint"),
       icon: CalendarDays,
     },
     capacity: {
-      eyebrow: t("wizard.eyebrow.capacity", { defaultValue: "Étape 3" }),
-      title: t("wizard.step.capacity.title", { defaultValue: "Places et tarif" }),
-      hint: t("wizard.step.capacity.hint", {
-        defaultValue: "Combien de participants, à quel prix",
-      }),
+      eyebrow: t("wizard.eyebrow.capacity"),
+      title: t("wizard.step.capacity.title"),
+      hint: t("wizard.step.capacity.hint"),
       icon: Users,
     },
     venue: {
-      eyebrow: t("wizard.eyebrow.venue", { defaultValue: "Étape 4" }),
-      title: t("wizard.step.venue.title", { defaultValue: "Où se passe le stage ?" }),
-      hint: t("wizard.step.venue.hint", { defaultValue: "Facultatif — modifiable plus tard" }),
+      eyebrow: t("wizard.eyebrow.venue"),
+      title: t("wizard.step.venue.title"),
+      hint: t("wizard.step.venue.hint"),
       icon: MapPin,
     },
     ageGroups: {
-      eyebrow: t("wizard.eyebrow.ageGroups", { defaultValue: "Étape 5" }),
-      title: t("wizard.step.ageGroups.title", { defaultValue: "Catégories d'âge" }),
-      hint: t("wizard.step.ageGroups.hint", {
-        defaultValue: "Requis pour publier — sélectionne au moins une catégorie",
-      }),
+      eyebrow: t("wizard.eyebrow.ageGroups"),
+      title: t("wizard.step.ageGroups.title"),
+      hint: t("wizard.step.ageGroups.hint"),
       icon: Tag,
     },
     summary: {
-      eyebrow: t("wizard.eyebrow.summary", { defaultValue: "Récap" }),
-      title: t("wizard.step.summary.title", { defaultValue: "Prêt à créer" }),
-      hint: t("wizard.step.summary.hint", {
-        defaultValue: "Brouillon créé — publication au prochain écran",
-      }),
+      eyebrow: t("wizard.eyebrow.summary"),
+      title: t("wizard.step.summary.title"),
+      hint: t("wizard.step.summary.hint"),
       icon: Check,
     },
   };
@@ -263,7 +257,7 @@ export function CampWizard({ clubId, onClose, onCreated }: Props) {
                 type="button"
                 onClick={onClose}
                 className="flex h-6 w-6 items-center justify-center rounded-full bg-white/15 ring-1 ring-white/30 transition hover:bg-white/30"
-                aria-label={t("common.cancel", { defaultValue: "Fermer" })}
+                aria-label={t("common.cancel")}
               >
                 <X className="h-3.5 w-3.5 text-white" strokeWidth={3} />
               </button>
@@ -295,18 +289,18 @@ export function CampWizard({ clubId, onClose, onCreated }: Props) {
         {stepIdx > 0 && !isLast && (
           <Button variant="ghost" size="sm" className="h-7 px-2 -ml-2" onClick={() => go(-1)}>
             <ChevronLeft className="h-3.5 w-3.5" />
-            {t("wizard.back", { defaultValue: "Retour" })}
+            {t("wizard.back")}
           </Button>
         )}
 
         {current === "title" && (
           <div className="space-y-2">
-            <Label>{t("form.title", { defaultValue: "Titre" })}</Label>
+            <Label>{t("form.title")}</Label>
             <Input
               autoFocus
               value={state.title}
               onChange={(e) => patch("title", e.target.value)}
-              placeholder={t("form.titlePlaceholder", { defaultValue: "Stage de Pâques U9-U11" })}
+              placeholder={t("form.titlePlaceholder")}
             />
           </div>
         )}
@@ -315,7 +309,7 @@ export function CampWizard({ clubId, onClose, onCreated }: Props) {
           <div className="space-y-3">
             <div className="grid gap-3 sm:grid-cols-2">
               <div className="space-y-1.5">
-                <Label>{t("form.startDate", { defaultValue: "Début" })}</Label>
+                <Label>{t("form.startDate")}</Label>
                 <Input
                   type="date"
                   value={state.startDate}
@@ -323,7 +317,7 @@ export function CampWizard({ clubId, onClose, onCreated }: Props) {
                 />
               </div>
               <div className="space-y-1.5">
-                <Label>{t("form.endDate", { defaultValue: "Fin" })}</Label>
+                <Label>{t("form.endDate")}</Label>
                 <Input
                   type="date"
                   value={state.endDate}
@@ -332,27 +326,19 @@ export function CampWizard({ clubId, onClose, onCreated }: Props) {
               </div>
             </div>
             <div className="space-y-1.5">
-              <Label>{t("form.deadline", { defaultValue: "Date limite d'inscription" })}</Label>
+              <Label>{t("form.deadline")}</Label>
               <Input
                 type="date"
                 value={state.deadline}
                 onChange={(e) => patch("deadline", e.target.value)}
               />
-              <p className="text-[11px] text-muted-foreground">
-                {t("wizard.deadlineHint", {
-                  defaultValue: "Facultatif — doit être avant la date de début.",
-                })}
-              </p>
+              <p className="text-[11px] text-muted-foreground">{t("wizard.deadlineHint")}</p>
             </div>
             {!stepValid.dates && (
               <p className="text-xs text-destructive">
                 {state.endDate < state.startDate
-                  ? t("errors.datesInvalid", {
-                      defaultValue: "La date de fin doit être postérieure au début.",
-                    })
-                  : t("errors.publishDeadlineAfterStart", {
-                      defaultValue: "La deadline d'inscription doit être avant la date de début.",
-                    })}
+                  ? t("errors.datesInvalid")
+                  : t("errors.publishDeadlineAfterStart")}
               </p>
             )}
           </div>
@@ -361,7 +347,7 @@ export function CampWizard({ clubId, onClose, onCreated }: Props) {
         {current === "capacity" && (
           <div className="grid gap-3 sm:grid-cols-2">
             <div className="space-y-1.5">
-              <Label>{t("form.capacity", { defaultValue: "Capacité" })}</Label>
+              <Label>{t("form.capacity")}</Label>
               <Input
                 type="number"
                 min={1}
@@ -371,9 +357,9 @@ export function CampWizard({ clubId, onClose, onCreated }: Props) {
             </div>
             <div className="space-y-1.5">
               <Label>
-                {t("form.price", { defaultValue: "Tarif indicatif" })}
+                {t("form.price")}
                 <span className="ml-1 text-[10px] text-muted-foreground">
-                  ({t("wizard.optional", { defaultValue: "optionnel" })})
+                  ({t("wizard.optional")})
                 </span>
               </Label>
               <Input
@@ -404,21 +390,13 @@ export function CampWizard({ clubId, onClose, onCreated }: Props) {
                 }))
               }
             />
-            <p className="text-[11px] text-muted-foreground">
-              {t("wizard.venueHint", {
-                defaultValue: "Tu peux passer cette étape et l'ajouter plus tard.",
-              })}
-            </p>
+            <p className="text-[11px] text-muted-foreground">{t("wizard.venueHint")}</p>
           </div>
         )}
 
         {current === "ageGroups" && (
           <div className="space-y-3">
-            <p className="text-xs text-muted-foreground">
-              {t("ageGroups.selectAll", {
-                defaultValue: "Sélectionne les catégories concernées",
-              })}
-            </p>
+            <p className="text-xs text-muted-foreground">{t("ageGroups.selectAll")}</p>
             <div className="grid grid-cols-3 gap-2 sm:grid-cols-5 md:grid-cols-7">
               {presets.map((p) => {
                 const active = selectedLabels.has(p.label.toUpperCase());
@@ -444,12 +422,7 @@ export function CampWizard({ clubId, onClose, onCreated }: Props) {
               })}
             </div>
             {state.ageGroups.length === 0 && (
-              <p className="text-xs text-muted-foreground">
-                {t("wizard.ageGroupsEmpty", {
-                  defaultValue:
-                    "Au moins une catégorie est requise pour publier. Tu pourras en ajouter d'autres après.",
-                })}
-              </p>
+              <p className="text-xs text-muted-foreground">{t("wizard.ageGroupsEmpty")}</p>
             )}
           </div>
         )}
@@ -463,35 +436,27 @@ export function CampWizard({ clubId, onClose, onCreated }: Props) {
                 {state.deadline && (
                   <>
                     {" · "}
-                    {t("wizard.summary.deadline", { defaultValue: "deadline" })} {state.deadline}
+                    {t("wizard.summary.deadline")} {state.deadline}
                   </>
                 )}
               </div>
               <div>
-                👥 {state.capacity} {t("wizard.summary.places", { defaultValue: "places" })}
+                👥 {state.capacity} {t("wizard.summary.places")}
                 {state.price && ` · ${state.price} €`}
               </div>
               {(state.venueId || state.externalLocation.trim()) && (
                 <div>
-                  📍{" "}
-                  {state.venueId
-                    ? t("wizard.summary.venueSet", { defaultValue: "Lieu défini" })
-                    : state.externalLocation}
+                  📍 {state.venueId ? t("wizard.summary.venueSet") : state.externalLocation}
                 </div>
               )}
               <div className="pt-1">
                 <span className="text-xs text-muted-foreground">
-                  {t("wizard.summary.ageGroups", { defaultValue: "Catégories" })} :{" "}
+                  {t("wizard.summary.ageGroups")} :{" "}
                 </span>
                 {state.ageGroups.map((g) => g.label).join(" · ") || "—"}
               </div>
             </div>
-            <p className="text-xs text-muted-foreground">
-              {t("wizard.summary.next", {
-                defaultValue:
-                  "Le stage sera créé en brouillon. Tu pourras ajouter description, image, programme et documents avant de publier.",
-              })}
-            </p>
+            <p className="text-xs text-muted-foreground">{t("wizard.summary.next")}</p>
           </div>
         )}
       </div>
@@ -500,11 +465,10 @@ export function CampWizard({ clubId, onClose, onCreated }: Props) {
       <div className="border-t border-border bg-background/95 px-4 py-3 flex items-center justify-between gap-2">
         <span className="text-[11px] text-muted-foreground">
           {isLast
-            ? t("wizard.footerReady", { defaultValue: "Tout est prêt" })
+            ? t("wizard.footerReady")
             : t("wizard.footerProgress", {
                 current: stepIdx + 1,
                 total: totalSteps,
-                defaultValue: "Étape {{current}} sur {{total}}",
               })}
         </span>
         {isLast ? (
@@ -514,11 +478,11 @@ export function CampWizard({ clubId, onClose, onCreated }: Props) {
             className={cn("min-w-[140px]")}
           >
             {createMut.isPending && <Loader2 className="h-4 w-4 mr-1.5 animate-spin" />}
-            {t("wizard.create", { defaultValue: "Créer le stage" })}
+            {t("wizard.create")}
           </Button>
         ) : (
           <Button onClick={() => go(1)} disabled={!canNext} className="min-w-[110px]">
-            {t("wizard.next", { defaultValue: "Suivant" })}
+            {t("wizard.next")}
           </Button>
         )}
       </div>

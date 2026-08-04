@@ -77,25 +77,21 @@ export function CampCreateChooser({ clubId, open, onOpenChange, onSaved }: Props
         {mode === "chooser" && (
           <>
             <DialogHeader>
-              <DialogTitle>{t("chooser.title", { defaultValue: "Nouveau stage" })}</DialogTitle>
-              <DialogDescription>
-                {t("chooser.subtitle", {
-                  defaultValue: "Comment veux-tu créer ce stage ?",
-                })}
-              </DialogDescription>
+              <DialogTitle>{t("chooser.title")}</DialogTitle>
+              <DialogDescription>{t("chooser.subtitle")}</DialogDescription>
             </DialogHeader>
             <div className="grid gap-2 pt-2">
               <DoorButton
                 icon={<Sparkles className="h-5 w-5" />}
-                title={t("chooser.assistant", { defaultValue: "Créer avec l'assistant" })}
-                hint={t("chooser.assistantHint", { defaultValue: "Guidé, étape par étape" })}
+                title={t("chooser.assistant")}
+                hint={t("chooser.assistantHint")}
                 primary
                 onClick={() => setMode("wizard")}
               />
               <DoorButton
                 icon={<Settings2 className="h-5 w-5" />}
-                title={t("chooser.classic", { defaultValue: "Création rapide" })}
-                hint={t("chooser.classicHint", { defaultValue: "Titre, dates, capacité" })}
+                title={t("chooser.classic")}
+                hint={t("chooser.classicHint")}
                 onClick={() => setMode("classic")}
               />
             </div>
@@ -105,12 +101,8 @@ export function CampCreateChooser({ clubId, open, onOpenChange, onSaved }: Props
         {mode === "wizard" && (
           <>
             <DialogHeader className="sr-only">
-              <DialogTitle>
-                {t("wizard.title", { defaultValue: "Assistant de création" })}
-              </DialogTitle>
-              <DialogDescription>
-                {t("chooser.assistantHint", { defaultValue: "Guidé, étape par étape" })}
-              </DialogDescription>
+              <DialogTitle>{t("wizard.title")}</DialogTitle>
+              <DialogDescription>{t("chooser.assistantHint")}</DialogDescription>
             </DialogHeader>
             <CampWizard
               clubId={clubId}
@@ -127,27 +119,21 @@ export function CampCreateChooser({ clubId, open, onOpenChange, onSaved }: Props
         {mode === "classic" && (
           <>
             <DialogHeader>
-              <DialogTitle>{t("list.newTitle", { defaultValue: "Nouveau stage" })}</DialogTitle>
+              <DialogTitle>{t("list.newTitle")}</DialogTitle>
             </DialogHeader>
             <div className="space-y-3">
               <div className="space-y-1.5">
-                <label className="text-sm font-medium">
-                  {t("form.title", { defaultValue: "Titre" })}
-                </label>
+                <label className="text-sm font-medium">{t("form.title")}</label>
                 <Input
                   data-testid="camp-title-input"
                   value={draft.title}
                   onChange={(e) => setDraft({ ...draft, title: e.target.value })}
-                  placeholder={t("form.titlePlaceholder", {
-                    defaultValue: "Stage de Pâques U9-U11",
-                  })}
+                  placeholder={t("form.titlePlaceholder")}
                 />
               </div>
               <div className="grid gap-3 sm:grid-cols-2">
                 <div className="space-y-1.5">
-                  <label className="text-sm font-medium">
-                    {t("form.startDate", { defaultValue: "Début" })}
-                  </label>
+                  <label className="text-sm font-medium">{t("form.startDate")}</label>
                   <Input
                     type="date"
                     value={draft.startDate}
@@ -155,9 +141,7 @@ export function CampCreateChooser({ clubId, open, onOpenChange, onSaved }: Props
                   />
                 </div>
                 <div className="space-y-1.5">
-                  <label className="text-sm font-medium">
-                    {t("form.endDate", { defaultValue: "Fin" })}
-                  </label>
+                  <label className="text-sm font-medium">{t("form.endDate")}</label>
                   <Input
                     type="date"
                     value={draft.endDate}
@@ -166,9 +150,7 @@ export function CampCreateChooser({ clubId, open, onOpenChange, onSaved }: Props
                 </div>
               </div>
               <div className="space-y-1.5">
-                <label className="text-sm font-medium">
-                  {t("form.capacity", { defaultValue: "Capacité" })}
-                </label>
+                <label className="text-sm font-medium">{t("form.capacity")}</label>
                 <Input
                   type="number"
                   min={1}
@@ -179,7 +161,7 @@ export function CampCreateChooser({ clubId, open, onOpenChange, onSaved }: Props
             </div>
             <DialogFooter>
               <Button variant="outline" onClick={() => setMode("chooser")}>
-                {t("wizard.back", { defaultValue: "Retour" })}
+                {t("wizard.back")}
               </Button>
               <Button
                 onClick={() => createMut.mutate()}
@@ -192,7 +174,7 @@ export function CampCreateChooser({ clubId, open, onOpenChange, onSaved }: Props
                 }
               >
                 {createMut.isPending && <Loader2 className="h-4 w-4 mr-1.5 animate-spin" />}
-                {t("list.create", { defaultValue: "Créer le brouillon" })}
+                {t("list.create")}
               </Button>
             </DialogFooter>
           </>

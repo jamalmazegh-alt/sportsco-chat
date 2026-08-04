@@ -156,7 +156,7 @@ export function HomeNeedsCard() {
             )}
           </div>
           <span className="text-[11px] font-bold text-foreground inline-flex items-center gap-0.5 shrink-0">
-            {t("common.seeAll", { defaultValue: "Tout voir" })}
+            {t("common.seeAll")}
             <ChevronRight className="h-3 w-3" />
           </span>
         </Link>

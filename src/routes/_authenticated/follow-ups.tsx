@@ -193,9 +193,7 @@ function FollowUpsPage() {
   if (!isCoach) {
     return (
       <div className="px-5 pt-8 pb-8">
-        <p className="text-sm text-muted-foreground">
-          {t("common.unauthorized", { defaultValue: "Accès réservé aux coachs." })}
-        </p>
+        <p className="text-sm text-muted-foreground">{t("common.unauthorized")}</p>
       </div>
     );
   }
@@ -206,14 +204,8 @@ function FollowUpsPage() {
     <div className="px-5 pt-8 pb-8 space-y-5">
       <header className="flex items-start justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-semibold">
-            {t("followUps.title", { defaultValue: "À relancer" })}
-          </h1>
-          <p className="text-sm text-muted-foreground mt-1">
-            {t("followUps.subtitle", {
-              defaultValue: "Joueurs sans réponse sur les prochains événements.",
-            })}
-          </p>
+          <h1 className="text-2xl font-semibold">{t("followUps.title")}</h1>
+          <p className="text-sm text-muted-foreground mt-1">{t("followUps.subtitle")}</p>
         </div>
         {total > 0 && (
           <Button size="sm" onClick={handleRemindAll} disabled={bulkSending} className="shrink-0">
@@ -236,10 +228,8 @@ function FollowUpsPage() {
       ) : total === 0 ? (
         <EmptyState
           icon={<Calendar className="h-6 w-6" />}
-          title={t("followUps.empty", { defaultValue: "Tout le monde a répondu 🎉" })}
-          description={t("followUps.emptyHint", {
-            defaultValue: "Aucun joueur en attente sur les prochaines convocations.",
-          })}
+          title={t("followUps.empty")}
+          description={t("followUps.emptyHint")}
         />
       ) : (
         <div className="space-y-6">

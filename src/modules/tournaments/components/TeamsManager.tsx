@@ -162,10 +162,10 @@ export function TeamsManager({ tournamentId, clubId, teams, maxTeams, sport }: P
     onSuccess: (_d, vars) => {
       const msg =
         vars.status === "paid"
-          ? t("teams.payment.markedPaid", { defaultValue: "Marqué comme payé" })
+          ? t("teams.payment.markedPaid")
           : vars.status === "exempt"
-            ? t("teams.payment.markedExempt", { defaultValue: "Marqué exempté" })
-            : t("teams.payment.markedUnpaid", { defaultValue: "Marqué impayé" });
+            ? t("teams.payment.markedExempt")
+            : t("teams.payment.markedUnpaid");
       toast.success(msg);
       qc.invalidateQueries({ queryKey: ["tournament", tournamentId] });
     },
@@ -611,10 +611,10 @@ export function TeamsManager({ tournamentId, clubId, teams, maxTeams, sport }: P
                         : "bg-amber-50 text-amber-800 border-amber-300 hover:bg-amber-100";
                   const label =
                     ps === "paid"
-                      ? t("teams.payment.paid", { defaultValue: "Payé" })
+                      ? t("teams.payment.paid")
                       : ps === "exempt"
-                        ? t("teams.payment.exempt", { defaultValue: "Exempté" })
-                        : t("teams.payment.unpaid", { defaultValue: "À encaisser" });
+                        ? t("teams.payment.exempt")
+                        : t("teams.payment.unpaid");
                   const Icon = ps === "paid" ? CheckCircle2 : ps === "exempt" ? Circle : Banknote;
 
                   return (
@@ -651,9 +651,7 @@ export function TeamsManager({ tournamentId, clubId, teams, maxTeams, sport }: P
                           "group ml-auto inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold border border-dashed transition-colors disabled:opacity-50 cursor-pointer",
                           styles,
                         )}
-                        title={t("teams.payment.cycleHint", {
-                          defaultValue: "Cliquer pour changer le statut de paiement",
-                        })}
+                        title={t("teams.payment.cycleHint")}
                       >
                         <Icon className="h-3 w-3" />
                         <span>{label}</span>
@@ -664,7 +662,7 @@ export function TeamsManager({ tournamentId, clubId, teams, maxTeams, sport }: P
                       </button>
                       {!hasContact && (
                         <span className="text-muted-foreground/60 italic">
-                          {t("teams.row.noContact", { defaultValue: "Pas de contact" })}
+                          {t("teams.row.noContact")}
                         </span>
                       )}
                     </div>

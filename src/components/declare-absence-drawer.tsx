@@ -310,15 +310,15 @@ export function DeclareAbsenceDrawer({
       const labelFor = (type: string) => {
         switch (type) {
           case "match":
-            return t("eventType.match", { defaultValue: "Match" });
+            return t("eventType.match");
           case "training":
-            return t("eventType.training", { defaultValue: "Entraînement" });
+            return t("eventType.training");
           case "tournament":
-            return t("eventType.tournament", { defaultValue: "Tournoi" });
+            return t("eventType.tournament");
           case "meeting":
-            return t("eventType.meeting", { defaultValue: "Réunion" });
+            return t("eventType.meeting");
           default:
-            return t("eventType.other", { defaultValue: "Événement" });
+            return t("eventType.other");
         }
       };
       const fmtShort = (d: string) =>
@@ -339,7 +339,7 @@ export function DeclareAbsenceDrawer({
       uids.map((uid) => ({
         user_id: uid,
         type: "availability_declared",
-        title: t("availability.upcomingWidget", { defaultValue: "Absence déclarée" }),
+        title: t("availability.upcomingWidget"),
         body,
         link: `/players/${playerId}`,
       })),
@@ -348,25 +348,18 @@ export function DeclareAbsenceDrawer({
 
   async function onSubmit() {
     if (!playerId) {
-      toast.error(
-        t("availability.errors.missingPlayer", { defaultValue: "Sélectionnez un joueur." }),
-      );
+      toast.error(t("availability.errors.missingPlayer"));
       return;
     }
     if (endDate < startDate) {
-      toast.error(t("availability.errors.invalidRange", { defaultValue: "Dates invalides." }));
+      toast.error(t("availability.errors.invalidRange"));
       return;
     }
     setBusy(true);
     try {
       const overlap = await checkOverlap();
       if (overlap) {
-        toast.error(
-          t("availability.errors.overlap", {
-            defaultValue:
-              "Une absence est déjà déclarée sur ces dates. Édite l'existante à la place.",
-          }),
-        );
+        toast.error(t("availability.errors.overlap"));
         setBusy(false);
         return;
       }
@@ -447,11 +440,7 @@ export function DeclareAbsenceDrawer({
         }
       }
 
-      toast.success(
-        editing
-          ? t("availability.updated", { defaultValue: "Absence mise à jour" })
-          : t("availability.saved", { defaultValue: "Absence enregistrée" }),
-      );
+      toast.success(editing ? t("availability.updated") : t("availability.saved"));
       qc.invalidateQueries({ queryKey: ["player-availabilities"] });
       qc.invalidateQueries({ queryKey: ["upcoming-absences"] });
       qc.invalidateQueries({ queryKey: ["event-availabilities"] });
@@ -471,24 +460,14 @@ export function DeclareAbsenceDrawer({
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent side="right" className="w-full sm:max-w-md overflow-y-auto">
         <SheetHeader className="pt-[env(safe-area-inset-top)]">
-          <SheetTitle>
-            {t("availability.declare", { defaultValue: "Déclarer une absence" })}
-          </SheetTitle>
-          <SheetDescription>
-            {t("availability.drawerHint", {
-              defaultValue: "Indique la période et le motif. Le coach sera informé.",
-            })}
-          </SheetDescription>
+          <SheetTitle>{t("availability.declare")}</SheetTitle>
+          <SheetDescription>{t("availability.drawerHint")}</SheetDescription>
         </SheetHeader>
 
         <div className="mt-4 space-y-4">
           {!initialPlayerId && candidates.length > 1 && (
             <div className="space-y-1.5">
-              <Label>
-                {teamId
-                  ? t("availability.forPlayer", { defaultValue: "Pour quel joueur ?" })
-                  : t("availability.forChild", { defaultValue: "Pour quel enfant ?" })}
-              </Label>
+              <Label>{teamId ? t("availability.forPlayer") : t("availability.forChild")}</Label>
               <Select value={playerId} onValueChange={setPlayerId}>
                 <SelectTrigger>
                   <SelectValue placeholder="—" />
@@ -510,7 +489,7 @@ export function DeclareAbsenceDrawer({
           )}
 
           <div className="space-y-1.5">
-            <Label>{t("availability.dates", { defaultValue: "Période d'absence" })}</Label>
+            <Label>{t("availability.dates")}</Label>
             <Popover>
               <PopoverTrigger asChild>
                 <Button variant="outline" className="h-11 w-full justify-start font-normal">
@@ -534,7 +513,7 @@ export function DeclareAbsenceDrawer({
                       </span>
                     )
                   ) : (
-                    t("availability.pickRange", { defaultValue: "Sélectionner une période" })
+                    t("availability.pickRange")
                   )}
                 </Button>
               </PopoverTrigger>
@@ -559,7 +538,7 @@ export function DeclareAbsenceDrawer({
           </div>
 
           <div className="space-y-1.5">
-            <Label>{t("availability.reasonLabel", { defaultValue: "Motif" })}</Label>
+            <Label>{t("availability.reasonLabel")}</Label>
             <div className="grid grid-cols-2 gap-2">
               {REASONS.map(({ value, Icon }) => (
                 <WizardOptionCard
@@ -574,13 +553,13 @@ export function DeclareAbsenceDrawer({
           </div>
 
           <div className="space-y-1.5">
-            <Label>{t("availability.comment", { defaultValue: "Commentaire" })}</Label>
+            <Label>{t("availability.comment")}</Label>
             <Textarea
               value={comment}
               onChange={(e) => setComment(e.target.value.slice(0, 300))}
               rows={3}
               maxLength={300}
-              placeholder={t("availability.commentPlaceholder", { defaultValue: "Optionnel" })}
+              placeholder={t("availability.commentPlaceholder")}
             />
             <p className="text-[10px] text-muted-foreground text-right">{comment.length}/300</p>
           </div>
@@ -588,7 +567,7 @@ export function DeclareAbsenceDrawer({
           {impactedEvents.length > 0 && (
             <div className="rounded-lg border border-border bg-muted/40 p-3 space-y-2">
               <p className="text-xs font-medium text-foreground">
-                {t("availability.impactedEvents", { defaultValue: "📅 Cette absence impactera :" })}
+                {t("availability.impactedEvents")}
               </p>
               <ul className="space-y-1.5">
                 {impactedEvents.slice(0, 10).map((ev) => {
@@ -625,14 +604,10 @@ export function DeclareAbsenceDrawer({
 
         <SheetFooter className="mt-6 flex-row gap-2 sm:justify-end">
           <Button variant="ghost" onClick={() => onOpenChange(false)} disabled={busy}>
-            {t("common.cancel", { defaultValue: "Annuler" })}
+            {t("common.cancel")}
           </Button>
           <Button onClick={onSubmit} disabled={busy || !playerId}>
-            {busy ? (
-              <Loader2 className="h-4 w-4 animate-spin" />
-            ) : (
-              t("availability.save", { defaultValue: "Enregistrer l'absence" })
-            )}
+            {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : t("availability.save")}
           </Button>
         </SheetFooter>
       </SheetContent>

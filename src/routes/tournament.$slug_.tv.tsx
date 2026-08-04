@@ -135,7 +135,7 @@ function TvSlideshowPage() {
     if (isCompleted) {
       out.push({
         key: "podium",
-        title: t("finalStandings.title", { defaultValue: "Classement final" }),
+        title: t("finalStandings.title"),
         icon: <Trophy className="h-7 w-7 text-amber-500" />,
         render: () => (
           <div className="h-full w-full overflow-auto flex items-start justify-center">
@@ -523,9 +523,8 @@ function MatchesGrid({
         const setsLine = scoring.mode === "sets" ? formatSets(m.sets) : "";
         const details: string[] = [];
         if (m.details?.went_to_aet || m.overtime_score_a != null)
-          details.push(t("public.match.aet", { defaultValue: "AP" }));
-        if (m.details?.penalties || m.details?.shootout)
-          details.push(t("public.match.pen", { defaultValue: "TAB" }));
+          details.push(t("public.match.aet"));
+        if (m.details?.penalties || m.details?.shootout) details.push(t("public.match.pen"));
         const mvp = m.details?.mvp_name as string | undefined;
         return (
           <li

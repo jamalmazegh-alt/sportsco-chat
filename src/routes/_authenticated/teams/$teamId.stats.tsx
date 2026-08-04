@@ -18,7 +18,7 @@ export const Route = createFileRoute("/_authenticated/teams/$teamId/stats")({
   head: () => ({
     meta: [
       {
-        title: i18n.t("stats.teamStats", { defaultValue: "Statistiques de l'équipe" }),
+        title: i18n.t("stats.teamStats"),
       },
     ],
   }),
@@ -51,28 +51,26 @@ function TeamStatsPage() {
           <ArrowLeft className="h-4 w-4" />
         </Link>
         <h1 className="text-xl font-semibold">
-          {t("stats.teamStats", { defaultValue: "Statistiques" })}
+          {t("stats.teamStats")}
           {team?.name ? ` · ${team.name}` : ""}
         </h1>
       </div>
 
       <section className="space-y-3">
         <SectionTitle icon={<BarChart3 className="h-4 w-4" />}>
-          {t("stats.attendanceSection", { defaultValue: "Présence" })}
+          {t("stats.attendanceSection")}
         </SectionTitle>
         <TeamAttendanceStats teamId={teamId} />
       </section>
 
       <section className="space-y-3">
-        <SectionTitle icon={<Goal className="h-4 w-4" />}>
-          {t("stats.matchesSection", { defaultValue: "Matchs & buts" })}
-        </SectionTitle>
+        <SectionTitle icon={<Goal className="h-4 w-4" />}>{t("stats.matchesSection")}</SectionTitle>
         <TeamMatchStats teamId={teamId} />
       </section>
 
       <section className="space-y-3">
         <SectionTitle icon={<Trophy className="h-4 w-4" />}>
-          {t("stats.challengesSection", { defaultValue: "Défis" })}
+          {t("stats.challengesSection")}
         </SectionTitle>
         {team?.club_id && <TeamChallengesRankings clubId={team.club_id} teamId={teamId} />}
       </section>
@@ -267,8 +265,8 @@ function ChallengeRankingCard({ challenge }: { challenge: any }) {
     }));
     const csv = toCsv(rows, [
       { key: "rank", header: "#" },
-      { key: "player", header: t("stats.player", { defaultValue: "Joueur" }) },
-      { key: "score", header: t("stats.score", { defaultValue: "Score" }) },
+      { key: "player", header: t("stats.player") },
+      { key: "score", header: t("stats.score") },
     ]);
     const safe = (displayName ?? "challenge").replace(/[^a-z0-9-_]+/gi, "_");
     downloadCsv(`ranking_${safe}.csv`, csv);

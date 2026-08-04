@@ -47,7 +47,7 @@ export function TeamInviteShareButton({ clubId, teamId, teamName }: Props) {
       for (let i = 0; i < bin.length; i++) arr[i] = bin.charCodeAt(i);
       const blob = new Blob([arr], { type: "application/pdf" });
       await downloadFile(blob, filename);
-      toast.success(t("teams.posterReady", { defaultValue: "Affiche prête" }));
+      toast.success(t("teams.posterReady"));
     } catch (e: any) {
       toast.error(e?.message ?? "Error");
     } finally {
@@ -101,7 +101,7 @@ export function TeamInviteShareButton({ clubId, teamId, teamName }: Props) {
   const copy = async () => {
     if (!url) return;
     await copyText(url);
-    toast.success(t("share.linkCopied", { defaultValue: "Lien copié" }));
+    toast.success(t("share.linkCopied"));
   };
 
   const download = () => {
@@ -136,16 +136,14 @@ export function TeamInviteShareButton({ clubId, teamId, teamName }: Props) {
         variant="ghost"
         className="h-8 w-8 shrink-0"
         onClick={() => onOpenChange(true)}
-        aria-label={t("teams.shareInvite", { defaultValue: "Partager le lien d'invitation" })}
+        aria-label={t("teams.shareInvite")}
       >
         <Share2 className="h-4 w-4" />
       </Button>
       <Dialog open={open} onOpenChange={onOpenChange}>
         <DialogContent className="max-w-sm">
           <DialogHeader>
-            <DialogTitle>
-              {t("teams.shareInviteTitle", { defaultValue: "Inviter à rejoindre" })}
-            </DialogTitle>
+            <DialogTitle>{t("teams.shareInviteTitle")}</DialogTitle>
           </DialogHeader>
           <div className="space-y-4">
             {busy || !url ? (
@@ -176,11 +174,11 @@ export function TeamInviteShareButton({ clubId, teamId, teamName }: Props) {
                 <div className="flex gap-2">
                   <Button variant="outline" className="flex-1" onClick={download}>
                     <Download className="h-4 w-4" />
-                    {t("share.qrCode", { defaultValue: "QR code" })}
+                    {t("share.qrCode")}
                   </Button>
                   <Button className="flex-1" onClick={nativeShare}>
                     <Share2 className="h-4 w-4" />
-                    {t("share.trigger", { defaultValue: "Partager" })}
+                    {t("share.trigger")}
                   </Button>
                 </div>
                 <Button
@@ -194,7 +192,7 @@ export function TeamInviteShareButton({ clubId, teamId, teamName }: Props) {
                   ) : (
                     <FileText className="h-4 w-4" />
                   )}
-                  {t("teams.downloadPoster", { defaultValue: "Télécharger l'affiche PDF" })}
+                  {t("teams.downloadPoster")}
                 </Button>
               </>
             )}

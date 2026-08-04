@@ -707,7 +707,8 @@
       "clubMismatch": "Diese Meisterschaft gehört nicht zu diesem Verein",
       "archived": "Diese Meisterschaft ist archiviert",
       "notFound": "Meisterschaft nicht gefunden"
-    }
+    },
+    "levelPlaceholder": "Landesliga 1"
   },
   "club": {
     "logo": "Vereinslogo",

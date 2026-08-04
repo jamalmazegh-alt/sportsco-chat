@@ -221,9 +221,7 @@ export function FieldsManager({
                 <Input
                   value={streams[f] ?? ""}
                   onChange={(e) => setStreams({ ...streams, [f]: e.target.value })}
-                  placeholder={t("fields.streamUrlPlaceholder", {
-                    defaultValue: "URL de streaming (YouTube, Twitch…)",
-                  })}
+                  placeholder={t("fields.streamUrlPlaceholder")}
                   maxLength={500}
                   className="flex-1 h-8 text-xs"
                   type="url"

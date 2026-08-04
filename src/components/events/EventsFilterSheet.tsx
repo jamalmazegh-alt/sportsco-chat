@@ -102,17 +102,17 @@ export function EventsFilterSheet({
     () => [
       {
         key: "training",
-        label: t("events.typeTraining", { defaultValue: "Entraînement" }),
+        label: t("events.typeTraining"),
         icon: Dumbbell,
       },
-      { key: "match", label: t("events.typeMatch", { defaultValue: "Match" }), icon: Trophy },
+      { key: "match", label: t("events.typeMatch"), icon: Trophy },
       {
         key: "tournament",
-        label: t("events.typeTournament", { defaultValue: "Tournoi" }),
+        label: t("events.typeTournament"),
         icon: Trophy,
       },
-      { key: "meeting", label: t("events.typeMeeting", { defaultValue: "Réunion" }), icon: Users },
-      { key: "other", label: t("events.typeOther", { defaultValue: "Autre" }), icon: CalendarIcon },
+      { key: "meeting", label: t("events.typeMeeting"), icon: Users },
+      { key: "other", label: t("events.typeOther"), icon: CalendarIcon },
     ],
     [t],
   );
@@ -156,7 +156,7 @@ export function EventsFilterSheet({
           )}
         >
           <Filter className="h-4 w-4" />
-          {t("events.filters", { defaultValue: "Filtres" })}
+          {t("events.filters")}
           {activeCount > 0 && (
             <Badge
               variant="secondary"
@@ -169,45 +169,41 @@ export function EventsFilterSheet({
       </SheetTrigger>
       <SheetContent side="right" className="w-full sm:max-w-md overflow-y-auto">
         <SheetHeader>
-          <SheetTitle>{t("events.filters", { defaultValue: "Filtres" })}</SheetTitle>
-          <SheetDescription>
-            {t("events.filtersDescription", {
-              defaultValue: "Affinez la liste des événements affichés.",
-            })}
-          </SheetDescription>
+          <SheetTitle>{t("events.filters")}</SheetTitle>
+          <SheetDescription>{t("events.filtersDescription")}</SheetDescription>
         </SheetHeader>
 
         <div className="space-y-6 py-4 pb-8">
           {/* Convocations sent */}
           {isCoach && (
-            <Section title={t("events.filterConvocations", { defaultValue: "Convocations" })}>
+            <Section title={t("events.filterConvocations")}>
               <div className="flex flex-wrap gap-2">
                 <ChipButton
                   active={draft.convocationsSent === "all"}
                   onClick={() => setDraft({ ...draft, convocationsSent: "all" })}
                 >
-                  {t("events.convocAll", { defaultValue: "Tous" })}
+                  {t("events.convocAll")}
                 </ChipButton>
                 <ChipButton
                   active={draft.convocationsSent === "sent"}
                   onClick={() => setDraft({ ...draft, convocationsSent: "sent" })}
                 >
                   <Send className="h-3.5 w-3.5" />
-                  {t("events.convocSent", { defaultValue: "Envoyées" })}
+                  {t("events.convocSent")}
                 </ChipButton>
                 <ChipButton
                   active={draft.convocationsSent === "not_sent"}
                   onClick={() => setDraft({ ...draft, convocationsSent: "not_sent" })}
                 >
                   <MailX className="h-3.5 w-3.5" />
-                  {t("events.convocNotSent", { defaultValue: "Non envoyées" })}
+                  {t("events.convocNotSent")}
                 </ChipButton>
               </div>
             </Section>
           )}
 
           {/* Types */}
-          <Section title={t("events.filterType", { defaultValue: "Type d'événement" })}>
+          <Section title={t("events.filterType")}>
             <div className="flex flex-wrap gap-2">
               {typeOptions.map(({ key, label, icon: Icon }) => {
                 const on = draft.types.has(key);
@@ -225,27 +221,27 @@ export function EventsFilterSheet({
           {(draft.types.size === 0 ||
             draft.types.has("match") ||
             draft.types.has("tournament")) && (
-            <Section title={t("events.filterVenue", { defaultValue: "Lieu" })}>
+            <Section title={t("events.filterVenue")}>
               <div className="flex flex-wrap gap-2">
                 <ChipButton
                   active={draft.homeAway === "all"}
                   onClick={() => setDraft({ ...draft, homeAway: "all" })}
                 >
-                  {t("events.venueAll", { defaultValue: "Tous" })}
+                  {t("events.venueAll")}
                 </ChipButton>
                 <ChipButton
                   active={draft.homeAway === "home"}
                   onClick={() => setDraft({ ...draft, homeAway: "home" })}
                 >
                   <Home className="h-3.5 w-3.5" />
-                  {t("events.venueHome", { defaultValue: "Domicile" })}
+                  {t("events.venueHome")}
                 </ChipButton>
                 <ChipButton
                   active={draft.homeAway === "away"}
                   onClick={() => setDraft({ ...draft, homeAway: "away" })}
                 >
                   <Plane className="h-3.5 w-3.5" />
-                  {t("events.venueAway", { defaultValue: "Extérieur" })}
+                  {t("events.venueAway")}
                 </ChipButton>
               </div>
             </Section>
@@ -254,7 +250,7 @@ export function EventsFilterSheet({
           {/* Teams */}
           {isCoach && teams.length > 1 && (
             <Section
-              title={t("events.filterTeams", { defaultValue: "Équipes" })}
+              title={t("events.filterTeams")}
               action={
                 draft.teamIds.size > 0 ? (
                   <button
@@ -262,7 +258,7 @@ export function EventsFilterSheet({
                     className="text-xs text-muted-foreground hover:text-foreground"
                     onClick={() => setDraft({ ...draft, teamIds: new Set() })}
                   >
-                    {t("common.clear", { defaultValue: "Effacer" })}
+                    {t("common.clear")}
                   </button>
                 ) : null
               }
@@ -282,16 +278,16 @@ export function EventsFilterSheet({
           )}
 
           {/* Date range */}
-          <Section title={t("events.filterPeriod", { defaultValue: "Période" })}>
+          <Section title={t("events.filterPeriod")}>
             <div className="grid grid-cols-2 gap-2">
               <DateField
-                label={t("events.dateFrom", { defaultValue: "Du" })}
+                label={t("events.dateFrom")}
                 value={draft.dateFrom}
                 onChange={(d) => setDraft({ ...draft, dateFrom: d })}
                 locale={locale}
               />
               <DateField
-                label={t("events.dateTo", { defaultValue: "Au" })}
+                label={t("events.dateTo")}
                 value={draft.dateTo}
                 onChange={(d) => setDraft({ ...draft, dateTo: d })}
                 locale={locale}
@@ -304,22 +300,20 @@ export function EventsFilterSheet({
                 className="mt-2 inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground"
               >
                 <X className="h-3 w-3" />
-                {t("events.clearDates", { defaultValue: "Effacer les dates" })}
+                {t("events.clearDates")}
               </button>
             )}
           </Section>
 
           {/* Display options */}
-          <Section title={t("events.filterDisplay", { defaultValue: "Affichage" })}>
+          <Section title={t("events.filterDisplay")}>
             <div className="flex flex-wrap gap-2">
               <ChipButton
                 active={draft.showPast}
                 onClick={() => setDraft({ ...draft, showPast: !draft.showPast })}
               >
                 <Eye className="h-3.5 w-3.5" />
-                {t("events.includePast", {
-                  defaultValue: "Inclure les événements passés",
-                })}
+                {t("events.includePast")}
                 {pastCount ? <span className="opacity-70">· {pastCount}</span> : null}
               </ChipButton>
               <ChipButton
@@ -327,7 +321,7 @@ export function EventsFilterSheet({
                 onClick={() => setDraft({ ...draft, showCancelled: !draft.showCancelled })}
               >
                 <Ban className="h-3.5 w-3.5" />
-                {t("events.includeCancelled", { defaultValue: "Inclure les annulés" })}
+                {t("events.includeCancelled")}
               </ChipButton>
               {isCoach && hasInternalTeam && (
                 <ChipButton
@@ -335,9 +329,7 @@ export function EventsFilterSheet({
                   onClick={() => setDraft({ ...draft, includeInternal: !draft.includeInternal })}
                 >
                   <Building2 className="h-3.5 w-3.5" />
-                  {t("events.hideInternalMeetings", {
-                    defaultValue: "Masquer les réunions internes",
-                  })}
+                  {t("events.hideInternalMeetings")}
                 </ChipButton>
               )}
             </div>
@@ -346,10 +338,10 @@ export function EventsFilterSheet({
 
         <SheetFooter className="gap-2 sm:gap-2">
           <Button type="button" variant="ghost" onClick={reset} className="flex-1 sm:flex-none">
-            {t("common.reset", { defaultValue: "Réinitialiser" })}
+            {t("common.reset")}
           </Button>
           <Button type="button" onClick={apply} className="flex-1 sm:flex-none">
-            {t("events.applyFilters", { defaultValue: "Appliquer" })}
+            {t("events.applyFilters")}
           </Button>
         </SheetFooter>
       </SheetContent>

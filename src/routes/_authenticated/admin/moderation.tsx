@@ -99,7 +99,7 @@ function ModerationPage() {
     mutationFn: async (vars: { reportId: string; action: string }) =>
       resolve({ data: vars as never }),
     onSuccess: () => {
-      toast.success(t("wall.moderation.done", { defaultValue: "Signalement traité" }));
+      toast.success(t("wall.moderation.done"));
       qc.invalidateQueries({ queryKey: ["wall-reports"] });
     },
     onError: (e: Error) => toast.error(e.message),
@@ -109,7 +109,7 @@ function ModerationPage() {
     mutationFn: async (vars: { reportId: string; action: string }) =>
       resolveUser({ data: vars as never }),
     onSuccess: () => {
-      toast.success(t("wall.moderation.done", { defaultValue: "Signalement traité" }));
+      toast.success(t("wall.moderation.done"));
       qc.invalidateQueries({ queryKey: ["user-reports"] });
     },
     onError: (e: Error) => toast.error(e.message),
@@ -119,7 +119,7 @@ function ModerationPage() {
     mutationFn: async (vars: { reportId: string; action: string }) =>
       resolveChat({ data: vars as never }),
     onSuccess: () => {
-      toast.success(t("wall.moderation.done", { defaultValue: "Signalement traité" }));
+      toast.success(t("wall.moderation.done"));
       qc.invalidateQueries({ queryKey: ["chat-reports"] });
     },
     onError: (e: Error) => toast.error(e.message),
@@ -143,27 +143,20 @@ function ModerationPage() {
   );
 
   const filters: Array<{ key: StatusFilter; label: string }> = [
-    { key: "pending", label: t("wall.moderation.pending", { defaultValue: "En attente" }) },
-    { key: "reviewing", label: t("wall.moderation.reviewing", { defaultValue: "En cours" }) },
-    { key: "actioned", label: t("wall.moderation.actioned", { defaultValue: "Traités" }) },
-    { key: "dismissed", label: t("wall.moderation.dismissed", { defaultValue: "Ignorés" }) },
-    { key: "all", label: t("common.all", { defaultValue: "Tous" }) },
+    { key: "pending", label: t("wall.moderation.pending") },
+    { key: "reviewing", label: t("wall.moderation.reviewing") },
+    { key: "actioned", label: t("wall.moderation.actioned") },
+    { key: "dismissed", label: t("wall.moderation.dismissed") },
+    { key: "all", label: t("common.all") },
   ];
 
   return (
     <div className="px-5 py-4 space-y-4">
       <div className="flex items-center gap-2">
         <Flag className="h-4 w-4 text-primary" />
-        <h2 className="text-base font-semibold">
-          {t("wall.moderation.title", { defaultValue: "Modération du mur" })}
-        </h2>
+        <h2 className="text-base font-semibold">{t("wall.moderation.title")}</h2>
       </div>
-      <p className="text-xs text-muted-foreground">
-        {t("wall.moderation.hint", {
-          defaultValue:
-            "Les contenus signalés restent visibles tant qu'un responsable ne les masque pas ou ne les supprime pas.",
-        })}
-      </p>
+      <p className="text-xs text-muted-foreground">{t("wall.moderation.hint")}</p>
 
       <div className="grid grid-cols-2 gap-1 rounded-xl bg-muted/50 p-1">
         <button
@@ -174,7 +167,7 @@ function ModerationPage() {
           )}
         >
           <MessageSquare className="h-3.5 w-3.5" />
-          {t("userReport.tabContent", { defaultValue: "Contenus" })}
+          {t("userReport.tabContent")}
         </button>
         <button
           onClick={() => setKind("members")}
@@ -184,7 +177,7 @@ function ModerationPage() {
           )}
         >
           <UserRound className="h-3.5 w-3.5" />
-          {t("userReport.tabMembers", { defaultValue: "Membres" })}
+          {t("userReport.tabMembers")}
         </button>
       </div>
 
@@ -213,10 +206,8 @@ function ModerationPage() {
         ) : contentItems.length === 0 ? (
           <EmptyState
             icon={<Flag className="h-5 w-5" />}
-            title={t("wall.moderation.empty", { defaultValue: "Aucun signalement" })}
-            description={t("wall.moderation.emptyHint", {
-              defaultValue: "Les contenus signalés par les membres apparaîtront ici.",
-            })}
+            title={t("wall.moderation.empty")}
+            description={t("wall.moderation.emptyHint")}
           />
         ) : (
           <ul className="space-y-3">
@@ -230,7 +221,7 @@ function ModerationPage() {
                   >
                     <div className="flex items-center gap-1.5 flex-wrap">
                       <Badge variant="outline" className="text-[10px]">
-                        {t("chatReport.badge", { defaultValue: "Message de chat" })}
+                        {t("chatReport.badge")}
                       </Badge>
                       <Badge variant="secondary" className="text-[10px]">
                         {t(`wall.report.${c.reason}`, {
@@ -239,17 +230,17 @@ function ModerationPage() {
                       </Badge>
                       {c.deleted && (
                         <Badge variant="destructive" className="text-[10px]">
-                          {t("wall.moderation.deleted", { defaultValue: "Supprimé" })}
+                          {t("wall.moderation.deleted")}
                         </Badge>
                       )}
                     </div>
                     <p className="text-xs text-muted-foreground">
-                      {t("wall.moderation.by", { defaultValue: "Signalé par" })}{" "}
+                      {t("wall.moderation.by")}{" "}
                       <span className="font-medium text-foreground">{c.reporterName}</span> ·{" "}
                       {fmt(c.created_at, "d MMM HH:mm")}
                     </p>
                     <p className="text-xs text-muted-foreground">
-                      {t("wall.moderation.author", { defaultValue: "Écrit par" })}{" "}
+                      {t("wall.moderation.author")}{" "}
                       <span className="font-medium text-foreground">{c.authorName}</span>
                     </p>
                     {c.excerpt && (
@@ -269,7 +260,7 @@ function ModerationPage() {
                           onClick={() => chatMutation.mutate({ reportId: c.id, action: "dismiss" })}
                         >
                           <Check className="h-3.5 w-3.5 mr-1" />
-                          {t("wall.moderation.dismiss", { defaultValue: "Ignorer" })}
+                          {t("wall.moderation.dismiss")}
                         </Button>
                         {!c.deleted && (
                           <Button
@@ -281,9 +272,7 @@ function ModerationPage() {
                             }
                           >
                             <Trash2 className="h-3.5 w-3.5 mr-1" />
-                            {t("chatReport.deleteMessage", {
-                              defaultValue: "Supprimer le message",
-                            })}
+                            {t("chatReport.deleteMessage")}
                           </Button>
                         )}
                         <Button
@@ -294,7 +283,7 @@ function ModerationPage() {
                           }
                         >
                           <Check className="h-3.5 w-3.5 mr-1" />
-                          {t("userReport.markActioned", { defaultValue: "Marquer traité" })}
+                          {t("userReport.markActioned")}
                         </Button>
                       </div>
                     )}
@@ -309,8 +298,8 @@ function ModerationPage() {
                       <div className="flex items-center gap-1.5 flex-wrap">
                         <Badge variant="outline" className="text-[10px]">
                           {r.kind === "comment"
-                            ? t("wall.moderation.comment", { defaultValue: "Commentaire" })
-                            : t("wall.moderation.post", { defaultValue: "Publication" })}
+                            ? t("wall.moderation.comment")
+                            : t("wall.moderation.post")}
                         </Badge>
                         <Badge variant="secondary" className="text-[10px]">
                           {t(`wall.report.${r.reason}`, {
@@ -319,22 +308,22 @@ function ModerationPage() {
                         </Badge>
                         {r.hidden && (
                           <Badge variant="destructive" className="text-[10px]">
-                            {t("wall.moderation.hidden", { defaultValue: "Masqué" })}
+                            {t("wall.moderation.hidden")}
                           </Badge>
                         )}
                         {r.deleted && (
                           <Badge variant="destructive" className="text-[10px]">
-                            {t("wall.moderation.deleted", { defaultValue: "Supprimé" })}
+                            {t("wall.moderation.deleted")}
                           </Badge>
                         )}
                       </div>
                       <p className="text-xs text-muted-foreground mt-1">
-                        {t("wall.moderation.by", { defaultValue: "Signalé par" })}{" "}
+                        {t("wall.moderation.by")}{" "}
                         <span className="font-medium text-foreground">{r.reporterName}</span> ·{" "}
                         {fmt(r.created_at, "d MMM HH:mm")}
                       </p>
                       <p className="text-xs text-muted-foreground">
-                        {t("wall.moderation.author", { defaultValue: "Écrit par" })}{" "}
+                        {t("wall.moderation.author")}{" "}
                         <span className="font-medium text-foreground">{r.authorName}</span>
                         {r.contentCreatedAt ? ` · ${fmt(r.contentCreatedAt, "d MMM HH:mm")}` : ""}
                       </p>
@@ -350,20 +339,14 @@ function ModerationPage() {
                   {r.kind === "comment" && (
                     <div className="rounded-lg border border-dashed border-border px-3 py-2 space-y-1">
                       <p className="text-[11px] uppercase tracking-wide text-muted-foreground">
-                        {t("wall.moderation.originalPost", {
-                          defaultValue: "Publication d'origine",
-                        })}
+                        {t("wall.moderation.originalPost")}
                       </p>
                       <p className="text-xs text-muted-foreground">
-                        {t("wall.moderation.author", { defaultValue: "Écrit par" })}{" "}
+                        {t("wall.moderation.author")}{" "}
                         <span className="font-medium text-foreground">{r.postAuthorName}</span>
                         {r.postCreatedAt ? ` · ${fmt(r.postCreatedAt, "d MMM HH:mm")}` : ""}
-                        {r.postHidden
-                          ? ` · ${t("wall.moderation.hidden", { defaultValue: "Masqué" })}`
-                          : ""}
-                        {r.postDeleted
-                          ? ` · ${t("wall.moderation.deleted", { defaultValue: "Supprimé" })}`
-                          : ""}
+                        {r.postHidden ? ` · ${t("wall.moderation.hidden")}` : ""}
+                        {r.postDeleted ? ` · ${t("wall.moderation.deleted")}` : ""}
                       </p>
                       {r.postExcerpt && (
                         <p className="text-sm whitespace-pre-wrap line-clamp-4">{r.postExcerpt}</p>
@@ -383,7 +366,7 @@ function ModerationPage() {
                         onClick={() => mutation.mutate({ reportId: r.id, action: "dismiss" })}
                       >
                         <Check className="h-3.5 w-3.5 mr-1" />
-                        {t("wall.moderation.dismiss", { defaultValue: "Ignorer" })}
+                        {t("wall.moderation.dismiss")}
                       </Button>
                       {r.hidden ? (
                         <Button
@@ -393,7 +376,7 @@ function ModerationPage() {
                           onClick={() => mutation.mutate({ reportId: r.id, action: "unhide" })}
                         >
                           <Eye className="h-3.5 w-3.5 mr-1" />
-                          {t("wall.moderation.unhide", { defaultValue: "Réafficher" })}
+                          {t("wall.moderation.unhide")}
                         </Button>
                       ) : (
                         <Button
@@ -403,7 +386,7 @@ function ModerationPage() {
                           onClick={() => mutation.mutate({ reportId: r.id, action: "hide" })}
                         >
                           <EyeOff className="h-3.5 w-3.5 mr-1" />
-                          {t("wall.moderation.hide", { defaultValue: "Masquer" })}
+                          {t("wall.moderation.hide")}
                         </Button>
                       )}
                       <Button
@@ -413,7 +396,7 @@ function ModerationPage() {
                         onClick={() => mutation.mutate({ reportId: r.id, action: "delete" })}
                       >
                         <Trash2 className="h-3.5 w-3.5 mr-1" />
-                        {t("common.delete", { defaultValue: "Supprimer" })}
+                        {t("common.delete")}
                       </Button>
                     </div>
                   )}
@@ -431,10 +414,8 @@ function ModerationPage() {
         ) : userReports.length === 0 ? (
           <EmptyState
             icon={<UserRound className="h-5 w-5" />}
-            title={t("wall.moderation.empty", { defaultValue: "Aucun signalement" })}
-            description={t("userReport.emptyHint", {
-              defaultValue: "Les membres signalés apparaîtront ici.",
-            })}
+            title={t("wall.moderation.empty")}
+            description={t("userReport.emptyHint")}
           />
         ) : (
           <ul className="space-y-3">
@@ -442,7 +423,7 @@ function ModerationPage() {
               <li key={r.id} className="rounded-xl border border-border bg-card p-3 space-y-2">
                 <div className="flex items-center gap-1.5 flex-wrap">
                   <Badge variant="outline" className="text-[10px]">
-                    {t("userReport.tabMembers", { defaultValue: "Membres" })}
+                    {t("userReport.tabMembers")}
                   </Badge>
                   <Badge variant="secondary" className="text-[10px]">
                     {t(`wall.report.${r.reason}`, {
@@ -454,7 +435,7 @@ function ModerationPage() {
                   <span className="font-semibold">{r.reportedName}</span>
                 </p>
                 <p className="text-xs text-muted-foreground">
-                  {t("wall.moderation.by", { defaultValue: "Signalé par" })}{" "}
+                  {t("wall.moderation.by")}{" "}
                   <span className="font-medium text-foreground">{r.reporterName}</span> ·{" "}
                   {fmt(r.created_at, "d MMM HH:mm")}
                 </p>
@@ -470,7 +451,7 @@ function ModerationPage() {
                       onClick={() => userMutation.mutate({ reportId: r.id, action: "dismiss" })}
                     >
                       <Check className="h-3.5 w-3.5 mr-1" />
-                      {t("wall.moderation.dismiss", { defaultValue: "Ignorer" })}
+                      {t("wall.moderation.dismiss")}
                     </Button>
                     {r.status === "pending" && (
                       <Button
@@ -480,7 +461,7 @@ function ModerationPage() {
                         onClick={() => userMutation.mutate({ reportId: r.id, action: "reviewing" })}
                       >
                         <Eye className="h-3.5 w-3.5 mr-1" />
-                        {t("userReport.markReviewing", { defaultValue: "Examiner" })}
+                        {t("userReport.markReviewing")}
                       </Button>
                     )}
                     <Button
@@ -489,7 +470,7 @@ function ModerationPage() {
                       onClick={() => userMutation.mutate({ reportId: r.id, action: "actioned" })}
                     >
                       <Check className="h-3.5 w-3.5 mr-1" />
-                      {t("userReport.markActioned", { defaultValue: "Marquer traité" })}
+                      {t("userReport.markActioned")}
                     </Button>
                   </div>
                 )}

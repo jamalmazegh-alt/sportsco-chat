@@ -75,20 +75,19 @@ export function DisciplineWidget({ clubId, className }: Props) {
           </div>
           <h2 className="text-sm font-semibold">
             {isLoading
-              ? t("discipline.title", { defaultValue: "Discipline" })
+              ? t("discipline.title")
               : total > 0
                 ? t("discipline.activeCount", {
-                    defaultValue: "{{count}} suspension active",
                     count: total,
                   })
-                : t("discipline.none", { defaultValue: "Aucune suspension active" })}
+                : t("discipline.none")}
           </h2>
         </div>
         <Link
           to="/club/discipline"
           className="text-xs text-primary font-medium inline-flex items-center gap-0.5"
         >
-          {t("discipline.viewAll", { defaultValue: "Voir tout" })}
+          {t("discipline.viewAll")}
           <ChevronRight className="h-3 w-3" />
         </Link>
       </div>
@@ -117,7 +116,6 @@ export function DisciplineWidget({ clubId, className }: Props) {
                   )}
                 >
                   {t("discipline.matchesLeft", {
-                    defaultValue: "{{count}} match restant",
                     defaultValue_plural: "{{count}} matchs restants",
                     count: r.remaining,
                   })}
@@ -130,13 +128,11 @@ export function DisciplineWidget({ clubId, className }: Props) {
 
       <div className="mt-3 flex items-center gap-2">
         <Button asChild size="sm" variant="outline" className="flex-1">
-          <Link to="/club/discipline">
-            {t("discipline.viewAll", { defaultValue: "Voir tout" })}
-          </Link>
+          <Link to="/club/discipline">{t("discipline.viewAll")}</Link>
         </Button>
         <Button size="sm" className="flex-1" onClick={() => setDrawerOpen(true)}>
           <Plus className="h-4 w-4" />
-          {t("discipline.createSanction", { defaultValue: "Créer une sanction" })}
+          {t("discipline.createSanction")}
         </Button>
       </div>
 

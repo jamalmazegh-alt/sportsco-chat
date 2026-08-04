@@ -130,11 +130,10 @@ export function AttendanceHeatmap({ playerId }: { playerId: string }) {
     <section className="rounded-2xl border border-border bg-card p-5 shadow-sm space-y-3">
       <div className="flex items-center justify-between">
         <h2 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground flex items-center gap-2">
-          <CalendarDays className="h-4 w-4" />{" "}
-          {t("heatmap.title", { defaultValue: "Carte de présence" })}
+          <CalendarDays className="h-4 w-4" /> {t("heatmap.title")}
         </h2>
         <span className="text-[10px] text-muted-foreground">
-          {t("heatmap.lastWeeks", { defaultValue: "{{n}} dernières semaines", n: WEEKS })}
+          {t("heatmap.lastWeeks", { n: WEEKS })}
         </span>
       </div>
 
@@ -174,7 +173,7 @@ export function AttendanceHeatmap({ playerId }: { playerId: string }) {
                     ? `${dateLabel} · ${d.titles.join(", ")}`
                     : d.isFuture
                       ? dateLabel
-                      : `${dateLabel} — ${t("heatmap.noEvent", { defaultValue: "Pas d'événement" })}`;
+                      : `${dateLabel} — ${t("heatmap.noEvent")}`;
                   return (
                     <div
                       key={row}
@@ -202,10 +201,7 @@ export function AttendanceHeatmap({ playerId }: { playerId: string }) {
           count={counts.uncertain}
         />
         <LegendDot cls="bg-absent/80" label={t("attendance.absent")} count={counts.absent} />
-        <LegendDot
-          cls="bg-muted/40"
-          label={t("heatmap.noEvent", { defaultValue: "Pas d'événement" })}
-        />
+        <LegendDot cls="bg-muted/40" label={t("heatmap.noEvent")} />
       </div>
     </section>
   );

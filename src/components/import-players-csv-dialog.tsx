@@ -210,7 +210,7 @@ export function ImportPlayersCsvDialog({
       setPreview(null);
       setOverrides({});
       setLoading(true);
-      setBusyLabel(t("players.import.reading", { defaultValue: "Lecture du fichier..." }));
+      setBusyLabel(t("players.import.reading"));
       try {
         const buf = await f.arrayBuffer();
         const wb = XLSX.read(buf, { type: "array", cellDates: true });
@@ -222,17 +222,12 @@ export function ImportPlayersCsvDialog({
             blankrows: false,
           }),
         );
-        if (rows.length === 0)
-          throw new Error(
-            t("players.import.noneDetected", {
-              defaultValue: "Aucun joueur détecté dans le fichier.",
-            }),
-          );
+        if (rows.length === 0) throw new Error(t("players.import.noneDetected"));
         const hdrs = Object.keys(rows[0]);
         setHeaders(hdrs);
         setRawRows(rows);
 
-        setBusyLabel(t("players.import.ai", { defaultValue: "Analyse IA en cours..." }));
+        setBusyLabel(t("players.import.ai"));
         const res = await aiAnalyze({
           data: { clubId, teamId, type: "players", headers: hdrs, rawRows: rows },
         });
@@ -255,7 +250,7 @@ export function ImportPlayersCsvDialog({
       // 1. Preview to detect conflicts on existing players.
       let previewRes = preview;
       if (!previewRes) {
-        setBusyLabel(t("players.import.previewing", { defaultValue: "Vérification..." }));
+        setBusyLabel(t("players.import.previewing"));
         previewRes = await doPreview({
           data: { clubId, teamId, rows: cleanRows },
         });
@@ -271,7 +266,7 @@ export function ImportPlayersCsvDialog({
       }
 
       // 2. Direct import (no conflicts, or user confirmed from diffs step).
-      setBusyLabel(t("players.import.importing", { defaultValue: "Import en cours..." }));
+      setBusyLabel(t("players.import.importing"));
       const fieldOverrides: Record<string, string[]> = {};
       for (const [idx, set] of Object.entries(overrides)) {
         if (set.size > 0) fieldOverrides[idx] = Array.from(set);
@@ -317,37 +312,22 @@ export function ImportPlayersCsvDialog({
   const rowsWithDiffs = preview?.rowPreviews.filter((r) => r.diffs.length > 0) ?? [];
 
   return (
-    <ResponsiveFormDialog
-      open={open}
-      onOpenChange={handleClose}
-      title={t("players.import.title", { defaultValue: "Importer des joueurs" })}
-    >
+    <ResponsiveFormDialog open={open} onOpenChange={handleClose} title={t("players.import.title")}>
       <div className="space-y-4 mt-3 pb-6">
         {/* Step 1: upload */}
         {!analysis && !result && (
           <>
-            <p className="text-sm text-muted-foreground">
-              {t("players.import.intro2", {
-                defaultValue:
-                  "Importez un fichier Excel (.xlsx) ou CSV. Les colonnes sont détectées automatiquement ; la date de naissance est obligatoire.",
-              })}
-            </p>
+            <p className="text-sm text-muted-foreground">{t("players.import.intro2")}</p>
             <div className="flex items-center justify-between gap-2">
               <Button type="button" variant="ghost" size="sm" onClick={downloadTemplate}>
                 <Download className="h-4 w-4 mr-1" />
-                {t("players.import.template", {
-                  defaultValue: "Télécharger le modèle",
-                })}
+                {t("players.import.template")}
               </Button>
             </div>
             <label className="block border-2 border-dashed rounded-lg p-8 text-center cursor-pointer hover:bg-muted/50 transition-colors">
               <Upload className="h-8 w-8 mx-auto mb-2 text-muted-foreground" />
               <div className="text-sm font-medium">
-                {loading
-                  ? busyLabel
-                  : t("players.import.dropOrClick", {
-                      defaultValue: "Cliquez pour choisir un fichier",
-                    })}
+                {loading ? busyLabel : t("players.import.dropOrClick")}
               </div>
               <div className="text-xs text-muted-foreground mt-1">.xlsx, .xls, .csv</div>
               <input
@@ -379,35 +359,26 @@ export function ImportPlayersCsvDialog({
             <div className="grid grid-cols-3 gap-2 text-center">
               <div className="rounded-lg border p-3">
                 <div className="text-2xl font-semibold">{analysis.summary.total}</div>
-                <div className="text-xs text-muted-foreground">
-                  {t("players.import.rowsTotal", { defaultValue: "lignes" })}
-                </div>
+                <div className="text-xs text-muted-foreground">{t("players.import.rowsTotal")}</div>
               </div>
               <div className="rounded-lg border p-3">
                 <div className="text-2xl font-semibold text-green-600">
                   {analysis.summary.valid}
                 </div>
-                <div className="text-xs text-muted-foreground">
-                  {t("players.import.rowsValid", { defaultValue: "valides" })}
-                </div>
+                <div className="text-xs text-muted-foreground">{t("players.import.rowsValid")}</div>
               </div>
               <div className="rounded-lg border p-3">
                 <div className="text-2xl font-semibold text-amber-600">
                   {analysis.summary.to_fix}
                 </div>
-                <div className="text-xs text-muted-foreground">
-                  {t("players.import.rowsToFix", { defaultValue: "à corriger" })}
-                </div>
+                <div className="text-xs text-muted-foreground">{t("players.import.rowsToFix")}</div>
               </div>
             </div>
             {analysis.summary.to_fix > 0 && (
               <div className="rounded-md border border-amber-200 bg-amber-50 p-3 text-xs text-amber-900 space-y-1">
                 <div className="font-medium flex items-center gap-1">
                   <AlertCircle className="h-3.5 w-3.5" />
-                  {t("players.import.toFixHintEditable", {
-                    defaultValue:
-                      "Certaines lignes ont des erreurs (cases rouges) ou champs manquants (cases orange). Corrigez-les directement dans le tableau ci-dessous avant d'importer.",
-                  })}
+                  {t("players.import.toFixHintEditable")}
                 </div>
               </div>
             )}
@@ -459,7 +430,7 @@ export function ImportPlayersCsvDialog({
             </div>
             <div className="flex gap-2">
               <Button variant="outline" onClick={reset} disabled={loading}>
-                {t("common.back", { defaultValue: "Retour" })}
+                {t("common.back")}
               </Button>
               <Button
                 onClick={() => runImportFlow()}
@@ -485,40 +456,28 @@ export function ImportPlayersCsvDialog({
             <div className="grid grid-cols-3 gap-2 text-center text-xs">
               <div className="rounded-lg border p-2">
                 <div className="text-xl font-semibold text-green-600">{preview.summary.new}</div>
-                <div className="text-muted-foreground">
-                  {t("players.import.actionNew", { defaultValue: "nouveaux" })}
-                </div>
+                <div className="text-muted-foreground">{t("players.import.actionNew")}</div>
               </div>
               <div className="rounded-lg border p-2">
                 <div className="text-xl font-semibold text-blue-600">{preview.summary.update}</div>
-                <div className="text-muted-foreground">
-                  {t("players.import.actionUpdate", { defaultValue: "mises à jour" })}
-                </div>
+                <div className="text-muted-foreground">{t("players.import.actionUpdate")}</div>
               </div>
               <div className="rounded-lg border p-2">
                 <div className="text-xl font-semibold text-amber-600">
                   {preview.summary.restore}
                 </div>
-                <div className="text-muted-foreground">
-                  {t("players.import.actionRestore", { defaultValue: "réactivés" })}
-                </div>
+                <div className="text-muted-foreground">{t("players.import.actionRestore")}</div>
               </div>
             </div>
 
             {rowsWithDiffs.length === 0 ? (
               <div className="rounded-md border p-3 text-xs text-muted-foreground">
-                {t("players.import.noDiffs", {
-                  defaultValue:
-                    "Aucun conflit détecté. Les champs vides des joueurs existants seront complétés automatiquement.",
-                })}
+                {t("players.import.noDiffs")}
               </div>
             ) : (
               <>
                 <div className="rounded-md border border-blue-200 bg-blue-50 p-3 text-xs text-blue-900">
-                  {t("players.import.diffsHint", {
-                    defaultValue:
-                      "Les joueurs existants ci-dessous ont des données qui diffèrent. Cochez uniquement les champs que vous voulez écraser. Par défaut, aucun écrasement.",
-                  })}
+                  {t("players.import.diffsHint")}
                 </div>
                 <div className="space-y-2 max-h-[40vh] overflow-y-auto">
                   {rowsWithDiffs.map((row) => (
@@ -538,32 +497,24 @@ export function ImportPlayersCsvDialog({
                           }`}
                         >
                           {row.action === "restore"
-                            ? t("players.import.actionRestore", {
-                                defaultValue: "réactivés",
-                              })
-                            : t("players.import.actionUpdate", {
-                                defaultValue: "mises à jour",
-                              })}
+                            ? t("players.import.actionRestore")
+                            : t("players.import.actionUpdate")}
                         </span>
                       </div>
                       <table className="w-full text-xs">
                         <thead className="text-muted-foreground">
                           <tr>
                             <th className="text-left font-normal py-1">
-                              {t("players.import.field", { defaultValue: "Champ" })}
+                              {t("players.import.field")}
                             </th>
                             <th className="text-left font-normal py-1">
-                              {t("players.import.current", { defaultValue: "Actuel" })}
+                              {t("players.import.current")}
                             </th>
                             <th className="text-left font-normal py-1">
-                              {t("players.import.incoming", {
-                                defaultValue: "Nouveau",
-                              })}
+                              {t("players.import.incoming")}
                             </th>
                             <th className="text-right font-normal py-1 w-24">
-                              {t("players.import.overwrite", {
-                                defaultValue: "Écraser",
-                              })}
+                              {t("players.import.overwrite")}
                             </th>
                           </tr>
                         </thead>
@@ -578,20 +529,14 @@ export function ImportPlayersCsvDialog({
                                 </td>
                                 <td className="py-1 text-muted-foreground">
                                   {d.current ?? (
-                                    <span className="italic">
-                                      {t("players.import.empty", {
-                                        defaultValue: "(vide)",
-                                      })}
-                                    </span>
+                                    <span className="italic">{t("players.import.empty")}</span>
                                   )}
                                 </td>
                                 <td className="py-1">{d.incoming ?? "—"}</td>
                                 <td className="py-1 text-right">
                                   {willAutoFill ? (
                                     <span className="text-[10px] text-green-700">
-                                      {t("players.import.autoFill", {
-                                        defaultValue: "auto",
-                                      })}
+                                      {t("players.import.autoFill")}
                                     </span>
                                   ) : (
                                     <Checkbox
@@ -622,7 +567,7 @@ export function ImportPlayersCsvDialog({
                 }}
                 disabled={loading}
               >
-                {t("common.back", { defaultValue: "Retour" })}
+                {t("common.back")}
               </Button>
               <Button
                 onClick={() => runImportFlow({ fromDiffs: true })}
@@ -647,34 +592,28 @@ export function ImportPlayersCsvDialog({
           <div className="space-y-3">
             <div className="flex items-center gap-2 text-green-600">
               <CheckCircle2 className="h-5 w-5" />
-              <span className="font-medium">
-                {t("players.import.doneTitle", { defaultValue: "Import terminé" })}
-              </span>
+              <span className="font-medium">{t("players.import.doneTitle")}</span>
             </div>
             <div className="rounded-md border p-3 text-sm space-y-1">
               <div>
-                {t("players.import.created", { defaultValue: "Nouveaux joueurs" })} :{" "}
+                {t("players.import.created")} :{" "}
                 <strong>{result.summary.players_created ?? 0}</strong>
               </div>
               <div>
-                {t("players.import.updated", { defaultValue: "Mis à jour" })} :{" "}
+                {t("players.import.updated")} :{" "}
                 <strong>{result.summary.players_updated ?? 0}</strong>
               </div>
               <div>
-                {t("players.import.restored", { defaultValue: "Réactivés" })} :{" "}
+                {t("players.import.restored")} :{" "}
                 <strong>{result.summary.players_restored ?? 0}</strong>
               </div>
               <div>
-                {t("players.import.linked", {
-                  defaultValue: "Rattachés à cette équipe",
-                })}{" "}
-                : <strong>{result.summary.players_linked ?? 0}</strong>
+                {t("players.import.linked")} : <strong>{result.summary.players_linked ?? 0}</strong>
               </div>
 
               {result.errors.length > 0 && (
                 <div className="text-amber-700 mt-2">
-                  {result.errors.length}{" "}
-                  {t("players.import.errorRows", { defaultValue: "ligne(s) en erreur" })}
+                  {result.errors.length} {t("players.import.errorRows")}
                 </div>
               )}
             </div>
@@ -682,17 +621,17 @@ export function ImportPlayersCsvDialog({
               <ul className="text-xs text-muted-foreground max-h-32 overflow-y-auto space-y-0.5">
                 {result.errors.slice(0, 10).map((e, i) => (
                   <li key={i}>
-                    {t("players.import.row", { defaultValue: "Ligne" })} {e.row} : {e.error}
+                    {t("players.import.row")} {e.row} : {e.error}
                   </li>
                 ))}
               </ul>
             )}
             <div className="flex gap-2">
               <Button variant="outline" onClick={reset}>
-                {t("players.import.another", { defaultValue: "Nouvel import" })}
+                {t("players.import.another")}
               </Button>
               <Button className="flex-1" onClick={() => handleClose(false)}>
-                {t("common.close", { defaultValue: "Fermer" })}
+                {t("common.close")}
               </Button>
             </div>
           </div>

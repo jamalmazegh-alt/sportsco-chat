@@ -24,15 +24,11 @@ export const Route = createFileRoute("/_authenticated/admin/camps/")({
   head: () => ({
     meta: [
       {
-        title: i18nInstance.t("camps:meta.list.title", {
-          defaultValue: "Stages du club – Clubero",
-        }),
+        title: i18nInstance.t("camps:meta.list.title"),
       },
       {
         name: "description",
-        content: i18nInstance.t("camps:meta.list.description", {
-          defaultValue: "Créez, publiez et gérez les stages proposés par votre club.",
-        }),
+        content: i18nInstance.t("camps:meta.list.description"),
       },
     ],
   }),
@@ -112,18 +108,12 @@ function CampsListPage() {
     <div className="mx-auto max-w-5xl px-4 py-6 space-y-6">
       <div className="flex items-start justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-semibold">
-            {t("list.title", { defaultValue: "Stages du club" })}
-          </h1>
-          <p className="text-sm text-muted-foreground">
-            {t("list.subtitle", {
-              defaultValue: "Créez et publiez les stages proposés par votre club.",
-            })}
-          </p>
+          <h1 className="text-2xl font-semibold">{t("list.title")}</h1>
+          <p className="text-sm text-muted-foreground">{t("list.subtitle")}</p>
         </div>
         <Button onClick={() => setCreating(true)}>
           <Plus className="h-4 w-4 mr-1" />
-          {t("list.new", { defaultValue: "Nouveau stage" })}
+          {t("list.new")}
         </Button>
       </div>
 
@@ -135,7 +125,7 @@ function CampsListPage() {
             <Input
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              placeholder={t("filters.searchPlaceholder", { defaultValue: "Rechercher…" })}
+              placeholder={t("filters.searchPlaceholder")}
               className="pl-8 h-9"
             />
           </div>
@@ -144,21 +134,11 @@ function CampsListPage() {
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">
-                {t("filters.status.all", { defaultValue: "Tous les statuts" })}
-              </SelectItem>
-              <SelectItem value="draft">
-                {t("status.draft", { defaultValue: "Brouillon" })}
-              </SelectItem>
-              <SelectItem value="published">
-                {t("status.published", { defaultValue: "Publié" })}
-              </SelectItem>
-              <SelectItem value="closed">
-                {t("status.closed", { defaultValue: "Fermé" })}
-              </SelectItem>
-              <SelectItem value="archived">
-                {t("status.archived", { defaultValue: "Archivé" })}
-              </SelectItem>
+              <SelectItem value="all">{t("filters.status.all")}</SelectItem>
+              <SelectItem value="draft">{t("status.draft")}</SelectItem>
+              <SelectItem value="published">{t("status.published")}</SelectItem>
+              <SelectItem value="closed">{t("status.closed")}</SelectItem>
+              <SelectItem value="archived">{t("status.archived")}</SelectItem>
             </SelectContent>
           </Select>
           <Select value={sortMode} onValueChange={(v) => setSortMode(v as SortMode)}>
@@ -166,18 +146,10 @@ function CampsListPage() {
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="startDesc">
-                {t("filters.sort.startDesc", { defaultValue: "Date de début ↓" })}
-              </SelectItem>
-              <SelectItem value="startAsc">
-                {t("filters.sort.startAsc", { defaultValue: "Date de début ↑" })}
-              </SelectItem>
-              <SelectItem value="titleAsc">
-                {t("filters.sort.titleAsc", { defaultValue: "Titre A→Z" })}
-              </SelectItem>
-              <SelectItem value="createdDesc">
-                {t("filters.sort.createdDesc", { defaultValue: "Récemment créés" })}
-              </SelectItem>
+              <SelectItem value="startDesc">{t("filters.sort.startDesc")}</SelectItem>
+              <SelectItem value="startAsc">{t("filters.sort.startAsc")}</SelectItem>
+              <SelectItem value="titleAsc">{t("filters.sort.titleAsc")}</SelectItem>
+              <SelectItem value="createdDesc">{t("filters.sort.createdDesc")}</SelectItem>
             </SelectContent>
           </Select>
           <div className="text-xs text-muted-foreground ml-auto">
@@ -196,15 +168,15 @@ function CampsListPage() {
         </div>
       ) : totalCount === 0 ? (
         <div className="rounded-xl border border-dashed border-border p-10 text-center text-sm text-muted-foreground space-y-4">
-          <p>{t("list.empty", { defaultValue: "Aucun stage pour le moment." })}</p>
+          <p>{t("list.empty")}</p>
           <Button onClick={() => setCreating(true)}>
             <Plus className="h-4 w-4 mr-1" />
-            {t("list.new", { defaultValue: "Nouveau stage" })}
+            {t("list.new")}
           </Button>
         </div>
       ) : displayed.length === 0 ? (
         <div className="rounded-xl border border-dashed border-border p-10 text-center text-sm text-muted-foreground">
-          {t("filters.noResults", { defaultValue: "Aucun stage ne correspond à ces filtres." })}
+          {t("filters.noResults")}
         </div>
       ) : (
         <ul className="grid gap-3 sm:grid-cols-2">
@@ -231,7 +203,7 @@ function CampsListPage() {
                       {c.venue_id && (
                         <span className="inline-flex items-center gap-1">
                           <MapPin className="h-3.5 w-3.5" />
-                          {t("list.hasVenue", { defaultValue: "Lieu défini" })}
+                          {t("list.hasVenue")}
                         </span>
                       )}
                     </div>

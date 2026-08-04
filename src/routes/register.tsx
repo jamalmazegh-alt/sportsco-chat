@@ -162,15 +162,15 @@ function RegisterPage() {
     let teamPayload: PendingClubInvitePayload | null = null;
     if (teamInvite) {
       if (joinMode === "child" && (!childFirstName.trim() || !childLastName.trim())) {
-        toast.error(t("auth.childNameRequired", { defaultValue: "Nom de l'enfant requis" }));
+        toast.error(t("auth.childNameRequired"));
         return;
       }
       if (joinMode === "self" && !birthDate) {
-        toast.error(t("auth.birthDateRequired", { defaultValue: "Date de naissance requise" }));
+        toast.error(t("auth.birthDateRequired"));
         return;
       }
       if (joinMode === "child" && !childBirthDate) {
-        toast.error(t("auth.birthDateRequired", { defaultValue: "Date de naissance requise" }));
+        toast.error(t("auth.birthDateRequired"));
         return;
       }
       teamPayload = {
@@ -216,13 +216,7 @@ function RegisterPage() {
           // inscrite) : le mot de passe saisi ici n'est pas celui du compte.
           // On l'explique au lieu d'afficher « identifiants invalides ».
           if (res?.alreadyExisted) {
-            toast.error(
-              t("auth.accountAlreadyExistsSignIn", {
-                defaultValue:
-                  "Un compte existe déjà avec cette adresse. Connectez-vous avec votre mot de passe habituel (ou utilisez « mot de passe oublié »).",
-              }),
-              { duration: 8000 },
-            );
+            toast.error(t("auth.accountAlreadyExistsSignIn"), { duration: 8000 });
             (navigate as any)({
               to: "/login",
               search: { email, invite: inviteToken },
@@ -428,10 +422,7 @@ function RegisterPage() {
             <div className="space-y-3 rounded-lg border border-border bg-muted/30 p-3">
               {minorOnlyTeam ? (
                 <div className="rounded-md border border-border bg-background px-3 py-2 text-xs text-muted-foreground">
-                  {t("auth.minorTeamParentOnly", {
-                    defaultValue:
-                      "Cette catégorie accueille des mineurs : le compte est créé par le parent ou le tuteur.",
-                  })}
+                  {t("auth.minorTeamParentOnly")}
                 </div>
               ) : (
                 !adultOnlyTeam && (
@@ -450,9 +441,7 @@ function RegisterPage() {
                             : "border-border bg-background text-muted-foreground"
                         }`}
                       >
-                        {m === "self"
-                          ? t("auth.joinAsPlayer", { defaultValue: "Je suis le joueur" })
-                          : t("auth.joinAsParent", { defaultValue: "J'inscris mon enfant" })}
+                        {m === "self" ? t("auth.joinAsPlayer") : t("auth.joinAsParent")}
                       </button>
                     ))}
                   </div>
@@ -462,9 +451,7 @@ function RegisterPage() {
               {joinMode === "child" && (
                 <div className="grid grid-cols-2 gap-3">
                   <div className="space-y-1.5">
-                    <Label htmlFor="cfirst">
-                      {t("auth.childFirstName", { defaultValue: "Prénom de l'enfant" })}
-                    </Label>
+                    <Label htmlFor="cfirst">{t("auth.childFirstName")}</Label>
                     <Input
                       id="cfirst"
                       value={childFirstName}
@@ -472,9 +459,7 @@ function RegisterPage() {
                     />
                   </div>
                   <div className="space-y-1.5">
-                    <Label htmlFor="clast">
-                      {t("auth.childLastName", { defaultValue: "Nom de l'enfant" })}
-                    </Label>
+                    <Label htmlFor="clast">{t("auth.childLastName")}</Label>
                     <Input
                       id="clast"
                       value={childLastName}
@@ -486,9 +471,7 @@ function RegisterPage() {
 
               <div className="space-y-1.5">
                 <Label htmlFor="bdate">
-                  {joinMode === "child"
-                    ? t("auth.childBirthDate", { defaultValue: "Date de naissance de l'enfant" })
-                    : t("auth.birthDate", { defaultValue: "Date de naissance" })}
+                  {joinMode === "child" ? t("auth.childBirthDate") : t("auth.birthDate")}
                 </Label>
                 <Input
                   id="bdate"
@@ -504,11 +487,7 @@ function RegisterPage() {
 
               {joinMode === "child" && (
                 <div className="space-y-1.5">
-                  <Label htmlFor="cphone">
-                    {t("auth.childPhone", {
-                      defaultValue: "Téléphone de l'enfant (optionnel)",
-                    })}
-                  </Label>
+                  <Label htmlFor="cphone">{t("auth.childPhone")}</Label>
                   <Input
                     id="cphone"
                     type="tel"
@@ -521,7 +500,7 @@ function RegisterPage() {
               <div className={joinMode === "child" ? "" : "grid grid-cols-2 gap-3"}>
                 {joinMode !== "child" && (
                   <div className="space-y-1.5">
-                    <Label htmlFor="phone">{t("auth.phone", { defaultValue: "Téléphone" })}</Label>
+                    <Label htmlFor="phone">{t("auth.phone")}</Label>
                     <Input
                       id="phone"
                       type="tel"
@@ -531,9 +510,7 @@ function RegisterPage() {
                   </div>
                 )}
                 <div className="space-y-1.5">
-                  <Label htmlFor="license">
-                    {t("auth.licenseNumber", { defaultValue: "N° licence (optionnel)" })}
-                  </Label>
+                  <Label htmlFor="license">{t("auth.licenseNumber")}</Label>
                   <Input
                     id="license"
                     value={license}
@@ -542,12 +519,7 @@ function RegisterPage() {
                 </div>
               </div>
 
-              <p className="text-xs text-muted-foreground">
-                {t("auth.teamJoinHint", {
-                  defaultValue:
-                    "Ces informations créent la fiche joueur. Le club pourra les compléter ensuite.",
-                })}
-              </p>
+              <p className="text-xs text-muted-foreground">{t("auth.teamJoinHint")}</p>
             </div>
           )}
 
@@ -573,9 +545,7 @@ function RegisterPage() {
           </div>
           {joinMode === "child" && (
             <div className="space-y-1.5">
-              <Label htmlFor="phone">
-                {t("auth.parentPhone", { defaultValue: "Votre téléphone (parent)" })}
-              </Label>
+              <Label htmlFor="phone">{t("auth.parentPhone")}</Label>
               <Input
                 id="phone"
                 type="tel"

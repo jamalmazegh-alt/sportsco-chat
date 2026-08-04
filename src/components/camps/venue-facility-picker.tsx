@@ -76,12 +76,8 @@ export function VenueFacilityPicker({
         >
           <Home className="h-4 w-4 shrink-0" />
           <div>
-            <div className="font-medium">
-              {t("form.venueModeHome", { defaultValue: "Lieux du club" })}
-            </div>
-            <div className="text-[11px] text-muted-foreground">
-              {t("form.venueModeHomeHint", { defaultValue: "Terrain, gymnase, salle…" })}
-            </div>
+            <div className="font-medium">{t("form.venueModeHome")}</div>
+            <div className="text-[11px] text-muted-foreground">{t("form.venueModeHomeHint")}</div>
           </div>
         </button>
         <button
@@ -96,11 +92,9 @@ export function VenueFacilityPicker({
         >
           <MapPin className="h-4 w-4 shrink-0" />
           <div>
-            <div className="font-medium">
-              {t("form.venueModeExternal", { defaultValue: "Adresse externe" })}
-            </div>
+            <div className="font-medium">{t("form.venueModeExternal")}</div>
             <div className="text-[11px] text-muted-foreground">
-              {t("form.venueModeExternalHint", { defaultValue: "Autre lieu, hors club" })}
+              {t("form.venueModeExternalHint")}
             </div>
           </div>
         </button>
@@ -109,7 +103,7 @@ export function VenueFacilityPicker({
       {mode === "home" ? (
         <div className="grid gap-4 sm:grid-cols-2">
           <div className="space-y-1.5">
-            <Label>{t("form.venue", { defaultValue: "Lieu" })}</Label>
+            <Label>{t("form.venue")}</Label>
             <Select
               value={venueId ?? "__none"}
               onValueChange={(v) =>
@@ -121,14 +115,10 @@ export function VenueFacilityPicker({
               }
             >
               <SelectTrigger>
-                <SelectValue
-                  placeholder={t("form.venuePlaceholder", { defaultValue: "Choisir un lieu" })}
-                />
+                <SelectValue placeholder={t("form.venuePlaceholder")} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="__none">
-                  {t("form.venueNone", { defaultValue: "— Aucun —" })}
-                </SelectItem>
+                <SelectItem value="__none">{t("form.venueNone")}</SelectItem>
                 {list.map((v) => (
                   <SelectItem key={v.id} value={v.id}>
                     {v.name}
@@ -138,7 +128,7 @@ export function VenueFacilityPicker({
             </Select>
           </div>
           <div className="space-y-1.5">
-            <Label>{t("form.facility", { defaultValue: "Terrain / installation" })}</Label>
+            <Label>{t("form.facility")}</Label>
             <Select
               value={facilityId ?? "__none"}
               onValueChange={(v) =>
@@ -151,14 +141,10 @@ export function VenueFacilityPicker({
               disabled={!venueId || facilities.length === 0}
             >
               <SelectTrigger>
-                <SelectValue
-                  placeholder={t("form.facilityPlaceholder", { defaultValue: "Optionnel" })}
-                />
+                <SelectValue placeholder={t("form.facilityPlaceholder")} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="__none">
-                  {t("form.facilityNone", { defaultValue: "— Aucun —" })}
-                </SelectItem>
+                <SelectItem value="__none">{t("form.facilityNone")}</SelectItem>
                 {facilities.map((f) => (
                   <SelectItem key={f.id} value={f.id}>
                     {f.name}
@@ -170,7 +156,7 @@ export function VenueFacilityPicker({
         </div>
       ) : (
         <div className="space-y-1.5">
-          <Label>{t("form.externalAddress", { defaultValue: "Adresse" })}</Label>
+          <Label>{t("form.externalAddress")}</Label>
           <LocationAutocomplete
             value={externalLocation ?? ""}
             onChange={(v) =>
@@ -180,16 +166,9 @@ export function VenueFacilityPicker({
                 externalLocation: v,
               })
             }
-            placeholder={t("form.externalAddressPlaceholder", {
-              defaultValue: "Ex. 12 rue du Stade, 75001 Paris",
-            })}
+            placeholder={t("form.externalAddressPlaceholder")}
           />
-          <p className="text-[11px] text-muted-foreground">
-            {t("form.externalAddressHint", {
-              defaultValue:
-                "Adresse libre — sera affichée aux inscrits et cliquable vers Google Maps.",
-            })}
-          </p>
+          <p className="text-[11px] text-muted-foreground">{t("form.externalAddressHint")}</p>
         </div>
       )}
     </div>

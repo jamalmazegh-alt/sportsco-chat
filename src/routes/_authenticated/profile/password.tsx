@@ -37,27 +37,15 @@ function PasswordPage() {
     if (!user?.email) return;
 
     if (next.length < 8) {
-      toast.error(
-        t("profile.password.tooShort", {
-          defaultValue: "Le mot de passe doit faire au moins 8 caractères.",
-        }),
-      );
+      toast.error(t("profile.password.tooShort"));
       return;
     }
     if (next !== confirm) {
-      toast.error(
-        t("profile.password.mismatch", {
-          defaultValue: "Les deux mots de passe ne correspondent pas.",
-        }),
-      );
+      toast.error(t("profile.password.mismatch"));
       return;
     }
     if (next === current) {
-      toast.error(
-        t("profile.password.sameAsCurrent", {
-          defaultValue: "Le nouveau mot de passe doit être différent de l'actuel.",
-        }),
-      );
+      toast.error(t("profile.password.sameAsCurrent"));
       return;
     }
 
@@ -70,11 +58,7 @@ function PasswordPage() {
     });
     if (signInError) {
       setBusy(false);
-      toast.error(
-        t("profile.password.wrongCurrent", {
-          defaultValue: "Mot de passe actuel incorrect.",
-        }),
-      );
+      toast.error(t("profile.password.wrongCurrent"));
       return;
     }
 
@@ -86,11 +70,7 @@ function PasswordPage() {
       return;
     }
 
-    toast.success(
-      t("profile.password.updated", {
-        defaultValue: "Mot de passe mis à jour.",
-      }),
-    );
+    toast.success(t("profile.password.updated"));
     setCurrent("");
     setNext("");
     setConfirm("");
@@ -106,22 +86,14 @@ function PasswordPage() {
           <KeyRound className="h-5 w-5" />
         </div>
         <div>
-          <h1 className="text-xl font-semibold">
-            {t("profile.password.title", { defaultValue: "Mot de passe" })}
-          </h1>
-          <p className="text-sm text-muted-foreground">
-            {t("profile.password.subtitle", {
-              defaultValue: "Modifiez le mot de passe de votre compte.",
-            })}
-          </p>
+          <h1 className="text-xl font-semibold">{t("profile.password.title")}</h1>
+          <p className="text-sm text-muted-foreground">{t("profile.password.subtitle")}</p>
         </div>
       </div>
 
       <form onSubmit={onSubmit} className="rounded-2xl border border-border bg-card p-5 space-y-4">
         <div className="space-y-1.5">
-          <Label htmlFor="current">
-            {t("profile.password.current", { defaultValue: "Mot de passe actuel" })}
-          </Label>
+          <Label htmlFor="current">{t("profile.password.current")}</Label>
           <div className="relative">
             <Input
               id="current"
@@ -143,9 +115,7 @@ function PasswordPage() {
         </div>
 
         <div className="space-y-1.5">
-          <Label htmlFor="next">
-            {t("profile.password.new", { defaultValue: "Nouveau mot de passe" })}
-          </Label>
+          <Label htmlFor="next">{t("profile.password.new")}</Label>
           <div className="relative">
             <Input
               id="next"
@@ -165,17 +135,11 @@ function PasswordPage() {
               {showNext ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
             </button>
           </div>
-          <p className="text-xs text-muted-foreground">
-            {t("profile.password.hint", {
-              defaultValue: "8 caractères minimum.",
-            })}
-          </p>
+          <p className="text-xs text-muted-foreground">{t("profile.password.hint")}</p>
         </div>
 
         <div className="space-y-1.5">
-          <Label htmlFor="confirm">
-            {t("profile.password.confirm", { defaultValue: "Confirmer le nouveau mot de passe" })}
-          </Label>
+          <Label htmlFor="confirm">{t("profile.password.confirm")}</Label>
           <Input
             id="confirm"
             type={showNext ? "text" : "password"}
@@ -188,11 +152,7 @@ function PasswordPage() {
         </div>
 
         <Button type="submit" className="w-full h-11" disabled={busy}>
-          {busy ? (
-            <Loader2 className="h-4 w-4 animate-spin" />
-          ) : (
-            t("profile.password.save", { defaultValue: "Mettre à jour le mot de passe" })
-          )}
+          {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : t("profile.password.save")}
         </Button>
       </form>
     </div>

@@ -193,7 +193,7 @@ export function EventChat({ eventId }: { eventId: string }) {
     const { error } = await supabase.from("event_messages").delete().eq("id", id);
     if (error) {
       setMessages(prev);
-      toast.error(t("common.error", { defaultValue: "Une erreur est survenue" }));
+      toast.error(t("common.error"));
     }
   }
 
@@ -268,9 +268,7 @@ export function EventChat({ eventId }: { eventId: string }) {
                   disabled={loadingMore}
                   className="text-[11px] font-medium text-primary hover:underline disabled:opacity-50"
                 >
-                  {loadingMore
-                    ? t("common.loading", { defaultValue: "Loading…" })
-                    : t("chat.loadMore", { defaultValue: "Load earlier messages" })}
+                  {loadingMore ? t("common.loading") : t("chat.loadMore")}
                 </button>
               </div>
             )}
@@ -292,8 +290,8 @@ export function EventChat({ eventId }: { eventId: string }) {
                         "shrink-0 p-1 text-muted-foreground/60 hover:text-destructive",
                         !mine && "order-last",
                       )}
-                      aria-label={t("common.delete", { defaultValue: "Supprimer" })}
-                      title={t("common.delete", { defaultValue: "Supprimer" })}
+                      aria-label={t("common.delete")}
+                      title={t("common.delete")}
                     >
                       <Trash2 className="h-3.5 w-3.5" />
                     </button>
@@ -314,8 +312,8 @@ export function EventChat({ eventId }: { eventId: string }) {
                         })
                       }
                       className="order-last shrink-0 p-1 text-muted-foreground/60 hover:text-amber-600"
-                      aria-label={t("wall.report.action", { defaultValue: "Signaler" })}
-                      title={t("wall.report.action", { defaultValue: "Signaler" })}
+                      aria-label={t("wall.report.action")}
+                      title={t("wall.report.action")}
                     >
                       <Flag className="h-3.5 w-3.5" />
                     </button>

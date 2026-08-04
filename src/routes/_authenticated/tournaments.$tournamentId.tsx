@@ -128,20 +128,17 @@ function TournamentDetailPage() {
       toast.success(t("detail.statusUpdated"));
       qc.invalidateQueries({ queryKey: ["tournament", tournamentId] });
     },
-    onError: (e: unknown) =>
-      toast.error(
-        (e as { message?: string })?.message ?? t("common.error", { defaultValue: "Erreur" }),
-      ),
+    onError: (e: unknown) => toast.error((e as { message?: string })?.message ?? t("common.error")),
   });
 
   async function onUploadLogo(file: File) {
     if (!user) return;
     if (file.size > 5 * 1024 * 1024) {
-      toast.error(t("common.fileTooLarge", { defaultValue: "Fichier trop volumineux (max 5 Mo)" }));
+      toast.error(t("common.fileTooLarge"));
       return;
     }
     if (!file.type.startsWith("image/")) {
-      toast.error(t("common.invalidImage", { defaultValue: "Format d'image non supporté" }));
+      toast.error(t("common.invalidImage"));
       return;
     }
     setUploadingLogo(true);
@@ -157,12 +154,10 @@ function TournamentDetailPage() {
       await updateFn({
         data: { tournament_id: tournamentId, patch: { cover_image_url: pub.publicUrl } },
       });
-      toast.success(t("detail.logoUpdated", { defaultValue: "Logo mis à jour" }));
+      toast.success(t("detail.logoUpdated"));
       qc.invalidateQueries({ queryKey: ["tournament", tournamentId] });
     } catch (e) {
-      toast.error(
-        (e as { message?: string })?.message ?? t("common.error", { defaultValue: "Erreur" }),
-      );
+      toast.error((e as { message?: string })?.message ?? t("common.error"));
     } finally {
       setUploadingLogo(false);
     }
@@ -369,7 +364,7 @@ function TournamentDetailPage() {
             </div>
             {estimatedEnd && (
               <div className="text-xs text-muted-foreground">
-                {t("cockpit.estimatedEnd", { defaultValue: "Fin prévue" })}{" "}
+                {t("cockpit.estimatedEnd")}{" "}
                 {estimatedEnd.toLocaleTimeString(undefined, {
                   hour: "2-digit",
                   minute: "2-digit",
@@ -379,18 +374,10 @@ function TournamentDetailPage() {
           </div>
         </div>
         <div className="grid grid-cols-3 gap-3">
+          <Counter label={t("controlCenter.counters.done")} value={counters.done} tone="emerald" />
+          <Counter label={t("controlCenter.counters.live")} value={counters.live} tone="orange" />
           <Counter
-            label={t("controlCenter.counters.done", { defaultValue: "Terminés" })}
-            value={counters.done}
-            tone="emerald"
-          />
-          <Counter
-            label={t("controlCenter.counters.live", { defaultValue: "En cours" })}
-            value={counters.live}
-            tone="orange"
-          />
-          <Counter
-            label={t("controlCenter.counters.upcoming", { defaultValue: "À venir" })}
+            label={t("controlCenter.counters.upcoming")}
             value={counters.upcoming}
             tone="muted"
           />
@@ -432,7 +419,7 @@ function TournamentDetailPage() {
               )}
               <div className="min-w-0">
                 <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-white/80">
-                  {t("roles.referee", { defaultValue: "Arbitre", ns: "tournaments" })}
+                  {t("roles.referee", { ns: "tournaments" })}
                 </p>
                 <h1
                   className="text-[20px] font-extrabold leading-tight"
@@ -472,11 +459,7 @@ function TournamentDetailPage() {
             tournamentName={tournament.name}
           />
 
-          <Section
-            id="section-matches"
-            icon={Calendar}
-            title={t("tabs.matches", { defaultValue: "Matchs" })}
-          >
+          <Section id="section-matches" icon={Calendar} title={t("tabs.matches")}>
             <MatchesList
               tournamentId={tournament.id}
               matches={matches as unknown as React.ComponentProps<typeof MatchesList>["matches"]}
@@ -489,21 +472,13 @@ function TournamentDetailPage() {
           </Section>
 
           {groups.length > 0 && (
-            <Section
-              id="section-standings"
-              icon={ListOrdered}
-              title={t("tabs.standings", { defaultValue: "Classements" })}
-            >
+            <Section id="section-standings" icon={ListOrdered} title={t("tabs.standings")}>
               <StandingsView tournamentId={tournament.id} />
             </Section>
           )}
 
           {matches.some((m) => m.round !== "group") && (
-            <Section
-              id="section-bracket"
-              icon={GitBranch}
-              title={t("tabs.bracket", { defaultValue: "Phase finale" })}
-            >
+            <Section id="section-bracket" icon={GitBranch} title={t("tabs.bracket")}>
               <BracketView
                 matches={matches as unknown as React.ComponentProps<typeof BracketView>["matches"]}
                 teams={teams as unknown as React.ComponentProps<typeof BracketView>["teams"]}
@@ -589,11 +564,7 @@ function TournamentDetailPage() {
               {canManage ? (
                 <label
                   className="group relative h-14 w-14 shrink-0 rounded-xl ring-1 ring-white/30 bg-white/10 backdrop-blur overflow-hidden cursor-pointer hover:ring-white/60 transition"
-                  title={
-                    tournament.cover_image_url
-                      ? t("detail.changeLogo", { defaultValue: "Changer le logo" })
-                      : t("detail.addLogo", { defaultValue: "Ajouter un logo" })
-                  }
+                  title={tournament.cover_image_url ? t("detail.changeLogo") : t("detail.addLogo")}
                 >
                   {tournament.cover_image_url ? (
                     <img
@@ -673,7 +644,7 @@ function TournamentDetailPage() {
               )}
               <span className="inline-flex items-center gap-1 rounded-full bg-card/15 px-2.5 py-1 text-[11px] font-semibold ring-1 ring-white/20 backdrop-blur">
                 <Users className="h-3 w-3" />
-                {teams.length} {t("detail.teams", { defaultValue: "équipes" })}
+                {teams.length} {t("detail.teams")}
               </span>
               {flights.length > 0 ? (
                 <span className="inline-flex items-center gap-1 rounded-full bg-card/15 px-2.5 py-1 text-[11px] font-semibold ring-1 ring-white/20 backdrop-blur">
@@ -704,18 +675,13 @@ function TournamentDetailPage() {
                     if (standalone) {
                       e.preventDefault();
                       void copyText(url);
-                      toast.success(
-                        t("detail.linkCopiedOpenBrowser", {
-                          defaultValue:
-                            "Lien copié — ouvre-le dans ton navigateur (Safari/Chrome).",
-                        }),
-                      );
+                      toast.success(t("detail.linkCopiedOpenBrowser"));
                     }
                   }}
                   className="inline-flex items-center gap-1.5 rounded-full bg-white/15 hover:bg-white/25 transition px-3 py-1.5 text-[12px] font-semibold ring-1 ring-white/25 backdrop-blur"
                 >
                   <ExternalLink className="h-3.5 w-3.5" />
-                  {t("detail.openPublic", { defaultValue: "Page publique" })}
+                  {t("detail.openPublic")}
                 </a>
                 <a
                   href={`${getPublicOrigin()}/tournament/${tournament.slug}/tv`}
@@ -730,18 +696,13 @@ function TournamentDetailPage() {
                     if (standalone) {
                       e.preventDefault();
                       void copyText(url);
-                      toast.success(
-                        t("detail.linkCopiedOpenBrowser", {
-                          defaultValue:
-                            "Lien copié — ouvre-le dans ton navigateur (Safari/Chrome).",
-                        }),
-                      );
+                      toast.success(t("detail.linkCopiedOpenBrowser"));
                     }
                   }}
                   className="inline-flex items-center gap-1.5 rounded-full bg-white/15 hover:bg-white/25 transition px-3 py-1.5 text-[12px] font-semibold ring-1 ring-white/25 backdrop-blur"
                 >
                   <Tv className="h-3.5 w-3.5" />
-                  {t("detail.openTv", { defaultValue: "Écran TV" })}
+                  {t("detail.openTv")}
                 </a>
               </div>
             )}
@@ -764,18 +725,10 @@ function TournamentDetailPage() {
       {/* ─── Counters ─────────────────────────────────────────────────── */}
       <div className="px-5 pt-4">
         <div className="grid grid-cols-3 gap-2">
+          <Counter label={t("controlCenter.counters.done")} value={counters.done} tone="emerald" />
+          <Counter label={t("controlCenter.counters.live")} value={counters.live} tone="orange" />
           <Counter
-            label={t("controlCenter.counters.done", { defaultValue: "Terminés" })}
-            value={counters.done}
-            tone="emerald"
-          />
-          <Counter
-            label={t("controlCenter.counters.live", { defaultValue: "En cours" })}
-            value={counters.live}
-            tone="orange"
-          />
-          <Counter
-            label={t("controlCenter.counters.upcoming", { defaultValue: "À venir" })}
+            label={t("controlCenter.counters.upcoming")}
             value={counters.upcoming}
             tone="muted"
           />
@@ -785,7 +738,7 @@ function TournamentDetailPage() {
           <div className="mt-2 flex items-center justify-between gap-3 rounded-lg border border-border bg-card/50 px-3 py-2 text-xs">
             {estimatedEnd && (
               <span className="text-muted-foreground">
-                {t("cockpit.estimatedEnd", { defaultValue: "Fin prévue" })}{" "}
+                {t("cockpit.estimatedEnd")}{" "}
                 <strong className="text-foreground tabular-nums">
                   {estimatedEnd.toLocaleTimeString(undefined, {
                     hour: "2-digit",
@@ -833,15 +786,10 @@ function TournamentDetailPage() {
               </div>
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-semibold text-foreground">
-                  {t("detail.autoScheduleCta.title", {
-                    defaultValue: "Planifier automatiquement les matchs",
-                  })}
+                  {t("detail.autoScheduleCta.title")}
                 </p>
                 <p className="text-xs text-muted-foreground mt-0.5">
-                  {t("detail.autoScheduleCta.subtitle", {
-                    defaultValue:
-                      "Aucun terrain ni horaire n'est encore assigné. Lancez la planification automatique.",
-                  })}
+                  {t("detail.autoScheduleCta.subtitle")}
                 </p>
               </div>
               <ChevronRight className="h-5 w-5 text-muted-foreground shrink-0" />
@@ -911,15 +859,10 @@ function TournamentDetailPage() {
             <AlertTriangle className="h-4 w-4 text-amber-600 mt-0.5 shrink-0" />
             <div className="flex-1 min-w-0">
               <p className="text-sm font-medium text-amber-900 dark:text-amber-200">
-                {t("registrations.disabledBanner.title", {
-                  defaultValue: "Les inscriptions en ligne sont désactivées",
-                })}
+                {t("registrations.disabledBanner.title")}
               </p>
               <p className="text-xs text-amber-800/80 dark:text-amber-300/80 mt-0.5">
-                {t("registrations.disabledBanner.body", {
-                  defaultValue:
-                    "Aucun bouton « S'inscrire » n'apparaît sur la page publique. Active-les pour recevoir des candidatures.",
-                })}
+                {t("registrations.disabledBanner.body")}
               </p>
             </div>
           </div>
@@ -952,20 +895,12 @@ function TournamentDetailPage() {
         {/* Poules / Classement en haut : composition + résultats live, mis à jour
             automatiquement après chaque tirage via invalidateQueries(['tournament', id]). */}
         {groups.length > 0 && (
-          <Section
-            id="section-standings"
-            icon={ListOrdered}
-            title={t("tabs.standings", { defaultValue: "Poules & classement" })}
-          >
+          <Section id="section-standings" icon={ListOrdered} title={t("tabs.standings")}>
             <StandingsView tournamentId={tournament.id} />
           </Section>
         )}
 
-        <Section
-          id="section-matches"
-          icon={Calendar}
-          title={t("tabs.matches", { defaultValue: "Matchs" })}
-        >
+        <Section id="section-matches" icon={Calendar} title={t("tabs.matches")}>
           <MatchesList
             tournamentId={tournament.id}
             // DB rows vs the component's local Match/Team shapes (jsonb sets,
@@ -980,11 +915,7 @@ function TournamentDetailPage() {
           />
         </Section>
 
-        <Section
-          id="section-teams"
-          icon={Users}
-          title={t("tabs.teams", { defaultValue: "Équipes" })}
-        >
+        <Section id="section-teams" icon={Users} title={t("tabs.teams")}>
           <TeamsManager
             tournamentId={tournament.id}
             clubId={tournament.club_id}
@@ -997,11 +928,7 @@ function TournamentDetailPage() {
 
         {/* Classement (fallback si aucun groupe — vue vide gérée par StandingsView) */}
         {groups.length === 0 && (
-          <Section
-            id="section-standings"
-            icon={ListOrdered}
-            title={t("tabs.standings", { defaultValue: "Classement" })}
-          >
+          <Section id="section-standings" icon={ListOrdered} title={t("tabs.standings")}>
             <StandingsView tournamentId={tournament.id} />
           </Section>
         )}
@@ -1011,15 +938,12 @@ function TournamentDetailPage() {
           <Section
             id="section-flights"
             icon={Trophy}
-            title={t("sections.flights", { defaultValue: "Flights" })}
+            title={t("sections.flights")}
             highlight={poolMatchesDone && !hasFlights}
           >
             {poolMatchesDone && !hasFlights && (
               <div className="rounded-lg border border-primary/40 bg-primary/5 p-3 mb-3 text-sm">
-                {t("controlCenter.flightsReady", {
-                  defaultValue:
-                    "Les poules sont terminées. Crée les Flights pour générer les 3 tableaux (Champions / Europa / Conference).",
-                })}
+                {t("controlCenter.flightsReady")}
               </div>
             )}
             <FlightsManager
@@ -1039,11 +963,7 @@ function TournamentDetailPage() {
 
         {/* Bracket (knockout) */}
         {matches.some((m) => m.round !== "group") && (
-          <Section
-            id="section-bracket"
-            icon={GitBranch}
-            title={t("tabs.bracket", { defaultValue: "Phase finale" })}
-          >
+          <Section id="section-bracket" icon={GitBranch} title={t("tabs.bracket")}>
             {/* DB rows vs BracketView's local shapes — cast to its prop types. */}
             <BracketView
               matches={matches as unknown as React.ComponentProps<typeof BracketView>["matches"]}
@@ -1054,11 +974,7 @@ function TournamentDetailPage() {
 
         {/* Registrations (managers only, draft/published — B8: hidden once started) */}
         {canManage && (tournament.status === "draft" || tournament.status === "published") && (
-          <Section
-            id="section-registrations"
-            icon={ClipboardList}
-            title={t("tabs.registrations", { defaultValue: "Inscriptions" })}
-          >
+          <Section id="section-registrations" icon={ClipboardList} title={t("tabs.registrations")}>
             <RegistrationsManager
               tournamentId={tournament.id}
               tournament={{

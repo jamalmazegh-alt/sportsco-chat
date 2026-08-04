@@ -130,11 +130,7 @@ export function QuickSanctionDrawer({
 
   async function onSubmit() {
     if (!playerId || !teamId) {
-      toast.error(
-        t("discipline.errors.missingSelection", {
-          defaultValue: "Sélectionnez un joueur et une équipe.",
-        }),
-      );
+      toast.error(t("discipline.errors.missingSelection"));
       return;
     }
     setBusy(true);
@@ -160,7 +156,6 @@ export function QuickSanctionDrawer({
       const player = roster.find((r) => r.id === playerId);
       toast.success(
         t("notification.sanctionCreated", {
-          defaultValue: "{{name}} a reçu une suspension de {{n}} match(s).",
           name: player ? `${player.first_name} ${player.last_name}` : "",
           n: matches,
         }),
@@ -183,22 +178,15 @@ export function QuickSanctionDrawer({
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent side="right" className="w-full sm:max-w-md overflow-y-auto">
         <SheetHeader>
-          <SheetTitle>
-            {t("discipline.createSanction", { defaultValue: "Créer une sanction" })}
-          </SheetTitle>
-          <SheetDescription>
-            {t("discipline.drawerHint", {
-              defaultValue:
-                "Renseigne le joueur et la sanction. La logique métier existante prend le relais.",
-            })}
-          </SheetDescription>
+          <SheetTitle>{t("discipline.createSanction")}</SheetTitle>
+          <SheetDescription>{t("discipline.drawerHint")}</SheetDescription>
         </SheetHeader>
 
         <div className="mt-4 space-y-4">
           <div className="space-y-1.5">
-            <Label>{t("discipline.player", { defaultValue: "Joueur" })}</Label>
+            <Label>{t("discipline.player")}</Label>
             <Input
-              placeholder={t("discipline.searchPlayer", { defaultValue: "Rechercher…" })}
+              placeholder={t("discipline.searchPlayer")}
               value={search}
               onChange={(e) => setSearch(e.target.value)}
             />
@@ -209,7 +197,7 @@ export function QuickSanctionDrawer({
               <SelectContent className="max-h-64">
                 {filtered.length === 0 && (
                   <div className="px-3 py-2 text-xs text-muted-foreground">
-                    {t("discipline.noPlayer", { defaultValue: "Aucun joueur" })}
+                    {t("discipline.noPlayer")}
                   </div>
                 )}
                 {Array.from(new Map(filtered.map((r) => [r.id, r])).values()).map((r) => (
@@ -224,7 +212,7 @@ export function QuickSanctionDrawer({
 
           {playerTeams.length > 1 && (
             <div className="space-y-1.5">
-              <Label>{t("teams.title", { defaultValue: "Équipe" })}</Label>
+              <Label>{t("teams.title")}</Label>
               <Select value={teamId} onValueChange={setTeamId}>
                 <SelectTrigger>
                   <SelectValue />
@@ -295,14 +283,10 @@ export function QuickSanctionDrawer({
 
         <SheetFooter className="mt-6 flex-row gap-2 sm:justify-end">
           <Button variant="ghost" onClick={() => onOpenChange(false)} disabled={busy}>
-            {t("common.cancel", { defaultValue: "Annuler" })}
+            {t("common.cancel")}
           </Button>
           <Button onClick={onSubmit} disabled={busy || !playerId || !teamId}>
-            {busy ? (
-              <Loader2 className="h-4 w-4 animate-spin" />
-            ) : (
-              t("discipline.createSanction", { defaultValue: "Créer une sanction" })
-            )}
+            {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : t("discipline.createSanction")}
           </Button>
         </SheetFooter>
       </SheetContent>

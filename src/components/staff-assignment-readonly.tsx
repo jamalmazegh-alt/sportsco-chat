@@ -45,14 +45,8 @@ export function StaffAssignmentReadOnly({
           <Users className="h-4 w-4" />
         </div>
         <div className="flex-1 min-w-0">
-          <h3 className="text-sm font-semibold">
-            {t("staffAssignment.title", { defaultValue: "Encadrement" })}
-          </h3>
-          <p className="text-[11px] text-muted-foreground">
-            {t("staffAssignment.readOnlyHint", {
-              defaultValue: "Encadrants assignés à cet événement.",
-            })}
-          </p>
+          <h3 className="text-sm font-semibold">{t("staffAssignment.title")}</h3>
+          <p className="text-[11px] text-muted-foreground">{t("staffAssignment.readOnlyHint")}</p>
         </div>
       </div>
       <ul className="divide-y divide-border">

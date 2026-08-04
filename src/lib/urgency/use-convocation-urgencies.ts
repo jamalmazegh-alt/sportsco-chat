@@ -87,7 +87,6 @@ export function useConvocationUrgencies(): UrgencyCollectorResult & { isPending:
             title: ev.title,
             subtitle: t("urgency.coach.convocationSilence", {
               count,
-              defaultValue: "{{count}} sans réponse",
             }),
             anchorAt: ev.starts_at,
             primaryAction: { kind: "remind-all", eventId },
@@ -134,9 +133,7 @@ export function useConvocationUrgencies(): UrgencyCollectorResult & { isPending:
               severity: sev,
               role,
               title: ev.title,
-              subtitle: t("urgency.self.convocationSilence", {
-                defaultValue: "Tu n'as pas répondu",
-              }),
+              subtitle: t("urgency.self.convocationSilence"),
               anchorAt: ev.starts_at,
               primaryAction: { kind: "respond", eventId },
               quickRespondConvocationId: convocIds.length === 1 ? convocIds[0] : undefined,

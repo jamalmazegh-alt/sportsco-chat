@@ -155,18 +155,9 @@ export function RegistrationsManager({
               origin: getPublicOrigin(),
             },
           });
-          toast.success(
-            t("registrations.payments.linkSentEmail", {
-              defaultValue: "Lien de paiement envoyé par email",
-            }),
-          );
+          toast.success(t("registrations.payments.linkSentEmail"));
         } catch (e: any) {
-          toast.error(
-            e?.message ??
-              t("registrations.payments.linkSendFailed", {
-                defaultValue: "Échec de l'envoi du lien de paiement",
-              }),
-          );
+          toast.error(e?.message ?? t("registrations.payments.linkSendFailed"));
         }
       }
 
@@ -212,9 +203,7 @@ export function RegistrationsManager({
       } else if (vars.channel === "whatsapp" && res?.whatsappUrl) {
         openInSystemApp(res.whatsappUrl);
       } else if (vars.channel === "email") {
-        toast.success(
-          t("registrations.payments.linkSentEmail", { defaultValue: "Lien envoyé par email" }),
-        );
+        toast.success(t("registrations.payments.linkSentEmail"));
       }
       qc.invalidateQueries({ queryKey: ["tournament-registrations", tournamentId] });
     },
@@ -251,11 +240,7 @@ export function RegistrationsManager({
         },
       }),
     onSuccess: () => {
-      toast.success(
-        t("registrations.invite.success", {
-          defaultValue: "Invitation envoyée par email",
-        }),
-      );
+      toast.success(t("registrations.invite.success"));
       setInviteOpen(false);
       setInviteForm({ team_name: "", contact_name: "", contact_email: "", contact_phone: "" });
       qc.invalidateQueries({ queryKey: ["tournament-registrations", tournamentId] });
@@ -276,18 +261,9 @@ export function RegistrationsManager({
       {stripeNotConnected && (
         <Alert variant="destructive">
           <AlertTriangle className="h-4 w-4" />
-          <AlertTitle>
-            {t("registrations.stripeNotConnected.title", {
-              defaultValue: "Compte de paiement non connecté",
-            })}
-          </AlertTitle>
+          <AlertTitle>{t("registrations.stripeNotConnected.title")}</AlertTitle>
           <AlertDescription className="space-y-2">
-            <p>
-              {t("registrations.stripeNotConnected.description", {
-                defaultValue:
-                  "Ce tournoi est payant en ligne mais votre club n'a pas connecté de compte Stripe. Les équipes ne pourront pas payer tant que le compte n'est pas configuré.",
-              })}
-            </p>
+            <p>{t("registrations.stripeNotConnected.description")}</p>
             <Button
               size="sm"
               variant="outline"
@@ -303,9 +279,7 @@ export function RegistrationsManager({
                 navigate({ to: "/admin/settings/payments" });
               }}
             >
-              {t("registrations.stripeNotConnected.cta", {
-                defaultValue: "Connecter un compte Stripe",
-              })}
+              {t("registrations.stripeNotConnected.cta")}
             </Button>
           </AlertDescription>
         </Alert>
@@ -321,30 +295,17 @@ export function RegistrationsManager({
               <DialogTrigger asChild>
                 <Button size="sm" variant="outline" className="h-8 gap-1.5">
                   <UserPlus className="h-3.5 w-3.5" />
-                  {t("registrations.invite.button", {
-                    defaultValue: "Inviter une équipe",
-                  })}
+                  {t("registrations.invite.button")}
                 </Button>
               </DialogTrigger>
               <DialogContent>
                 <DialogHeader>
-                  <DialogTitle>
-                    {t("registrations.invite.title", {
-                      defaultValue: "Inviter une équipe à payer",
-                    })}
-                  </DialogTitle>
-                  <DialogDescription>
-                    {t("registrations.invite.description", {
-                      defaultValue:
-                        "L'équipe recevra un email personnalisé avec son lien de paiement sécurisé.",
-                    })}
-                  </DialogDescription>
+                  <DialogTitle>{t("registrations.invite.title")}</DialogTitle>
+                  <DialogDescription>{t("registrations.invite.description")}</DialogDescription>
                 </DialogHeader>
                 <div className="space-y-3">
                   <div className="space-y-1.5">
-                    <Label htmlFor="invite-team-name">
-                      {t("registrations.invite.teamName", { defaultValue: "Nom de l'équipe" })} *
-                    </Label>
+                    <Label htmlFor="invite-team-name">{t("registrations.invite.teamName")} *</Label>
                     <Input
                       id="invite-team-name"
                       value={inviteForm.team_name}
@@ -355,10 +316,7 @@ export function RegistrationsManager({
                   </div>
                   <div className="space-y-1.5">
                     <Label htmlFor="invite-contact-name">
-                      {t("registrations.invite.contactName", {
-                        defaultValue: "Nom du contact",
-                      })}{" "}
-                      *
+                      {t("registrations.invite.contactName")} *
                     </Label>
                     <Input
                       id="invite-contact-name"
@@ -371,7 +329,7 @@ export function RegistrationsManager({
                   </div>
                   <div className="space-y-1.5">
                     <Label htmlFor="invite-contact-email">
-                      {t("registrations.invite.email", { defaultValue: "Email" })} *
+                      {t("registrations.invite.email")} *
                     </Label>
                     <Input
                       id="invite-contact-email"
@@ -385,11 +343,7 @@ export function RegistrationsManager({
                     />
                   </div>
                   <div className="space-y-1.5">
-                    <Label htmlFor="invite-contact-phone">
-                      {t("registrations.invite.phone", {
-                        defaultValue: "Téléphone (optionnel)",
-                      })}
-                    </Label>
+                    <Label htmlFor="invite-contact-phone">{t("registrations.invite.phone")}</Label>
                     <Input
                       id="invite-contact-phone"
                       type="tel"
@@ -408,7 +362,7 @@ export function RegistrationsManager({
                     onClick={() => setInviteOpen(false)}
                     disabled={invite.isPending}
                   >
-                    {t("common.cancel", { defaultValue: "Annuler" })}
+                    {t("common.cancel")}
                   </Button>
                   <Button
                     type="button"
@@ -426,9 +380,7 @@ export function RegistrationsManager({
                     ) : (
                       <Send className="h-4 w-4" />
                     )}
-                    {t("registrations.invite.send", {
-                      defaultValue: "Envoyer l'invitation",
-                    })}
+                    {t("registrations.invite.send")}
                   </Button>
                 </DialogFooter>
               </DialogContent>
@@ -456,16 +408,12 @@ export function RegistrationsManager({
         </div>
       ) : q.isError ? (
         <div className="rounded-xl border border-destructive/40 bg-destructive/5 p-4 text-sm text-destructive space-y-2">
-          <p className="font-medium">
-            {t("registrations.loadError", {
-              defaultValue: "Erreur de chargement des inscriptions",
-            })}
-          </p>
+          <p className="font-medium">{t("registrations.loadError")}</p>
           <p className="text-xs opacity-80 break-all">
             {(q.error as any)?.message ?? String(q.error)}
           </p>
           <Button size="sm" variant="outline" onClick={() => q.refetch()}>
-            {t("common.retry", { defaultValue: "Réessayer" })}
+            {t("common.retry")}
           </Button>
         </div>
       ) : regs.length === 0 ? (

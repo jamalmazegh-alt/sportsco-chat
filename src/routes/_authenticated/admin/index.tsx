@@ -84,10 +84,8 @@ function AdminSettingsPage() {
     {
       to: "/admin/settings/payments",
       icon: Wallet,
-      title: t("admin.hubPayments", { defaultValue: "Paiements" }),
-      hint: t("admin.hubPaymentsHint", {
-        defaultValue: "Encaissez les inscriptions tournoi via Stripe",
-      }),
+      title: t("admin.hubPayments"),
+      hint: t("admin.hubPaymentsHint"),
       tone: "bg-cyan-500/10 text-cyan-600 dark:text-cyan-400",
     },
     {
@@ -152,40 +150,32 @@ function AdminSettingsPage() {
     {
       to: "/admin/settings/branding",
       icon: Palette,
-      title: t("admin.hubBranding", { defaultValue: "Identité visuelle" }),
-      hint: t("admin.hubBrandingHint", {
-        defaultValue: "Couleur principale de l'app pour ton club",
-      }),
+      title: t("admin.hubBranding"),
+      hint: t("admin.hubBrandingHint"),
       tone: "bg-fuchsia-500/10 text-fuchsia-600 dark:text-fuchsia-400",
       clubOnly: true,
     },
     {
       to: "/admin/settings/sponsors",
       icon: Handshake,
-      title: t("admin.hubSponsors", { defaultValue: "Sponsors" }),
-      hint: t("admin.hubSponsorsHint", {
-        defaultValue: "Affichez vos partenaires en haut de la page d'accueil",
-      }),
+      title: t("admin.hubSponsors"),
+      hint: t("admin.hubSponsorsHint"),
       tone: "bg-orange-500/10 text-orange-600 dark:text-orange-400",
       clubOnly: true,
     },
     {
       to: "/admin/settings/venues",
       icon: MapPin,
-      title: t("admin.hubVenues", { defaultValue: "Lieux et terrains" }),
-      hint: t("admin.hubVenuesHint", {
-        defaultValue: "Sites et terrains du club préremplis à la création d'événement",
-      }),
+      title: t("admin.hubVenues"),
+      hint: t("admin.hubVenuesHint"),
       tone: "bg-sky-500/10 text-sky-600 dark:text-sky-400",
       clubOnly: true,
     },
     {
       to: "/admin/camps",
       icon: Tent,
-      title: t("admin.hubCamps", { defaultValue: "Stages" }),
-      hint: t("admin.hubCampsHint", {
-        defaultValue: "Créez, publiez et gérez les stages proposés par votre club",
-      }),
+      title: t("admin.hubCamps"),
+      hint: t("admin.hubCampsHint"),
       tone: "bg-lime-500/10 text-lime-600 dark:text-lime-400",
       clubOnly: true,
     },

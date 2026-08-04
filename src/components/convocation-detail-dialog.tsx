@@ -262,7 +262,6 @@ export function ConvocationDetailDialog({
                     title={
                       inCooldown
                         ? t("attendance.cooldownHint", {
-                            defaultValue: "Encore {{m}} min avant de pouvoir relancer",
                             m: remainingMin,
                           })
                         : undefined
@@ -271,7 +270,6 @@ export function ConvocationDetailDialog({
                     <Bell className="h-4 w-4" />
                     {inCooldown
                       ? t("attendance.remindIn", {
-                          defaultValue: "Relancer dans {{m}} min",
                           m: remainingMin,
                         })
                       : t("attendance.remind")}

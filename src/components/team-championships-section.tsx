@@ -87,20 +87,14 @@ export function TeamChampionshipsSection({ teamId, canManage }: Props) {
         data: { teamId, name: newName.trim(), seasonLabel: newSeason.trim() || null },
       }),
     onSuccess: () => {
-      toast.success(t("common.saved", { defaultValue: "Enregistré" }));
+      toast.success(t("common.saved"));
       setAddOpen(false);
       setNewName("");
       setNewSeason("");
       invalidate();
     },
     onError: (e: Error) => {
-      toast.error(
-        e.message === "duplicate"
-          ? t("championships.errors.duplicate", {
-              defaultValue: "Ce championnat est déjà configuré pour cette équipe",
-            })
-          : e.message,
-      );
+      toast.error(e.message === "duplicate" ? t("championships.errors.duplicate") : e.message);
     },
   });
 
@@ -114,18 +108,12 @@ export function TeamChampionshipsSection({ teamId, canManage }: Props) {
         },
       }),
     onSuccess: () => {
-      toast.success(t("common.saved", { defaultValue: "Enregistré" }));
+      toast.success(t("common.saved"));
       setEditing(null);
       invalidate();
     },
     onError: (e: Error) => {
-      toast.error(
-        e.message === "duplicate"
-          ? t("championships.errors.duplicate", {
-              defaultValue: "Ce championnat est déjà configuré pour cette équipe",
-            })
-          : e.message,
-      );
+      toast.error(e.message === "duplicate" ? t("championships.errors.duplicate") : e.message);
     },
   });
 
@@ -141,17 +129,12 @@ export function TeamChampionshipsSection({ teamId, canManage }: Props) {
   const deleteMut = useMutation({
     mutationFn: async (row: Championship) => remove({ data: { id: row.id } }),
     onSuccess: () => {
-      toast.success(t("common.deleted", { defaultValue: "Supprimé" }));
+      toast.success(t("common.deleted"));
       invalidate();
     },
     onError: (e: Error) => {
       if (e.message === "championship_in_use") {
-        toast.error(
-          t("championships.errors.inUse", {
-            defaultValue:
-              "Impossible de supprimer ce championnat car il est utilisé par des matchs. Archivez-le pour le retirer des nouveaux événements.",
-          }),
-        );
+        toast.error(t("championships.errors.inUse"));
       } else {
         toast.error(e.message);
       }
@@ -177,28 +160,20 @@ export function TeamChampionshipsSection({ teamId, canManage }: Props) {
       <div className="flex items-center justify-between gap-2">
         <div className="flex items-center gap-2">
           <Trophy className="h-4 w-4 text-muted-foreground" />
-          <h2 className="font-semibold">
-            {t("championships.title", { defaultValue: "Championnats" })}
-          </h2>
+          <h2 className="font-semibold">{t("championships.title")}</h2>
         </div>
         {canManage && (
           <Button size="sm" variant="outline" onClick={() => setAddOpen(true)}>
             <Plus className="h-4 w-4 mr-1" />
-            {t("championships.add", { defaultValue: "Ajouter un championnat" })}
+            {t("championships.add")}
           </Button>
         )}
       </div>
 
       {isLoading ? (
-        <p className="text-xs text-muted-foreground">
-          {t("common.loading", { defaultValue: "Chargement…" })}
-        </p>
+        <p className="text-xs text-muted-foreground">{t("common.loading")}</p>
       ) : active.length === 0 ? (
-        <p className="text-xs text-muted-foreground">
-          {t("championships.emptyActive", {
-            defaultValue: "Aucun championnat actif pour cette équipe",
-          })}
-        </p>
+        <p className="text-xs text-muted-foreground">{t("championships.emptyActive")}</p>
       ) : (
         <ul className="space-y-1.5">
           {active.map((row) => (
@@ -218,7 +193,7 @@ export function TeamChampionshipsSection({ teamId, canManage }: Props) {
                     size="icon"
                     variant="ghost"
                     className="h-8 w-8"
-                    aria-label={t("championships.rename", { defaultValue: "Renommer" })}
+                    aria-label={t("championships.rename")}
                     onClick={() => {
                       setEditing(row);
                       setEditName(row.name);
@@ -231,7 +206,7 @@ export function TeamChampionshipsSection({ teamId, canManage }: Props) {
                     size="icon"
                     variant="ghost"
                     className="h-8 w-8"
-                    aria-label={t("championships.archive", { defaultValue: "Archiver" })}
+                    aria-label={t("championships.archive")}
                     onClick={() => toggleActive.mutate(row)}
                   >
                     <Archive className="h-4 w-4" />
@@ -240,15 +215,9 @@ export function TeamChampionshipsSection({ teamId, canManage }: Props) {
                     size="icon"
                     variant="ghost"
                     className="h-8 w-8 text-destructive"
-                    aria-label={t("championships.delete", { defaultValue: "Supprimer" })}
+                    aria-label={t("championships.delete")}
                     onClick={() => {
-                      if (
-                        window.confirm(
-                          t("championships.confirmDelete", {
-                            defaultValue: "Supprimer ce championnat ?",
-                          }),
-                        )
-                      ) {
+                      if (window.confirm(t("championships.confirmDelete"))) {
                         deleteMut.mutate(row);
                       }
                     }}
@@ -271,9 +240,8 @@ export function TeamChampionshipsSection({ teamId, canManage }: Props) {
             onClick={() => setShowArchived((v) => !v)}
           >
             {showArchived
-              ? t("common.hide", { defaultValue: "Masquer" })
+              ? t("common.hide")
               : t("championships.showArchived", {
-                  defaultValue: "Voir les championnats archivés ({{n}})",
                   n: archived.length,
                 })}
           </Button>
@@ -296,7 +264,7 @@ export function TeamChampionshipsSection({ teamId, canManage }: Props) {
                         size="icon"
                         variant="ghost"
                         className="h-8 w-8"
-                        aria-label={t("championships.reactivate", { defaultValue: "Réactiver" })}
+                        aria-label={t("championships.reactivate")}
                         onClick={() => toggleActive.mutate(row)}
                       >
                         <ArchiveRestore className="h-4 w-4" />
@@ -305,15 +273,9 @@ export function TeamChampionshipsSection({ teamId, canManage }: Props) {
                         size="icon"
                         variant="ghost"
                         className="h-8 w-8 text-destructive"
-                        aria-label={t("championships.delete", { defaultValue: "Supprimer" })}
+                        aria-label={t("championships.delete")}
                         onClick={() => {
-                          if (
-                            window.confirm(
-                              t("championships.confirmDelete", {
-                                defaultValue: "Supprimer ce championnat ?",
-                              }),
-                            )
-                          ) {
+                          if (window.confirm(t("championships.confirmDelete"))) {
                             deleteMut.mutate(row);
                           }
                         }}
@@ -333,26 +295,24 @@ export function TeamChampionshipsSection({ teamId, canManage }: Props) {
       <Dialog open={addOpen} onOpenChange={setAddOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>
-              {t("championships.add", { defaultValue: "Ajouter un championnat" })}
-            </DialogTitle>
+            <DialogTitle>{t("championships.add")}</DialogTitle>
           </DialogHeader>
           <form onSubmit={onSubmitAdd} className="space-y-3">
             <div className="space-y-1.5">
-              <Label>{t("championships.name", { defaultValue: "Nom du championnat" })}</Label>
+              <Label>{t("championships.name")}</Label>
               <Input
                 autoFocus
                 required
                 value={newName}
                 onChange={(e) => setNewName(e.target.value)}
-                placeholder="Départemental 1"
+                placeholder={t("championships.levelPlaceholder")}
               />
             </div>
             <div className="space-y-1.5">
               <Label>
-                {t("championships.season", { defaultValue: "Saison" })}{" "}
+                {t("championships.season")}{" "}
                 <span className="text-xs text-muted-foreground">
-                  ({t("championships.seasonOptional", { defaultValue: "facultative" })})
+                  ({t("championships.seasonOptional")})
                 </span>
               </Label>
               <Input
@@ -368,12 +328,10 @@ export function TeamChampionshipsSection({ teamId, canManage }: Props) {
                 onClick={() => setAddOpen(false)}
                 disabled={addMut.isPending}
               >
-                {t("common.cancel", { defaultValue: "Annuler" })}
+                {t("common.cancel")}
               </Button>
               <Button type="submit" disabled={addMut.isPending || !newName.trim()}>
-                {addMut.isPending
-                  ? t("common.saving", { defaultValue: "Enregistrement…" })
-                  : t("common.save", { defaultValue: "Enregistrer" })}
+                {addMut.isPending ? t("common.saving") : t("common.save")}
               </Button>
             </DialogFooter>
           </form>
@@ -384,11 +342,11 @@ export function TeamChampionshipsSection({ teamId, canManage }: Props) {
       <Dialog open={!!editing} onOpenChange={(o) => !o && setEditing(null)}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>{t("championships.rename", { defaultValue: "Renommer" })}</DialogTitle>
+            <DialogTitle>{t("championships.rename")}</DialogTitle>
           </DialogHeader>
           <form onSubmit={onSubmitEdit} className="space-y-3">
             <div className="space-y-1.5">
-              <Label>{t("championships.name", { defaultValue: "Nom du championnat" })}</Label>
+              <Label>{t("championships.name")}</Label>
               <Input
                 autoFocus
                 required
@@ -398,9 +356,9 @@ export function TeamChampionshipsSection({ teamId, canManage }: Props) {
             </div>
             <div className="space-y-1.5">
               <Label>
-                {t("championships.season", { defaultValue: "Saison" })}{" "}
+                {t("championships.season")}{" "}
                 <span className="text-xs text-muted-foreground">
-                  ({t("championships.seasonOptional", { defaultValue: "facultative" })})
+                  ({t("championships.seasonOptional")})
                 </span>
               </Label>
               <Input value={editSeason} onChange={(e) => setEditSeason(e.target.value)} />
@@ -412,12 +370,10 @@ export function TeamChampionshipsSection({ teamId, canManage }: Props) {
                 onClick={() => setEditing(null)}
                 disabled={editMut.isPending}
               >
-                {t("common.cancel", { defaultValue: "Annuler" })}
+                {t("common.cancel")}
               </Button>
               <Button type="submit" disabled={editMut.isPending || !editName.trim()}>
-                {editMut.isPending
-                  ? t("common.saving", { defaultValue: "Enregistrement…" })
-                  : t("common.save", { defaultValue: "Enregistrer" })}
+                {editMut.isPending ? t("common.saving") : t("common.save")}
               </Button>
             </DialogFooter>
           </form>

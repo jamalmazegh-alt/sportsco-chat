@@ -108,7 +108,7 @@ export function PositionCombobox({
           )}
         >
           <span className="truncate">
-            {displayLabel || placeholder || t("position.placeholder", { defaultValue: "Position" })}
+            {displayLabel || placeholder || t("position.placeholder")}
             {matchedOption?.abbr && (
               <span className="ml-2 text-xs text-muted-foreground">{matchedOption.abbr}</span>
             )}
@@ -118,19 +118,13 @@ export function PositionCombobox({
       </PopoverTrigger>
       <PopoverContent className="w-[--radix-popover-trigger-width] p-0" align="start">
         <Command shouldFilter={false}>
-          <CommandInput
-            placeholder={t("position.search", { defaultValue: "Rechercher ou saisir…" })}
-            value={query}
-            onValueChange={setQuery}
-          />
+          <CommandInput placeholder={t("position.search")} value={query} onValueChange={setQuery} />
           <CommandList>
             {filtered.length === 0 && !customAvailable && (
-              <CommandEmpty>
-                {t("position.empty", { defaultValue: "Aucune suggestion" })}
-              </CommandEmpty>
+              <CommandEmpty>{t("position.empty")}</CommandEmpty>
             )}
             {filtered.length > 0 && (
-              <CommandGroup heading={t("position.suggested", { defaultValue: "Suggestions" })}>
+              <CommandGroup heading={t("position.suggested")}>
                 {filtered.map((o) => {
                   const label = localizedPositionLabel(o, lang);
                   const isSelected = matchedOption && matchedOption.value === o.value;
@@ -157,7 +151,7 @@ export function PositionCombobox({
               </CommandGroup>
             )}
             {customAvailable && (
-              <CommandGroup heading={t("position.custom", { defaultValue: "Personnalisé" })}>
+              <CommandGroup heading={t("position.custom")}>
                 <CommandItem
                   value={`__custom__${query}`}
                   onSelect={() => {
@@ -167,7 +161,7 @@ export function PositionCombobox({
                   }}
                 >
                   <Plus className="mr-2 h-4 w-4" />
-                  {t("position.use", { defaultValue: "Utiliser" })} “{query.trim()}”
+                  {t("position.use")} “{query.trim()}”
                 </CommandItem>
               </CommandGroup>
             )}

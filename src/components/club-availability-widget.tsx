@@ -196,17 +196,13 @@ export function ClubAvailabilityWidget({ clubId, className }: Props) {
           >
             {total > 0 ? <Users className="h-4 w-4" /> : <CheckCircle2 className="h-4 w-4" />}
           </div>
-          <h2 className="text-sm font-semibold truncate">
-            {t("widget.availability.title", { defaultValue: "Disponibilité du club" })}
-          </h2>
+          <h2 className="text-sm font-semibold truncate">{t("widget.availability.title")}</h2>
         </div>
       </div>
 
       {total === 0 ? (
         <p className="mt-3 text-sm text-emerald-700 dark:text-emerald-400">
-          {t("widget.availability.allAvailable", {
-            defaultValue: "✅ Tous les joueurs sont disponibles",
-          })}
+          {t("widget.availability.allAvailable")}
         </p>
       ) : (
         <>
@@ -216,7 +212,6 @@ export function ClubAvailabilityWidget({ clubId, className }: Props) {
               <span className="inline-flex items-center gap-1 font-medium text-destructive">
                 <ShieldAlert className="h-3.5 w-3.5" />
                 {t("widget.availability.suspended", {
-                  defaultValue: "{{n}} suspendu(s)",
                   n: suspendedCount,
                 })}
               </span>
@@ -225,7 +220,6 @@ export function ClubAvailabilityWidget({ clubId, className }: Props) {
               <span className="inline-flex items-center gap-1 font-medium text-sky-700 dark:text-sky-400">
                 <Palmtree className="h-3.5 w-3.5" />
                 {t("widget.availability.absent", {
-                  defaultValue: "{{n}} absent(s)",
                   n: absentCount,
                 })}
               </span>
@@ -234,7 +228,6 @@ export function ClubAvailabilityWidget({ clubId, className }: Props) {
               <span className="inline-flex items-center gap-1 font-medium text-amber-700 dark:text-amber-400">
                 <HeartPulse className="h-3.5 w-3.5" />
                 {t("widget.availability.injured", {
-                  defaultValue: "{{n}} blessé(s)",
                   n: injuredCount,
                 })}
               </span>
@@ -243,7 +236,6 @@ export function ClubAvailabilityWidget({ clubId, className }: Props) {
 
           <p className="mt-2 text-[11px] uppercase tracking-wider text-muted-foreground">
             {t("widget.availability.total", {
-              defaultValue: "Total indisponibles : {{n}}",
               n: total,
             })}
           </p>
@@ -275,7 +267,6 @@ export function ClubAvailabilityWidget({ clubId, className }: Props) {
                   {it.kind === "absence" && (
                     <p className="text-[11px] text-muted-foreground truncate">
                       {t("availability.until", {
-                        defaultValue: "jusqu'au {{date}}",
                         date: formatUntil(it.end_date),
                       })}
                     </p>
@@ -285,7 +276,6 @@ export function ClubAvailabilityWidget({ clubId, className }: Props) {
                   <UnavailableBadge
                     reason="suspension"
                     detail={t("discipline.matchesLeft", {
-                      defaultValue: "{{count}} match restant",
                       count: it.remaining,
                     })}
                   />
@@ -298,7 +288,7 @@ export function ClubAvailabilityWidget({ clubId, className }: Props) {
 
           {extra > 0 && (
             <p className="mt-2 text-[11px] text-muted-foreground">
-              {t("widget.availability.more", { defaultValue: "+ {{n}} autres", n: extra })}
+              {t("widget.availability.more", { n: extra })}
             </p>
           )}
         </>
@@ -308,25 +298,19 @@ export function ClubAvailabilityWidget({ clubId, className }: Props) {
         <Button asChild size="sm" variant="outline">
           <Link to="/club/discipline" className="inline-flex items-center justify-center gap-1">
             <ShieldAlert className="h-3.5 w-3.5" />
-            <span className="truncate">
-              {t("widget.availability.viewSuspensions", { defaultValue: "Voir les suspensions" })}
-            </span>
+            <span className="truncate">{t("widget.availability.viewSuspensions")}</span>
             <ChevronRight className="h-3 w-3" />
           </Link>
         </Button>
         {/* Bêta V1 : listing /players masqué (public_player_profiles off). Bouton retiré. */}
         <Button size="sm" variant="default" onClick={() => setSanctionOpen(true)}>
           <Plus className="h-4 w-4" />
-          <span className="truncate">
-            {t("discipline.createSanction", { defaultValue: "Créer une sanction" })}
-          </span>
+          <span className="truncate">{t("discipline.createSanction")}</span>
         </Button>
         {canDeclare && (
           <Button size="sm" variant="default" onClick={() => setAbsenceOpen(true)}>
             <Plus className="h-4 w-4" />
-            <span className="truncate">
-              {t("availability.declare", { defaultValue: "Déclarer une absence" })}
-            </span>
+            <span className="truncate">{t("availability.declare")}</span>
           </Button>
         )}
       </div>

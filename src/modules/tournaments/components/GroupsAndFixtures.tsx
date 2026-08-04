@@ -373,14 +373,7 @@ export function GroupsAndFixtures({
       // B3 — backstop : régénérer une phase finale avec résultats exige une
       // confirmation forte (le serveur refuse sinon via 409).
       if (msg.includes("FINALS_ALREADY_STARTED")) {
-        if (
-          window.confirm(
-            t("groups.regenFinalsConfirm", {
-              defaultValue:
-                "La phase finale a déjà des résultats. Régénérer EFFACERA tous ces résultats. Continuer ?",
-            }),
-          )
-        ) {
+        if (window.confirm(t("groups.regenFinalsConfirm"))) {
           genKnockout.mutate(true);
         }
         return;

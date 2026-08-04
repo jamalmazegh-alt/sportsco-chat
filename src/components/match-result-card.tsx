@@ -271,16 +271,16 @@ export function MatchResultCard({
   const outcomePill =
     outcome === "win"
       ? {
-          label: t("match.outcomeWin", { defaultValue: "Victoire" }),
+          label: t("match.outcomeWin"),
           cls: "bg-gradient-to-r from-emerald-500 to-emerald-600 text-white ring-emerald-500/30",
         }
       : outcome === "loss"
         ? {
-            label: t("match.outcomeLoss", { defaultValue: "Défaite" }),
+            label: t("match.outcomeLoss"),
             cls: "bg-rose-500/15 text-rose-500 ring-rose-500/30",
           }
         : {
-            label: t("match.outcomeDraw", { defaultValue: "Nul" }),
+            label: t("match.outcomeDraw"),
             cls: "bg-muted text-muted-foreground ring-border",
           };
 
@@ -312,11 +312,11 @@ export function MatchResultCard({
           )
         ) : isPast ? (
           <span className="inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wide ring-1 bg-amber-500/15 text-amber-600 ring-amber-500/30">
-            {t("match.pillToEnter", { defaultValue: "à saisir" })}
+            {t("match.pillToEnter")}
           </span>
         ) : (
           <span className="inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wide ring-1 bg-sky-500/15 text-sky-600 ring-sky-500/30">
-            {t("match.pillUpcoming", { defaultValue: "à venir" })}
+            {t("match.pillUpcoming")}
           </span>
         )}
       </header>
@@ -369,25 +369,14 @@ export function MatchResultCard({
         )}
 
         {!editing && !result && !isPast && (
-          <p className="text-xs text-muted-foreground italic">
-            {t("match.notPlayedYet", {
-              defaultValue:
-                "Le match n'a pas encore eu lieu — le score pourra être saisi après le coup de sifflet final.",
-            })}
-          </p>
+          <p className="text-xs text-muted-foreground italic">{t("match.notPlayedYet")}</p>
         )}
 
         {!editing && !result && isPast && isCoach && (
           <div className="flex items-center justify-between gap-3 rounded-xl bg-gradient-to-r from-emerald-50 to-transparent dark:from-emerald-950/30 px-4 py-3 border border-emerald-200/60 dark:border-emerald-900/50">
             <div className="min-w-0">
-              <p className="text-sm font-bold text-foreground">
-                {t("match.finishedTitle", { defaultValue: "Le match est terminé." })}
-              </p>
-              <p className="text-xs text-muted-foreground">
-                {t("match.finishedHint", {
-                  defaultValue: "Enregistrez le score et les faits de match.",
-                })}
-              </p>
+              <p className="text-sm font-bold text-foreground">{t("match.finishedTitle")}</p>
+              <p className="text-xs text-muted-foreground">{t("match.finishedHint")}</p>
             </div>
             <Button
               size="sm"
@@ -395,15 +384,13 @@ export function MatchResultCard({
               className="rounded-xl bg-gradient-to-br from-[#1d7a45] to-[#2d9d5f] hover:from-[#185c34] hover:to-[#22834d] text-white shadow-[0_8px_20px_-10px_rgba(29,122,69,0.6)] active:scale-[0.98] transition shrink-0"
             >
               <Plus className="h-4 w-4" />
-              {t("match.enterResult", { defaultValue: "Saisir le résultat" })}
+              {t("match.enterResult")}
             </Button>
           </div>
         )}
 
         {!editing && !result && isPast && !isCoach && (
-          <p className="text-xs text-muted-foreground italic">
-            {t("match.noResultYet", { defaultValue: "Pas de résultat enregistré pour l'instant." })}
-          </p>
+          <p className="text-xs text-muted-foreground italic">{t("match.noResultYet")}</p>
         )}
 
         {editing && (
@@ -497,7 +484,7 @@ export function MatchResultCard({
         <div className="px-5 py-4 space-y-3 border-t border-border">
           <div className="flex items-center justify-between">
             <p className="text-[10px] font-bold uppercase tracking-[0.08em] text-muted-foreground">
-              {t("match.playerEvents", { defaultValue: "Faits de match" })}
+              {t("match.playerEvents")}
             </p>
             {isCoach && !showGoalForm && (
               <button
@@ -506,7 +493,7 @@ export function MatchResultCard({
                 className="inline-flex items-center gap-1 text-xs font-semibold text-[#1d7a45] hover:text-[#0f4a26] transition-colors"
               >
                 <Plus className="h-3.5 w-3.5" />
-                {t("match.addEvent", { defaultValue: "Ajouter" })}
+                {t("match.addEvent")}
               </button>
             )}
           </div>

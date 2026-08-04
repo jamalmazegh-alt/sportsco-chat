@@ -109,7 +109,7 @@ export function ContinueCTA({ action, onAction, variant = "sticky", disabled }: 
           </div>
           <div className="flex-1 min-w-0">
             <div className="text-[10px] font-bold uppercase tracking-wider text-emerald-700 dark:text-emerald-400">
-              {t("controlCenter.nextAction", { defaultValue: "Prochaine action" })}
+              {t("controlCenter.nextAction")}
             </div>
             <div className="truncate text-base font-bold text-foreground dark:text-slate-50">
               {label}

@@ -707,7 +707,8 @@
       "clubMismatch": "Ce championnat n'appartient pas à ce club",
       "archived": "Ce championnat est archivé",
       "notFound": "Championnat introuvable"
-    }
+    },
+    "levelPlaceholder": "Départemental 1"
   },
   "club": {
     "logo": "Logo du club",

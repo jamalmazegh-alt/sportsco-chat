@@ -30,13 +30,13 @@ function AdminLayout() {
     {
       to: "/admin/moderation",
       icon: Flag,
-      label: t("wall.moderation.tab", { defaultValue: "Modération" }),
+      label: t("wall.moderation.tab"),
       exact: false,
     },
     {
       to: "/admin/billing",
       icon: CreditCard,
-      label: t("billing.title", { defaultValue: "Abonnement" }),
+      label: t("billing.title"),
       exact: false,
     },
   ];
@@ -46,7 +46,7 @@ function AdminLayout() {
     <div className="pb-2">
       <header className="px-5 pt-6 pb-4 flex items-center gap-2">
         <ShieldCheck className="h-5 w-5 text-primary" />
-        <h1 className="text-xl font-semibold">{t("nav.admin", { defaultValue: "Admin" })}</h1>
+        <h1 className="text-xl font-semibold">{t("nav.admin")}</h1>
       </header>
       <nav className="pb-3 sticky top-0 bg-background/95 backdrop-blur z-10 border-b border-border">
         <div className="flex gap-1 overflow-x-auto px-5 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">

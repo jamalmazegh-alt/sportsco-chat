@@ -137,11 +137,11 @@ function DisciplinePage() {
       <div className="flex items-center justify-between gap-2">
         <Link to="/home" className="inline-flex items-center gap-1 text-sm text-muted-foreground">
           <ChevronLeft className="h-4 w-4" />
-          {t("common.back", { defaultValue: "Retour" })}
+          {t("common.back")}
         </Link>
         <Button size="sm" onClick={() => setDrawerOpen(true)}>
           <Plus className="h-4 w-4" />
-          {t("discipline.createSanction", { defaultValue: "Créer une sanction" })}
+          {t("discipline.createSanction")}
         </Button>
       </div>
 
@@ -151,14 +151,8 @@ function DisciplinePage() {
             <ShieldAlert className="h-5 w-5" />
           </div>
           <div>
-            <h1 className="text-xl font-bold">
-              {t("discipline.title", { defaultValue: "Discipline" })}
-            </h1>
-            <p className="text-xs text-muted-foreground">
-              {t("discipline.subtitle", {
-                defaultValue: "Vue globale des suspensions du club.",
-              })}
-            </p>
+            <h1 className="text-xl font-bold">{t("discipline.title")}</h1>
+            <p className="text-xs text-muted-foreground">{t("discipline.subtitle")}</p>
           </div>
         </div>
       </header>
@@ -168,14 +162,10 @@ function DisciplinePage() {
       <div className="grid gap-2 sm:grid-cols-[1fr_180px_180px]">
         <Select value={teamFilter} onValueChange={setTeamFilter}>
           <SelectTrigger>
-            <SelectValue
-              placeholder={t("discipline.allTeams", { defaultValue: "Toutes les équipes" })}
-            />
+            <SelectValue placeholder={t("discipline.allTeams")} />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">
-              {t("discipline.allTeams", { defaultValue: "Toutes les équipes" })}
-            </SelectItem>
+            <SelectItem value="all">{t("discipline.allTeams")}</SelectItem>
             {teams.map((tm: any) => (
               <SelectItem key={tm.id} value={tm.id}>
                 {tm.name}
@@ -187,7 +177,7 @@ function DisciplinePage() {
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
             className="pl-9"
-            placeholder={t("discipline.searchPlayer", { defaultValue: "Rechercher un joueur…" })}
+            placeholder={t("discipline.searchPlayer")}
             value={playerSearch}
             onChange={(e) => setPlayerSearch(e.target.value)}
           />
@@ -197,9 +187,7 @@ function DisciplinePage() {
             <SelectValue placeholder={t("suspension.reason")} />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">
-              {t("discipline.allReasons", { defaultValue: "Toutes raisons" })}
-            </SelectItem>
+            <SelectItem value="all">{t("discipline.allReasons")}</SelectItem>
             {(
               [
                 "red_card",
@@ -220,7 +208,7 @@ function DisciplinePage() {
       <Tabs value={tab} onValueChange={(v) => setTab(v as any)}>
         <TabsList className="w-full">
           <TabsTrigger value="active" className="flex-1">
-            {t("discipline.active", { defaultValue: "Actives" })}
+            {t("discipline.active")}
             {active.length > 0 && (
               <span className="ml-1.5 rounded-full bg-destructive/10 text-destructive text-[10px] px-1.5 py-0.5 font-semibold">
                 {active.length}
@@ -228,10 +216,10 @@ function DisciplinePage() {
             )}
           </TabsTrigger>
           <TabsTrigger value="history" className="flex-1">
-            {t("discipline.history", { defaultValue: "Historique" })}
+            {t("discipline.history")}
           </TabsTrigger>
           <TabsTrigger value="stats" className="flex-1">
-            {t("discipline.stats", { defaultValue: "Stats" })}
+            {t("discipline.stats")}
           </TabsTrigger>
         </TabsList>
 
@@ -239,11 +227,7 @@ function DisciplinePage() {
           {isLoading ? (
             <p className="text-sm text-muted-foreground">…</p>
           ) : active.length === 0 ? (
-            <EmptyState
-              message={t("discipline.noneInClub", {
-                defaultValue: "✅ Aucune suspension active dans le club.",
-              })}
-            />
+            <EmptyState message={t("discipline.noneInClub")} />
           ) : (
             <SuspensionTable rows={active} t={t} showRemaining />
           )}
@@ -251,9 +235,7 @@ function DisciplinePage() {
 
         <TabsContent value="history" className="mt-4">
           {filtered.length === 0 ? (
-            <EmptyState
-              message={t("discipline.historyEmpty", { defaultValue: "Aucun résultat." })}
-            />
+            <EmptyState message={t("discipline.historyEmpty")} />
           ) : (
             <SuspensionTable rows={filtered as any} t={t} showStatus />
           )}
@@ -261,29 +243,12 @@ function DisciplinePage() {
 
         <TabsContent value="stats" className="mt-4">
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-            <Kpi
-              label={t("discipline.kpi.yellows", { defaultValue: "Cartons jaunes" })}
-              value={stats.yellows}
-            />
-            <Kpi
-              label={t("discipline.kpi.reds", { defaultValue: "Cartons rouges" })}
-              value={stats.reds}
-              tone="destructive"
-            />
-            <Kpi
-              label={t("discipline.kpi.active", { defaultValue: "Actives" })}
-              value={stats.activeC}
-              tone="amber"
-            />
-            <Kpi
-              label={t("discipline.kpi.completed", { defaultValue: "Purgées" })}
-              value={stats.completedC}
-              tone="emerald"
-            />
+            <Kpi label={t("discipline.kpi.yellows")} value={stats.yellows} />
+            <Kpi label={t("discipline.kpi.reds")} value={stats.reds} tone="destructive" />
+            <Kpi label={t("discipline.kpi.active")} value={stats.activeC} tone="amber" />
+            <Kpi label={t("discipline.kpi.completed")} value={stats.completedC} tone="emerald" />
           </div>
-          <p className="mt-3 text-xs text-muted-foreground">
-            {t("discipline.kpi.windowHint", { defaultValue: "Sur les 12 derniers mois." })}
-          </p>
+          <p className="mt-3 text-xs text-muted-foreground">{t("discipline.kpi.windowHint")}</p>
         </TabsContent>
       </Tabs>
 
@@ -342,11 +307,9 @@ function SuspensionTable({
       <table className="w-full text-sm">
         <thead className="bg-muted/40 text-[11px] uppercase tracking-wider text-muted-foreground">
           <tr>
-            <th className="text-left px-3 py-2 font-medium">
-              {t("discipline.col.player", { defaultValue: "Joueur" })}
-            </th>
+            <th className="text-left px-3 py-2 font-medium">{t("discipline.col.player")}</th>
             <th className="text-left px-3 py-2 font-medium hidden sm:table-cell">
-              {t("discipline.col.team", { defaultValue: "Équipe" })}
+              {t("discipline.col.team")}
             </th>
             <th className="text-left px-3 py-2 font-medium hidden md:table-cell">
               {t("suspension.reason")}
@@ -355,9 +318,7 @@ function SuspensionTable({
               {t("suspension.startDate")}
             </th>
             <th className="text-right px-3 py-2 font-medium">
-              {showRemaining
-                ? t("discipline.col.remaining", { defaultValue: "Restants" })
-                : t("discipline.col.status", { defaultValue: "Statut" })}
+              {showRemaining ? t("discipline.col.remaining") : t("discipline.col.status")}
             </th>
           </tr>
         </thead>
@@ -415,7 +376,7 @@ function StatusPill({
 }) {
   const map: Record<Row["status"], { label: string; cls: string }> = {
     active: {
-      label: t("discipline.statusActive", { defaultValue: "Active" }),
+      label: t("discipline.statusActive"),
       cls: "bg-destructive/10 text-destructive",
     },
     completed: {

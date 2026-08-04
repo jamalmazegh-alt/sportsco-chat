@@ -74,36 +74,28 @@ export function WallReportDialog({
 
   const labels: Record<Reason, { title: string; description: string }> = {
     inappropriate: {
-      title: t("wall.report.inappropriate", { defaultValue: "Contenu inapproprié" }),
-      description: t("wall.report.inappropriateHint", {
-        defaultValue: "Propos choquants, violents ou déplacés",
-      }),
+      title: t("wall.report.inappropriate"),
+      description: t("wall.report.inappropriateHint"),
     },
     harassment: {
-      title: t("wall.report.harassment", { defaultValue: "Harcèlement" }),
-      description: t("wall.report.harassmentHint", {
-        defaultValue: "Attaques personnelles, intimidation",
-      }),
+      title: t("wall.report.harassment"),
+      description: t("wall.report.harassmentHint"),
     },
     spam: {
-      title: t("wall.report.spam", { defaultValue: "Spam ou publicité" }),
-      description: t("wall.report.spamHint", { defaultValue: "Message répétitif ou promotionnel" }),
+      title: t("wall.report.spam"),
+      description: t("wall.report.spamHint"),
     },
     misinformation: {
-      title: t("wall.report.misinformation", { defaultValue: "Information erronée" }),
-      description: t("wall.report.misinformationHint", {
-        defaultValue: "Information fausse ou trompeuse",
-      }),
+      title: t("wall.report.misinformation"),
+      description: t("wall.report.misinformationHint"),
     },
     privacy: {
-      title: t("wall.report.privacy", { defaultValue: "Atteinte à la vie privée" }),
-      description: t("wall.report.privacyHint", {
-        defaultValue: "Données personnelles, photo d'un mineur",
-      }),
+      title: t("wall.report.privacy"),
+      description: t("wall.report.privacyHint"),
     },
     other: {
-      title: t("wall.report.other", { defaultValue: "Autre" }),
-      description: t("wall.report.otherHint", { defaultValue: "Précisez ci-dessous" }),
+      title: t("wall.report.other"),
+      description: t("wall.report.otherHint"),
     },
   };
 
@@ -143,25 +135,17 @@ export function WallReportDialog({
         userDuplicate = !!res?.duplicate;
       }
       if (userOnly ? userDuplicate : contentDuplicate) {
-        toast.info(
-          userOnly
-            ? t("userReport.already", { defaultValue: "Vous avez déjà signalé cette personne." })
-            : t("wall.report.already", { defaultValue: "Vous avez déjà signalé ce contenu." }),
-        );
+        toast.info(userOnly ? t("userReport.already") : t("wall.report.already"));
       } else {
-        toast.success(
-          t("wall.report.sent", {
-            defaultValue: "Signalement transmis aux responsables du club.",
-          }),
-        );
+        toast.success(t("wall.report.sent"));
       }
       onOpenChange(false);
       reset();
     } catch (e) {
       toast.error(
         e instanceof Error && e.message === "not_found"
-          ? t("wall.report.notFound", { defaultValue: "Ce contenu n'est plus disponible." })
-          : t("common.error", { defaultValue: "Une erreur est survenue" }),
+          ? t("wall.report.notFound")
+          : t("common.error"),
       );
     } finally {
       setBusy(false);
@@ -175,21 +159,12 @@ export function WallReportDialog({
           <SheetTitle>
             {userOnly
               ? t("userReport.title", {
-                  defaultValue: "Signaler {{name}}",
                   name: reportedUser?.name ?? "",
                 })
-              : t("wall.report.title", { defaultValue: "Signaler ce contenu" })}
+              : t("wall.report.title")}
           </SheetTitle>
           <SheetDescription>
-            {userOnly
-              ? t("userReport.subtitle", {
-                  defaultValue:
-                    "Votre signalement est envoyé aux responsables du club. La personne n'est pas informée.",
-                })
-              : t("wall.report.subtitle", {
-                  defaultValue:
-                    "Votre signalement est envoyé aux responsables du club. L'auteur n'est pas informé.",
-                })}
+            {userOnly ? t("userReport.subtitle") : t("wall.report.subtitle")}
           </SheetDescription>
         </SheetHeader>
 
@@ -212,9 +187,7 @@ export function WallReportDialog({
         <Textarea
           value={details}
           onChange={(e) => setDetails(e.target.value.slice(0, 500))}
-          placeholder={t("wall.report.detailsPlaceholder", {
-            defaultValue: "Précisions (facultatif)",
-          })}
+          placeholder={t("wall.report.detailsPlaceholder")}
           rows={3}
         />
 
@@ -223,7 +196,6 @@ export function WallReportDialog({
             <Checkbox checked={alsoUser} onCheckedChange={(v) => setAlsoUser(v === true)} />
             <span>
               {t("userReport.also", {
-                defaultValue: "Signaler aussi {{name}}",
                 name: reportedUser.name,
               })}
             </span>
@@ -232,10 +204,10 @@ export function WallReportDialog({
 
         <div className="flex gap-2 pt-3 pb-[env(safe-area-inset-bottom)]">
           <Button variant="outline" className="flex-1" onClick={() => onOpenChange(false)}>
-            {t("common.cancel", { defaultValue: "Annuler" })}
+            {t("common.cancel")}
           </Button>
           <Button className="flex-1" disabled={!reason || busy} onClick={submit}>
-            {t("wall.report.submit", { defaultValue: "Signaler" })}
+            {t("wall.report.submit")}
           </Button>
         </div>
       </SheetContent>

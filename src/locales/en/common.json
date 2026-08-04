@@ -707,7 +707,8 @@
       "clubMismatch": "This championship does not belong to this club",
       "archived": "This championship is archived",
       "notFound": "Championship not found"
-    }
+    },
+    "levelPlaceholder": "Division 1"
   },
   "club": {
     "logo": "Club logo",

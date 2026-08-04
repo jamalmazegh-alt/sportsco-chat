@@ -707,7 +707,8 @@
       "clubMismatch": "Deze competitie hoort niet bij deze club",
       "archived": "Deze competitie is gearchiveerd",
       "notFound": "Competitie niet gevonden"
-    }
+    },
+    "levelPlaceholder": "1e klasse"
   },
   "club": {
     "logo": "Clublogo",

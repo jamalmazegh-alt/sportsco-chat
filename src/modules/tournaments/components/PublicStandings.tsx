@@ -108,7 +108,7 @@ export function PublicStandings({ groups, teams, matches }: Props) {
                           {tm?.name ?? "—"}
                           {qualified && (
                             <span className="hidden sm:inline-block rounded-md bg-primary/15 text-primary px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-wider">
-                              {t("public.standings.qualifiedTag", { defaultValue: "Qualifié" })}
+                              {t("public.standings.qualifiedTag")}
                             </span>
                           )}
                         </span>

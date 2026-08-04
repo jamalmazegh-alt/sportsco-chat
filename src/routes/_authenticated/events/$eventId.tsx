@@ -320,10 +320,7 @@ function EventDetail() {
       void downloadFile(blob, res.filename);
     } catch (e: unknown) {
       const msg = e instanceof Error ? e.message : String(e);
-      toast.error(
-        t("events.matchSheet.failed", { defaultValue: "Generation failed" }) +
-          (msg ? ` — ${msg}` : ""),
-      );
+      toast.error(t("events.matchSheet.failed") + (msg ? ` — ${msg}` : ""));
     } finally {
       setGeneratingSheet(false);
     }
@@ -371,33 +368,21 @@ function EventDetail() {
           void downloadBase64(dataUrl.split(",")[1] ?? "", "composition.png", "image/png");
           await copyText(messageText);
           openInSystemApp(`https://wa.me/?text=${encodeURIComponent(messageText)}`);
-          toast.success(
-            t("events.whatsappShare.imageDownloadedAttach", {
-              defaultValue: "Image downloaded, message copied — attach the image in WhatsApp",
-            }),
-          );
+          toast.success(t("events.whatsappShare.imageDownloadedAttach"));
           return;
         }
-        toast.success(
-          t("events.whatsappShare.shareReady", { defaultValue: "Share ready — pick WhatsApp" }),
-        );
+        toast.success(t("events.whatsappShare.shareReady"));
       } else {
         // Browser fallback: WhatsApp deep-links cannot auto-attach files.
         // Repli : l'attribut `download` est ignoré par les WebView.
         void downloadBase64(dataUrl.split(",")[1] ?? "", "composition.png", "image/png");
         await copyText(messageText);
         openInSystemApp(`https://wa.me/?text=${encodeURIComponent(messageText)}`);
-        toast.success(
-          t("events.whatsappShare.imageDownloadedAttach", {
-            defaultValue: "Image downloaded, message copied — attach the image in WhatsApp",
-          }),
-        );
+        toast.success(t("events.whatsappShare.imageDownloadedAttach"));
       }
     } catch (e: any) {
       if (e?.name !== "AbortError") {
-        toast.error(
-          t("events.whatsappShare.shareImageFailed", { defaultValue: "Unable to share the image" }),
-        );
+        toast.error(t("events.whatsappShare.shareImageFailed"));
       }
     } finally {
       setSharingLineup(false);
@@ -766,9 +751,7 @@ function EventDetail() {
           user_id: uid,
           type: "convocation_response",
           title: `${playerName} : ${t(`attendance.${status}`)}${
-            isChange
-              ? ` (${t("attendance.responseChanged", { defaultValue: "réponse modifiée" })})`
-              : ""
+            isChange ? ` (${t("attendance.responseChanged")})` : ""
           }`,
           body,
           link: `/events/${event.id}`,
@@ -813,11 +796,7 @@ function EventDetail() {
     if (error) {
       const raw = (error.message || "").toLowerCase();
       if (raw.includes("past_event_locked")) {
-        toast.error(
-          t("attendance.errorPastEventLocked", {
-            defaultValue: "L'événement est passé — les réponses ne peuvent plus être modifiées.",
-          }),
-        );
+        toast.error(t("attendance.errorPastEventLocked"));
       } else {
         toast.error(error.message);
       }
@@ -884,11 +863,7 @@ function EventDetail() {
     if (error) {
       const raw = (error.message || "").toLowerCase();
       if (raw.includes("past_event_locked")) {
-        toast.error(
-          t("attendance.errorPastEventLocked", {
-            defaultValue: "L'événement est passé — les réponses ne peuvent plus être modifiées.",
-          }),
-        );
+        toast.error(t("attendance.errorPastEventLocked"));
       } else {
         toast.error(error.message);
       }
@@ -1389,11 +1364,7 @@ function EventDetail() {
     }
 
     toast.success(
-      useWhatsApp
-        ? t("events.whatsappShare.convocationsCreated", {
-            defaultValue: "Call-ups created — share now via WhatsApp below",
-          })
-        : t("events.convocationsSent"),
+      useWhatsApp ? t("events.whatsappShare.convocationsCreated") : t("events.convocationsSent"),
     );
   }
 
@@ -1902,7 +1873,7 @@ function EventDetail() {
   async function resendConvocations() {
     if (!event || !user) return;
     if (!convocations || convocations.length === 0) {
-      toast.error(t("events.resend.noConvocations", { defaultValue: "No call-up to resend" }));
+      toast.error(t("events.resend.noConvocations"));
       return;
     }
     const changes = diffSnapshot((event as any).convocation_sent_snapshot, event, t);
@@ -2111,10 +2082,9 @@ function EventDetail() {
             body:
               changes.length > 0
                 ? t("events.resend.notifUpdated", {
-                    defaultValue: "Call-up updated: {{fields}}",
                     fields: changes.map((ch) => ch.label).join(", "),
                   })
-                : t("events.resend.notifResent", { defaultValue: "Call-up resent" }),
+                : t("events.resend.notifResent"),
             link: `/events/${event.id}`,
           })),
         );
@@ -2153,7 +2123,6 @@ function EventDetail() {
       } else {
         toast.success(
           t("events.resend.success", {
-            defaultValue: "Call-up resent to {{count}} player(s)",
             count: convocations.length,
           }),
         );
@@ -2161,9 +2130,7 @@ function EventDetail() {
       setResendOpen(false);
       refetchEvent();
     } catch (e: any) {
-      toast.error(
-        e?.message ?? t("events.resend.error", { defaultValue: "Error while resending" }),
-      );
+      toast.error(e?.message ?? t("events.resend.error"));
     } finally {
       setResendSubmitting(false);
     }
@@ -2357,7 +2324,7 @@ function EventDetail() {
               <button
                 type="button"
                 onClick={() => setEditOpen(true)}
-                aria-label={t("common.edit", { defaultValue: "Modifier" })}
+                aria-label={t("common.edit")}
                 className="shrink-0 h-7 w-7 rounded-full bg-white/15 hover:bg-white/25 backdrop-blur-sm flex items-center justify-center transition-colors"
               >
                 <Pencil className="h-3 w-3 text-white" />
@@ -2433,9 +2400,9 @@ function EventDetail() {
                   <span className="inline-flex items-center gap-1 rounded-md bg-emerald-50 dark:bg-emerald-950/40 px-2 py-0.5 text-[11px] font-semibold text-emerald-700 dark:text-emerald-300 border border-emerald-200/70 dark:border-emerald-800/60">
                     <Clock className="h-3 w-3" />
                     {event.type === "match" ? (
-                      <span>{t("events.matchTimeShort", { defaultValue: "Match" })}</span>
+                      <span>{t("events.matchTimeShort")}</span>
                     ) : (
-                      <span>{t("events.timeShort", { defaultValue: "Horaire" })}</span>
+                      <span>{t("events.timeShort")}</span>
                     )}
                     <span className="tabular-nums">{fmt(event.starts_at, "HH:mm")}</span>
                     {event.ends_at &&
@@ -2528,7 +2495,7 @@ function EventDetail() {
                   <div className="rounded-xl border border-border bg-muted/30 overflow-hidden">
                     <div className="px-3 py-2 border-b border-border bg-muted/40 flex items-center gap-2 text-xs font-semibold text-foreground">
                       <Clock className="h-3.5 w-3.5 text-primary" />
-                      {t("events.scheduleTitle", { defaultValue: "Horaires" })}
+                      {t("events.scheduleTitle")}
                     </div>
                     <ul className="divide-y divide-border">
                       {parsedSchedule.items.map((s) => {
@@ -2600,10 +2567,10 @@ function EventDetail() {
                     buttonVariants({ variant: "secondary", size: "sm" }),
                     "h-9 gap-1.5 flex-1 min-w-[7rem]",
                   )}
-                  title={t("lineup.title", { defaultValue: "Composition" })}
+                  title={t("lineup.title")}
                 >
                   <CircleDot className="h-4 w-4" />
-                  <span>{t("lineup.title", { defaultValue: "Composition" })}</span>
+                  <span>{t("lineup.title")}</span>
                 </Link>
               )}
               {isCoach && event.type === "training" && (
@@ -2614,10 +2581,10 @@ function EventDetail() {
                     buttonVariants({ variant: "secondary", size: "sm" }),
                     "h-9 gap-1.5 flex-1 min-w-[7rem]",
                   )}
-                  title={t("challenges:list.title", { defaultValue: "Défis" })}
+                  title={t("challenges:list.title")}
                 >
                   <Trophy className="h-4 w-4" />
-                  <span>{t("challenges:list.title", { defaultValue: "Défis" })}</span>
+                  <span>{t("challenges:list.title")}</span>
                 </Link>
               )}
               {showFeedbackButton && (
@@ -2628,10 +2595,10 @@ function EventDetail() {
                     buttonVariants({ variant: "secondary", size: "sm" }),
                     "h-9 gap-1.5 flex-1 min-w-[7rem]",
                   )}
-                  title={t("feedback.postMatchTitle", { defaultValue: "Retours coach" })}
+                  title={t("feedback.postMatchTitle")}
                 >
                   <ClipboardList className="h-4 w-4" />
-                  <span>{t("feedback.postMatchTitle", { defaultValue: "Retours coach" })}</span>
+                  <span>{t("feedback.postMatchTitle")}</span>
                 </Link>
               )}
               {isCoach && (event.type === "match" || event.type === "tournament") && (
@@ -2936,13 +2903,10 @@ function EventDetail() {
                     </div>
                     <div className="min-w-0 leading-tight">
                       <div className="text-base font-extrabold tracking-tight">
-                        {t("events.whatsappShare.shareViaWhatsApp", {
-                          defaultValue: "Partager la convocation par WhatsApp",
-                        })}
+                        {t("events.whatsappShare.shareViaWhatsApp")}
                       </div>
                       <div className="text-[11px] text-white/75 font-medium mt-0.5">
                         {t("events.commCard.subtitle", {
-                          defaultValue: "{{count}} joueurs convoqués",
                           count: convocCount,
                         })}
                       </div>
@@ -2986,7 +2950,7 @@ function EventDetail() {
                         {t("events.whatsappShare.shareCancellation")}
                       </span>
                       <span className="block text-[11px] text-white/80">
-                        {t("events.commCard.cancelledHint", { defaultValue: "Lien d'annulation" })}
+                        {t("events.commCard.cancelledHint")}
                       </span>
                     </span>
                   </a>
@@ -3032,9 +2996,7 @@ function EventDetail() {
                         </span>
                         <span className="relative flex-1 min-w-0">
                           <span className="block text-sm font-bold">
-                            {t("events.commCard.invitePlayersFirstTitle", {
-                              defaultValue: "Inviter les joueurs",
-                            })}
+                            {t("events.commCard.invitePlayersFirstTitle")}
                           </span>
                         </span>
                       </button>
@@ -3065,9 +3027,7 @@ function EventDetail() {
                         </span>
                         <span className="flex-1 min-w-0">
                           <span className="block text-sm font-bold text-foreground">
-                            {t("events.whatsappShare.shareLineup", {
-                              defaultValue: "Partager la compo",
-                            })}
+                            {t("events.whatsappShare.shareLineup")}
                           </span>
                         </span>
                       </button>
@@ -3098,11 +3058,7 @@ function EventDetail() {
           </DialogHeader>
           {event.series_id && (
             <div className="space-y-2 rounded-lg border border-border bg-muted/30 p-3">
-              <div className="text-sm font-medium">
-                {t("events.series.scopeTitle", {
-                  defaultValue: "Cette séance fait partie d'une série",
-                })}
-              </div>
+              <div className="text-sm font-medium">{t("events.series.scopeTitle")}</div>
               <div className="space-y-1.5">
                 {(["single", "future", "all"] as const).map((s) => (
                   <label key={s} className="flex items-center gap-2 text-sm cursor-pointer">
@@ -3114,14 +3070,9 @@ function EventDetail() {
                       className="accent-primary"
                     />
                     <span>
-                      {s === "single" &&
-                        t("events.series.scopeSingle", { defaultValue: "Cette séance uniquement" })}
-                      {s === "future" &&
-                        t("events.series.scopeFuture", {
-                          defaultValue: "Celle-ci et toutes les suivantes",
-                        })}
-                      {s === "all" &&
-                        t("events.series.scopeAll", { defaultValue: "Toute la série" })}
+                      {s === "single" && t("events.series.scopeSingle")}
+                      {s === "future" && t("events.series.scopeFuture")}
+                      {s === "all" && t("events.series.scopeAll")}
                     </span>
                   </label>
                 ))}
@@ -3196,26 +3147,19 @@ function EventDetail() {
       >
         <DialogContent className="max-w-md">
           <DialogHeader>
-            <DialogTitle>
-              {t("events.resend.title", { defaultValue: "Resend call-up" })}
-            </DialogTitle>
+            <DialogTitle>{t("events.resend.title")}</DialogTitle>
             <DialogDescription>
               {convocChanges.length > 0
                 ? t("events.resend.descChanges", {
-                    defaultValue:
-                      "{{count}} change(s) detected since the last send. The email will highlight what changed.",
                     count: convocChanges.length,
                   })
-                : t("events.resend.descNoChanges", {
-                    defaultValue:
-                      "No changes detected since the last send. The call-up will still be resent to all players.",
-                  })}
+                : t("events.resend.descNoChanges")}
             </DialogDescription>
           </DialogHeader>
           {convocChanges.length > 0 && (
             <div className="rounded-lg border border-amber-300 dark:border-amber-800 bg-amber-50 dark:bg-amber-950/40 p-3 space-y-2 max-h-64 overflow-auto">
               <p className="text-xs font-semibold uppercase tracking-wide text-amber-900 dark:text-amber-200">
-                {t("events.resend.changesHeader", { defaultValue: "Changes" })}
+                {t("events.resend.changesHeader")}
               </p>
               {convocChanges.map((c) => (
                 <div key={c.field} className="text-sm">
@@ -3233,8 +3177,6 @@ function EventDetail() {
           )}
           <p className="text-xs text-muted-foreground">
             {t("events.resend.recipientsHint", {
-              defaultValue:
-                "Sent to {{count}} player(s) (+ parents). Existing responses are preserved.",
               count: convocations?.length ?? 0,
             })}
           </p>
@@ -3249,7 +3191,7 @@ function EventDetail() {
             <Button onClick={resendConvocations} disabled={resendSubmitting}>
               {resendSubmitting && <Loader2 className="h-4 w-4 animate-spin" />}
               <Send className="h-4 w-4" />
-              {t("events.resend.confirm", { defaultValue: "Resend" })}
+              {t("events.resend.confirm")}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -3267,14 +3209,12 @@ function EventDetail() {
             <DialogTitle>
               {pickerStep === "select"
                 ? t("attendance.selectPlayers")
-                : t("attendance.reviewBeforeSend", { defaultValue: "Vérifier avant envoi" })}
+                : t("attendance.reviewBeforeSend")}
             </DialogTitle>
             <DialogDescription>
               {pickerStep === "select"
                 ? t("attendance.selectPlayersHint")
                 : t("attendance.reviewBeforeSendHint", {
-                    defaultValue:
-                      "Vérifie les destinataires et les détails — l'envoi est définitif.",
                     count: selectedIds.size,
                   })}
             </DialogDescription>
@@ -3299,16 +3239,13 @@ function EventDetail() {
                   <div className="rounded-xl border border-amber-300 bg-amber-50 text-amber-900 dark:border-amber-800 dark:bg-amber-950 dark:text-amber-200 p-3 text-xs space-y-1 mb-2">
                     <p className="font-semibold flex items-center gap-1.5">
                       <AlertTriangle className="h-3.5 w-3.5 shrink-0" />
-                      {t("suspensions.warningInPicker", {
-                        defaultValue: "Joueur(s) suspendu(s) dans l'effectif",
-                      })}
+                      {t("suspensions.warningInPicker")}
                     </p>
                     <ul className="list-disc pl-5">
                       {suspendedInRoster.map((s) => (
                         <li key={s.id}>
                           {s.name} —{" "}
                           {t("suspensions.remaining", {
-                            defaultValue: "{{count}} match(s) restant(s)",
                             count: s.remaining,
                           })}
                         </li>
@@ -3398,14 +3335,12 @@ function EventDetail() {
                       {susp && (
                         <span
                           title={t("suspensions.warningTooltip", {
-                            defaultValue: "{{count}} match(s) restant(s) à purger",
                             count: susp.remaining,
                           })}
                           className="inline-flex items-center gap-1 text-[10px] font-semibold uppercase tracking-wider text-amber-700 bg-amber-100 dark:bg-amber-950 dark:text-amber-300 px-1.5 py-0.5 rounded"
                         >
                           <AlertTriangle className="h-3 w-3" />
-                          {t("suspensions.suspendedShort", { defaultValue: "Suspendu" })} ·{" "}
-                          {susp.remaining}
+                          {t("suspensions.suspendedShort")} · {susp.remaining}
                         </span>
                       )}
                       {abs && <UnavailableBadge reason={abs.reason as UnavailableReason} />}
@@ -3462,16 +3397,13 @@ function EventDetail() {
                   >
                     <p className="font-semibold flex items-center gap-1.5">
                       <AlertTriangle className="h-3.5 w-3.5" />
-                      {t("suspensions.warningOfficial", {
-                        defaultValue: "Joueurs suspendus dans la sélection (match officiel)",
-                      })}
+                      {t("suspensions.warningOfficial")}
                     </p>
                     <ul className="list-disc pl-5">
                       {suspendedSelected.map((s) => (
                         <li key={s.id}>
                           {s.name} —{" "}
                           {t("suspensions.remaining", {
-                            defaultValue: "{{count}} match(s) restant(s)",
                             count: s.remaining,
                           })}
                         </li>
@@ -3503,11 +3435,7 @@ function EventDetail() {
                 if (absentSelected.length === 0) return null;
                 return (
                   <div className="rounded-xl border border-sky-300 bg-sky-50 dark:border-sky-800 dark:bg-sky-950/40 text-sky-900 dark:text-sky-200 p-3 text-xs space-y-2">
-                    <p className="font-semibold">
-                      {t("availability.warningSelected", {
-                        defaultValue: "Joueurs signalés indisponibles pour cette date",
-                      })}
-                    </p>
+                    <p className="font-semibold">{t("availability.warningSelected")}</p>
                     <ul className="space-y-1">
                       {absentSelected.map((a) => (
                         <li key={a.id} className="flex items-center gap-2">
@@ -3521,8 +3449,7 @@ function EventDetail() {
               })()}
               <div>
                 <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-2">
-                  {t("attendance.recipients", { defaultValue: "Destinataires" })} (
-                  {selectedIds.size})
+                  {t("attendance.recipients")} ({selectedIds.size})
                 </p>
                 <div className="max-h-48 overflow-y-auto rounded-xl border divide-y">
                   {teamPlayers
@@ -3566,7 +3493,7 @@ function EventDetail() {
                   {t("common.cancel")}
                 </Button>
                 <Button onClick={() => setPickerStep("review")} disabled={selectedIds.size === 0}>
-                  {t("common.continue", { defaultValue: "Continuer" })} ({selectedIds.size})
+                  {t("common.continue")} ({selectedIds.size})
                 </Button>
               </>
             ) : (
@@ -3596,7 +3523,7 @@ function EventDetail() {
                   ) : (
                     <Send className="h-4 w-4" />
                   )}
-                  {t("attendance.confirmSend", { defaultValue: "Confirmer l'envoi" })}
+                  {t("attendance.confirmSend")}
                 </Button>
               </>
             )}
@@ -3609,9 +3536,7 @@ function EventDetail() {
       {/* Match result + scorers (matches only, hidden when the event is cancelled) */}
       {event.type === "match" && event.status === "cancelled" && (
         <div className="rounded-2xl border border-red-300/60 bg-red-50/30 p-4 text-sm text-red-700 dark:bg-red-950/20 dark:text-red-300">
-          {t("events.scoreDisabledCancelled", {
-            defaultValue: "Événement annulé — édition du score et des faits de match désactivée.",
-          })}
+          {t("events.scoreDisabledCancelled")}
         </div>
       )}
       {event.type === "match" &&
@@ -3671,7 +3596,7 @@ function EventDetail() {
                       <div className="min-w-0">
                         <div className="flex items-center gap-2 flex-wrap">
                           <h2 className="text-sm font-extrabold tracking-tight">
-                            {t("attendance.title", { defaultValue: "Présences" })}
+                            {t("attendance.title")}
                           </h2>
                           {teamName && (
                             <span className="inline-flex items-center rounded-full bg-white/15 ring-1 ring-white/25 px-2 py-0.5 text-[10px] font-semibold tracking-wide backdrop-blur-sm">
@@ -3680,14 +3605,12 @@ function EventDetail() {
                           )}
                           {event.responses_locked && (
                             <span className="inline-flex items-center gap-1 rounded-full bg-amber-300/20 ring-1 ring-amber-200/40 px-2 py-0.5 text-[10px] font-semibold text-amber-100">
-                              <Lock className="h-3 w-3" />{" "}
-                              {t("attendance.locked", { defaultValue: "Verrouillé" })}
+                              <Lock className="h-3 w-3" /> {t("attendance.locked")}
                             </span>
                           )}
                           {convocChanges.length > 0 && (
                             <span className="inline-flex items-center rounded-full bg-amber-300/90 text-amber-950 px-2 py-0.5 text-[10px] font-bold">
                               {t("events.resend.updatesBadge", {
-                                defaultValue: "{{count}} update(s)",
                                 count: convocChanges.length,
                               })}
                             </span>
@@ -3721,17 +3644,11 @@ function EventDetail() {
                               <DropdownMenuItem onClick={toggleLock}>
                                 {event.responses_locked ? (
                                   <>
-                                    <Unlock className="h-4 w-4" />{" "}
-                                    {t("attendance.unlockResponses", {
-                                      defaultValue: "Unlock responses",
-                                    })}
+                                    <Unlock className="h-4 w-4" /> {t("attendance.unlockResponses")}
                                   </>
                                 ) : (
                                   <>
-                                    <Lock className="h-4 w-4" />{" "}
-                                    {t("attendance.lockResponses", {
-                                      defaultValue: "Lock responses",
-                                    })}
+                                    <Lock className="h-4 w-4" /> {t("attendance.lockResponses")}
                                   </>
                                 )}
                               </DropdownMenuItem>
@@ -3747,29 +3664,26 @@ function EventDetail() {
                                   const csv = toCsv(rows, [
                                     {
                                       key: "last_name",
-                                      header: t("players.lastName", { defaultValue: "Last name" }),
+                                      header: t("players.lastName"),
                                     },
                                     {
                                       key: "first_name",
-                                      header: t("players.firstName", {
-                                        defaultValue: "First name",
-                                      }),
+                                      header: t("players.firstName"),
                                     },
                                     { key: "jersey_number", header: "#" },
                                     {
                                       key: "status",
-                                      header: t("attendance.status", { defaultValue: "Status" }),
+                                      header: t("attendance.status"),
                                     },
                                     {
                                       key: "comment",
-                                      header: t("common.comment", { defaultValue: "Comment" }),
+                                      header: t("common.comment"),
                                     },
                                   ]);
                                   downloadCsv(`${event.title}-attendance`, csv);
                                 }}
                               >
-                                <Download className="h-4 w-4" />{" "}
-                                {t("common.exportCsv", { defaultValue: "Export CSV" })}
+                                <Download className="h-4 w-4" /> {t("common.exportCsv")}
                               </DropdownMenuItem>
                             </DropdownMenuContent>
                           </DropdownMenu>
@@ -3787,7 +3701,7 @@ function EventDetail() {
                           <span className="text-lg font-bold text-white/80">%</span>
                         </div>
                         <p className="text-[9px] uppercase tracking-[0.16em] text-white/70 font-bold mt-1">
-                          {t("attendance.responseRate", { defaultValue: "Taux de réponse" })}
+                          {t("attendance.responseRate")}
                         </p>
                       </div>
                       <div className="text-right leading-tight">
@@ -3795,7 +3709,7 @@ function EventDetail() {
                           {respondedP}
                           <span className="text-white/65 font-medium">/{totalP}</span>{" "}
                           <span className="text-white/85 font-semibold">
-                            {t("attendance.responded", { defaultValue: "réponses" })}
+                            {t("attendance.responded")}
                           </span>
                         </p>
                         {counts.pending > 0 && (
@@ -3886,10 +3800,10 @@ function EventDetail() {
               <header className="flex items-start justify-between gap-3 px-5 py-4 border-b border-border/70">
                 <div className="min-w-0">
                   <h2 className="text-base font-extrabold tracking-tight text-foreground">
-                    {t("attendance.title", { defaultValue: "Présences" })}
+                    {t("attendance.title")}
                   </h2>
                   <p className="text-xs text-muted-foreground mt-0.5">
-                    {t("attendance.notSentYet", { defaultValue: "Pas encore envoyée" })}
+                    {t("attendance.notSentYet")}
                   </p>
                 </div>
               </header>
@@ -3920,18 +3834,13 @@ function EventDetail() {
                 <Send className="h-4 w-4" />
                 {convocChanges.length > 0
                   ? t("events.resend.buttonWithChangesAll", {
-                      defaultValue: "Renvoyer à tous les joueurs ({{count}} mise(s) à jour)",
                       count: convocChanges.length,
                     })
-                  : t("events.resend.buttonAll", {
-                      defaultValue: "Renvoyer la convocation à tous les joueurs",
-                    })}
+                  : t("events.resend.buttonAll")}
               </Button>
               {convocChanges.length > 0 && (
                 <p className="text-[11px] text-muted-foreground mt-1.5 text-center">
-                  {t("events.resend.changesDetected", {
-                    defaultValue: "Changes were detected since the last send.",
-                  })}
+                  {t("events.resend.changesDetected")}
                 </p>
               )}
             </div>
@@ -3978,10 +3887,7 @@ function EventDetail() {
                       <p className="text-xs text-muted-foreground">
                         {event.responses_locked
                           ? t("attendance.responsesLocked")
-                          : t("attendance.responsesClosedPast", {
-                              defaultValue:
-                                "Les réponses ne sont plus modifiables pour cet événement passé.",
-                            })}
+                          : t("attendance.responsesClosedPast")}
                       </p>
                     ) : hasResponded ? (
                       <div className="flex items-center justify-between gap-2 rounded-2xl border border-border/70 bg-muted/30 px-3 py-2">
@@ -4093,9 +3999,7 @@ function EventDetail() {
                     {t("attendance.pendingCount", { count: counts.pending })}
                   </p>
                   <p className="text-[11px] text-amber-700/80 truncate">
-                    {t("attendance.lastSendHint", {
-                      defaultValue: "Dernier envoi de la convocation",
-                    })}
+                    {t("attendance.lastSendHint")}
                   </p>
                 </div>
               </div>
@@ -4129,11 +4033,11 @@ function EventDetail() {
                     <>
                       <div className="px-4 pt-4 pb-2 flex items-center justify-between gap-2">
                         <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-muted-foreground">
-                          {t("attendance.convokedPlayers", { defaultValue: "Called-up players" })}
+                          {t("attendance.convokedPlayers")}
                         </p>
                         {isCoach && (
                           <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-muted-foreground/70 pr-11">
-                            {t("attendance.response", { defaultValue: "Réponse" })}
+                            {t("attendance.response")}
                           </p>
                         )}
                       </div>
@@ -4229,9 +4133,7 @@ function EventDetail() {
                                             size="icon"
                                             variant="ghost"
                                             className="h-8 w-8 text-muted-foreground/80"
-                                            aria-label={t("common.moreActions", {
-                                              defaultValue: "More actions",
-                                            })}
+                                            aria-label={t("common.moreActions")}
                                           >
                                             <MoreVertical className="h-4 w-4" />
                                           </Button>
@@ -4281,7 +4183,7 @@ function EventDetail() {
                           className="w-full px-4 py-3 border-t border-border/70 text-xs font-semibold text-[#1d7a45] hover:bg-emerald-50/40 transition-colors flex items-center justify-center gap-1"
                         >
                           {presencesExpanded
-                            ? t("attendance.showLess", { defaultValue: "Réduire la liste" })
+                            ? t("attendance.showLess")
                             : t("attendance.showAll", {
                                 defaultValue: "Voir les {{count}} joueurs",
                                 count: sortedConvocations.length,
@@ -4360,23 +4262,13 @@ function EventDetail() {
       <AlertDialog open={confirmSendSuspendedOpen} onOpenChange={setConfirmSendSuspendedOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>
-              {t("suspensions.confirmSendTitle", {
-                defaultValue: "Convoquer des joueurs suspendus ?",
-              })}
-            </AlertDialogTitle>
+            <AlertDialogTitle>{t("suspensions.confirmSendTitle")}</AlertDialogTitle>
             <AlertDialogDescription asChild>
               <div className="space-y-2">
                 <p>
                   {(event as any)?.is_official === true && event?.type === "match"
-                    ? t("suspensions.confirmSendOfficial", {
-                        defaultValue:
-                          "Ce match est officiel. Convoquer un joueur suspendu peut être contraire au règlement.",
-                      })
-                    : t("suspensions.confirmSendNonOfficial", {
-                        defaultValue:
-                          "Certains joueurs sélectionnés ont une suspension active. Ce match ne décompte pas leur suspension.",
-                      })}
+                    ? t("suspensions.confirmSendOfficial")
+                    : t("suspensions.confirmSendNonOfficial")}
                 </p>
                 <ul className="list-disc pl-5 text-sm">
                   {Array.from(selectedIds)
@@ -4398,7 +4290,6 @@ function EventDetail() {
                       <li key={s.id}>
                         {s.name} —{" "}
                         {t("suspensions.remaining", {
-                          defaultValue: "{{count}} match(s) restant(s)",
                           count: s.remaining,
                         })}
                       </li>
@@ -4415,7 +4306,7 @@ function EventDetail() {
                 sendConvocations();
               }}
             >
-              {t("suspensions.confirmSendAction", { defaultValue: "Convoquer quand même" })}
+              {t("suspensions.confirmSendAction")}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
@@ -4427,15 +4318,11 @@ function EventDetail() {
       >
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>
-              {t("attendance.forceResponseTitle", { defaultValue: "Force response?" })}
-            </AlertDialogTitle>
+            <AlertDialogTitle>{t("attendance.forceResponseTitle")}</AlertDialogTitle>
             <AlertDialogDescription>
               {coachOverrideTarget ? (
                 <>
                   {t("attendance.forceResponseDesc", {
-                    defaultValue:
-                      "{{name}} already responded {{current}}. Do you really want to force their status to {{next}}?",
                     name: coachOverrideTarget.playerName,
                     current: t(`attendance.${coachOverrideTarget.currentStatus}`),
                     next: t(`attendance.${coachOverrideTarget.status}`),

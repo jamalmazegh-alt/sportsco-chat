@@ -90,7 +90,7 @@ export function FollowButton({
     },
     onError: (_e, _v, ctx) => {
       if (ctx?.prev) qc.setQueryData(queryKey, ctx.prev);
-      toast.error(t("follow.error", { defaultValue: "Something went wrong, try again" }));
+      toast.error(t("follow.error"));
     },
     onSettled: () => {
       qc.invalidateQueries({ queryKey: ["following-list"] });
@@ -99,7 +99,7 @@ export function FollowButton({
 
   function handleClick() {
     if (!user) {
-      toast(t("follow.loginRequired", { defaultValue: "Log in to follow this profile" }));
+      toast(t("follow.loginRequired"));
       navigate({ to: "/login" });
       return;
     }
@@ -120,11 +120,7 @@ export function FollowButton({
               variant={isFollowing ? "default" : "outline"}
               onClick={handleClick}
               disabled={busy}
-              aria-label={
-                isFollowing
-                  ? t("follow.following", { defaultValue: "Following" })
-                  : t("follow.follow", { defaultValue: "Follow" })
-              }
+              aria-label={isFollowing ? t("follow.following") : t("follow.follow")}
               className={cn(
                 isFollowing && "bg-teal-600 hover:bg-teal-700 text-white border-teal-600",
                 className,
@@ -134,9 +130,7 @@ export function FollowButton({
             </Button>
           </TooltipTrigger>
           <TooltipContent>
-            {isFollowing
-              ? t("follow.following", { defaultValue: "Following ✓" })
-              : t("follow.follow", { defaultValue: "Follow" })}
+            {isFollowing ? t("follow.following") : t("follow.follow")}
           </TooltipContent>
         </Tooltip>
       </TooltipProvider>
@@ -153,13 +147,9 @@ export function FollowButton({
         className={cn(isFollowing && "bg-teal-600 hover:bg-teal-700 text-white border-teal-600")}
       >
         {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : <Icon className="h-4 w-4" />}
-        {isFollowing
-          ? t("follow.following", { defaultValue: "Following ✓" })
-          : t("follow.follow", { defaultValue: "Follow" })}
+        {isFollowing ? t("follow.following") : t("follow.follow")}
       </Button>
-      <span className="text-xs text-muted-foreground">
-        {t("follow.followers", { count, defaultValue: "{{count}} follower(s)" })}
-      </span>
+      <span className="text-xs text-muted-foreground">{t("follow.followers", { count })}</span>
     </div>
   );
 }

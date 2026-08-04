@@ -472,10 +472,7 @@ export function DrawDialog({
                     </Button>
                   ) : (
                     <p className="text-xs text-muted-foreground italic">
-                      {t("draw.relaunchFromFooterHint", {
-                        defaultValue:
-                          "Tirage effectué. Utilisez « Relancer » en bas du dialog pour en générer un nouveau (les résultats actuels seront perdus).",
-                      })}
+                      {t("draw.relaunchFromFooterHint")}
                     </p>
                   )}
                 </TabsContent>
@@ -499,7 +496,7 @@ export function DrawDialog({
                       footer Relancer button (with confirm sheet) instead. */}
                   {finished && !drawing && (
                     <p className="text-xs text-muted-foreground italic">
-                      {t("draw.relaunchFromFooterHint", { defaultValue: "" })}
+                      {t("draw.relaunchFromFooterHint")}
                     </p>
                   )}
 

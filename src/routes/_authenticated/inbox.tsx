@@ -85,10 +85,8 @@ function InboxPage() {
           }
         >
           <TabsList className="mb-4">
-            <TabsTrigger value="wall">{t("wall.tabs.wall", { defaultValue: "Mur" })}</TabsTrigger>
-            <TabsTrigger value="documents">
-              {t("wall.tabs.documents", { defaultValue: "Documents" })}
-            </TabsTrigger>
+            <TabsTrigger value="wall">{t("wall.tabs.wall")}</TabsTrigger>
+            <TabsTrigger value="documents">{t("wall.tabs.documents")}</TabsTrigger>
           </TabsList>
           <TabsContent value="wall">
             <WallFeed clubId={activeClubId} focusPostId={postId} />

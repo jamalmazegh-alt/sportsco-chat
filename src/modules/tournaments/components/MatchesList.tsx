@@ -198,9 +198,7 @@ export function MatchesList({
             className="h-8 text-xs gap-1.5"
           >
             <Gavel className="h-3.5 w-3.5" />
-            {onlyMine
-              ? t("matches.allMatches", { defaultValue: "Tous les matchs" })
-              : t("matches.myMatches", { defaultValue: "Mes matchs" })}
+            {onlyMine ? t("matches.allMatches") : t("matches.myMatches")}
             <span className="ml-1 rounded-full bg-background/30 px-1.5 text-[10px] font-semibold tabular-nums">
               {assignedToMe}
             </span>
@@ -1331,7 +1329,7 @@ function MatchCard({
                 <DropdownMenuSub>
                   <DropdownMenuSubTrigger>
                     <Gavel className="h-3.5 w-3.5" />
-                    {t("matches.assignRefereeAction", { defaultValue: "Assigner un arbitre" })}
+                    {t("matches.assignRefereeAction")}
                   </DropdownMenuSubTrigger>
                   <DropdownMenuSubContent className="max-h-72 overflow-y-auto">
                     <DropdownMenuItem
@@ -1359,7 +1357,7 @@ function MatchCard({
                           <span className="truncate">{r.label}</span>
                           {r.offline && (
                             <span className="ml-auto text-[10px] text-muted-foreground">
-                              {t("matches.refereeOffline", { defaultValue: "(sans compte)" })}
+                              {t("matches.refereeOffline")}
                             </span>
                           )}
                         </DropdownMenuItem>
@@ -1395,12 +1393,10 @@ function MatchCard({
               <ShieldCheck className="h-4 w-4 text-emerald-600 dark:text-emerald-400 mt-0.5 shrink-0" />
               <div className="flex-1 min-w-0">
                 <p className="text-xs font-semibold text-emerald-700 dark:text-emerald-300">
-                  {t("matches.lockedTitle", { defaultValue: "Match validé" })}
+                  {t("matches.lockedTitle")}
                 </p>
                 <p className="text-[11px] text-emerald-700/80 dark:text-emerald-300/80 leading-snug mt-0.5">
-                  {t("matches.lockedHelper", {
-                    defaultValue: "Pour modifier le score, dévalidez d'abord le match.",
-                  })}
+                  {t("matches.lockedHelper")}
                 </p>
               </div>
             </div>
@@ -1573,7 +1569,7 @@ function MatchCard({
                   className="w-full h-12"
                 >
                   <Zap className="h-4 w-4" />
-                  {t("matches.nextMatch", { defaultValue: "Match suivant" })}
+                  {t("matches.nextMatch")}
                 </Button>
               )}
               <Button
@@ -1588,7 +1584,7 @@ function MatchCard({
                 ) : (
                   <ShieldCheck className="h-4 w-4" />
                 )}
-                {t("matches.unvalidateToEdit", { defaultValue: "Dévalider pour modifier" })}
+                {t("matches.unvalidateToEdit")}
               </Button>
             </div>
           ) : justSaved ? (
@@ -1607,13 +1603,11 @@ function MatchCard({
                   className="w-full h-12"
                 >
                   <Zap className="h-4 w-4" />
-                  {t("matches.nextMatch", { defaultValue: "Match suivant" })}
+                  {t("matches.nextMatch")}
                 </Button>
               ) : (
                 <p className="text-center text-xs text-muted-foreground">
-                  {t("matches.allMatchesEntered", {
-                    defaultValue: "Tous les matchs sont saisis.",
-                  })}
+                  {t("matches.allMatchesEntered")}
                 </p>
               )}
               <Button
@@ -1624,7 +1618,7 @@ function MatchCard({
                 }}
                 className="w-full h-11"
               >
-                {t("common.close", { defaultValue: "Fermer" })}
+                {t("common.close")}
               </Button>
             </div>
           ) : (

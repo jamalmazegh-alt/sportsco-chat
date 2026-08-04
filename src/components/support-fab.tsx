@@ -19,7 +19,7 @@ export function SupportFab() {
   return (
     <Link
       to="/support"
-      aria-label={t("fab", { defaultValue: "Support" })}
+      aria-label={t("fab")}
       className={cn(
         "fixed left-4 z-30 h-10 w-10 rounded-full bg-secondary text-secondary-foreground shadow-lg",
         "flex items-center justify-center hover:scale-105 active:scale-95 transition-transform",

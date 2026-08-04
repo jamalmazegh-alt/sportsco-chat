@@ -707,7 +707,8 @@
       "clubMismatch": "Este campeonato no pertenece a este club",
       "archived": "Este campeonato está archivado",
       "notFound": "Campeonato no encontrado"
-    }
+    },
+    "levelPlaceholder": "Preferente 1"
   },
   "club": {
     "logo": "Logo del Club",

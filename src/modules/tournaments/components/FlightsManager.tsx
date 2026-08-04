@@ -176,7 +176,7 @@ export function FlightsManager({
         },
       }),
     onSuccess: () => {
-      toast.success(t("flights.savedToast", { defaultValue: "Flights enregistrés" }));
+      toast.success(t("flights.savedToast"));
       qc.invalidateQueries({ queryKey: ["flights", tournamentId] });
       qc.invalidateQueries({ queryKey: ["tournament", tournamentId] });
       setShowWizard(false);
@@ -193,16 +193,10 @@ export function FlightsManager({
         // Fix F — aucun bracket généré : la répartition ne permet pas de
         // qualifier ≥ 2 équipes par flight. On l'explique au lieu d'un
         // discret "0 matchs créés" et on oriente vers un autre template.
-        toast.warning(
-          t("flights.fallback.empty", {
-            defaultValue:
-              "Aucun bracket généré : la structure ne qualifie pas assez d'équipes par flight. Ajuste la répartition, utilise un template de repli (Consolante / Médailles) ou configure les flights manuellement.",
-          }),
-        );
+        toast.warning(t("flights.fallback.empty"));
       } else {
         toast.success(
           t("flights.generatedToast", {
-            defaultValue: "{{n}} matchs créés",
             n: created,
           }),
         );
@@ -213,39 +207,19 @@ export function FlightsManager({
       const msg = String(e?.message ?? "");
       // B3 — backstop : le serveur refuse la régénération destructive sans force.
       if (msg.includes("FLIGHTS_ALREADY_STARTED")) {
-        if (
-          window.confirm(
-            t("flights.regenConfirm", {
-              defaultValue:
-                "Des matchs de phase finale ont déjà des résultats. Régénérer les brackets EFFACERA tous ces résultats. Continuer ?",
-            }),
-          )
-        ) {
+        if (window.confirm(t("flights.regenConfirm"))) {
           generate.mutate(true);
         }
         return;
       }
-      toast.error(
-        e?.message ??
-          t("flights.fallback.error", {
-            defaultValue:
-              "Génération impossible pour cette structure. Réessaie avec un autre template ou en mode manuel.",
-          }),
-      );
+      toast.error(e?.message ?? t("flights.fallback.error"));
     },
   });
 
   // B3 — un bracket déjà généré ne se régénère qu'après confirmation forte.
   const onGenerateClick = () => {
     if (bracketsGenerated) {
-      if (
-        !window.confirm(
-          t("flights.regenConfirm", {
-            defaultValue:
-              "Des matchs de phase finale ont déjà des résultats. Régénérer les brackets EFFACERA tous ces résultats. Continuer ?",
-          }),
-        )
-      ) {
+      if (!window.confirm(t("flights.regenConfirm"))) {
         return;
       }
       generate.mutate(true);
@@ -258,9 +232,7 @@ export function FlightsManager({
     return (
       <div className="rounded-lg border border-dashed bg-card p-6 text-center text-sm text-muted-foreground">
         <Trophy className="h-8 w-8 mx-auto mb-2 text-muted-foreground/50" />
-        {t("flights.noGroups", {
-          defaultValue: "Crée d'abord la phase de poules. Les Flights se génèrent après.",
-        })}
+        {t("flights.noGroups")}
       </div>
     );
   }
@@ -271,19 +243,14 @@ export function FlightsManager({
         <div>
           <h3 className="font-semibold flex items-center gap-2">
             <Trophy className="h-4 w-4 text-primary" />
-            {t("flights.title", { defaultValue: "Flights / phases finales" })}
+            {t("flights.title")}
           </h3>
-          <p className="text-xs text-muted-foreground mt-1">
-            {t("flights.intro", {
-              defaultValue:
-                "Plusieurs trophées par tournoi : Champions/Europa, Coupe/Plaque, Or/Argent/Bronze, ou custom.",
-            })}
-          </p>
+          <p className="text-xs text-muted-foreground mt-1">{t("flights.intro")}</p>
         </div>
         {live.length > 0 && !showWizard && (
           <Button size="sm" variant="outline" onClick={() => setShowWizard(true)}>
             <Wand2 className="h-4 w-4" />
-            {t("flights.reconfigure", { defaultValue: "Reconfigurer" })}
+            {t("flights.reconfigure")}
           </Button>
         )}
       </div>
@@ -300,14 +267,9 @@ export function FlightsManager({
               // On la cache derrière un disclosure + double confirmation.
               <details className="rounded-lg border border-dashed border-amber-500/40 bg-amber-50/40 p-2">
                 <summary className="cursor-pointer text-xs font-semibold text-amber-700">
-                  {t("flights.advancedDanger", { defaultValue: "Options avancées (dangereux)" })}
+                  {t("flights.advancedDanger")}
                 </summary>
-                <p className="mt-2 text-[11px] text-amber-700/90">
-                  {t("flights.regenWarn", {
-                    defaultValue:
-                      "Régénérer les brackets efface tous les résultats de phase finale déjà saisis.",
-                  })}
-                </p>
+                <p className="mt-2 text-[11px] text-amber-700/90">{t("flights.regenWarn")}</p>
                 <Button
                   className="mt-2 w-full"
                   variant="outline"
@@ -320,7 +282,7 @@ export function FlightsManager({
                   ) : (
                     <PlayCircle className="h-4 w-4" />
                   )}
-                  {t("flights.regenerate", { defaultValue: "Régénérer les brackets" })}
+                  {t("flights.regenerate")}
                 </Button>
               </details>
             ) : (
@@ -330,15 +292,11 @@ export function FlightsManager({
                 ) : (
                   <PlayCircle className="h-4 w-4" />
                 )}
-                {t("flights.generate", { defaultValue: "Générer les brackets" })}
+                {t("flights.generate")}
               </Button>
             )
           ) : (
-            <p className="text-xs text-muted-foreground text-center">
-              {t("flights.waitGroups", {
-                defaultValue: "Termine tous les matchs de poules pour générer les brackets.",
-              })}
-            </p>
+            <p className="text-xs text-muted-foreground text-center">{t("flights.waitGroups")}</p>
           )}
         </div>
       )}
@@ -354,19 +312,16 @@ export function FlightsManager({
           >
             <div className="flex items-center gap-2 font-medium text-sm">
               <Wand2 className="h-4 w-4 text-primary" />
-              {t("flights.preset.consolation", { defaultValue: "Préset Consolante (1 clic)" })}
+              {t("flights.preset.consolation")}
             </div>
             <p className="text-xs text-muted-foreground mt-1">
-              {t("flights.preset.consolationDesc", {
-                defaultValue:
-                  "Crée 2 flights : Principal (vainqueurs de poule) et Consolante (perdants). Configuration prête à enregistrer.",
-              })}
+              {t("flights.preset.consolationDesc")}
             </p>
           </button>
 
           <div>
             <Label className="text-xs uppercase tracking-wider text-muted-foreground">
-              {t("flights.wizard.template", { defaultValue: "Template de noms" })}
+              {t("flights.wizard.template")}
             </Label>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-2">
               {FLIGHT_TEMPLATES.map((tpl) => (
@@ -412,16 +367,10 @@ export function FlightsManager({
                 <AlertTriangle className="h-4 w-4 text-amber-600 mt-0.5 shrink-0" />
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-medium text-amber-900 dark:text-amber-200">
-                    {t("flights.fallback.title", {
-                      defaultValue:
-                        "Ce format ne permet pas la génération automatique des 3 flights",
-                    })}
+                    {t("flights.fallback.title")}
                   </p>
                   <p className="text-xs text-amber-800/80 dark:text-amber-300/80 mt-0.5">
-                    {t("flights.fallback.body", {
-                      defaultValue:
-                        "La structure des poules (effectifs irréguliers ou trop petits) ne se répartit pas proprement en Champions / Europa / Conference. Choisis un template Consolante / Médailles / Coupe-Plaque, ou personnalise les flights manuellement.",
-                    })}
+                    {t("flights.fallback.body")}
                   </p>
                 </div>
               </div>
@@ -432,15 +381,12 @@ export function FlightsManager({
             <div>
               <Label className="text-xs uppercase tracking-wider text-muted-foreground">
                 {t("flights.wizard.distribution", {
-                  defaultValue: "Répartition ({{n}} équipes)",
                   n: numTeams,
                 })}
               </Label>
               {distributions.length === 0 ? (
                 <p className="text-sm text-muted-foreground mt-2">
-                  {t("flights.wizard.notEnough", {
-                    defaultValue: "Au moins 4 équipes requises.",
-                  })}
+                  {t("flights.wizard.notEnough")}
                 </p>
               ) : (
                 <div className="grid grid-cols-1 gap-2 mt-2">
@@ -457,7 +403,7 @@ export function FlightsManager({
                         </span>
                         {d.cleanBrackets && (
                           <span className="text-[10px] uppercase bg-primary/10 text-primary px-1.5 py-0.5 rounded">
-                            {t("flights.wizard.clean", { defaultValue: "Brackets nets" })}
+                            {t("flights.wizard.clean")}
                           </span>
                         )}
                       </div>
@@ -474,7 +420,7 @@ export function FlightsManager({
           {drafts.length > 0 && (
             <div className="space-y-3">
               <Label className="text-xs uppercase tracking-wider text-muted-foreground">
-                {t("flights.wizard.customize", { defaultValue: "Personnaliser" })}
+                {t("flights.wizard.customize")}
               </Label>
               {drafts.map((d, i) => (
                 <DraftEditor
@@ -487,7 +433,7 @@ export function FlightsManager({
               ))}
               <div className="flex gap-2">
                 <Button variant="outline" size="sm" onClick={() => setDrafts([])}>
-                  {t("flights.wizard.back", { defaultValue: "Retour" })}
+                  {t("flights.wizard.back")}
                 </Button>
                 <Button
                   className="flex-1"
@@ -495,7 +441,7 @@ export function FlightsManager({
                   disabled={save.isPending || drafts.length === 0}
                 >
                   {save.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
-                  {t("flights.wizard.save", { defaultValue: "Enregistrer les Flights" })}
+                  {t("flights.wizard.save")}
                 </Button>
               </div>
             </div>
@@ -503,7 +449,7 @@ export function FlightsManager({
 
           {live.length > 0 && drafts.length === 0 && (
             <Button variant="ghost" size="sm" onClick={() => setShowWizard(false)}>
-              {t("common.cancel", { defaultValue: "Annuler" })}
+              {t("common.cancel")}
             </Button>
           )}
         </div>
@@ -525,10 +471,8 @@ function FlightCard({ flight }: { flight: Props["flights"][number] }) {
       <div className="flex-1 min-w-0">
         <p className="font-medium truncate">{flight.name}</p>
         <p className="text-xs text-muted-foreground">
-          {(flight.qualification_rules ?? []).length}{" "}
-          {t("flights.rulesCount", { defaultValue: "règles" })}
-          {flight.enable_third_place &&
-            ` · ${t("flights.thirdPlace", { defaultValue: "3e place" })}`}
+          {(flight.qualification_rules ?? []).length} {t("flights.rulesCount")}
+          {flight.enable_third_place && ` · ${t("flights.thirdPlace")}`}
         </p>
       </div>
     </div>
@@ -590,17 +534,11 @@ function DraftEditor({
               });
             }}
           />
-          {t("flights.thirdPlace", { defaultValue: "3e place" })}
+          {t("flights.thirdPlace")}
         </label>
         <label
           className={`flex items-center gap-1.5 ${!draft.enable_third_place ? "opacity-40 pointer-events-none" : ""}`}
-          title={
-            !draft.enable_third_place
-              ? t("flights.fifthPlaceDisabled", {
-                  defaultValue: "Activer la 3e place d'abord",
-                })
-              : undefined
-          }
+          title={!draft.enable_third_place ? t("flights.fifthPlaceDisabled") : undefined}
         >
           <Checkbox
             checked={draft.enable_fifth_place}
@@ -615,29 +553,22 @@ function DraftEditor({
               });
             }}
           />
-          {t("flights.fifthPlace", { defaultValue: "5e place" })}
+          {t("flights.fifthPlace")}
         </label>
         <label
           className={`flex items-center gap-1.5 ${!draft.enable_fifth_place ? "opacity-40 pointer-events-none" : ""}`}
-          title={
-            !draft.enable_fifth_place
-              ? t("flights.seventhPlaceDisabled", {
-                  defaultValue: "Activer la 5e place d'abord",
-                })
-              : undefined
-          }
+          title={!draft.enable_fifth_place ? t("flights.seventhPlaceDisabled") : undefined}
         >
           <Checkbox
             checked={draft.enable_seventh_place}
             disabled={!draft.enable_fifth_place}
             onCheckedChange={(v) => onChange({ ...draft, enable_seventh_place: !!v })}
           />
-          {t("flights.seventhPlace", { defaultValue: "7e place" })}
+          {t("flights.seventhPlace")}
         </label>
       </div>
       <p className="text-[11px] text-muted-foreground">
         {t("flights.draftRulesSummary", {
-          defaultValue: "{{n}} règle(s) de qualification configurée(s)",
           n: draft.qualification_rules.length,
         })}
       </p>

@@ -40,7 +40,7 @@ export const Route = createFileRoute("/_authenticated/admin/settings/social")({
     reason: typeof s.reason === "string" ? s.reason : undefined,
   }),
   head: () => ({
-    meta: [{ title: i18nInstance.t("admin.hubSocial", { defaultValue: "Réseaux sociaux" }) }],
+    meta: [{ title: i18nInstance.t("admin.hubSocial") }],
   }),
 });
 
@@ -85,7 +85,7 @@ function SocialSettings() {
       });
       window.location.href = url;
     } catch (e) {
-      toast.error(e instanceof Error ? e.message : t("common.error", { defaultValue: "Error" }));
+      toast.error(e instanceof Error ? e.message : t("common.error"));
       setBusy(null);
     }
   }
@@ -99,7 +99,7 @@ function SocialSettings() {
       toast.success(t("admin.socialDisconnectSuccess", { network: META[network].label }));
       refetch();
     } catch (e) {
-      toast.error(e instanceof Error ? e.message : t("common.error", { defaultValue: "Error" }));
+      toast.error(e instanceof Error ? e.message : t("common.error"));
     } finally {
       setBusy(null);
     }
@@ -113,7 +113,7 @@ function SocialSettings() {
       toast.success(t("admin.socialSyncResult", { imported: r.imported, skipped: r.skipped }));
       refetch();
     } catch (e) {
-      toast.error(e instanceof Error ? e.message : t("common.error", { defaultValue: "Error" }));
+      toast.error(e instanceof Error ? e.message : t("common.error"));
     } finally {
       setBusy(null);
     }

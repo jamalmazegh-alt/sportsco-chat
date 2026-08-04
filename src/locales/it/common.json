@@ -707,7 +707,8 @@
       "clubMismatch": "Questo campionato non appartiene a questo club",
       "archived": "Questo campionato è archiviato",
       "notFound": "Campionato non trovato"
-    }
+    },
+    "levelPlaceholder": "Promozione 1"
   },
   "club": {
     "logo": "Logo del Club",

@@ -181,7 +181,7 @@ function PlayerProfile() {
     toast(t("players.deleted"), {
       action: wasSoft
         ? {
-            label: t("common.undo", { defaultValue: "Undo" }),
+            label: t("common.undo"),
             onClick: async () => {
               const { error: e2 } = await supabase.rpc("restore_entity", {
                 _kind: "player",
@@ -224,12 +224,7 @@ function PlayerProfile() {
     if (pp.email) {
       const { data: exists } = await supabase.rpc("email_exists", { _email: pp.email });
       if (exists === true) {
-        toast.info(
-          t("players.inviteAccountExists", {
-            defaultValue:
-              "Un compte Clubero existe déjà avec cette adresse : la personne doit se connecter (ou utiliser « mot de passe oublié »).",
-          }),
-        );
+        toast.info(t("players.inviteAccountExists"));
         return;
       }
     }
@@ -358,20 +353,12 @@ function PlayerProfile() {
 
   function formatSuppressionReason(reason: string | null): string {
     const r = (reason ?? "").toLowerCase();
-    if (r.includes("bounce"))
-      return t("players.suppressionBounce", {
-        defaultValue: "rebond permanent (adresse invalide ou boîte inexistante)",
-      });
-    if (r.includes("complaint") || r.includes("spam"))
-      return t("players.suppressionComplaint", { defaultValue: "plainte pour spam" });
-    if (r.includes("unsubscribe"))
-      return t("players.suppressionUnsubscribe", {
-        defaultValue: "désinscription du destinataire",
-      });
-    if (r.includes("manual"))
-      return t("players.suppressionManual", { defaultValue: "blocage manuel" });
+    if (r.includes("bounce")) return t("players.suppressionBounce");
+    if (r.includes("complaint") || r.includes("spam")) return t("players.suppressionComplaint");
+    if (r.includes("unsubscribe")) return t("players.suppressionUnsubscribe");
+    if (r.includes("manual")) return t("players.suppressionManual");
     if (reason && reason.trim().length > 0) return reason;
-    return t("players.suppressionUnknown", { defaultValue: "raison inconnue" });
+    return t("players.suppressionUnknown");
   }
 
   // Used for sport-aware position suggestions. Falls back to free text when
@@ -483,9 +470,9 @@ function PlayerProfile() {
     accountStatus === "active"
       ? t("players.accountActive")
       : accountStatus === "playerInviteSent"
-        ? t("players.playerInviteSentLabel", { defaultValue: "Invitation joueur envoyée" })
+        ? t("players.playerInviteSentLabel")
         : accountStatus === "inviteSent"
-          ? t("players.inviteSentLabel", { defaultValue: "Invitation envoyée" })
+          ? t("players.inviteSentLabel")
           : t("players.accountInactive");
 
   async function sendChildOnboardingInvite(targetEmail: string) {
@@ -531,7 +518,7 @@ function PlayerProfile() {
           ),
         },
       });
-      toast.success(t("players.inviteSent", { defaultValue: "Invitation envoyée" }));
+      toast.success(t("players.inviteSent"));
     } catch (e: any) {
       toast.error(e?.message ?? "Failed");
     }
@@ -547,25 +534,18 @@ function PlayerProfile() {
       // RGPD: parental consent required for photos of minors
       if (minor && player.media_consent_status !== "granted") {
         setBusy(false);
-        toast.error(
-          t("players.photoBlockedMinor", {
-            defaultValue:
-              "Le consentement parental pour l'image est requis avant tout upload de photo d'un mineur.",
-          }),
-        );
+        toast.error(t("players.photoBlockedMinor"));
         return;
       }
       // Limite côté client : refuse > 5 Mo (le bucket impose aussi la limite côté serveur)
       if (photoFile.size > 5 * 1024 * 1024) {
         setBusy(false);
-        toast.error(t("players.photoTooLarge", { defaultValue: "Photo trop lourde (max 5 Mo)." }));
+        toast.error(t("players.photoTooLarge"));
         return;
       }
       if (!photoFile.type.startsWith("image/")) {
         setBusy(false);
-        toast.error(
-          t("players.photoInvalidType", { defaultValue: "Format de fichier non supporté." }),
-        );
+        toast.error(t("players.photoInvalidType"));
         return;
       }
       const ext = photoFile.name.split(".").pop() || "jpg";
@@ -577,7 +557,6 @@ function PlayerProfile() {
         setBusy(false);
         toast.error(
           t("players.photoUploadFailed", {
-            defaultValue: "Échec de l'envoi de la photo : {{message}}",
             message: upErr.message,
           }),
         );
@@ -647,14 +626,9 @@ function PlayerProfile() {
       if (!res.ok) {
         toast.error(
           res.error === "parent_required"
-            ? t("players.childAccessParentOnly", {
-                defaultValue: "Seul un parent ou représentant légal peut activer l'accès.",
-              })
+            ? t("players.childAccessParentOnly")
             : res.error === "attestation_required"
-              ? t("players.childConsentParent", {
-                  defaultValue:
-                    "Je confirme être le représentant légal de ce joueur et j'autorise la création de son accès.",
-                })
+              ? t("players.childConsentParent")
               : res.error,
         );
         return;
@@ -676,11 +650,7 @@ function PlayerProfile() {
       // Activation réservée au représentant légal (garde-fou aussi côté
       // serveur et par trigger DB) ; le staff peut seulement désactiver.
       if (!isParentOfThisPlayer) {
-        toast.error(
-          t("players.childAccessParentOnly", {
-            defaultValue: "Seul un parent ou représentant légal peut activer l'accès.",
-          }),
-        );
+        toast.error(t("players.childAccessParentOnly"));
         return;
       }
       const target = (email || player.email || "").trim();
@@ -881,8 +851,8 @@ function PlayerProfile() {
             variant="ghost"
             className="h-9 w-9 shrink-0 text-muted-foreground hover:text-amber-600"
             onClick={() => setReportOpen(true)}
-            aria-label={t("userReport.action", { defaultValue: "Signaler cette personne" })}
-            title={t("userReport.action", { defaultValue: "Signaler cette personne" })}
+            aria-label={t("userReport.action")}
+            title={t("userReport.action")}
           >
             <Flag className="h-4 w-4" />
           </Button>
@@ -900,23 +870,14 @@ function PlayerProfile() {
             onClick={async () => {
               if (mutedUsers.has(player.user_id!)) {
                 const { error } = await unmuteUser(player.user_id!);
-                if (error)
-                  toast.error(t("common.error", { defaultValue: "Une erreur est survenue" }));
-                else toast.success(t("mutes.unmuted", { defaultValue: "Contenus réaffichés." }));
+                if (error) toast.error(t("common.error"));
+                else toast.success(t("mutes.unmuted"));
               } else {
                 setMuteOpen(true);
               }
             }}
-            aria-label={
-              mutedUsers.has(player.user_id)
-                ? t("mutes.unmute", { defaultValue: "Réafficher" })
-                : t("mutes.action", { defaultValue: "Masquer cette personne" })
-            }
-            title={
-              mutedUsers.has(player.user_id)
-                ? t("mutes.unmute", { defaultValue: "Réafficher" })
-                : t("mutes.action", { defaultValue: "Masquer cette personne" })
-            }
+            aria-label={mutedUsers.has(player.user_id) ? t("mutes.unmute") : t("mutes.action")}
+            title={mutedUsers.has(player.user_id) ? t("mutes.unmute") : t("mutes.action")}
           >
             <UserX className="h-4 w-4" />
           </Button>
@@ -957,16 +918,10 @@ function PlayerProfile() {
           <AlertDialogHeader>
             <AlertDialogTitle>
               {t("players.childConsentTitle", {
-                defaultValue: "Activer l'accès plateforme de {{name}} ?",
                 name: `${player?.first_name ?? ""} ${player?.last_name ?? ""}`.trim() || "—",
               })}
             </AlertDialogTitle>
-            <AlertDialogDescription>
-              {t("players.childConsentBody", {
-                defaultValue:
-                  "Le joueur mineur recevra une invitation pour créer son propre accès Clubero, sous la responsabilité de son représentant légal.",
-              })}
-            </AlertDialogDescription>
+            <AlertDialogDescription>{t("players.childConsentBody")}</AlertDialogDescription>
           </AlertDialogHeader>
           <label className="flex items-start gap-2.5 rounded-lg border border-border p-3 text-sm cursor-pointer">
             <Checkbox
@@ -974,12 +929,7 @@ function PlayerProfile() {
               onCheckedChange={(v) => setChildAccessAttested(v === true)}
               className="mt-0.5"
             />
-            <span>
-              {t("players.childConsentParent", {
-                defaultValue:
-                  "Je confirme être le représentant légal de ce joueur et j'autorise la création de son accès.",
-              })}
-            </span>
+            <span>{t("players.childConsentParent")}</span>
           </label>
           <Link
             to="/legal/$kind"
@@ -987,17 +937,15 @@ function PlayerProfile() {
             target="_blank"
             className="text-xs text-primary hover:underline"
           >
-            {t("players.childConsentDoc", {
-              defaultValue: "Lire le document « Consentement parental »",
-            })}
+            {t("players.childConsentDoc")}
           </Link>
           <AlertDialogFooter>
-            <AlertDialogCancel>{t("common.cancel", { defaultValue: "Annuler" })}</AlertDialogCancel>
+            <AlertDialogCancel>{t("common.cancel")}</AlertDialogCancel>
             <AlertDialogAction
               disabled={!childAccessAttested || childAccessBusy}
               onClick={() => applyChildAccess(true)}
             >
-              {t("players.childConsentConfirm", { defaultValue: "Activer l'accès" })}
+              {t("players.childConsentConfirm")}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
@@ -1008,37 +956,30 @@ function PlayerProfile() {
           <AlertDialogHeader>
             <AlertDialogTitle>
               {t("mutes.confirmTitle", {
-                defaultValue: "Masquer les contenus de {{name}} ?",
                 name: `${player.first_name ?? ""} ${player.last_name ?? ""}`.trim() || "—",
               })}
             </AlertDialogTitle>
-            <AlertDialogDescription>
-              {t("mutes.confirmBody", {
-                defaultValue:
-                  "Vous ne verrez plus ses publications, commentaires, réactions et messages. Les communications officielles (convocations, événements, notifications) restent visibles. Vous pourrez la réafficher à tout moment depuis Profil → Confidentialité.",
-              })}
-            </AlertDialogDescription>
+            <AlertDialogDescription>{t("mutes.confirmBody")}</AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>{t("common.cancel", { defaultValue: "Annuler" })}</AlertDialogCancel>
+            <AlertDialogCancel>{t("common.cancel")}</AlertDialogCancel>
             <AlertDialogAction
               onClick={async () => {
                 if (!player.user_id) return;
                 const { error } = await muteUser(player.user_id);
                 if (error) {
-                  toast.error(t("common.error", { defaultValue: "Une erreur est survenue" }));
+                  toast.error(t("common.error"));
                   return;
                 }
                 toast.success(
                   t("mutes.muted", {
-                    defaultValue: "Les contenus de {{name}} sont masqués.",
                     name: `${player.first_name ?? ""} ${player.last_name ?? ""}`.trim() || "—",
                   }),
                 );
                 setMuteOpen(false);
               }}
             >
-              {t("mutes.confirm", { defaultValue: "Masquer" })}
+              {t("mutes.confirm")}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
@@ -1049,7 +990,7 @@ function PlayerProfile() {
         <>
           <Button variant="outline" className="w-full h-11" onClick={() => setAbsenceOpen(true)}>
             <Palmtree className="h-4 w-4" />
-            {t("availability.declare", { defaultValue: "Déclarer une absence" })}
+            {t("availability.declare")}
           </Button>
           <DeclareAbsenceDrawer
             open={absenceOpen}
@@ -1074,7 +1015,7 @@ function PlayerProfile() {
                     : "border-transparent text-muted-foreground hover:text-foreground",
                 )}
               >
-                {t("players.tabProfile", { defaultValue: "Profil" })}
+                {t("players.tabProfile")}
               </Link>
               {SHOW_PUBLIC_PROFILE_FEATURES && (
                 <>
@@ -1089,7 +1030,7 @@ function PlayerProfile() {
                     )}
                   >
                     <CalendarDays className="h-3.5 w-3.5" />
-                    {t("journey.tab.season", { defaultValue: "Saison" })}
+                    {t("journey.tab.season")}
                   </Link>
                   <Link
                     to="/players/$playerId/achievements"
@@ -1102,7 +1043,7 @@ function PlayerProfile() {
                     )}
                   >
                     <Trophy className="h-3.5 w-3.5" />
-                    {t("journey.tab.achievements", { defaultValue: "Palmarès" })}
+                    {t("journey.tab.achievements")}
                   </Link>
                   <Link
                     to="/players/$playerId/timeline"
@@ -1115,7 +1056,7 @@ function PlayerProfile() {
                     )}
                   >
                     <History className="h-3.5 w-3.5" />
-                    {t("journey.tab.timeline", { defaultValue: "Timeline" })}
+                    {t("journey.tab.timeline")}
                   </Link>
                 </>
               )}
@@ -1133,7 +1074,7 @@ function PlayerProfile() {
               )}
             >
               <Trophy className="h-3.5 w-3.5" />
-              {t("challenges:player_stats.title", { defaultValue: "Défis" })}
+              {t("challenges:player_stats.title")}
             </Link>
           )}
           {isCoach && (
@@ -1149,7 +1090,7 @@ function PlayerProfile() {
                 )}
               >
                 <ClipboardList className="h-3.5 w-3.5" />
-                {t("players.tabFeedback", { defaultValue: "Retours coach" })}
+                {t("players.tabFeedback")}
               </Link>
             </>
           )}
@@ -1164,7 +1105,7 @@ function PlayerProfile() {
             )}
           >
             <Palmtree className="h-3.5 w-3.5" />
-            {t("availability.title", { defaultValue: "Disponibilités" })}
+            {t("availability.title")}
           </Link>
         </div>
       )}
@@ -1343,10 +1284,7 @@ function PlayerProfile() {
                   {(isCoach || isParentOfThisPlayer) && !player.user_id && !minor && (
                     <div className="rounded-xl border border-dashed border-border p-3 space-y-2">
                       <p className="text-xs text-muted-foreground">
-                        {t("players.inviteAdultHint", {
-                          defaultValue:
-                            "Le joueur n'a pas encore de compte. Envoie-lui une invitation par email pour qu'il crée son accès.",
-                        })}
+                        {t("players.inviteAdultHint")}
                       </p>
                       <Button
                         type="button"
@@ -1363,9 +1301,7 @@ function PlayerProfile() {
                           sendChildOnboardingInvite(target);
                         }}
                       >
-                        {t("players.invitePlayer", {
-                          defaultValue: "Inviter le joueur à créer son compte",
-                        })}
+                        {t("players.invitePlayer")}
                       </Button>
                     </div>
                   )}
@@ -1402,20 +1338,13 @@ function PlayerProfile() {
 
               {!player.child_platform_access && !isParentOfThisPlayer && (
                 <p className="text-xs text-muted-foreground">
-                  {t("players.childAccessParentOnly", {
-                    defaultValue: "Seul un parent ou représentant légal peut activer l'accès.",
-                  })}
+                  {t("players.childAccessParentOnly")}
                 </p>
               )}
 
               {player.child_platform_access && !player.user_id && (
                 <div className="rounded-xl border border-dashed border-border p-3 space-y-2">
-                  <p className="text-xs text-muted-foreground">
-                    {t("players.inviteMinorHint", {
-                      defaultValue:
-                        "L'accès plateforme est activé mais le joueur n'a pas encore de compte. Envoie-lui l'email d'invitation.",
-                    })}
-                  </p>
+                  <p className="text-xs text-muted-foreground">{t("players.inviteMinorHint")}</p>
                   <Button
                     type="button"
                     variant="outline"
@@ -1431,9 +1360,7 @@ function PlayerProfile() {
                       sendChildOnboardingInvite(target);
                     }}
                   >
-                    {t("players.sendChildInvite", {
-                      defaultValue: "Envoyer l'invitation au joueur",
-                    })}
+                    {t("players.sendChildInvite")}
                   </Button>
                 </div>
               )}
@@ -1526,30 +1453,19 @@ function PlayerProfile() {
                           {inviteSent && (
                             <span
                               className="inline-flex items-center gap-1 text-[10px] font-medium px-1.5 py-0.5 rounded-full bg-primary/10 text-primary"
-                              title={t("players.inviteSentHint", {
-                                defaultValue: "Un email d'invitation a été envoyé à ce parent",
-                              })}
+                              title={t("players.inviteSentHint")}
                             >
                               <Send className="h-3 w-3" />
-                              {t("players.inviteSent", {
-                                defaultValue: "Invitation envoyée",
-                              })}
+                              {t("players.inviteSent")}
                             </span>
                           )}
                           {inviteFailed && (
                             <span
                               className="inline-flex items-center gap-1 text-[10px] font-medium px-1.5 py-0.5 rounded-full bg-destructive/15 text-destructive"
-                              title={
-                                inviteFailedReasonLabel ??
-                                t("players.inviteFailedHint", {
-                                  defaultValue: "L'email d'invitation n'a pas pu être délivré",
-                                })
-                              }
+                              title={inviteFailedReasonLabel ?? t("players.inviteFailedHint")}
                             >
                               <X className="h-3 w-3" />
-                              {t("players.inviteFailed", {
-                                defaultValue: "Envoi échoué",
-                              })}
+                              {t("players.inviteFailed")}
                             </span>
                           )}
                         </div>
@@ -1584,7 +1500,7 @@ function PlayerProfile() {
                           variant="ghost"
                           className="h-8 w-8 shrink-0"
                           onClick={() => startEditParent(pp)}
-                          title={t("common.edit", { defaultValue: "Modifier" })}
+                          title={t("common.edit")}
                         >
                           <Pencil className="h-4 w-4 text-muted-foreground" />
                         </Button>
@@ -1621,8 +1537,7 @@ function PlayerProfile() {
                         <div className="min-w-0 flex-1">
                           <div className="flex items-center gap-2 flex-wrap">
                             <p className="font-medium truncate text-sm">
-                              {p.full_name ??
-                                t("players.unnamedParent", { defaultValue: "Parent" })}
+                              {p.full_name ?? t("players.unnamedParent")}
                             </p>
                             <span
                               className={cn(
@@ -1633,18 +1548,12 @@ function PlayerProfile() {
                               )}
                             >
                               {p.has_account
-                                ? t("players.parentOnPlatform", {
-                                    defaultValue: "Sur la plateforme",
-                                  })
-                                : t("players.parentNotOnPlatform", {
-                                    defaultValue: "Pas encore inscrit",
-                                  })}
+                                ? t("players.parentOnPlatform")
+                                : t("players.parentNotOnPlatform")}
                             </span>
                           </div>
                           <p className="text-xs text-muted-foreground mt-0.5 leading-relaxed">
-                            {t("players.parentContactsHidden", {
-                              defaultValue: "Coordonnées confidentielles",
-                            })}
+                            {t("players.parentContactsHidden")}
                           </p>
                         </div>
                       </li>
@@ -1655,9 +1564,7 @@ function PlayerProfile() {
                 <form onSubmit={onSubmitParent} className="space-y-3 pt-3 border-t border-border">
                   <div className="flex items-center justify-between">
                     <p className="text-sm font-medium">
-                      {editingParentId
-                        ? t("common.edit", { defaultValue: "Modifier" })
-                        : t("players.addParent")}
+                      {editingParentId ? t("common.edit") : t("players.addParent")}
                     </p>
                     <Button
                       type="button"

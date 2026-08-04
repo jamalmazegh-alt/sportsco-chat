@@ -707,7 +707,8 @@
       "clubMismatch": "Este campeonato não pertence a este clube",
       "archived": "Este campeonato está arquivado",
       "notFound": "Campeonato não encontrado"
-    }
+    },
+    "levelPlaceholder": "Distrital 1"
   },
   "club": {
     "logo": "Logótipo do Clube",

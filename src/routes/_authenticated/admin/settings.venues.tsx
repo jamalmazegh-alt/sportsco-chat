@@ -52,15 +52,11 @@ export const Route = createFileRoute("/_authenticated/admin/settings/venues")({
   head: () => ({
     meta: [
       {
-        title: i18nInstance.t("meta.adminVenues.title", {
-          defaultValue: "Lieux et terrains – Clubero",
-        }),
+        title: i18nInstance.t("meta.adminVenues.title"),
       },
       {
         name: "description",
-        content: i18nInstance.t("meta.adminVenues.description", {
-          defaultValue: "Configurez les sites et terrains de votre club.",
-        }),
+        content: i18nInstance.t("meta.adminVenues.description"),
       },
     ],
   }),
@@ -126,7 +122,7 @@ function VenuesSettingsPage() {
     onSuccess: () => {
       invalidate();
       setVenueEdit(null);
-      toast.success(t("common.saved", { defaultValue: "Enregistré" }));
+      toast.success(t("common.saved"));
     },
     onError: (e: Error) => toast.error(e.message),
   });
@@ -158,13 +154,13 @@ function VenuesSettingsPage() {
     onSuccess: () => {
       invalidate();
       setFacilityEdit(null);
-      toast.success(t("common.saved", { defaultValue: "Enregistré" }));
+      toast.success(t("common.saved"));
     },
     onError: (e: Error) => toast.error(e.message),
   });
 
   async function onDeleteVenue(v: ClubVenueWithFacilities) {
-    if (!confirm(t("venues.confirmDeleteSite", { defaultValue: "Supprimer ce site ?" }))) return;
+    if (!confirm(t("venues.confirmDeleteSite"))) return;
     try {
       await deleteVenueFn({ data: { venueId: v.id, clubId: activeClubId! } });
       invalidate();
@@ -173,8 +169,7 @@ function VenuesSettingsPage() {
     }
   }
   async function onDeleteFacility(f: ClubFacility) {
-    if (!confirm(t("venues.confirmDeleteField", { defaultValue: "Supprimer ce terrain ?" })))
-      return;
+    if (!confirm(t("venues.confirmDeleteField"))) return;
     try {
       await deleteFacilityFn({ data: { facilityId: f.id, venueId: f.venue_id } });
       invalidate();
@@ -207,13 +202,7 @@ function VenuesSettingsPage() {
 
   return (
     <div className="pb-24">
-      <SettingsSubHeader
-        title={t("venues.pageTitle", { defaultValue: "Lieux et terrains" })}
-        description={t("venues.pageSubtitle", {
-          defaultValue:
-            "Sites du club et terrains associés, réutilisés à la création d'événements.",
-        })}
-      />
+      <SettingsSubHeader title={t("venues.pageTitle")} description={t("venues.pageSubtitle")} />
 
       <div className="px-5 py-4 space-y-3">
         <Button
@@ -228,7 +217,7 @@ function VenuesSettingsPage() {
           }
         >
           <Plus className="h-4 w-4 mr-1" />
-          {t("venues.addSite", { defaultValue: "Ajouter un site" })}
+          {t("venues.addSite")}
         </Button>
 
         {isLoading && (
@@ -239,9 +228,7 @@ function VenuesSettingsPage() {
 
         {!isLoading && (venues?.length ?? 0) === 0 && (
           <div className="rounded-2xl border border-dashed border-border p-8 text-center text-sm text-muted-foreground">
-            {t("venues.emptyState", {
-              defaultValue: "Aucun site configuré. Ajoutez-en un pour préremplir vos événements.",
-            })}
+            {t("venues.emptyState")}
           </div>
         )}
 
@@ -255,7 +242,7 @@ function VenuesSettingsPage() {
                     <p className="font-semibold truncate">{v.name}</p>
                     {v.is_default && (
                       <span className="text-[10px] bg-primary/10 text-primary rounded px-1.5 py-0.5">
-                        {t("venues.defaultBadge", { defaultValue: "Défaut" })}
+                        {t("venues.defaultBadge")}
                       </span>
                     )}
                   </div>
@@ -280,7 +267,7 @@ function VenuesSettingsPage() {
                             data: { venueId: v.id, clubId: activeClubId! },
                           }).then(invalidate)
                     }
-                    title={t("venues.toggleDefault", { defaultValue: "Site par défaut" })}
+                    title={t("venues.toggleDefault")}
                   >
                     {v.is_default ? <StarOff className="h-4 w-4" /> : <Star className="h-4 w-4" />}
                   </Button>
@@ -296,7 +283,7 @@ function VenuesSettingsPage() {
               <div className="border-t border-border px-4 py-3 space-y-2">
                 <div className="flex items-center justify-between">
                   <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
-                    {t("venues.facilitiesTitle", { defaultValue: "Terrains / installations" })}
+                    {t("venues.facilitiesTitle")}
                   </p>
                   <Button
                     size="sm"
@@ -312,13 +299,11 @@ function VenuesSettingsPage() {
                     }
                   >
                     <Plus className="h-4 w-4 mr-1" />
-                    {t("venues.addField", { defaultValue: "Ajouter un terrain" })}
+                    {t("venues.addField")}
                   </Button>
                 </div>
                 {v.facilities.length === 0 && (
-                  <p className="text-xs text-muted-foreground">
-                    {t("venues.noFacilities", { defaultValue: "Aucun terrain pour ce site." })}
-                  </p>
+                  <p className="text-xs text-muted-foreground">{t("venues.noFacilities")}</p>
                 )}
                 <ul className="space-y-1">
                   {v.facilities.map((f, fi) => (
@@ -333,7 +318,7 @@ function VenuesSettingsPage() {
                         )}
                         {f.is_default && (
                           <span className="ml-2 text-[10px] bg-primary/10 text-primary rounded px-1.5 py-0.5">
-                            {t("venues.defaultBadge", { defaultValue: "Défaut" })}
+                            {t("venues.defaultBadge")}
                           </span>
                         )}
                       </span>
@@ -430,15 +415,11 @@ function VenueEditDialog({
     <Dialog open onOpenChange={(o) => !o && onClose()}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>
-            {value.id
-              ? t("venues.editSite", { defaultValue: "Modifier le site" })
-              : t("venues.addSite", { defaultValue: "Ajouter un site" })}
-          </DialogTitle>
+          <DialogTitle>{value.id ? t("venues.editSite") : t("venues.addSite")}</DialogTitle>
         </DialogHeader>
         <div className="space-y-3">
           <div className="space-y-1.5">
-            <Label>{t("venues.field.name", { defaultValue: "Nom" })}</Label>
+            <Label>{t("venues.field.name")}</Label>
             <Input
               value={draft.name ?? ""}
               onChange={(e) => setDraft({ ...draft, name: e.target.value })}
@@ -446,7 +427,7 @@ function VenueEditDialog({
             />
           </div>
           <AddressField
-            label={t("venues.field.address", { defaultValue: "Adresse" })}
+            label={t("venues.field.address")}
             value={draft.address ?? ""}
             onValueChange={(v: string) => setDraft({ ...draft, address: v })}
             onPlaceUrl={() => {}}
@@ -454,7 +435,7 @@ function VenueEditDialog({
             helper=""
           />
           <div className="space-y-1.5">
-            <Label>{t("venues.field.notes", { defaultValue: "Notes" })}</Label>
+            <Label>{t("venues.field.notes")}</Label>
             <Textarea
               rows={2}
               value={draft.notes ?? ""}
@@ -462,7 +443,7 @@ function VenueEditDialog({
             />
           </div>
           <div className="flex items-center justify-between">
-            <Label>{t("venues.field.isDefault", { defaultValue: "Site par défaut" })}</Label>
+            <Label>{t("venues.field.isDefault")}</Label>
             <Switch
               checked={!!draft.is_default}
               onCheckedChange={(v) => setDraft({ ...draft, is_default: v })}
@@ -471,17 +452,13 @@ function VenueEditDialog({
         </div>
         <DialogFooter>
           <Button variant="ghost" onClick={onClose}>
-            {t("common.cancel", { defaultValue: "Annuler" })}
+            {t("common.cancel")}
           </Button>
           <Button
             onClick={() => onSave(draft)}
             disabled={saving || !draft.name?.trim() || !draft.address?.trim()}
           >
-            {saving ? (
-              <Loader2 className="h-4 w-4 animate-spin" />
-            ) : (
-              t("common.save", { defaultValue: "Enregistrer" })
-            )}
+            {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : t("common.save")}
           </Button>
         </DialogFooter>
       </DialogContent>
@@ -512,15 +489,11 @@ function FacilityEditDialog({
     <Dialog open onOpenChange={(o) => !o && onClose()}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>
-            {value.id
-              ? t("venues.editField", { defaultValue: "Modifier le terrain" })
-              : t("venues.addField", { defaultValue: "Ajouter un terrain" })}
-          </DialogTitle>
+          <DialogTitle>{value.id ? t("venues.editField") : t("venues.addField")}</DialogTitle>
         </DialogHeader>
         <div className="space-y-3">
           <div className="space-y-1.5">
-            <Label>{t("venues.field.name", { defaultValue: "Nom" })}</Label>
+            <Label>{t("venues.field.name")}</Label>
             <Input
               value={draft.name ?? ""}
               onChange={(e) => setDraft({ ...draft, name: e.target.value })}
@@ -528,7 +501,7 @@ function FacilityEditDialog({
             />
           </div>
           <div className="space-y-1.5">
-            <Label>{t("venues.field.surface", { defaultValue: "Surface" })}</Label>
+            <Label>{t("venues.field.surface")}</Label>
             <Input
               value={draft.surface_type ?? ""}
               onChange={(e) => setDraft({ ...draft, surface_type: e.target.value || null })}
@@ -536,16 +509,14 @@ function FacilityEditDialog({
             />
           </div>
           <div className="space-y-1.5">
-            <Label>{t("venues.field.sport", { defaultValue: "Sport (optionnel)" })}</Label>
+            <Label>{t("venues.field.sport")}</Label>
             <Input
               value={draft.sport ?? ""}
               onChange={(e) => setDraft({ ...draft, sport: e.target.value || null })}
             />
           </div>
           <div className="flex items-center justify-between">
-            <Label>
-              {t("venues.field.isDefaultField", { defaultValue: "Terrain par défaut" })}
-            </Label>
+            <Label>{t("venues.field.isDefaultField")}</Label>
             <Switch
               checked={!!draft.is_default}
               onCheckedChange={(v) => setDraft({ ...draft, is_default: v })}
@@ -554,14 +525,10 @@ function FacilityEditDialog({
         </div>
         <DialogFooter>
           <Button variant="ghost" onClick={onClose}>
-            {t("common.cancel", { defaultValue: "Annuler" })}
+            {t("common.cancel")}
           </Button>
           <Button onClick={() => onSave(draft)} disabled={saving || !draft.name?.trim()}>
-            {saving ? (
-              <Loader2 className="h-4 w-4 animate-spin" />
-            ) : (
-              t("common.save", { defaultValue: "Enregistrer" })
-            )}
+            {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : t("common.save")}
           </Button>
         </DialogFooter>
       </DialogContent>
