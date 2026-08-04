@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Loader2, Calculator, AlertTriangle } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -11,6 +12,7 @@ import { DestructiveConfirmSheet } from "@/components/destructive-confirm-sheet"
 type Result = Awaited<ReturnType<typeof recomputePlayerCategoriesForSeason>>;
 
 export function RecomputeCategoriesPanel({ clubId }: { clubId: string }) {
+  const { t } = useTranslation();
   const [seasonLabel, setSeasonLabel] = useState("");
   const [overwrite, setOverwrite] = useState(false);
   const [confirmOpen, setConfirmOpen] = useState(false);
@@ -29,7 +31,7 @@ export function RecomputeCategoriesPanel({ clubId }: { clubId: string }) {
         },
       });
       setResult(res);
-      toast.success(`Catégories recalculées (saison ${res.seasonLabel})`);
+      toast.success(t("superadmin.components.categoriesRecomputed", { season: res.seasonLabel }));
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Échec du recalcul");
     } finally {

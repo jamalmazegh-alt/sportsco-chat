@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { useTranslation } from "react-i18next";
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { listInviteBatches, getInviteBatchRows } from "@/lib/superadmin/observability.functions";
@@ -16,6 +17,7 @@ function fmt(iso: string) {
 }
 
 function InviteBatchesPage() {
+  const { t } = useTranslation();
   const [template, setTemplate] = useState<string>("");
   const { data, isLoading, refetch, isFetching } = useQuery({
     queryKey: ["superadmin", "invite-batches", template],
@@ -28,18 +30,18 @@ function InviteBatchesPage() {
     <div className="p-6 md:p-8 max-w-6xl">
       <header className="mb-5">
         <div className="flex items-center gap-2 text-xs uppercase tracking-wide text-muted-foreground">
-          <Send className="h-3.5 w-3.5" /> Invitations
+          <Send className="h-3.5 w-3.5" /> {t("superadmin.inviteBatches.eyebrow")}
         </div>
         <div className="flex items-center justify-between gap-3 mt-1">
           <div>
-            <h1 className="text-xl font-semibold">Batches d'invitations</h1>
+            <h1 className="text-xl font-semibold">{t("superadmin.inviteBatches.title")}</h1>
             <p className="text-sm text-muted-foreground mt-0.5">
-              Regroupés par club + template + fenêtre de 2&nbsp;min.
+              {t("superadmin.inviteBatches.subtitle")}
             </p>
           </div>
           <div className="flex items-center gap-2">
             <Input
-              placeholder="Filtre template (ex: player-invite)"
+              placeholder={t("superadmin.inviteBatches.filterPlaceholder")}
               value={template}
               onChange={(e) => setTemplate(e.target.value)}
               className="h-8 w-64"
@@ -57,7 +59,7 @@ function InviteBatchesPage() {
         </div>
       ) : rows.length === 0 ? (
         <div className="rounded-lg border border-border p-8 text-center text-sm text-muted-foreground">
-          Aucun batch trouvé.
+          {t("superadmin.inviteBatches.empty")}
         </div>
       ) : (
         <div className="rounded-lg border border-border divide-y divide-border overflow-hidden">
@@ -75,6 +77,7 @@ function BatchRow({
 }: {
   row: NonNullable<Awaited<ReturnType<typeof listInviteBatches>>["rows"]>[number];
 }) {
+  const { t } = useTranslation();
   const [open, setOpen] = useState(false);
   const { data, isLoading, isError, error, refetch, isFetching } = useQuery({
     queryKey: ["superadmin", "invite-batch-rows", row.batch_id],
@@ -100,11 +103,29 @@ function BatchRow({
           <div className="text-xs text-muted-foreground">{fmt(row.bucket_start)}</div>
         </div>
         <div className="flex items-center gap-1.5">
-          <StatusBadge tone="muted">{row.total} total</StatusBadge>
-          {row.sent > 0 && <StatusBadge tone="success">{row.sent} envoyés</StatusBadge>}
-          {row.pending > 0 && <StatusBadge tone="info">{row.pending} en cours</StatusBadge>}
-          {row.failed > 0 && <StatusBadge tone="danger">{row.failed} échec</StatusBadge>}
-          {row.suppressed > 0 && <StatusBadge tone="warn">{row.suppressed} bloqué</StatusBadge>}
+          <StatusBadge tone="muted">
+            {t("superadmin.inviteBatches.total", { count: row.total })}
+          </StatusBadge>
+          {row.sent > 0 && (
+            <StatusBadge tone="success">
+              {t("superadmin.inviteBatches.sent", { count: row.sent })}
+            </StatusBadge>
+          )}
+          {row.pending > 0 && (
+            <StatusBadge tone="info">
+              {t("superadmin.inviteBatches.pending", { count: row.pending })}
+            </StatusBadge>
+          )}
+          {row.failed > 0 && (
+            <StatusBadge tone="danger">
+              {t("superadmin.inviteBatches.failed", { count: row.failed })}
+            </StatusBadge>
+          )}
+          {row.suppressed > 0 && (
+            <StatusBadge tone="warn">
+              {t("superadmin.inviteBatches.blocked", { count: row.suppressed })}
+            </StatusBadge>
+          )}
         </div>
       </button>
       {open && (
@@ -116,7 +137,12 @@ function BatchRow({
           ) : isError ? (
             <div className="px-6 py-4 space-y-2">
               <p className="text-sm text-destructive">
-                Erreur de chargement : {error instanceof Error ? error.message : "échec inconnu"}
+                {t("superadmin.inviteBatches.loadError", {
+                  message:
+                    error instanceof Error
+                      ? error.message
+                      : t("superadmin.inviteBatches.unknownFailure"),
+                })}
               </p>
               <Button
                 type="button"
@@ -126,12 +152,12 @@ function BatchRow({
                 disabled={isFetching}
               >
                 <RefreshCw className={`h-3.5 w-3.5 mr-1.5 ${isFetching ? "animate-spin" : ""}`} />
-                Réessayer
+                {t("superadmin.inviteBatches.retry")}
               </Button>
             </div>
           ) : (data?.rows ?? []).length === 0 ? (
             <div className="px-6 py-4 text-xs text-muted-foreground">
-              Aucune ligne trouvée pour ce batch.
+              {t("superadmin.inviteBatches.noRows")}
             </div>
           ) : (
             <div className="divide-y divide-border">
@@ -161,7 +187,9 @@ function BatchRow({
                         <span className="font-mono">{r.message_id.slice(0, 12)}…</span>
                       </span>
                     ) : null}
-                    <span>tentatives&nbsp;: {r.attempt_count}</span>
+                    <span>
+                      {t("superadmin.inviteBatches.attempts", { count: r.attempt_count })}
+                    </span>
                     {r.dispatch_id && (
                       <span>
                         dispatch&nbsp;

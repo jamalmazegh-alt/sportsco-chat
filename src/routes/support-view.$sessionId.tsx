@@ -1,12 +1,31 @@
 import { createFileRoute, Outlet, useNavigate, redirect } from "@tanstack/react-router";
 import { QueryClientProvider, useQuery } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { ShieldAlert, LogOut, Loader2 } from "lucide-react";
 import { getSupportViewSession, endSupportViewSession } from "@/lib/support-view/session.functions";
 import { getSupportQueryClient, disposeSupportQueryClient } from "@/lib/support-view/query-client";
 import { SupportViewProvider } from "@/lib/support-view/context";
 import type { SupportViewSessionDTO } from "@/lib/support-view/schemas";
 import { Button } from "@/components/ui/button";
+
+function SupportViewError({ error }: { error: Error }) {
+  const { t } = useTranslation();
+  return (
+    <div className="min-h-screen flex items-center justify-center p-6">
+      <div className="max-w-md text-center space-y-3">
+        <ShieldAlert className="h-8 w-8 mx-auto text-destructive" />
+        <h1 className="text-lg font-semibold">{t("supportView.sessionUnavailable")}</h1>
+        <p className="text-sm text-muted-foreground">
+          {error instanceof Error ? error.message : t("supportView.unknownError")}
+        </p>
+        <Button asChild variant="outline">
+          <a href="/superadmin/support">{t("supportView.backToHub")}</a>
+        </Button>
+      </div>
+    </div>
+  );
+}
 
 export const Route = createFileRoute("/support-view/$sessionId")({
   // Inject a SESSION-SCOPED, STABLE QueryClient into the router context so
@@ -30,18 +49,7 @@ export const Route = createFileRoute("/support-view/$sessionId")({
   },
   component: SupportViewLayout,
   errorComponent: ({ error }) => (
-    <div className="min-h-screen flex items-center justify-center p-6">
-      <div className="max-w-md text-center space-y-3">
-        <ShieldAlert className="h-8 w-8 mx-auto text-destructive" />
-        <h1 className="text-lg font-semibold">Support session unavailable</h1>
-        <p className="text-sm text-muted-foreground">
-          {error instanceof Error ? error.message : "Unknown error"}
-        </p>
-        <Button asChild variant="outline">
-          <a href="/superadmin/support">← Back to Support hub</a>
-        </Button>
-      </div>
-    </div>
+    <SupportViewError error={error instanceof Error ? error : new Error(String(error))} />
   ),
 });
 
@@ -71,6 +79,7 @@ function SupportViewBanner({
   session: SupportViewSessionDTO;
   sessionId: string;
 }) {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [remaining, setRemaining] = useState(() =>
     Math.max(0, new Date(session.expires_at).getTime() - Date.now()),
@@ -127,11 +136,14 @@ function SupportViewBanner({
         <div className="flex items-center gap-2.5 text-sm min-w-0">
           <ShieldAlert className="h-4 w-4 shrink-0" />
           <div className="min-w-0 truncate">
-            <span className="font-semibold">Support view</span>
+            <span className="font-semibold">{t("supportView.bannerTitle")}</span>
             <span className="mx-2">•</span>
             <span>
-              as <b>{session.target_full_name ?? "user"}</b> · {session.club_name ?? "club"} ·{" "}
-              <span className="uppercase text-xs">{session.persona}</span>
+              {t("supportView.bannerAs", {
+                name: session.target_full_name ?? t("supportView.userFallback"),
+                club: session.club_name ?? t("supportView.clubFallback"),
+                persona: session.persona,
+              })}
             </span>
           </div>
         </div>
@@ -145,7 +157,7 @@ function SupportViewBanner({
             ) : (
               <LogOut className="h-3.5 w-3.5 mr-1.5" />
             )}
-            End session
+            {t("supportView.endSession")}
           </Button>
         </div>
       </div>

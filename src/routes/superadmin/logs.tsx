@@ -1,5 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { listSuperadminLogsEnriched } from "@/lib/superadmin.functions";
 import { Loader2, Activity } from "lucide-react";
 import { StatusBadge, Avatar, categorize } from "@/lib/superadmin/ui";
@@ -22,12 +23,13 @@ const CATEGORIES = [
   "Onboarding",
   "Billing",
   "Other",
-];
+] as const;
 
 function SuperAdminLogs() {
+  const { t } = useTranslation();
   const [items, setItems] = useState<Item[]>([]);
   const [loading, setLoading] = useState(true);
-  const [cat, setCat] = useState("All");
+  const [cat, setCat] = useState<string>("All");
   const [q, setQ] = useState("");
 
   useEffect(() => {
@@ -65,12 +67,10 @@ function SuperAdminLogs() {
     <div className="p-6 md:p-8 max-w-6xl">
       <header className="mb-5">
         <div className="flex items-center gap-2 text-xs uppercase tracking-wide text-muted-foreground">
-          <Activity className="h-3.5 w-3.5" /> Activity
+          <Activity className="h-3.5 w-3.5" /> {t("superadmin.logs.eyebrow")}
         </div>
-        <h1 className="text-xl font-semibold mt-1">Activity logs</h1>
-        <p className="text-sm text-muted-foreground mt-0.5">
-          Every sensitive super-admin action is recorded here with actor, target and severity.
-        </p>
+        <h1 className="text-xl font-semibold mt-1">{t("superadmin.logs.title")}</h1>
+        <p className="text-sm text-muted-foreground mt-0.5">{t("superadmin.logs.subtitle")}</p>
       </header>
 
       <div className="flex gap-2 mb-3 flex-wrap">
@@ -82,7 +82,7 @@ function SuperAdminLogs() {
             onClick={() => setCat(c)}
             className="text-xs h-7"
           >
-            {c}
+            {t(`superadmin.logs.categories.${c}`)}
             {c !== "All" && counts[c] ? (
               <span className="ml-1.5 text-[10px] opacity-70">{counts[c]}</span>
             ) : null}
@@ -91,7 +91,7 @@ function SuperAdminLogs() {
       </div>
 
       <Input
-        placeholder="Search by action, actor or target…"
+        placeholder={t("superadmin.logs.searchPlaceholder")}
         value={q}
         onChange={(e) => setQ(e.target.value)}
         className="mb-4 max-w-md"
@@ -99,11 +99,11 @@ function SuperAdminLogs() {
 
       {loading && (
         <div className="flex items-center gap-2 text-sm text-muted-foreground">
-          <Loader2 className="h-4 w-4 animate-spin" /> Loading…
+          <Loader2 className="h-4 w-4 animate-spin" /> {t("superadmin.common.loading")}
         </div>
       )}
       {!loading && filtered.length === 0 && (
-        <div className="text-sm text-muted-foreground">No activity matches your filters.</div>
+        <div className="text-sm text-muted-foreground">{t("superadmin.logs.empty")}</div>
       )}
       {!loading && filtered.length > 0 && (
         <ul className="space-y-1.5">
@@ -120,8 +120,14 @@ function SuperAdminLogs() {
                   <div className="min-w-0">
                     <div className="flex items-center gap-2 flex-wrap">
                       <span className="font-mono text-xs">{l.action}</span>
-                      <StatusBadge tone={meta.tone}>{meta.category}</StatusBadge>
-                      {meta.severity === "high" && <StatusBadge tone="danger">high</StatusBadge>}
+                      <StatusBadge tone={meta.tone}>
+                        {t(`superadmin.logs.categories.${meta.category}`, {
+                          defaultValue: meta.category,
+                        })}
+                      </StatusBadge>
+                      {meta.severity === "high" && (
+                        <StatusBadge tone="danger">{t("superadmin.logs.high")}</StatusBadge>
+                      )}
                     </div>
                     <div className="text-xs text-muted-foreground mt-0.5 truncate">
                       <span className="font-medium text-foreground/80">{actor}</span>

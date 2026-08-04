@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { useTranslation } from "react-i18next";
 import { Fragment, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import {
@@ -19,16 +20,17 @@ function fmt(iso: string) {
 }
 
 function NotificationsPage() {
+  const { t } = useTranslation();
   const [tab, setTab] = useState<"email" | "push">("email");
   return (
     <div className="p-6 md:p-8 max-w-6xl">
       <header className="mb-5">
         <div className="flex items-center gap-2 text-xs uppercase tracking-wide text-muted-foreground">
-          <Bell className="h-3.5 w-3.5" /> Notifications envoyées
+          <Bell className="h-3.5 w-3.5" /> {t("superadmin.notifications.eyebrow")}
         </div>
-        <h1 className="text-xl font-semibold mt-1">Toutes les notifications</h1>
+        <h1 className="text-xl font-semibold mt-1">{t("superadmin.notifications.title")}</h1>
         <p className="text-sm text-muted-foreground mt-0.5">
-          Flux unifié d'emails (dédupliqués par message) et de notifications push.
+          {t("superadmin.notifications.subtitle")}
         </p>
       </header>
 
@@ -41,7 +43,7 @@ function NotificationsPage() {
               : "border-transparent text-muted-foreground"
           }`}
         >
-          <Mail className="inline h-3.5 w-3.5 mr-1" /> Emails
+          <Mail className="inline h-3.5 w-3.5 mr-1" /> {t("superadmin.notifications.emails")}
         </button>
         <button
           onClick={() => setTab("push")}
@@ -51,7 +53,7 @@ function NotificationsPage() {
               : "border-transparent text-muted-foreground"
           }`}
         >
-          <Bell className="inline h-3.5 w-3.5 mr-1" /> Push
+          <Bell className="inline h-3.5 w-3.5 mr-1" /> {t("superadmin.notifications.push")}
         </button>
       </div>
 
@@ -61,6 +63,7 @@ function NotificationsPage() {
 }
 
 function EmailsTab() {
+  const { t } = useTranslation();
   const [search, setSearch] = useState("");
   const [template, setTemplate] = useState("");
   const [status, setStatus] = useState("");
@@ -83,13 +86,13 @@ function EmailsTab() {
     <div>
       <div className="flex items-center gap-2 mb-3">
         <Input
-          placeholder="Recherche email"
+          placeholder={t("superadmin.notifications.emailSearch")}
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           className="h-8"
         />
         <Input
-          placeholder="Template"
+          placeholder={t("superadmin.notifications.template")}
           value={template}
           onChange={(e) => setTemplate(e.target.value)}
           className="h-8 w-52"
@@ -99,7 +102,7 @@ function EmailsTab() {
           onChange={(e) => setStatus(e.target.value)}
           className="h-8 rounded-md border border-border bg-background text-sm px-2"
         >
-          <option value="">Tous statuts</option>
+          <option value="">{t("superadmin.notifications.allStatuses")}</option>
           <option value="sent">sent</option>
           <option value="delivered">delivered</option>
           <option value="pending">pending</option>
@@ -114,7 +117,7 @@ function EmailsTab() {
       </div>
       {error ? (
         <div className="rounded-lg border border-destructive/40 bg-destructive/10 p-4 text-sm text-destructive">
-          Erreur de chargement : {(error as Error).message}
+          {t("superadmin.notifications.loadError", { message: (error as Error).message })}
         </div>
       ) : isLoading ? (
         <div className="flex justify-center py-10">
@@ -125,11 +128,11 @@ function EmailsTab() {
           <table className="w-full text-sm">
             <thead className="bg-muted/40 text-xs text-muted-foreground">
               <tr>
-                <th className="text-left px-3 py-2">Date</th>
-                <th className="text-left px-3 py-2">Template</th>
-                <th className="text-left px-3 py-2">Destinataire</th>
-                <th className="text-left px-3 py-2">Statut</th>
-                <th className="text-left px-3 py-2">Erreur</th>
+                <th className="text-left px-3 py-2">{t("superadmin.notifications.date")}</th>
+                <th className="text-left px-3 py-2">{t("superadmin.notifications.template")}</th>
+                <th className="text-left px-3 py-2">{t("superadmin.notifications.recipient")}</th>
+                <th className="text-left px-3 py-2">{t("superadmin.notifications.status")}</th>
+                <th className="text-left px-3 py-2">{t("superadmin.notifications.error")}</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-border">
@@ -170,15 +173,21 @@ function EmailsTab() {
                         <td colSpan={5} className="px-3 py-3">
                           <div className="grid grid-cols-2 gap-x-6 gap-y-1 text-xs">
                             <div>
-                              <span className="text-muted-foreground">message_id :</span>{" "}
+                              <span className="text-muted-foreground">
+                                {t("superadmin.notifications.messageId")}
+                              </span>{" "}
                               <span className="font-mono">{r.message_id}</span>
                             </div>
                             <div>
-                              <span className="text-muted-foreground">tentatives :</span>{" "}
+                              <span className="text-muted-foreground">
+                                {t("superadmin.notifications.attempts")}
+                              </span>{" "}
                               {r.attempt_count}
                             </div>
                             <div className="col-span-2">
-                              <span className="text-muted-foreground">metadata :</span>
+                              <span className="text-muted-foreground">
+                                {t("superadmin.notifications.metadata")}
+                              </span>
                               <pre className="mt-1 rounded bg-background border border-border p-2 overflow-x-auto text-[11px]">
                                 {JSON.stringify(r.metadata, null, 2)}
                               </pre>
@@ -193,7 +202,9 @@ function EmailsTab() {
             </tbody>
           </table>
           {rows.length === 0 && (
-            <div className="p-6 text-center text-sm text-muted-foreground">Aucun email.</div>
+            <div className="p-6 text-center text-sm text-muted-foreground">
+              {t("superadmin.notifications.noEmail")}
+            </div>
           )}
         </div>
       )}
@@ -202,6 +213,7 @@ function EmailsTab() {
 }
 
 function PushTab() {
+  const { t } = useTranslation();
   const [kind, setKind] = useState("");
   const { data, isLoading, error, refetch, isFetching } = useQuery({
     queryKey: ["superadmin", "notif-push", kind],
@@ -213,7 +225,7 @@ function PushTab() {
     <div>
       <div className="flex items-center gap-2 mb-3">
         <Input
-          placeholder="Type (ex: convocation, wall_post)"
+          placeholder={t("superadmin.notifications.typePlaceholder")}
           value={kind}
           onChange={(e) => setKind(e.target.value)}
           className="h-8 w-64"
@@ -224,7 +236,7 @@ function PushTab() {
       </div>
       {error ? (
         <div className="rounded-lg border border-destructive/40 bg-destructive/10 p-4 text-sm text-destructive">
-          Erreur de chargement : {(error as Error).message}
+          {t("superadmin.notifications.loadError", { message: (error as Error).message })}
         </div>
       ) : isLoading ? (
         <div className="flex justify-center py-10">
@@ -235,13 +247,13 @@ function PushTab() {
           <table className="w-full text-sm">
             <thead className="bg-muted/40 text-xs text-muted-foreground">
               <tr>
-                <th className="text-left px-3 py-2">Date</th>
-                <th className="text-left px-3 py-2">Type</th>
-                <th className="text-left px-3 py-2">Réf.</th>
-                <th className="text-left px-3 py-2">Cibles</th>
-                <th className="text-left px-3 py-2">Envoyées</th>
-                <th className="text-left px-3 py-2">Ouvertes</th>
-                <th className="text-left px-3 py-2">1ère ouverture</th>
+                <th className="text-left px-3 py-2">{t("superadmin.notifications.date")}</th>
+                <th className="text-left px-3 py-2">{t("superadmin.notifications.type")}</th>
+                <th className="text-left px-3 py-2">{t("superadmin.notifications.ref")}</th>
+                <th className="text-left px-3 py-2">{t("superadmin.notifications.targets")}</th>
+                <th className="text-left px-3 py-2">{t("superadmin.notifications.sent")}</th>
+                <th className="text-left px-3 py-2">{t("superadmin.notifications.opened")}</th>
+                <th className="text-left px-3 py-2">{t("superadmin.notifications.firstOpened")}</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-border">
@@ -268,7 +280,9 @@ function PushTab() {
             </tbody>
           </table>
           {rows.length === 0 && (
-            <div className="p-6 text-center text-sm text-muted-foreground">Aucun push.</div>
+            <div className="p-6 text-center text-sm text-muted-foreground">
+              {t("superadmin.notifications.noPush")}
+            </div>
           )}
         </div>
       )}

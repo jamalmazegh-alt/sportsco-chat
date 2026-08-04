@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "@tanstack/react-router";
 import { toast } from "sonner";
@@ -41,6 +42,7 @@ export function CreateTicketOnBehalfDialog({
   open: boolean;
   onOpenChange: (v: boolean) => void;
 }) {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const qc = useQueryClient();
   const [search, setSearch] = useState("");
@@ -72,7 +74,7 @@ export function CreateTicketOnBehalfDialog({
         },
       }),
     onSuccess: (res) => {
-      toast.success("Ticket créé");
+      toast.success(t("superadmin.components.ticketCreated"));
       qc.invalidateQueries({ queryKey: ["admin-support-tickets"] });
       reset();
       onOpenChange(false);
@@ -82,7 +84,7 @@ export function CreateTicketOnBehalfDialog({
       });
     },
     onError: (e: unknown) => {
-      toast.error(e instanceof Error ? e.message : "Échec de création");
+      toast.error(e instanceof Error ? e.message : t("superadmin.components.createFailed"));
     },
   });
 

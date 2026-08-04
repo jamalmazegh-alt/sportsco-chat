@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { useTranslation } from "react-i18next";
 import { useCallback, useEffect, useState } from "react";
 import { listAllClubs } from "@/lib/superadmin.functions";
 import { getClubActivitySummary, type ClubActivitySummary } from "@/lib/superadmin.functions";
@@ -8,43 +9,16 @@ import { Switch } from "@/components/ui/switch";
 import { Loader2, Mail, Phone, Search, ShieldCheck, User2 } from "lucide-react";
 import { format, formatDistanceToNowStrict } from "date-fns";
 import { fr } from "date-fns/locale";
+import i18nInstance from "@/lib/i18n";
 import { EXEMPT_REASON_LABELS, type ExemptReason, isBillingExempt } from "@/lib/has-paid-access";
 
 const INACTIVE_DAYS = 14;
 
-const ACTION_LABELS: Record<string, string> = {
-  "event.created": "Événement créé",
-  "event.updated": "Événement modifié",
-  "event.cancelled": "Événement annulé",
-  "convocation.sent": "Convocation envoyée",
-  "convocation.email_backfill": "Convoc. — rattrapage email superadmin",
-  "convocation.responded": "Réponse convocation",
-  "team.created": "Équipe créée",
-  "team.updated": "Équipe modifiée",
-  "camp.created": "Stage créé",
-  "camp.published": "Stage publié",
-  "camp.registration_received": "Inscription stage",
-  "tournament.created": "Tournoi créé",
-  "social.connected": "Réseau connecté",
-  "social.disconnected": "Réseau déconnecté",
-  "social.sync_succeeded": "Sync réseau OK",
-  "social.sync_failed": "Sync réseau KO",
-  "wall.post_published": "Post publié",
-  "invite.club_sent": "Invitation club",
-  "invite.club_accepted": "Invitation club acceptée",
-  "invite.member_sent": "Invitation membre",
-  "invite.member_accepted": "Invitation membre acceptée",
-  "import.started": "Import démarré",
-  "import.succeeded": "Import réussi",
-  "import.partial": "Import partiel",
-  "import.failed": "Import échoué",
-  "support.ticket_opened": "Ticket support",
-  "impersonation.started": "Impersonation",
-};
-
 function actionLabel(type: string | null): string {
   if (!type) return "—";
-  return ACTION_LABELS[type] ?? type;
+  const key = `superadmin.activityTypes.${type.replace(/\./g, "_")}`;
+  const translated = i18nInstance.t(key);
+  return translated === key ? type : translated;
 }
 
 export const Route = createFileRoute("/superadmin/clubs/")({
@@ -79,17 +53,20 @@ type BillingPill = {
   cls: string;
 };
 
-function billingPill(sub: Subscription | null): BillingPill {
+function billingPill(
+  sub: Subscription | null,
+  t: (k: string, o?: Record<string, unknown>) => string,
+): BillingPill {
   if (sub && isBillingExempt(sub)) {
     return {
-      label: "Exempté",
+      label: t("superadmin.clubs.exempt"),
       emoji: "🛡️",
       cls: "bg-[#eff6ff] text-[#2563eb] border-[#bfdbfe]",
     };
   }
   if (!sub) {
     return {
-      label: "Aucun abonnement",
+      label: t("superadmin.clubs.noSubscription"),
       emoji: "—",
       cls: "bg-[#f8fafc] text-[#94a3b8] border-[#e2e8f0]",
     };
@@ -97,33 +74,34 @@ function billingPill(sub: Subscription | null): BillingPill {
   const s = sub.status;
   if (s === "active" || s === "trialing") {
     return {
-      label: s === "trialing" ? "Essai" : "Actif",
+      label: s === "trialing" ? t("superadmin.clubs.trial") : t("superadmin.clubs.active"),
       emoji: "✅",
       cls: "bg-[#f0fdf4] text-[#16a34a] border-[#86efac]",
     };
   }
   if (s === "past_due" || s === "incomplete") {
     return {
-      label: s === "past_due" ? "Impayé" : "Incomplet",
+      label: s === "past_due" ? t("superadmin.clubs.pastDue") : t("superadmin.clubs.incomplete"),
       emoji: "⚠️",
       cls: "bg-[#fffbeb] text-[#d97706] border-[#fde68a]",
     };
   }
   if (s === "canceled") {
     return {
-      label: "Inactif",
+      label: t("superadmin.clubs.inactive"),
       emoji: "⚠️",
       cls: "bg-[#fff5f5] text-[#ef4444] border-[#fecaca]",
     };
   }
   return {
-    label: s,
+    label: t("superadmin.clubs.otherStatus", { status: s }),
     emoji: "—",
     cls: "bg-[#f8fafc] text-[#94a3b8] border-[#e2e8f0]",
   };
 }
 
 function SuperAdminClubs() {
+  const { t } = useTranslation();
   const [search, setSearch] = useState("");
   const [includePersonal, setIncludePersonal] = useState(false);
   const [includeSystem, setIncludeSystem] = useState(false);
@@ -165,7 +143,7 @@ function SuperAdminClubs() {
     <div className="p-4 sm:p-6 md:p-8 max-w-7xl">
       <header className="mb-5 flex items-end justify-between gap-4 flex-wrap">
         <div>
-          <h1 className="text-xl font-semibold">Clubs</h1>
+          <h1 className="text-xl font-semibold">{t("superadmin.clubs.title")}</h1>
           <p className="text-sm text-muted-foreground mt-0.5">
             {total} club{total === 1 ? "" : "s"}
             {!includePersonal && " (hors orgas libres)"}
@@ -194,7 +172,7 @@ function SuperAdminClubs() {
             <Input
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              placeholder="Rechercher un club…"
+              placeholder={t("superadmin.clubs.searchPlaceholder")}
               className="pl-9 h-9"
             />
           </div>
@@ -206,12 +184,22 @@ function SuperAdminClubs() {
         <table className="w-full text-sm">
           <thead className="bg-muted/40 text-xs text-muted-foreground">
             <tr>
-              <th className="text-left font-medium px-3 py-2">Club</th>
-              <th className="text-left font-medium px-3 py-2">Contact</th>
-              <th className="text-left font-medium px-3 py-2">Membres</th>
-              <th className="text-left font-medium px-3 py-2">Activité</th>
-              <th className="text-left font-medium px-3 py-2">Facturation</th>
-              <th className="text-left font-medium px-3 py-2 hidden lg:table-cell">Créé le</th>
+              <th className="text-left font-medium px-3 py-2">{t("superadmin.clubs.colClub")}</th>
+              <th className="text-left font-medium px-3 py-2">
+                {t("superadmin.clubs.colContact")}
+              </th>
+              <th className="text-left font-medium px-3 py-2">
+                {t("superadmin.clubs.colMembers")}
+              </th>
+              <th className="text-left font-medium px-3 py-2">
+                {t("superadmin.clubs.colActivity")}
+              </th>
+              <th className="text-left font-medium px-3 py-2">
+                {t("superadmin.clubs.colBilling")}
+              </th>
+              <th className="text-left font-medium px-3 py-2 hidden lg:table-cell">
+                {t("superadmin.clubs.colCreated")}
+              </th>
             </tr>
           </thead>
           <tbody>
@@ -226,13 +214,13 @@ function SuperAdminClubs() {
             {!loading && clubs.length === 0 && (
               <tr>
                 <td colSpan={6} className="px-3 py-8 text-center text-muted-foreground">
-                  Aucun club trouvé.
+                  {t("superadmin.clubs.empty")}
                 </td>
               </tr>
             )}
             {!loading &&
               clubs.map((c) => {
-                const pill = billingPill(c.subscription);
+                const pill = billingPill(c.subscription, t);
                 const isTest = c.name.startsWith("__rls_") || c.name.startsWith("__e2e_");
                 const exempt = c.subscription && isBillingExempt(c.subscription);
                 const act = activity[c.id];
@@ -383,11 +371,13 @@ function SuperAdminClubs() {
           </div>
         )}
         {!loading && clubs.length === 0 && (
-          <div className="text-center text-sm text-muted-foreground py-8">Aucun club trouvé.</div>
+          <div className="text-center text-sm text-muted-foreground py-8">
+            {t("superadmin.clubs.empty")}
+          </div>
         )}
         {!loading &&
           clubs.map((c) => {
-            const pill = billingPill(c.subscription);
+            const pill = billingPill(c.subscription, t);
             const exempt = c.subscription && isBillingExempt(c.subscription);
             const act = activity[c.id];
             const lastAt = act?.last_activity_at ? new Date(act.last_activity_at) : null;
@@ -423,7 +413,7 @@ function SuperAdminClubs() {
                           {act?.count_7d ?? 0}/7j
                         </>
                       ) : (
-                        "Aucune activité"
+                        t("superadmin.clubs.noActivity")
                       )}
                     </div>
                   </div>

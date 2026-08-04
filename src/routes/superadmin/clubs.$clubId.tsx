@@ -1,4 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { useTranslation } from "react-i18next";
+import i18nInstance from "@/lib/i18n";
 import { useCallback, useEffect, useState } from "react";
 import {
   getClubDetailExtended,
@@ -43,6 +45,7 @@ export const Route = createFileRoute("/superadmin/clubs/$clubId")({
 });
 
 function ClubDetail() {
+  const { t } = useTranslation();
   const { clubId } = Route.useParams();
   const [data, setData] = useState<Awaited<ReturnType<typeof getClubDetailExtended>> | null>(null);
   const [fin, setFin] = useState<Awaited<ReturnType<typeof getClubFinancials>> | null>(null);
@@ -54,7 +57,7 @@ function ClubDetail() {
     setErr(null);
     getClubDetailExtended({ data: { club_id: clubId } })
       .then(setData)
-      .catch((e) => setErr(e instanceof Error ? e.message : "Failed"));
+      .catch((e) => setErr(e instanceof Error ? e.message : t("superadmin.common.failed")));
     getClubFinancials({ data: { club_id: clubId } })
       .then(setFin)
       .catch((e) => console.error("financials", e));
@@ -66,16 +69,18 @@ function ClubDetail() {
   useEffect(refresh, [refresh]);
 
   const runArchive = async (archive: boolean) => {
-    const label = archive ? "Archive club" : "Restore club";
+    const label = archive
+      ? t("superadmin.clubDetail.archiveClub")
+      : t("superadmin.clubDetail.restoreClub");
     if (!window.confirm(`${label} — are you sure?`)) return;
     setBusy(true);
     try {
       if (archive) await archiveClub({ data: { club_id: clubId } });
       else await unarchiveClub({ data: { club_id: clubId } });
-      toast.success(`${label} done`);
+      toast.success(t("superadmin.clubDetail.actionDone", { label }));
       refresh();
     } catch (e) {
-      toast.error(e instanceof Error ? e.message : "Action failed");
+      toast.error(e instanceof Error ? e.message : t("superadmin.common.actionFailed"));
     } finally {
       setBusy(false);
     }
@@ -85,7 +90,7 @@ function ClubDetail() {
   if (!data)
     return (
       <div className="p-8 text-sm text-muted-foreground flex items-center gap-2">
-        <Loader2 className="h-4 w-4 animate-spin" /> Loading…
+        <Loader2 className="h-4 w-4 animate-spin" /> {t("superadmin.clubDetail.loading")}
       </div>
     );
 
@@ -98,7 +103,7 @@ function ClubDetail() {
     recent_convocations,
     whatsapp_configured_count,
   } = data;
-  if (!club) return <div className="p-8 text-sm">Club not found.</div>;
+  if (!club) return <div className="p-8 text-sm">{t("superadmin.clubDetail.notFound")}</div>;
   const archived = Boolean((club as { archived_at?: string | null }).archived_at);
   const sub = subTone(subscription?.status);
   const trial = trialCountdown(subscription?.trial_end ?? null);
@@ -114,7 +119,7 @@ function ClubDetail() {
         to="/superadmin/clubs"
         className="inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground mb-3"
       >
-        <ArrowLeft className="h-3.5 w-3.5" /> All clubs
+        <ArrowLeft className="h-3.5 w-3.5" /> {t("superadmin.clubDetail.allClubs")}
       </Link>
 
       <header className="mb-6 flex items-start justify-between gap-4 flex-wrap">
@@ -123,7 +128,9 @@ function ClubDetail() {
           <div>
             <h1 className="text-2xl font-semibold flex items-center gap-2 flex-wrap">
               {club.name}
-              {archived && <StatusBadge tone="warn">Archived</StatusBadge>}
+              {archived && (
+                <StatusBadge tone="warn">{t("superadmin.clubDetail.archived")}</StatusBadge>
+              )}
               <StatusBadge tone={sub.tone}>{sub.label}</StatusBadge>
               {trial && (
                 <StatusBadge tone={trial === "expired" ? "danger" : "info"}>
@@ -146,31 +153,35 @@ function ClubDetail() {
         >
           {archived ? (
             <>
-              <ArchiveRestore className="h-4 w-4 mr-1.5" /> Restore
+              <ArchiveRestore className="h-4 w-4 mr-1.5" /> {t("superadmin.clubDetail.restore")}
             </>
           ) : (
             <>
-              <Archive className="h-4 w-4 mr-1.5" /> Archive
+              <Archive className="h-4 w-4 mr-1.5" /> {t("superadmin.clubDetail.archive")}
             </>
           )}
         </Button>
       </header>
 
       <section className="grid sm:grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
-        <KPI icon={<Users className="h-4 w-4" />} label="Members" value={members.length} />
+        <KPI
+          icon={<Users className="h-4 w-4" />}
+          label={t("superadmin.clubDetail.members")}
+          value={members.length}
+        />
         <KPI
           icon={<Trophy className="h-4 w-4" />}
-          label="Teams"
+          label={t("superadmin.clubDetail.teams")}
           value={`${activeTeams.length}/${teams.length}`}
         />
         <KPI
           icon={<Calendar className="h-4 w-4" />}
-          label="Recent events"
+          label={t("superadmin.clubDetail.recentEvents")}
           value={recent_events.length}
         />
         <KPI
           icon={<MessageCircle className="h-4 w-4" />}
-          label="WhatsApp teams"
+          label={t("superadmin.clubDetail.whatsappTeams")}
           value={`${whatsapp_configured_count}/${teams.length}`}
         />
       </section>
@@ -180,12 +191,12 @@ function ClubDetail() {
           href={`/superadmin/clubs/${clubId}/invites`}
           className="inline-flex items-center gap-1.5 rounded-md border border-border bg-card px-3 py-2 text-sm hover:bg-muted/50"
         >
-          <ExternalLink className="h-3.5 w-3.5" /> Voir le statut des invitations
+          <ExternalLink className="h-3.5 w-3.5" /> {t("superadmin.clubDetail.viewInviteStatus")}
         </a>
       </div>
 
       <OnboardingProgress
-        title="Club onboarding"
+        title={t("superadmin.clubDetail.clubOnboarding")}
         className="mb-6"
         steps={buildClubOnboardingSteps(data)}
       />
@@ -204,32 +215,33 @@ function ClubDetail() {
         <div className="rounded-xl border border-primary/30 bg-gradient-to-br from-primary/5 to-card p-5">
           <div className="flex items-center justify-between mb-4 flex-wrap gap-2">
             <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground flex items-center gap-2">
-              <Receipt className="h-4 w-4" /> Financials
+              <Receipt className="h-4 w-4" /> {t("superadmin.clubDetail.financials")}
             </h2>
             {fin?.has_stripe === false && (
-              <StatusBadge tone="muted">No Stripe customer</StatusBadge>
+              <StatusBadge tone="muted">{t("superadmin.clubDetail.noStripeCustomer")}</StatusBadge>
             )}
           </div>
           {!fin ? (
             <div className="text-sm text-muted-foreground flex items-center gap-2">
-              <Loader2 className="h-4 w-4 animate-spin" /> Loading invoices…
+              <Loader2 className="h-4 w-4 animate-spin" />{" "}
+              {t("superadmin.clubDetail.loadingInvoices")}
             </div>
           ) : (
             <>
               <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-3 mb-4">
                 <KPI
                   icon={<Receipt className="h-4 w-4" />}
-                  label="Lifetime paid"
+                  label={t("superadmin.clubDetail.lifetimePaid")}
                   value={formatMoney(fin.lifetime_paid_cents, fin.currency)}
                 />
                 <KPI
                   icon={<Receipt className="h-4 w-4" />}
-                  label="Invoices"
+                  label={t("superadmin.clubDetail.invoices")}
                   value={fin.invoices.length}
                 />
                 <KPI
                   icon={<Calendar className="h-4 w-4" />}
-                  label="Next charge"
+                  label={t("superadmin.clubDetail.nextCharge")}
                   value={
                     fin.upcoming_amount_cents != null
                       ? formatMoney(fin.upcoming_amount_cents, fin.currency)
@@ -238,7 +250,7 @@ function ClubDetail() {
                 />
                 <KPI
                   icon={<CreditCard className="h-4 w-4" />}
-                  label="Card"
+                  label={t("superadmin.clubDetail.card")}
                   value={
                     fin.payment_method
                       ? `${fin.payment_method.brand} ··${fin.payment_method.last4}`
@@ -252,10 +264,18 @@ function ClubDetail() {
                   <table className="w-full text-sm">
                     <thead className="bg-muted/40 text-xs text-muted-foreground">
                       <tr>
-                        <th className="text-left font-medium px-3 py-2">Date</th>
-                        <th className="text-left font-medium px-3 py-2">Number</th>
-                        <th className="text-left font-medium px-3 py-2">Status</th>
-                        <th className="text-right font-medium px-3 py-2">Amount</th>
+                        <th className="text-left font-medium px-3 py-2">
+                          {t("superadmin.common.date")}
+                        </th>
+                        <th className="text-left font-medium px-3 py-2">
+                          {t("superadmin.clubDetail.number")}
+                        </th>
+                        <th className="text-left font-medium px-3 py-2">
+                          {t("superadmin.common.status")}
+                        </th>
+                        <th className="text-right font-medium px-3 py-2">
+                          {t("superadmin.clubDetail.amount")}
+                        </th>
                         <th className="px-3 py-2"></th>
                       </tr>
                     </thead>
@@ -304,7 +324,9 @@ function ClubDetail() {
                   </table>
                 </div>
               ) : (
-                <div className="text-sm text-muted-foreground">No invoices yet.</div>
+                <div className="text-sm text-muted-foreground">
+                  {t("superadmin.clubDetail.noInvoices")}
+                </div>
               )}
             </>
           )}
@@ -312,14 +334,14 @@ function ClubDetail() {
       </section>
 
       <section className="grid lg:grid-cols-2 gap-4 mb-6">
-        <Card title="Subscription">
+        <Card title={t("superadmin.clubDetail.subscription")}>
           {subscription ? (
             <dl className="text-sm space-y-1.5">
               <Row label="Status">
                 <StatusBadge tone={sub.tone}>{sub.label}</StatusBadge>
               </Row>
-              <Row label="Plan">{subscription.plan ?? "—"}</Row>
-              <Row label="Trial end">
+              <Row label={t("superadmin.common.plan")}>{subscription.plan ?? "—"}</Row>
+              <Row label={t("superadmin.clubDetail.trialEnd")}>
                 {subscription.trial_end ? (
                   <span className="flex items-center gap-1.5">
                     {new Date(subscription.trial_end).toLocaleDateString()}
@@ -329,26 +351,34 @@ function ClubDetail() {
                   "—"
                 )}
               </Row>
-              <Row label="Period end">
+              <Row label={t("superadmin.clubDetail.periodEnd")}>
                 {subscription.current_period_end
                   ? new Date(subscription.current_period_end).toLocaleDateString()
                   : "—"}
               </Row>
-              <Row label="Cancel at period end">
+              <Row label={t("superadmin.clubDetail.cancelAtPeriodEnd")}>
                 {subscription.cancel_at_period_end ? "Yes" : "No"}
               </Row>
-              <Row label="Stripe customer">
+              <Row label={t("superadmin.clubDetail.stripeCustomer")}>
                 <span className="font-mono text-xs">{subscription.stripe_customer_id ?? "—"}</span>
               </Row>
-              {respRate !== null && <Row label="Response rate (recent)">{respRate}%</Row>}
+              {respRate !== null && (
+                <Row label={t("superadmin.clubDetail.responseRate")}>{respRate}%</Row>
+              )}
             </dl>
           ) : (
-            <div className="text-sm text-muted-foreground">No subscription record.</div>
+            <div className="text-sm text-muted-foreground">
+              {t("superadmin.clubDetail.noSubscriptionRecord")}
+            </div>
           )}
         </Card>
 
         <Card title={`Teams (${teams.length})`}>
-          {teams.length === 0 && <div className="text-sm text-muted-foreground">No teams.</div>}
+          {teams.length === 0 && (
+            <div className="text-sm text-muted-foreground">
+              {t("superadmin.clubDetail.noTeams")}
+            </div>
+          )}
           <ul className="text-sm divide-y divide-border -mx-1">
             {teams.map((t) => (
               <li key={t.id} className="px-1 py-2 flex items-center justify-between gap-2">
@@ -373,24 +403,38 @@ function ClubDetail() {
       </section>
 
       <section className="mb-6">
-        <Card title="Roster recap — per team">
+        <Card title={t("superadmin.clubDetail.rosterRecap")}>
           {!roster ? (
             <div className="text-sm text-muted-foreground flex items-center gap-2">
               <Loader2 className="h-3.5 w-3.5 animate-spin" /> Loading roster…
             </div>
           ) : roster.rows.length === 0 ? (
-            <div className="text-sm text-muted-foreground">No teams.</div>
+            <div className="text-sm text-muted-foreground">
+              {t("superadmin.clubDetail.noTeams")}
+            </div>
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
                   <tr className="text-xs uppercase tracking-wide text-muted-foreground border-b border-border">
-                    <th className="text-left font-medium py-2 pr-3">Team</th>
-                    <th className="text-right font-medium py-2 px-2 tabular-nums">Coaches</th>
-                    <th className="text-right font-medium py-2 px-2 tabular-nums">Parents</th>
-                    <th className="text-right font-medium py-2 px-2 tabular-nums">Players</th>
-                    <th className="text-right font-medium py-2 px-2 tabular-nums">Other</th>
-                    <th className="text-right font-medium py-2 pl-2 tabular-nums">Total</th>
+                    <th className="text-left font-medium py-2 pr-3">
+                      {t("superadmin.clubDetail.team")}
+                    </th>
+                    <th className="text-right font-medium py-2 px-2 tabular-nums">
+                      {t("superadmin.clubDetail.coaches")}
+                    </th>
+                    <th className="text-right font-medium py-2 px-2 tabular-nums">
+                      {t("superadmin.clubDetail.parents")}
+                    </th>
+                    <th className="text-right font-medium py-2 px-2 tabular-nums">
+                      {t("superadmin.clubDetail.players")}
+                    </th>
+                    <th className="text-right font-medium py-2 px-2 tabular-nums">
+                      {t("superadmin.clubDetail.other")}
+                    </th>
+                    <th className="text-right font-medium py-2 pl-2 tabular-nums">
+                      {t("superadmin.clubDetail.total")}
+                    </th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-border">
@@ -435,7 +479,9 @@ function ClubDetail() {
       <section className="grid lg:grid-cols-2 gap-4 mb-6">
         <Card title="Recent events">
           {recent_events.length === 0 && (
-            <div className="text-sm text-muted-foreground">No events.</div>
+            <div className="text-sm text-muted-foreground">
+              {t("superadmin.clubDetail.noEvents")}
+            </div>
           )}
           <ul className="space-y-1.5 text-sm">
             {recent_events.map((e) => (
@@ -552,60 +598,61 @@ function buildClubOnboardingSteps(data: ClubDetailData): OnboardingStep[] {
   const subActive =
     !!sub && ["active", "trialing", "past_due"].includes((sub.status ?? "").toLowerCase());
 
+  const tr = i18nInstance.t.bind(i18nInstance);
   return [
     {
       id: "logo",
-      label: "Club logo uploaded",
+      label: tr("superadmin.clubOnboarding.logo"),
       done: !!club?.logo_url,
-      hint: "Displayed across app, invites and emails.",
+      hint: tr("superadmin.clubOnboarding.logoHint"),
     },
     {
       id: "branding",
-      label: "Brand color chosen",
+      label: tr("superadmin.clubOnboarding.branding"),
       done: !!club?.theme_color,
-      hint: "Custom theme not set — using default palette.",
+      hint: tr("superadmin.clubOnboarding.brandingHint"),
     },
     {
       id: "team",
-      label: "At least one team created",
+      label: tr("superadmin.clubOnboarding.team"),
       done: activeTeams.length > 0,
-      hint: "No active team yet.",
+      hint: tr("superadmin.clubDetail.hintNoTeam"),
     },
     {
       id: "players",
-      label: "Players added",
+      label: tr("superadmin.clubOnboarding.players"),
       done: counts.players > 0,
-      hint: "Roster is empty.",
+      hint: tr("superadmin.clubOnboarding.playersHint"),
     },
     {
       id: "invites",
-      label: "Members invited",
+      label: tr("superadmin.clubOnboarding.invites"),
       done: counts.invites > 0,
-      hint: "No parent/coach invite has been sent.",
+      hint: tr("superadmin.clubDetail.hintNoInvite"),
     },
     {
       id: "event",
-      label: "First event published",
+      label: tr("superadmin.clubOnboarding.event"),
       done: counts.published_events > 0,
-      hint: "No published event yet — try a training or match.",
+      hint: tr("superadmin.clubDetail.hintNoEvent"),
     },
     {
       id: "sponsor",
-      label: "Sponsor added",
+      label: tr("superadmin.clubOnboarding.sponsor"),
       done: counts.sponsors > 0,
-      hint: "Optional — visible on the club wall.",
+      hint: tr("superadmin.clubOnboarding.sponsorHint"),
     },
     {
       id: "payments",
-      label: "Payment settings configured",
+      label: tr("superadmin.clubOnboarding.payments"),
       done: counts.has_payment_settings,
-      hint: "Required to collect fees / receipts.",
+      hint: tr("superadmin.clubOnboarding.paymentsHint"),
     },
     {
       id: "subscription",
-      label: "Active subscription / trial",
+      label: tr("superadmin.clubOnboarding.subscription"),
       done: subActive,
-      hint: "No active plan detected.",
+      hint: tr("superadmin.clubDetail.hintNoPlan"),
     },
   ];
 }

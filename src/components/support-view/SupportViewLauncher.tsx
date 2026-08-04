@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
+import { useTranslation } from "react-i18next";
 import { Loader2, Eye } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -31,7 +32,7 @@ export function SupportViewLauncher({
   defaultPersona,
   size = "sm",
   variant = "outline",
-  label = "View as",
+  label,
 }: {
   targetUserId: string;
   clubId: string;
@@ -42,17 +43,19 @@ export function SupportViewLauncher({
   variant?: "outline" | "default" | "ghost";
   label?: string;
 }) {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
   const [persona, setPersona] = useState<SupportViewPersona>(defaultPersona ?? "club_admin");
   const [reason, setReason] = useState("");
   const [duration, setDuration] = useState(30);
   const [busy, setBusy] = useState(false);
+  const buttonLabel = label ?? t("supportView.defaultLabel");
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (reason.trim().length < 3) {
-      toast.error("Please describe why you need this view (min 3 chars).");
+      toast.error(t("supportView.reasonRequired"));
       return;
     }
     setBusy(true);
@@ -69,7 +72,7 @@ export function SupportViewLauncher({
       setOpen(false);
       navigate({ to: "/support-view/$sessionId", params: { sessionId: s.id } });
     } catch (err) {
-      const msg = err instanceof Error ? err.message : "Failed to start session";
+      const msg = err instanceof Error ? err.message : t("supportView.startFailed");
       toast.error(msg);
     } finally {
       setBusy(false);
@@ -80,20 +83,22 @@ export function SupportViewLauncher({
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button size={size} variant={variant}>
-          <Eye className="h-3.5 w-3.5 mr-1.5" /> {label}
+          <Eye className="h-3.5 w-3.5 mr-1.5" /> {buttonLabel}
         </Button>
       </DialogTrigger>
       <DialogContent>
         <form onSubmit={submit} className="space-y-4">
           <DialogHeader>
-            <DialogTitle>Start support view</DialogTitle>
+            <DialogTitle>{t("supportView.title")}</DialogTitle>
             <p className="text-xs text-muted-foreground mt-1">
-              You'll see {targetName ?? "the user"}'s app read-only
-              {clubName ? ` in ${clubName}` : ""}. The session is audited and expires automatically.
+              {t("supportView.subtitle", {
+                name: targetName ?? t("supportView.theUser"),
+                club: clubName ? t("supportView.inClub", { club: clubName }) : "",
+              })}
             </p>
           </DialogHeader>
           <div className="space-y-2">
-            <Label>Persona</Label>
+            <Label>{t("supportView.persona")}</Label>
             <Select value={persona} onValueChange={(v) => setPersona(v as SupportViewPersona)}>
               <SelectTrigger>
                 <SelectValue />
@@ -106,22 +111,20 @@ export function SupportViewLauncher({
                 ))}
               </SelectContent>
             </Select>
-            <p className="text-[11px] text-muted-foreground">
-              Must match a real role the user has in this club.
-            </p>
+            <p className="text-[11px] text-muted-foreground">{t("supportView.personaHint")}</p>
           </div>
           <div className="space-y-2">
-            <Label htmlFor="reason">Reason (audited)</Label>
+            <Label htmlFor="reason">{t("supportView.reason")}</Label>
             <Input
               id="reason"
               value={reason}
               onChange={(e) => setReason(e.target.value)}
-              placeholder="e.g. Ticket #123 — checking payment status"
+              placeholder={t("supportView.reasonPlaceholder")}
               maxLength={500}
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="duration">Duration (min, max 60)</Label>
+            <Label htmlFor="duration">{t("supportView.duration")}</Label>
             <Input
               id="duration"
               type="number"
@@ -133,11 +136,11 @@ export function SupportViewLauncher({
           </div>
           <DialogFooter>
             <Button type="button" variant="ghost" onClick={() => setOpen(false)} disabled={busy}>
-              Cancel
+              {t("supportView.cancel")}
             </Button>
             <Button type="submit" disabled={busy}>
               {busy && <Loader2 className="h-3.5 w-3.5 mr-1.5 animate-spin" />}
-              Start view
+              {t("supportView.startView")}
             </Button>
           </DialogFooter>
         </form>

@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { useTranslation } from "react-i18next";
 import { useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { getClubRoster, type ClubRosterRow } from "@/lib/superadmin/observability.functions";
@@ -15,6 +16,7 @@ function fmt(iso: string | null) {
 }
 
 function ClubRosterPage() {
+  const { t } = useTranslation();
   const { clubId } = Route.useParams();
   const [q, setQ] = useState("");
   const { data, isLoading } = useQuery({
@@ -60,17 +62,17 @@ function ClubRosterPage() {
     <div className="p-6 md:p-8 max-w-6xl">
       <header className="mb-5">
         <div className="flex items-center gap-2 text-xs uppercase tracking-wide text-muted-foreground">
-          <Users className="h-3.5 w-3.5" /> Roster
+          <Users className="h-3.5 w-3.5" /> {t("superadmin.roster.eyebrow")}
         </div>
         <div className="flex items-center justify-between gap-3 mt-1">
           <div>
-            <h1 className="text-xl font-semibold">Équipes · Joueurs · Parents</h1>
+            <h1 className="text-xl font-semibold">{t("superadmin.roster.title")}</h1>
             <p className="text-sm text-muted-foreground mt-0.5">
-              Statut d'activation du compte pour chaque joueur et chaque parent.
+              {t("superadmin.roster.subtitle")}
             </p>
           </div>
           <Input
-            placeholder="Rechercher joueur / parent"
+            placeholder={t("superadmin.roster.searchPlaceholder")}
             value={q}
             onChange={(e) => setQ(e.target.value)}
             className="h-8 w-72"
@@ -81,7 +83,7 @@ function ClubRosterPage() {
           params={{ clubId }}
           className="text-xs text-muted-foreground hover:underline"
         >
-          ← Retour au club
+          {t("superadmin.roster.backToClub")}
         </Link>
       </header>
 
@@ -96,7 +98,7 @@ function ClubRosterPage() {
           ))}
           {grouped.length === 0 && (
             <div className="rounded-lg border border-border p-8 text-center text-sm text-muted-foreground">
-              Aucun résultat.
+              {t("superadmin.roster.empty")}
             </div>
           )}
         </div>
@@ -115,6 +117,7 @@ function TeamBlock({
     players: ClubRosterRow[];
   };
 }) {
+  const { t } = useTranslation();
   const [open, setOpen] = useState(true);
   return (
     <div className="rounded-lg border border-border overflow-hidden bg-card">
@@ -143,6 +146,7 @@ function TeamBlock({
 }
 
 function PlayerRow({ p }: { p: ClubRosterRow }) {
+  const { t } = useTranslation();
   const [open, setOpen] = useState(false);
   const active = !!p.player_user_id && !!p.player_last_sign_in_at;
   return (
@@ -166,15 +170,17 @@ function PlayerRow({ p }: { p: ClubRosterRow }) {
           </div>
         </div>
         <div className="flex items-center gap-1.5">
-          {p.player_child_platform_access && <StatusBadge tone="info">accès enfant</StatusBadge>}
+          {p.player_child_platform_access && (
+            <StatusBadge tone="info">{t("superadmin.roster.childAccess")}</StatusBadge>
+          )}
           {active ? (
-            <StatusBadge tone="success">compte actif</StatusBadge>
+            <StatusBadge tone="success">{t("superadmin.roster.activeAccount")}</StatusBadge>
           ) : p.player_user_id ? (
-            <StatusBadge tone="warn">jamais connecté</StatusBadge>
+            <StatusBadge tone="warn">{t("superadmin.roster.neverLoggedIn")}</StatusBadge>
           ) : p.player_last_invite_at ? (
             <StatusBadge tone="info">invité</StatusBadge>
           ) : (
-            <StatusBadge tone="muted">pas de compte</StatusBadge>
+            <StatusBadge tone="muted">{t("superadmin.roster.noAccount")}</StatusBadge>
           )}
           <StatusBadge tone="muted">{p.parents.length} parent(s)</StatusBadge>
         </div>
@@ -198,13 +204,13 @@ function PlayerRow({ p }: { p: ClubRosterRow }) {
                 </div>
               </div>
               {par.account_active && par.last_sign_in_at ? (
-                <StatusBadge tone="success">compte actif</StatusBadge>
+                <StatusBadge tone="success">{t("superadmin.roster.activeAccount")}</StatusBadge>
               ) : par.account_active ? (
-                <StatusBadge tone="warn">jamais connecté</StatusBadge>
+                <StatusBadge tone="warn">{t("superadmin.roster.neverLoggedIn")}</StatusBadge>
               ) : par.last_invite_at ? (
                 <StatusBadge tone="info">invité {fmt(par.last_invite_at)}</StatusBadge>
               ) : (
-                <StatusBadge tone="muted">pas de compte</StatusBadge>
+                <StatusBadge tone="muted">{t("superadmin.roster.noAccount")}</StatusBadge>
               )}
             </div>
           ))}

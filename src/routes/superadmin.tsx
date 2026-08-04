@@ -8,6 +8,7 @@ import {
   isRedirect,
 } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { checkSuperAdmin } from "@/lib/superadmin.functions";
 import { useAuth } from "@/lib/auth-context";
 import { supabase } from "@/integrations/supabase/client";
@@ -46,31 +47,35 @@ export const Route = createFileRoute("/superadmin")({
   component: SuperAdminLayout,
 });
 
-type NavItem = { to: string; label: string; icon: typeof LayoutDashboard; exact?: boolean };
+type NavItem = { to: string; labelKey: string; icon: typeof LayoutDashboard; exact?: boolean };
 const NAV: NavItem[] = [
-  { to: "/superadmin", label: "Dashboard", icon: LayoutDashboard, exact: true },
-  { to: "/superadmin/clubs", label: "Clubs", icon: Building2 },
-  { to: "/superadmin/users", label: "Users", icon: Users },
-  { to: "/superadmin/onboarding/import", label: "Import données", icon: Upload },
-  { to: "/superadmin/billing", label: "Billing", icon: CreditCard },
-  { to: "/superadmin/logs", label: "Activity logs", icon: ScrollText },
-  { to: "/superadmin/email-dispatches", label: "Email sending", icon: Mail },
-  { to: "/superadmin/invite-batches", label: "Invite batches", icon: Mail },
-  { to: "/superadmin/notifications", label: "Notifications", icon: Bell },
-  { to: "/superadmin/support", label: "Support hub", icon: LifeBuoy },
-  { to: "/superadmin/support-tickets", label: "Tickets", icon: LifeBuoy },
-  { to: "/superadmin/build-clubero", label: "Marketing campaign", icon: MessageCircleHeart },
-  { to: "/superadmin/settings", label: "Settings", icon: Settings },
+  { to: "/superadmin", labelKey: "superadmin.nav.dashboard", icon: LayoutDashboard, exact: true },
+  { to: "/superadmin/clubs", labelKey: "superadmin.nav.clubs", icon: Building2 },
+  { to: "/superadmin/users", labelKey: "superadmin.nav.users", icon: Users },
+  { to: "/superadmin/onboarding/import", labelKey: "superadmin.nav.importData", icon: Upload },
+  { to: "/superadmin/billing", labelKey: "superadmin.nav.billing", icon: CreditCard },
+  { to: "/superadmin/logs", labelKey: "superadmin.nav.activityLogs", icon: ScrollText },
+  { to: "/superadmin/email-dispatches", labelKey: "superadmin.nav.emailSending", icon: Mail },
+  { to: "/superadmin/invite-batches", labelKey: "superadmin.nav.inviteBatches", icon: Mail },
+  { to: "/superadmin/notifications", labelKey: "superadmin.nav.notifications", icon: Bell },
+  { to: "/superadmin/support", labelKey: "superadmin.nav.supportHub", icon: LifeBuoy },
+  { to: "/superadmin/support-tickets", labelKey: "superadmin.nav.tickets", icon: LifeBuoy },
+  {
+    to: "/superadmin/build-clubero",
+    labelKey: "superadmin.nav.marketingCampaign",
+    icon: MessageCircleHeart,
+  },
+  { to: "/superadmin/settings", labelKey: "superadmin.nav.settings", icon: Settings },
 ];
 
 function SuperAdminLayout() {
+  const { t } = useTranslation();
   const { session, loading } = useAuth();
   const { verified } = Route.useLoaderData();
   // If the server loader verified, we skip the client re-check (no spinner flash).
   const [state, setState] = useState<"checking" | "ok" | "denied">(verified ? "ok" : "checking");
   const location = useLocation();
   const navigate = useNavigate();
-
   useEffect(() => {
     // Already verified server-side — skip the client roundtrip.
     if (verified) return;
@@ -113,9 +118,9 @@ function SuperAdminLayout() {
         <div className="px-5 py-5 border-b border-border">
           <div className="flex items-center gap-2 text-xs uppercase tracking-wider text-muted-foreground">
             <ShieldCheck className="h-3.5 w-3.5" />
-            <span>Clubero • Internal</span>
+            <span>{t("superadmin.brandInternal")}</span>
           </div>
-          <div className="mt-1 text-sm font-semibold">Super Admin</div>
+          <div className="mt-1 text-sm font-semibold">{t("superadmin.brand")}</div>
         </div>
         <nav className="flex-1 p-3 space-y-1">
           {NAV.map((item) => {
@@ -135,7 +140,7 @@ function SuperAdminLayout() {
                 )}
               >
                 <Icon className="h-4 w-4" />
-                {item.label}
+                {t(item.labelKey)}
               </Link>
             );
           })}
@@ -149,13 +154,13 @@ function SuperAdminLayout() {
             className="flex w-full items-center gap-2.5 rounded-md px-3 py-2 text-sm text-muted-foreground hover:bg-foreground/[0.03] hover:text-foreground"
           >
             <LogOut className="h-4 w-4" />
-            Sign out
+            {t("superadmin.signOut")}
           </button>
           <Link
             to="/home"
             className="mt-1 block px-3 py-1.5 text-xs text-muted-foreground hover:text-foreground"
           >
-            ← Back to club app
+            {t("superadmin.backToApp")}
           </Link>
         </div>
       </aside>
@@ -164,10 +169,10 @@ function SuperAdminLayout() {
       <header className="md:hidden fixed top-0 inset-x-0 z-40 flex items-center justify-between border-b border-border bg-background/95 backdrop-blur px-4 h-12">
         <div className="flex items-center gap-2 text-xs">
           <ShieldCheck className="h-3.5 w-3.5" />
-          <span className="font-medium">Super Admin</span>
+          <span className="font-medium">{t("superadmin.brand")}</span>
         </div>
         <Link to="/home" className="text-xs text-muted-foreground">
-          ← App
+          {t("superadmin.backToAppShort")}
         </Link>
       </header>
 
@@ -191,7 +196,7 @@ function SuperAdminLayout() {
                   )}
                 >
                   <Icon className="h-3.5 w-3.5" />
-                  {item.label}
+                  {t(item.labelKey)}
                 </Link>
               );
             })}
