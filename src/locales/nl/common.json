@@ -2626,7 +2626,10 @@
     "convoc": {
       "all": "Heel het team",
       "selection": "Spelers kiezen",
-      "none": "Niet nu"
+      "none": "Niet nu",
+      "allSubtitle": "Iedereen krijgt een bericht",
+      "selectionSubtitle": "Handmatige selectie",
+      "noneSubtitle": "Concept — later versturen"
     },
     "weekdayShort": {
       "0": "Z",
@@ -2712,7 +2715,20 @@
       "empty": "No matching people found."
     },
     "homeSubtitle": "Thuiswedstrijd",
-    "awaySubtitle": "Uitwedstrijd"
+    "awaySubtitle": "Uitwedstrijd",
+    "typeSubtitle": {
+      "training": "Reguliere training",
+      "match": "Officiële of vriendschappelijke wedstrijd",
+      "meeting": "Club- of teamvergadering",
+      "other": "Kamp, toernooi, evenement…"
+    },
+    "halvesPlaceholder": "3x30",
+    "gameformatPlaceholder": "6v6",
+    "opponentPlaceholder": "FC Buren",
+    "officialNoSubtitle": "Zonder officieel belang",
+    "officialChampionshipSubtitle": "Telt mee in het klassement",
+    "officialCupSubtitle": "Knock-outwedstrijd",
+    "carpoolSubtitle": "Gezinnen regelen het vervoer"
   },
   "urgency": {
     "empty": {

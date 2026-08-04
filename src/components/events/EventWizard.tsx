@@ -820,14 +820,40 @@ export function EventWizard({ teams, onClose, onCreated, onOpenExpert, initialSt
           >
             {(
               [
-                ["training", "⚽", t("events.types.training"), "Entraînement régulier", "green"],
-                ["match", "🆚", t("events.types.match"), "Match officiel ou amical", "red"],
-                ["meeting", "👥", t("events.types.meeting"), "Réunion club ou équipe", "blue"],
+                [
+                  "training",
+                  "⚽",
+                  t("events.types.training"),
+                  t("eventWizard.typeSubtitle.training", {
+                    defaultValue: "Entraînement régulier",
+                  }),
+                  "green",
+                ],
+                [
+                  "match",
+                  "🆚",
+                  t("events.types.match"),
+                  t("eventWizard.typeSubtitle.match", {
+                    defaultValue: "Match officiel ou amical",
+                  }),
+                  "red",
+                ],
+                [
+                  "meeting",
+                  "👥",
+                  t("events.types.meeting"),
+                  t("eventWizard.typeSubtitle.meeting", {
+                    defaultValue: "Réunion club ou équipe",
+                  }),
+                  "blue",
+                ],
                 [
                   "other",
                   "📌",
                   t("events.types.other", { defaultValue: "Autre" }),
-                  "Stage, tournoi, événement…",
+                  t("eventWizard.typeSubtitle.other", {
+                    defaultValue: "Stage, tournoi, événement…",
+                  }),
                   "amber",
                 ],
               ] as const
@@ -1455,7 +1481,7 @@ export function EventWizard({ teams, onClose, onCreated, onOpenExpert, initialSt
                 {t("eventWizard.halvesManual", { defaultValue: "Autre format (ex. 3x30)" })}
               </Label>
               <Input
-                placeholder="3x30"
+                placeholder={t("eventWizard.halvesPlaceholder", { defaultValue: "3x30" })}
                 value={
                   state.halvesFormat &&
                   !getHalvesPresets(selectedTeam?.sport).includes(state.halvesFormat)
@@ -1513,7 +1539,7 @@ export function EventWizard({ teams, onClose, onCreated, onOpenExpert, initialSt
                 {t("eventWizard.gameformatManual", { defaultValue: "Autre format" })}
               </Label>
               <Input
-                placeholder="6v6"
+                placeholder={t("eventWizard.gameformatPlaceholder", { defaultValue: "6v6" })}
                 value={
                   state.gameFormat &&
                   !getGameFormatPresets(selectedTeam?.sport).includes(state.gameFormat)
@@ -1679,7 +1705,7 @@ export function EventWizard({ teams, onClose, onCreated, onOpenExpert, initialSt
               autoFocus
               value={state.opponent ?? ""}
               onChange={(e) => patch("opponent", e.target.value)}
-              placeholder="FC Voisin"
+              placeholder={t("eventWizard.opponentPlaceholder", { defaultValue: "FC Voisin" })}
             />
             <Button
               className="w-full mt-2"
@@ -1696,7 +1722,9 @@ export function EventWizard({ teams, onClose, onCreated, onOpenExpert, initialSt
             <DoorButton
               icon="🤝"
               label={t("eventWizard.officialNo", { defaultValue: "Amical" })}
-              subtitle="Sans enjeu officiel"
+              subtitle={t("eventWizard.officialNoSubtitle", {
+                defaultValue: "Sans enjeu officiel",
+              })}
               color="green"
               active={state.competitionType === "friendly"}
               onClick={() => {
@@ -1709,7 +1737,9 @@ export function EventWizard({ teams, onClose, onCreated, onOpenExpert, initialSt
             <DoorButton
               icon="🏆"
               label={t("eventWizard.officialChampionship", { defaultValue: "Championnat" })}
-              subtitle="Compte au classement"
+              subtitle={t("eventWizard.officialChampionshipSubtitle", {
+                defaultValue: "Compte au classement",
+              })}
               color="amber"
               active={state.competitionType === "championship"}
               onClick={() => {
@@ -1725,7 +1755,9 @@ export function EventWizard({ teams, onClose, onCreated, onOpenExpert, initialSt
             <DoorButton
               icon="🥇"
               label={t("eventWizard.officialCup", { defaultValue: "Coupe" })}
-              subtitle="Match à élimination"
+              subtitle={t("eventWizard.officialCupSubtitle", {
+                defaultValue: "Match à élimination",
+              })}
               color="red"
               active={state.competitionType === "cup"}
               onClick={() => {
@@ -1881,21 +1913,27 @@ export function EventWizard({ teams, onClose, onCreated, onOpenExpert, initialSt
                   "all",
                   "👥",
                   t("eventWizard.convoc.all", { defaultValue: "Toute l'équipe" }),
-                  "Tout le monde reçoit",
+                  t("eventWizard.convoc.allSubtitle", {
+                    defaultValue: "Tout le monde reçoit",
+                  }),
                   "green",
                 ],
                 [
                   "selection",
                   "✋",
                   t("eventWizard.convoc.selection", { defaultValue: "Choisir les joueurs" }),
-                  "Sélection manuelle",
+                  t("eventWizard.convoc.selectionSubtitle", {
+                    defaultValue: "Sélection manuelle",
+                  }),
                   "amber",
                 ],
                 [
                   "none",
                   "⏸️",
                   t("eventWizard.convoc.none", { defaultValue: "Pas maintenant" }),
-                  "Brouillon, à envoyer plus tard",
+                  t("eventWizard.convoc.noneSubtitle", {
+                    defaultValue: "Brouillon, à envoyer plus tard",
+                  }),
                   "blue",
                 ],
               ] as const
@@ -1955,7 +1993,9 @@ export function EventWizard({ teams, onClose, onCreated, onOpenExpert, initialSt
                     state.carpoolEnabled ? "text-emerald-600" : "text-muted-foreground",
                   )}
                 >
-                  Les familles s'organisent
+                  {t("eventWizard.carpoolSubtitle", {
+                    defaultValue: "Les familles s'organisent",
+                  })}
                 </div>
               </div>
               <Switch

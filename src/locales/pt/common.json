@@ -2626,7 +2626,10 @@
     "convoc": {
       "all": "Equipa toda",
       "selection": "Escolher jogadores",
-      "none": "Agora não"
+      "none": "Agora não",
+      "allSubtitle": "Toda a gente recebe",
+      "selectionSubtitle": "Seleção manual",
+      "noneSubtitle": "Rascunho — enviar mais tarde"
     },
     "weekdayShort": {
       "0": "D",
@@ -2712,7 +2715,20 @@
       "empty": "No matching people found."
     },
     "homeSubtitle": "Jogamos em casa",
-    "awaySubtitle": "Jogamos fora"
+    "awaySubtitle": "Jogamos fora",
+    "typeSubtitle": {
+      "training": "Treino regular",
+      "match": "Jogo oficial ou amigável",
+      "meeting": "Reunião do clube ou da equipa",
+      "other": "Campo, torneio, evento…"
+    },
+    "halvesPlaceholder": "3x30",
+    "gameformatPlaceholder": "6v6",
+    "opponentPlaceholder": "FC Vizinhos",
+    "officialNoSubtitle": "Sem valor oficial",
+    "officialChampionshipSubtitle": "Conta para a classificação",
+    "officialCupSubtitle": "Jogo a eliminar",
+    "carpoolSubtitle": "As famílias organizam-se"
   },
   "urgency": {
     "empty": {

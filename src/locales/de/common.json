@@ -2631,7 +2631,10 @@
     "convoc": {
       "all": "Ganzes Team",
       "selection": "Pick players",
-      "none": "Nicht jetzt"
+      "none": "Nicht jetzt",
+      "allSubtitle": "Alle werden benachrichtigt",
+      "selectionSubtitle": "Manuelle Auswahl",
+      "noneSubtitle": "Entwurf — später senden"
     },
     "weekdayShort": {
       "0": "S",
@@ -2717,7 +2720,20 @@
       "empty": "No matching people found."
     },
     "homeSubtitle": "Wir empfangen",
-    "awaySubtitle": "Wir sind auswärts"
+    "awaySubtitle": "Wir sind auswärts",
+    "typeSubtitle": {
+      "training": "Regelmäßiges Training",
+      "match": "Offizielles oder Freundschaftsspiel",
+      "meeting": "Vereins- oder Teamtreffen",
+      "other": "Camp, Turnier, Veranstaltung…"
+    },
+    "halvesPlaceholder": "3x30",
+    "gameformatPlaceholder": "6v6",
+    "opponentPlaceholder": "FC Nachbarn",
+    "officialNoSubtitle": "Ohne offiziellen Einsatz",
+    "officialChampionshipSubtitle": "Zählt in der Tabelle",
+    "officialCupSubtitle": "K.-o.-Spiel",
+    "carpoolSubtitle": "Familien organisieren Fahrten"
   },
   "urgency": {
     "empty": {

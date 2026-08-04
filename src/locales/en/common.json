@@ -2626,7 +2626,10 @@
     "convoc": {
       "all": "Whole team",
       "selection": "Pick players",
-      "none": "Not now"
+      "none": "Not now",
+      "allSubtitle": "Everyone is notified",
+      "selectionSubtitle": "Manual selection",
+      "noneSubtitle": "Draft — send later"
     },
     "weekdayShort": {
       "0": "S",
@@ -2712,7 +2715,20 @@
       "empty": "No matching people found."
     },
     "homeSubtitle": "We're hosting",
-    "awaySubtitle": "We're away"
+    "awaySubtitle": "We're away",
+    "typeSubtitle": {
+      "training": "Regular training",
+      "match": "Official or friendly match",
+      "meeting": "Club or team meeting",
+      "other": "Camp, tournament, event…"
+    },
+    "halvesPlaceholder": "3x30",
+    "gameformatPlaceholder": "6v6",
+    "opponentPlaceholder": "FC Neighbors",
+    "officialNoSubtitle": "No official stakes",
+    "officialChampionshipSubtitle": "Counts in the standings",
+    "officialCupSubtitle": "Knockout match",
+    "carpoolSubtitle": "Families organize rides"
   },
   "urgency": {
     "empty": {

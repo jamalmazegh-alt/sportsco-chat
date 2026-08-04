@@ -2626,7 +2626,10 @@
     "convoc": {
       "all": "Todo el equipo",
       "selection": "Elegir jugadores",
-      "none": "Ahora no"
+      "none": "Ahora no",
+      "allSubtitle": "Todos reciben la convocatoria",
+      "selectionSubtitle": "Selección manual",
+      "noneSubtitle": "Borrador, enviar más tarde"
     },
     "weekdayShort": {
       "0": "D",
@@ -2712,7 +2715,20 @@
       "empty": "No matching people found."
     },
     "homeSubtitle": "Jugamos en casa",
-    "awaySubtitle": "Jugamos fuera"
+    "awaySubtitle": "Jugamos fuera",
+    "typeSubtitle": {
+      "training": "Entrenamiento regular",
+      "match": "Partido oficial o amistoso",
+      "meeting": "Reunión de club o equipo",
+      "other": "Campus, torneo, evento…"
+    },
+    "halvesPlaceholder": "3x30",
+    "gameformatPlaceholder": "6v6",
+    "opponentPlaceholder": "FC Vecinos",
+    "officialNoSubtitle": "Sin trascendencia oficial",
+    "officialChampionshipSubtitle": "Cuenta en la clasificación",
+    "officialCupSubtitle": "Partido de eliminación",
+    "carpoolSubtitle": "Las familias se organizan"
   },
   "urgency": {
     "empty": {

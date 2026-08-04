@@ -2626,7 +2626,10 @@
     "convoc": {
       "all": "Toute l'équipe",
       "selection": "Choisir les joueurs",
-      "none": "Pas maintenant"
+      "none": "Pas maintenant",
+      "allSubtitle": "Tout le monde reçoit",
+      "selectionSubtitle": "Sélection manuelle",
+      "noneSubtitle": "Brouillon, à envoyer plus tard"
     },
     "weekdayShort": {
       "0": "D",
@@ -2712,7 +2715,20 @@
       "empty": "Aucune personne correspondante trouvée."
     },
     "homeSubtitle": "On reçoit",
-    "awaySubtitle": "On se déplace"
+    "awaySubtitle": "On se déplace",
+    "typeSubtitle": {
+      "training": "Entraînement régulier",
+      "match": "Match officiel ou amical",
+      "meeting": "Réunion club ou équipe",
+      "other": "Stage, tournoi, événement…"
+    },
+    "halvesPlaceholder": "3x30",
+    "gameformatPlaceholder": "6v6",
+    "opponentPlaceholder": "FC Voisin",
+    "officialNoSubtitle": "Sans enjeu officiel",
+    "officialChampionshipSubtitle": "Compte au classement",
+    "officialCupSubtitle": "Match à élimination",
+    "carpoolSubtitle": "Les familles s'organisent"
   },
   "urgency": {
     "empty": {

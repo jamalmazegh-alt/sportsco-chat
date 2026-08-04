@@ -2626,7 +2626,10 @@
     "convoc": {
       "all": "Tutta la squadra",
       "selection": "Scegli i giocatori",
-      "none": "Non ora"
+      "none": "Non ora",
+      "allSubtitle": "Tutti ricevono la convocazione",
+      "selectionSubtitle": "Selezione manuale",
+      "noneSubtitle": "Bozza, da inviare dopo"
     },
     "weekdayShort": {
       "0": "D",
@@ -2712,7 +2715,20 @@
       "empty": "No matching people found."
     },
     "homeSubtitle": "Giochiamo in casa",
-    "awaySubtitle": "Giochiamo in trasferta"
+    "awaySubtitle": "Giochiamo in trasferta",
+    "typeSubtitle": {
+      "training": "Allenamento regolare",
+      "match": "Partita ufficiale o amichevole",
+      "meeting": "Riunione di club o squadra",
+      "other": "Stage, torneo, evento…"
+    },
+    "halvesPlaceholder": "3x30",
+    "gameformatPlaceholder": "6v6",
+    "opponentPlaceholder": "FC Vicini",
+    "officialNoSubtitle": "Senza valore ufficiale",
+    "officialChampionshipSubtitle": "Vale per la classifica",
+    "officialCupSubtitle": "Partita a eliminazione",
+    "carpoolSubtitle": "Le famiglie si organizzano"
   },
   "urgency": {
     "empty": {
