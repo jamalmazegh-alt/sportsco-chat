@@ -1390,7 +1390,7 @@ export function EventWizard({ teams, onClose, onCreated, onOpenExpert, initialSt
             <DoorButton
               icon="🏠"
               label={t("eventWizard.home", { defaultValue: "Domicile" })}
-              subtitle="On reçoit"
+              subtitle={t("eventWizard.homeSubtitle")}
               color="green"
               active={state.isHome === "home"}
               onClick={() => answer("isHome", "home")}
@@ -1398,7 +1398,7 @@ export function EventWizard({ teams, onClose, onCreated, onOpenExpert, initialSt
             <DoorButton
               icon="🚌"
               label={t("eventWizard.away", { defaultValue: "Extérieur" })}
-              subtitle="On se déplace"
+              subtitle={t("eventWizard.awaySubtitle")}
               color="blue"
               active={state.isHome === "away"}
               onClick={() => {
@@ -2483,6 +2483,7 @@ function WizardHero({
   progress: number;
   onClose: () => void;
 }) {
+  const { t } = useTranslation();
   const Icon = STEP_ICONS[step] ?? Sparkles;
   return (
     <div className="relative overflow-hidden rounded-t-xl text-primary-foreground">
@@ -2520,7 +2521,7 @@ function WizardHero({
               type="button"
               onClick={onClose}
               className="flex h-6 w-6 items-center justify-center rounded-full bg-white/15 ring-1 ring-white/30 backdrop-blur-sm transition hover:bg-white/30 hover:ring-white/50"
-              aria-label="Fermer"
+              aria-label={t("common.close")}
             >
               <X className="h-3.5 w-3.5 text-white" strokeWidth={3} />
             </button>

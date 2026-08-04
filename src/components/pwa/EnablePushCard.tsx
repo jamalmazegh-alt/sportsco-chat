@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Bell, BellOff, CheckCircle2, Loader2, Smartphone } from "lucide-react";
 import { toast } from "sonner";
 import { isIOS, isInStandaloneMode, isPushSupported } from "@/lib/pwa";
@@ -29,6 +30,7 @@ export function EnablePushCard() {
 }
 
 function EnablePushCardNative() {
+  const { t } = useTranslation();
   const [status, setStatus] = useState<NativePushStatus>("unavailable");
   const [loading, setLoading] = useState(false);
 
@@ -41,13 +43,13 @@ function EnablePushCardNative() {
     try {
       const res = await enableNativePush();
       if (res.ok) {
-        toast.success("Notifications activées");
+        toast.success(t("push.toastEnabled"));
         setStatus("granted");
       } else if (res.reason === "denied") {
         setStatus("denied");
-        toast.error("Notifications refusées");
+        toast.error(t("push.toastDenied"));
       } else {
-        toast.error("Activation impossible pour le moment");
+        toast.error(t("push.toastImpossible"));
         console.warn("[native-push] enable KO:", res.reason);
       }
     } finally {
@@ -61,7 +63,7 @@ function EnablePushCardNative() {
     <section className="rounded-2xl border border-border bg-card overflow-hidden">
       <header className="px-5 pt-4 pb-2">
         <h2 className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
-          Cet appareil
+          {t("push.deviceSection")}
         </h2>
       </header>
       <div className="px-5 py-4">
@@ -71,10 +73,8 @@ function EnablePushCardNative() {
               <CheckCircle2 className="h-5 w-5" />
             </div>
             <div className="min-w-0">
-              <p className="text-sm font-medium">Notifications activées</p>
-              <p className="text-xs text-muted-foreground mt-0.5">
-                Vous recevrez les push de Clubero sur cet appareil.
-              </p>
+              <p className="text-sm font-medium">{t("push.enabledTitle")}</p>
+              <p className="text-xs text-muted-foreground mt-0.5">{t("push.enabledDesc")}</p>
             </div>
           </div>
         )}
@@ -85,10 +85,8 @@ function EnablePushCardNative() {
               <Bell className="h-5 w-5" />
             </div>
             <div className="min-w-0 flex-1">
-              <p className="text-sm font-medium">Activer les notifications</p>
-              <p className="text-xs text-muted-foreground mt-0.5">
-                Recevez convocations, rappels et actualités du club en temps réel.
-              </p>
+              <p className="text-sm font-medium">{t("push.enableTitle")}</p>
+              <p className="text-xs text-muted-foreground mt-0.5">{t("push.enableDesc")}</p>
               <button
                 type="button"
                 disabled={loading}
@@ -97,11 +95,11 @@ function EnablePushCardNative() {
               >
                 {loading ? (
                   <>
-                    <Loader2 className="h-3.5 w-3.5 animate-spin" /> Activation…
+                    <Loader2 className="h-3.5 w-3.5 animate-spin" /> {t("push.enabling")}
                   </>
                 ) : (
                   <>
-                    <Bell className="h-3.5 w-3.5" /> Activer les notifications
+                    <Bell className="h-3.5 w-3.5" /> {t("push.enableCta")}
                   </>
                 )}
               </button>
@@ -115,10 +113,9 @@ function EnablePushCardNative() {
               <BellOff className="h-5 w-5" />
             </div>
             <div className="min-w-0">
-              <p className="text-sm font-medium">Notifications désactivées</p>
+              <p className="text-sm font-medium">{t("push.disabledTitle")}</p>
               <p className="text-xs text-muted-foreground mt-0.5 leading-relaxed">
-                Pour les réactiver : Réglages iOS/Android → <b>Clubero</b> → <b>Notifications</b> →{" "}
-                <b>Autoriser</b>.
+                {t("push.disabledDesc")}
               </p>
             </div>
           </div>
@@ -129,6 +126,7 @@ function EnablePushCardNative() {
 }
 
 function EnablePushCardWeb() {
+  const { t } = useTranslation();
   const [status, setStatus] = useState<Status>("unsupported");
   const [loading, setLoading] = useState(false);
 
@@ -141,20 +139,20 @@ function EnablePushCardWeb() {
     try {
       const sub = await subscribeToPush();
       if (sub) {
-        toast.success("Notifications activées");
+        toast.success(t("push.toastEnabled"));
         setStatus("granted");
       } else {
         const p = typeof Notification !== "undefined" ? Notification.permission : "denied";
         if (p === "denied") {
           setStatus("denied");
-          toast.error("Notifications refusées par le navigateur");
+          toast.error(t("push.toastDeniedBrowser"));
         } else {
-          toast.error("Activation impossible");
+          toast.error(t("push.toastImpossibleShort"));
         }
       }
     } catch (e) {
       console.error("[push] enable failed", e);
-      toast.error("Erreur lors de l'activation");
+      toast.error(t("push.toastError"));
     } finally {
       setLoading(false);
     }
@@ -164,7 +162,7 @@ function EnablePushCardWeb() {
     <section className="rounded-2xl border border-border bg-card overflow-hidden">
       <header className="px-5 pt-4 pb-2">
         <h2 className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
-          Cet appareil
+          {t("push.deviceSection")}
         </h2>
       </header>
       <div className="px-5 py-4">
@@ -174,10 +172,8 @@ function EnablePushCardWeb() {
               <CheckCircle2 className="h-5 w-5" />
             </div>
             <div className="min-w-0">
-              <p className="text-sm font-medium">Notifications activées</p>
-              <p className="text-xs text-muted-foreground mt-0.5">
-                Vous recevrez les push de Clubero sur cet appareil.
-              </p>
+              <p className="text-sm font-medium">{t("push.enabledTitle")}</p>
+              <p className="text-xs text-muted-foreground mt-0.5">{t("push.enabledDesc")}</p>
             </div>
           </div>
         )}
@@ -188,10 +184,8 @@ function EnablePushCardWeb() {
               <Bell className="h-5 w-5" />
             </div>
             <div className="min-w-0 flex-1">
-              <p className="text-sm font-medium">Activer les notifications</p>
-              <p className="text-xs text-muted-foreground mt-0.5">
-                Recevez convocations, rappels et actualités du club en temps réel.
-              </p>
+              <p className="text-sm font-medium">{t("push.enableTitle")}</p>
+              <p className="text-xs text-muted-foreground mt-0.5">{t("push.enableDesc")}</p>
               <button
                 type="button"
                 disabled={loading}
@@ -200,11 +194,11 @@ function EnablePushCardWeb() {
               >
                 {loading ? (
                   <>
-                    <Loader2 className="h-3.5 w-3.5 animate-spin" /> Activation…
+                    <Loader2 className="h-3.5 w-3.5 animate-spin" /> {t("push.enabling")}
                   </>
                 ) : (
                   <>
-                    <Bell className="h-3.5 w-3.5" /> Activer les notifications
+                    <Bell className="h-3.5 w-3.5" /> {t("push.enableCta")}
                   </>
                 )}
               </button>
@@ -218,11 +212,9 @@ function EnablePushCardWeb() {
               <BellOff className="h-5 w-5" />
             </div>
             <div className="min-w-0">
-              <p className="text-sm font-medium">Notifications bloquées</p>
+              <p className="text-sm font-medium">{t("push.blockedTitle")}</p>
               <p className="text-xs text-muted-foreground mt-0.5 leading-relaxed">
-                Votre navigateur bloque les notifications pour Clubero. Pour les réactiver, cliquez
-                sur l'icône cadenas 🔒 à gauche de la barre d'adresse → <b>Notifications</b> →{" "}
-                <b>Autoriser</b>, puis rechargez la page.
+                {t("push.blockedDesc")}
               </p>
             </div>
           </div>
@@ -234,11 +226,9 @@ function EnablePushCardWeb() {
               <Smartphone className="h-5 w-5" />
             </div>
             <div className="min-w-0">
-              <p className="text-sm font-medium">Installez Clubero sur iPhone</p>
+              <p className="text-sm font-medium">{t("push.iosInstallTitle")}</p>
               <p className="text-xs text-muted-foreground mt-0.5 leading-relaxed">
-                Sur iOS, les notifications ne fonctionnent qu'à partir de l'app installée. Dans
-                Safari : bouton <b>Partager</b> → <b>Sur l'écran d'accueil</b>, puis ouvrez Clubero
-                depuis l'icône pour activer les notifications.
+                {t("push.iosInstallDesc")}
               </p>
             </div>
           </div>
@@ -250,10 +240,8 @@ function EnablePushCardWeb() {
               <BellOff className="h-5 w-5" />
             </div>
             <div className="min-w-0">
-              <p className="text-sm font-medium">Notifications indisponibles</p>
-              <p className="text-xs text-muted-foreground mt-0.5">
-                Ce navigateur ne prend pas en charge les notifications push.
-              </p>
+              <p className="text-sm font-medium">{t("push.unsupportedTitle")}</p>
+              <p className="text-xs text-muted-foreground mt-0.5">{t("push.unsupportedDesc")}</p>
             </div>
           </div>
         )}

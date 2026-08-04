@@ -1,4 +1,5 @@
 import { useEffect, useState, type ReactNode } from "react";
+import { useTranslation } from "react-i18next";
 import { useIsMobile } from "@/hooks/use-mobile";
 import {
   Sheet,
@@ -62,6 +63,7 @@ export type DestructiveConfirmSheetProps = DelayProps | TypeProps | SimpleProps;
  * Renders as a bottom sheet on mobile, a centered dialog on desktop.
  */
 export function DestructiveConfirmSheet(props: DestructiveConfirmSheetProps) {
+  const { t } = useTranslation();
   const {
     open,
     onOpenChange,
@@ -69,7 +71,7 @@ export function DestructiveConfirmSheet(props: DestructiveConfirmSheetProps) {
     description,
     consequences,
     confirmLabel,
-    cancelLabel = "Annuler",
+    cancelLabel = t("common.cancel"),
     onConfirm,
     loading,
   } = props;
@@ -126,8 +128,7 @@ export function DestructiveConfirmSheet(props: DestructiveConfirmSheetProps) {
       {props.mode === "type" && (
         <div className="space-y-2">
           <label className="text-xs text-muted-foreground">
-            Tape <span className="font-mono font-semibold text-foreground">{confirmWord}</span> pour
-            débloquer
+            {t("destructiveConfirm.typeToUnlock", { word: confirmWord })}
           </label>
           <Input
             value={typed}

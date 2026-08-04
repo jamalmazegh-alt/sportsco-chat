@@ -258,20 +258,20 @@ function TournamentsList() {
             </div>
             <div className="min-w-0 flex-1">
               <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-white/75">
-                Organisateur
+                {t("list.ctaEyebrow")}
               </p>
               <p
                 className="font-display text-[17px] font-extrabold leading-snug"
                 style={{ letterSpacing: "-0.3px" }}
               >
-                Créez votre tournoi en 30 s avec l'IA
+                {t("list.ctaTitle")}
               </p>
               <p className="mt-1 text-[13px] text-white/85">
                 {hasAnnual
-                  ? "Pass Annuel actif — création illimitée."
+                  ? t("list.ctaAnnualActive")
                   : singlesLeft > 0
-                    ? `${singlesLeft} crédit${singlesLeft > 1 ? "s" : ""} tournoi disponible${singlesLeft > 1 ? "s" : ""}.`
-                    : "Choisissez un plan — à partir de 39 €."}
+                    ? t("list.ctaCredits", { count: singlesLeft })
+                    : t("list.ctaChoosePlan")}
               </p>
             </div>
           </div>
@@ -284,13 +284,13 @@ function TournamentsList() {
                 disabled={!effectiveClubId}
               >
                 <Zap className="h-4 w-4" />
-                Créer maintenant
+                {t("list.ctaCreateNow")}
               </Button>
             ) : (
               <Button asChild size="sm" className="bg-card text-emerald-800 hover:bg-card/90">
                 <Link to="/tournaments/pricing">
                   <Trophy className="h-4 w-4" />
-                  Voir les plans
+                  {t("list.viewPlans")}
                 </Link>
               </Button>
             )}
@@ -302,7 +302,7 @@ function TournamentsList() {
                 variant="outline"
                 className="border-white/40 bg-card/10 text-white hover:bg-card/20 hover:text-white"
               >
-                <Link to="/tournaments/pricing">Voir les plans</Link>
+                <Link to="/tournaments/pricing">{t("list.viewPlans")}</Link>
               </Button>
             )}
           </div>
@@ -339,7 +339,7 @@ function TournamentsList() {
                   <ShimmerButton asChild>
                     <Link to="/tournaments/pricing">
                       <Trophy className="h-4 w-4" />
-                      Voir les plans
+                      {t("list.viewPlans")}
                     </Link>
                   </ShimmerButton>
                 )
@@ -425,7 +425,7 @@ function TournamentsList() {
               <ShimmerButton asChild className="w-full">
                 <Link to="/tournaments/pricing">
                   <Trophy className="h-4 w-4" />
-                  Acheter un crédit tournoi
+                  {t("list.buyCredit")}
                 </Link>
               </ShimmerButton>
             )

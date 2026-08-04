@@ -3,6 +3,7 @@ import { getPublicOrigin } from "@/lib/native-platform";
 import { loadStripe, type Stripe as StripeJs } from "@stripe/stripe-js";
 import { Elements, PaymentElement, useElements, useStripe } from "@stripe/react-stripe-js";
 import { useServerFn } from "@tanstack/react-start";
+import { useTranslation } from "react-i18next";
 import {
   Dialog,
   DialogContent,
@@ -24,6 +25,7 @@ function getStripePromise(pk: string) {
 }
 
 function SetupForm({ onSuccess, onCancel }: { onSuccess: () => void; onCancel: () => void }) {
+  const { t } = useTranslation();
   const stripe = useStripe();
   const elements = useElements();
   const [submitting, setSubmitting] = useState(false);
@@ -42,12 +44,12 @@ function SetupForm({ onSuccess, onCancel }: { onSuccess: () => void; onCancel: (
       },
     });
     if (confirmError) {
-      setError(confirmError.message ?? "Erreur lors de l'enregistrement de la carte");
+      setError(confirmError.message ?? t("billing.errorSaveCard"));
       setSubmitting(false);
       return;
     }
     if (setupIntent && setupIntent.status === "succeeded") {
-      toast.success("Carte bancaire mise à jour.");
+      toast.success(t("billing.toastCardUpdated"));
       onSuccess();
       return;
     }
@@ -60,10 +62,10 @@ function SetupForm({ onSuccess, onCancel }: { onSuccess: () => void; onCancel: (
       {error && <p className="text-sm text-destructive">{error}</p>}
       <div className="flex gap-2 justify-end">
         <Button type="button" variant="ghost" onClick={onCancel} disabled={submitting}>
-          Annuler
+          {t("common.cancel")}
         </Button>
         <Button type="submit" disabled={!stripe || !elements || submitting}>
-          {submitting ? <Loader2 className="h-4 w-4 animate-spin" /> : "Enregistrer"}
+          {submitting ? <Loader2 className="h-4 w-4 animate-spin" /> : t("common.save")}
         </Button>
       </div>
     </form>
@@ -81,6 +83,7 @@ export function UpdateCardDialog({
   clubId: string | null;
   onSuccess?: () => void;
 }) {
+  const { t, i18n } = useTranslation();
   const createIntent = useServerFn(createCardSetupIntent);
   const [state, setState] = useState<{
     clientSecret: string;
@@ -100,7 +103,7 @@ export function UpdateCardDialog({
         setState({ clientSecret: res.clientSecret, publishableKey: res.publishableKey });
       })
       .catch((e) => {
-        toast.error(e instanceof Error ? e.message : "Impossible de préparer la mise à jour");
+        toast.error(e instanceof Error ? e.message : t("billing.errorCardSetup"));
         onOpenChange(false);
       })
       .finally(() => setLoading(false));
@@ -118,14 +121,14 @@ export function UpdateCardDialog({
     [state],
   );
 
+  const stripeLocale = (i18n.language || "en").slice(0, 2);
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>Changer la carte bancaire</DialogTitle>
-          <DialogDescription>
-            Votre nouvelle carte remplacera l'actuelle pour les prochains prélèvements.
-          </DialogDescription>
+          <DialogTitle>{t("billing.updateCardTitle")}</DialogTitle>
+          <DialogDescription>{t("billing.updateCardDescription")}</DialogDescription>
         </DialogHeader>
         {loading || !state || !stripePromise ? (
           <div className="flex justify-center py-10">
@@ -137,7 +140,7 @@ export function UpdateCardDialog({
             options={{
               clientSecret: state.clientSecret,
               appearance: { theme: "stripe" },
-              locale: "fr",
+              locale: stripeLocale,
             }}
           >
             <SetupForm

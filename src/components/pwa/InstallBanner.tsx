@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { X, Download, Smartphone } from "lucide-react";
 
 // iOS "More" icon (three horizontal dots), matches Safari bottom-bar menu button
@@ -81,6 +82,7 @@ export function InstallBanner() {
 }
 
 function InstallBannerWeb() {
+  const { t } = useTranslation();
   const [visible, setVisible] = useState(false);
   const [deferred, setDeferred] = useState<BeforeInstallPromptEvent | null>(null);
   const [showIOSGuide, setShowIOSGuide] = useState(false);
@@ -159,11 +161,9 @@ function InstallBannerWeb() {
             <Smartphone className="h-5 w-5" />
           </div>
           <div className="flex-1 min-w-0">
-            <p className="font-semibold text-sm text-gray-900">Installer Clubero</p>
+            <p className="font-semibold text-sm text-gray-900">{t("install.bannerTitle")}</p>
             <p className="text-xs text-gray-600 mt-0.5 leading-snug">
-              {ios
-                ? "Installez l'app pour activer les notifications"
-                : "Recevez vos convocations en temps réel"}
+              {ios ? t("install.bannerDescIos") : t("install.bannerDescAndroid")}
             </p>
             <div className="mt-2.5 flex items-center gap-2 flex-wrap">
               <button
@@ -172,7 +172,7 @@ function InstallBannerWeb() {
                 className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-gradient-to-br from-[#1d7a45] to-[#15583a] text-white text-xs font-semibold shadow-sm hover:opacity-90 transition"
               >
                 <Download className="h-3.5 w-3.5" />
-                Installer
+                {t("install.bannerInstall")}
               </button>
               <button
                 type="button"
@@ -187,13 +187,13 @@ function InstallBannerWeb() {
                 }}
                 className="text-xs text-gray-600 hover:text-gray-900 underline underline-offset-2"
               >
-                Déjà installée
+                {t("install.bannerAlready")}
               </button>
             </div>
           </div>
           <button
             type="button"
-            aria-label="Fermer"
+            aria-label={t("push.close")}
             onClick={dismiss}
             className="-mr-1 -mt-1 p-1.5 rounded-lg hover:bg-gray-100 transition"
           >
@@ -211,20 +211,20 @@ function InstallBannerWeb() {
             className="bg-white rounded-2xl shadow-2xl max-w-sm w-full p-6"
             onClick={(e) => e.stopPropagation()}
           >
-            <h2 className="text-lg font-bold text-gray-900 mb-1">Installer sur iPhone</h2>
-            <p className="text-xs text-gray-500 mb-4">3 étapes dans Safari</p>
+            <h2 className="text-lg font-bold text-gray-900 mb-1">{t("install.iosGuideTitle")}</h2>
+            <p className="text-xs text-gray-500 mb-4">{t("install.iosGuideSubtitle")}</p>
             <ol className="space-y-3 text-sm">
               <li className="flex gap-3 items-start">
                 <span className="h-7 w-7 shrink-0 rounded-full bg-emerald-50 text-[#1d7a45] flex items-center justify-center font-bold text-xs">
                   1
                 </span>
                 <span className="flex-1 pt-0.5 text-gray-700 inline-flex items-center gap-1.5 flex-wrap">
-                  Appuyez sur les
+                  {t("install.iosStep1Before")}
                   <span className="inline-flex items-center gap-1 rounded-md bg-gray-100 px-1.5 py-0.5 text-gray-900">
                     <IOSMoreIcon className="h-4 w-4" />
-                    <span className="text-[12px] font-medium">3 petits points</span>
+                    <span className="text-[12px] font-medium">{t("install.iosStep1Icon")}</span>
                   </span>
-                  en bas de Safari
+                  {t("install.iosStep1After")}
                 </span>
               </li>
               <li className="flex gap-3 items-start">
@@ -232,10 +232,10 @@ function InstallBannerWeb() {
                   2
                 </span>
                 <span className="flex-1 pt-0.5 text-gray-700 inline-flex items-center gap-1.5 flex-wrap">
-                  Choisissez
+                  {t("install.iosStep2Before")}
                   <span className="inline-flex items-center gap-1 rounded-md bg-gray-100 px-1.5 py-0.5 text-gray-900">
                     <IOSShareIcon className="h-4 w-4" />
-                    <span className="text-[12px] font-medium">Partager</span>
+                    <span className="text-[12px] font-medium">{t("install.iosStep2Icon")}</span>
                   </span>
                 </span>
               </li>
@@ -244,12 +244,12 @@ function InstallBannerWeb() {
                   3
                 </span>
                 <span className="flex-1 pt-0.5 text-gray-700 inline-flex items-center gap-1.5 flex-wrap">
-                  Choisissez
+                  {t("install.iosStep4Before")}
                   <span className="inline-flex items-center gap-1 rounded-md bg-gray-100 px-1.5 py-0.5 text-gray-900">
                     <IOSAddIcon className="h-4 w-4" />
-                    <span className="text-[12px] font-medium">Sur l'écran d'accueil</span>
+                    <span className="text-[12px] font-medium">{t("install.iosStep4Icon")}</span>
                   </span>
-                  puis appuyez sur « Ajouter »
+                  {t("install.iosStep4After")}
                 </span>
               </li>
             </ol>
@@ -266,7 +266,7 @@ function InstallBannerWeb() {
               }}
               className="mt-5 w-full py-2.5 rounded-xl bg-gradient-to-br from-[#1d7a45] to-[#15583a] text-white font-semibold text-sm shadow-md hover:opacity-90 transition"
             >
-              J'ai compris
+              {t("install.gotIt")}
             </button>
           </div>
         </div>

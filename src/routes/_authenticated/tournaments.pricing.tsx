@@ -3,6 +3,7 @@ import { getPublicOrigin } from "@/lib/native-platform";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Trophy, Check, Sparkles, Loader2, ArrowLeft } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -22,24 +23,18 @@ export const Route = createFileRoute("/_authenticated/tournaments/pricing")({
   head: () => ({
     meta: [
       {
-        title: i18n.t("pricing.metaTitle", {
-          ns: "tournaments",
-          defaultValue: "Facturation tournois — Clubero",
-        }),
+        title: i18n.t("pricing.metaTitle", { ns: "tournaments" }),
       },
       {
         name: "description",
-        content: i18n.t("pricing.metaDesc", {
-          ns: "tournaments",
-          defaultValue:
-            "Choisissez votre plan pour organiser un tournoi avec Clubero — 39€ à l'unité ou 149€/an en illimité.",
-        }),
+        content: i18n.t("pricing.metaDesc", { ns: "tournaments" }),
       },
     ],
   }),
 });
 
 function TournamentPricingPage() {
+  const { t, i18n: i18nInst } = useTranslation("tournaments");
   const navigate = useNavigate();
   const search = Route.useSearch();
   const checkoutFn = useServerFn(createTournamentPlanCheckout);
@@ -64,7 +59,7 @@ function TournamentPricingPage() {
     onSuccess: (res) => {
       if (res.url) window.location.href = res.url;
       else {
-        toast.error("Impossible d'initier le paiement");
+        toast.error(t("pricing.checkoutError"));
         setPendingPlan(null);
       }
     },
@@ -75,6 +70,9 @@ function TournamentPricingPage() {
   });
 
   const hasAnnual = !!entQ.data?.activeAnnual;
+  const annualUntil = entQ.data?.activeAnnual?.valid_until
+    ? new Date(entQ.data.activeAnnual.valid_until!).toLocaleDateString(i18nInst.language)
+    : "—";
 
   return (
     <div className="min-h-screen bg-background pb-16">
@@ -100,22 +98,21 @@ function TournamentPricingPage() {
             onClick={() => navigate({ to: "/tournaments" })}
           >
             <ArrowLeft className="h-4 w-4" />
-            Retour aux tournois
+            {t("pricing.backToTournaments")}
           </Button>
           <div className="flex items-center gap-3">
             <div className="flex h-12 w-12 items-center justify-center rounded-full bg-white/15 backdrop-blur">
               <Trophy className="h-6 w-6" />
             </div>
             <div>
-              <p className="text-xs uppercase tracking-wider text-white/80">Facturation tournois</p>
-              <h1 className="font-display text-2xl font-bold sm:text-3xl">
-                Lancez votre tournoi en 30 secondes
-              </h1>
+              <p className="text-xs uppercase tracking-wider text-white/80">
+                {t("pricing.eyebrow")}
+              </p>
+              <h1 className="font-display text-2xl font-bold sm:text-3xl">{t("pricing.title")}</h1>
             </div>
           </div>
           <p className="mt-4 max-w-xl text-sm text-white/90 sm:text-base">
-            Notre assistant IA configure votre tournoi en quelques questions — poules, phases
-            finales, planning. Choisissez votre plan ci-dessous.
+            {t("pricing.subtitle")}
           </p>
         </div>
       </header>
@@ -123,7 +120,7 @@ function TournamentPricingPage() {
       {search.canceled && (
         <div className="mx-auto mt-6 max-w-3xl px-5">
           <div className="rounded-xl border border-amber-300 bg-amber-50 px-4 py-3 text-sm text-amber-900">
-            Paiement annulé. Vous pouvez réessayer quand vous le souhaitez.
+            {t("pricing.canceled")}
           </div>
         </div>
       )}
@@ -132,11 +129,7 @@ function TournamentPricingPage() {
         <div className="mx-auto mt-6 max-w-3xl px-5">
           <div className="rounded-xl border border-emerald-300 bg-emerald-50 px-4 py-3 text-sm text-emerald-900 flex items-center gap-2">
             <Check className="h-4 w-4" />
-            Vous avez déjà un <strong>Pass Annuel</strong> actif — création illimitée jusqu'au{" "}
-            {entQ.data?.activeAnnual?.valid_until
-              ? new Date(entQ.data.activeAnnual.valid_until!).toLocaleDateString("fr-FR")
-              : "—"}
-            .
+            {t("pricing.annualActive", { date: annualUntil })}
           </div>
         </div>
       )}
@@ -145,18 +138,18 @@ function TournamentPricingPage() {
       <section className="mx-auto mt-10 grid max-w-4xl gap-5 px-5 sm:grid-cols-2">
         {/* Plan 1 — Single */}
         <PlanCard
-          name="Tournoi unique"
+          name={t("pricing.singleName")}
           price="39 €"
-          per="HT, paiement unique"
-          tagline="Pour organiser un tournoi ponctuel"
+          per={t("pricing.singlePer")}
+          tagline={t("pricing.singleTagline")}
           features={[
-            "1 tournoi à organiser",
-            "Création en 30 s avec l'IA",
-            "Poules, phases finales, classements",
-            "Inscriptions en ligne & TV publique",
-            "Pas d'expiration",
+            t("pricing.singleF1"),
+            t("pricing.singleF2"),
+            t("pricing.singleF3"),
+            t("pricing.singleF4"),
+            t("pricing.singleF5"),
           ]}
-          cta="Créer mon tournoi — 39 €"
+          cta={t("pricing.singleCta")}
           loading={checkout.isPending && pendingPlan === "single"}
           onClick={() => checkout.mutate("single")}
           disabled={hasAnnual}
@@ -164,29 +157,29 @@ function TournamentPricingPage() {
 
         {/* Plan 2 — Annual */}
         <PlanCard
-          name="Pass Annuel"
+          name={t("pricing.annualName")}
           price="149 €"
-          per="HT / an, sans engagement"
-          tagline="Tournois illimités pendant 12 mois"
+          per={t("pricing.annualPer")}
+          tagline={t("pricing.annualTagline")}
           features={[
-            "Tournois illimités",
-            "Renouvellement automatique annuel",
-            "Toutes les fonctionnalités Pro",
-            "Économisez dès le 4ème tournoi",
-            "Support prioritaire",
+            t("pricing.annualF1"),
+            t("pricing.annualF2"),
+            t("pricing.annualF3"),
+            t("pricing.annualF4"),
+            t("pricing.annualF5"),
           ]}
           highlight
-          badge="MEILLEURE VALEUR"
-          cta={hasAnnual ? "Pass actif" : "Prendre le Pass — 149 €/an"}
+          badge={t("pricing.annualBadge")}
+          cta={hasAnnual ? t("pricing.annualActiveCta") : t("pricing.annualCta")}
           loading={checkout.isPending && pendingPlan === "annual"}
           onClick={() => checkout.mutate("annual")}
           disabled={hasAnnual}
-          footnote="Économie réalisée dès 4 tournois (149 € au lieu de 156 €)"
+          footnote={t("pricing.annualFootnote")}
         />
       </section>
 
       <p className="mx-auto mt-8 max-w-3xl px-5 text-center text-xs text-muted-foreground">
-        Paiement sécurisé via Stripe · Facture automatique · TVA collectée selon votre pays
+        {t("pricing.securePayment")}
       </p>
 
       <div className="mx-auto mt-6 max-w-3xl px-5 text-center">
@@ -194,7 +187,7 @@ function TournamentPricingPage() {
           to="/tournaments"
           className="text-sm text-muted-foreground hover:text-primary underline-offset-4 hover:underline"
         >
-          ← Retour
+          {t("pricing.back")}
         </Link>
       </div>
     </div>

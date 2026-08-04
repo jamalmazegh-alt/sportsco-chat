@@ -332,7 +332,7 @@ function EventDetail() {
   async function shareLineupAsImage(messageText: string) {
     const node = lineupCardRef.current;
     if (!node) {
-      toast.error("Compo non disponible");
+      toast.error(t("lineup.shareUnavailable"));
       return;
     }
     setSharingLineup(true);

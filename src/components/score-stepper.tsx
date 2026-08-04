@@ -1,4 +1,5 @@
 import { Minus, Plus } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import { cn } from "@/lib/utils";
 
 interface ScoreStepperProps {
@@ -30,6 +31,7 @@ export function ScoreStepper({
   responsiveLg = false,
   disabled,
 }: ScoreStepperProps) {
+  const { t } = useTranslation();
   const dec = () => onChange(Math.max(min, value - 1));
   const inc = () => onChange(Math.min(max, value + 1));
 
@@ -61,7 +63,7 @@ export function ScoreStepper({
           type="button"
           onClick={dec}
           disabled={disabled || value <= min}
-          aria-label="Diminuer"
+          aria-label={t("scoreStepper.decrease")}
           className={cn(
             "flex items-center justify-center rounded-full border-[1.5px] border-slate-200 bg-white text-slate-700 transition-all hover:border-slate-300 hover:bg-slate-50 active:scale-90 disabled:cursor-not-allowed disabled:opacity-40 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-slate-800",
             sizes.btn,
@@ -83,7 +85,7 @@ export function ScoreStepper({
           type="button"
           onClick={inc}
           disabled={disabled || value >= max}
-          aria-label="Augmenter"
+          aria-label={t("scoreStepper.increase")}
           className={cn(
             "flex items-center justify-center rounded-full text-white transition-all hover:-translate-y-0.5 active:scale-90 disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:translate-y-0",
             sizes.btn,

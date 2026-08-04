@@ -1,6 +1,8 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { getPublicOrigin } from "@/lib/native-platform";
 import { useState, type FormEvent } from "react";
+import { useTranslation } from "react-i18next";
+import i18n from "@/lib/i18n";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -17,11 +19,10 @@ export const Route = createFileRoute("/register_/player")({
   component: RegisterPlayerPage,
   head: () => ({
     meta: [
-      { title: "Crée ton profil joueur — Clubero" },
+      { title: i18n.t("registerPlayer.metaTitle") },
       {
         name: "description",
-        content:
-          "Rejoins Clubero comme joueur indépendant. Crée ton profil sportif en quelques minutes.",
+        content: i18n.t("registerPlayer.metaDescription"),
       },
     ],
   }),
@@ -35,6 +36,7 @@ function isMinor(birth: string) {
 }
 
 function RegisterPlayerPage() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [step, setStep] = useState(1);
   const [busy, setBusy] = useState(false);
@@ -62,7 +64,7 @@ function RegisterPlayerPage() {
     e.preventDefault();
     if (busy) return;
     if (minor && !parentalConsent) {
-      toast.error("Un parent doit approuver le profil public.");
+      toast.error(t("registerPlayer.parentalRequired"));
       return;
     }
     setBusy(true);
@@ -82,7 +84,7 @@ function RegisterPlayerPage() {
       if (signUpErr) throw signUpErr;
       const userId = signUpData.user?.id;
       if (!userId) {
-        toast.success("Vérifie ton email pour confirmer ton inscription.");
+        toast.success(t("auth.checkEmail"));
         navigate({ to: "/login" });
         return;
       }
@@ -110,10 +112,10 @@ function RegisterPlayerPage() {
         preferred_position: position || null,
       } as any);
 
-      toast.success("Profil créé !");
+      toast.success(t("registerPlayer.successToast"));
       navigate({ to: "/" });
     } catch (err: any) {
-      toast.error(err?.message ?? "Erreur lors de l'inscription");
+      toast.error(err?.message ?? t("auth.signupError"));
     } finally {
       setBusy(false);
     }
@@ -123,15 +125,17 @@ function RegisterPlayerPage() {
     <div className="min-h-screen bg-gradient-to-b from-primary/5 to-background flex items-center justify-center px-5 py-10">
       <div className="w-full max-w-md rounded-2xl border border-border/60 bg-card p-8 shadow-sm">
         <img src={logo} alt="Clubero" className="mx-auto mb-6 h-14 w-auto object-contain" />
-        <h1 className="text-center text-2xl font-bold">Crée ton profil joueur</h1>
-        <p className="mt-1 text-center text-sm text-muted-foreground">Étape {step} sur 3</p>
+        <h1 className="text-center text-2xl font-bold">{t("registerPlayer.title")}</h1>
+        <p className="mt-1 text-center text-sm text-muted-foreground">
+          {t("registerPlayer.step", { step })}
+        </p>
 
         <form onSubmit={submit} className="mt-6 space-y-4">
           {step === 1 && (
             <>
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <Label htmlFor="fn">Prénom</Label>
+                  <Label htmlFor="fn">{t("auth.firstName")}</Label>
                   <Input
                     id="fn"
                     required
@@ -140,7 +144,7 @@ function RegisterPlayerPage() {
                   />
                 </div>
                 <div>
-                  <Label htmlFor="ln">Nom</Label>
+                  <Label htmlFor="ln">{t("auth.lastName")}</Label>
                   <Input
                     id="ln"
                     required
@@ -150,7 +154,7 @@ function RegisterPlayerPage() {
                 </div>
               </div>
               <div>
-                <Label htmlFor="bd">Date de naissance</Label>
+                <Label htmlFor="bd">{t("auth.birthDate")}</Label>
                 <Input
                   id="bd"
                   type="date"
@@ -160,7 +164,7 @@ function RegisterPlayerPage() {
                 />
               </div>
               <div>
-                <Label htmlFor="em">Email</Label>
+                <Label htmlFor="em">{t("auth.email")}</Label>
                 <Input
                   id="em"
                   type="email"
@@ -170,7 +174,7 @@ function RegisterPlayerPage() {
                 />
               </div>
               <div>
-                <Label htmlFor="pw">Mot de passe</Label>
+                <Label htmlFor="pw">{t("auth.password")}</Label>
                 <PasswordInput
                   id="pw"
                   required
@@ -185,7 +189,7 @@ function RegisterPlayerPage() {
                 onClick={() => setStep(2)}
                 disabled={!firstName || !lastName || !birthDate || !email || password.length < 8}
               >
-                Continuer
+                {t("common.continue")}
               </Button>
             </>
           )}
@@ -193,39 +197,39 @@ function RegisterPlayerPage() {
           {step === 2 && (
             <>
               <div>
-                <Label htmlFor="sp">Sport principal</Label>
+                <Label htmlFor="sp">{t("registerPlayer.mainSport")}</Label>
                 <SportSelect
                   value={sport}
                   onValueChange={(v) => {
                     setSport(v);
                     setPosition("");
                   }}
-                  placeholder="Choisis ton sport"
+                  placeholder={t("registerPlayer.sportPlaceholder")}
                 />
               </div>
               <div>
-                <Label htmlFor="po">Poste préféré</Label>
+                <Label htmlFor="po">{t("registerPlayer.preferredPosition")}</Label>
                 <PositionCombobox
                   value={position}
                   onChange={setPosition}
                   sport={sport}
-                  placeholder="Optionnel"
+                  placeholder={t("common.optional")}
                 />
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <Label htmlFor="ci">Ville</Label>
+                  <Label htmlFor="ci">{t("registerPlayer.city")}</Label>
                   <Input id="ci" value={city} onChange={(e) => setCity(e.target.value)} />
                 </div>
                 <div>
-                  <Label htmlFor="co">Pays</Label>
+                  <Label htmlFor="co">{t("registerPlayer.country")}</Label>
                   <select
                     id="co"
                     value={country}
                     onChange={(e) => setCountry(e.target.value)}
                     className="h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
                   >
-                    <option value="">Choisir…</option>
+                    <option value="">{t("registerPlayer.countryPlaceholder")}</option>
                     <option value="France">France</option>
                     <option value="Belgique">Belgique</option>
                     <option value="Suisse">Suisse</option>
@@ -241,7 +245,7 @@ function RegisterPlayerPage() {
                     <option value="Martinique">Martinique</option>
                     <option value="Polynésie française">Polynésie française</option>
                     <option value="Nouvelle-Calédonie">Nouvelle-Calédonie</option>
-                    <option value="Autre">Autre</option>
+                    <option value="Autre">{t("registerPlayer.countryOther")}</option>
                   </select>
                 </div>
               </div>
@@ -252,7 +256,7 @@ function RegisterPlayerPage() {
                   className="flex-1"
                   onClick={() => setStep(1)}
                 >
-                  Retour
+                  {t("common.back")}
                 </Button>
                 <Button
                   type="button"
@@ -260,7 +264,7 @@ function RegisterPlayerPage() {
                   onClick={() => setStep(3)}
                   disabled={!sport}
                 >
-                  Continuer
+                  {t("common.continue")}
                 </Button>
               </div>
             </>
@@ -269,11 +273,10 @@ function RegisterPlayerPage() {
           {step === 3 && (
             <>
               <div className="rounded-lg border border-border/60 bg-muted/30 p-4 text-sm">
-                Ton profil est privé par défaut. Tu pourras le rendre public depuis tes paramètres.
+                {t("registerPlayer.privacyHint")}
                 {minor && (
                   <p className="mt-2 text-xs text-amber-700 dark:text-amber-400">
-                    Tu es mineur : un parent/tuteur doit approuver la publication d'un profil
-                    public.
+                    {t("registerPlayer.minorHint")}
                   </p>
                 )}
               </div>
@@ -284,7 +287,7 @@ function RegisterPlayerPage() {
                     checked={parentalConsent}
                     onCheckedChange={(v) => setParentalConsent(v === true)}
                   />
-                  <span>Mon parent/tuteur approuve la création de mon profil public.</span>
+                  <span>{t("registerPlayer.parentalConsent")}</span>
                 </label>
               )}
 
@@ -293,7 +296,7 @@ function RegisterPlayerPage() {
                   checked={lookingForClub}
                   onCheckedChange={(v) => setLookingForClub(v === true)}
                 />
-                <span>Je recherche un club</span>
+                <span>{t("registerPlayer.lookingForClub")}</span>
               </label>
 
               <div className="flex gap-2">
@@ -303,10 +306,10 @@ function RegisterPlayerPage() {
                   className="flex-1"
                   onClick={() => setStep(2)}
                 >
-                  Retour
+                  {t("common.back")}
                 </Button>
                 <Button type="submit" className="flex-1" disabled={busy}>
-                  {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : "Créer mon profil"}
+                  {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : t("registerPlayer.submit")}
                 </Button>
               </div>
             </>
@@ -314,9 +317,9 @@ function RegisterPlayerPage() {
         </form>
 
         <p className="mt-5 text-center text-sm text-muted-foreground">
-          Déjà un compte ?{" "}
+          {t("auth.hasAccount")}{" "}
           <Link to="/login" className="font-semibold text-primary hover:underline">
-            Se connecter
+            {t("auth.login")}
           </Link>
         </p>
       </div>
