@@ -205,7 +205,7 @@
     "accepted": "Uitnodiging geaccepteerd",
     "noAccountPrompt": "Om deze uitnodiging te accepteren, maakt u uw Clubero-account aan met het uitgenodigde e-mailadres of logt u in als u er al een heeft.",
     "createAccount": "Maak mijn account aan",
-    "useExactEmail": "Use the email {{email}} so the invitation is recognized."
+    "useExactEmail": "Gebruik het e-mailadres {{email}} zodat de uitnodiging wordt herkend."
   },
   "passSuccess": {
     "metaTitle": "Toernooipas bevestigd — Clubero",
@@ -498,8 +498,8 @@
     "title": "Speler · {{team}}",
     "import": {
       "empty": "Er zijn geen spelers gedetecteerd in het bestand.",
-      "blocked": "Import blocked: {{total}} players exceed the limit of {{max}}. Reduce the file or choose “Replace”.",
-      "ok": "{{n}} player(s) imported",
+      "blocked": "Import geblokkeerd: {{total}} spelers overschrijden de limiet van {{max}}. Verklein het bestand of kies \"Vervangen\".",
+      "ok": "{{n}} speler(s) geïmporteerd",
       "button": "CSV importeren",
       "title": "Spelers importeren",
       "desc": "CSV-formaat: voornaam, achternaam, truinummer, positie, is_aanvoerder. Afscheiders , ; of tabblad geaccepteerd.",
@@ -546,9 +546,9 @@
     "metaTitle": "Samenstelling van het rooster",
     "invalidTitle": "Ongeldige link",
     "invalidBody": "Deze roosterlink is ongeldig of verlopen.",
-    "tooMany": "Roster limited to {{max}} players.",
+    "tooMany": "Selectie beperkt tot {{max}} spelers.",
     "saved": "Rooster opgeslagen",
-    "heading": "Roster — {{team}}",
+    "heading": "Selectie - {{team}}",
     "logo": {
       "none": "Geen embleem",
       "title": "Teamlogo",
@@ -561,11 +561,11 @@
     },
     "pendingTitle": "Aanvraag wordt beoordeeld",
     "pendingBody": "Zodra de organisatie uw registratie heeft goedgekeurd, kunt u via dezelfde link spelers toevoegen of bewerken.",
-    "playersLabelMax": "Players ({{count}} / {{max}})",
-    "remaining": "{{n}} spot(s) left",
+    "playersLabelMax": "Spelers ({{count}} / {{max}})",
+    "remaining": "{{n}} plaats(en) over",
     "captain": "Kapitein",
     "setCaptain": "Kapitein instellen",
-    "lastSaved": "Last saved: {{date}}",
+    "lastSaved": "Laatst opgeslagen: {{date}}",
     "save": "Opslaan"
   },
   "wizard": {
@@ -614,14 +614,14 @@
     "formatSwissDesc": "Paringen op stand per ronde, vast aantal ronden",
     "swissRounds": "Aantal ronden",
     "swissRoundsHint": "Aanbevolen: ceil(log₂(teams)) — 8 ≈ 3, 16 ≈ 4, 32 ≈ 5.",
-    "formatFlightedFinals": "Flighted finales",
+    "formatFlightedFinals": "Finales in poules",
     "formatFlightedFinalsDesc": "Poulefase gevolgd door meerdere parallelle finaletabellen (Champions, Europa…)",
     "formatConsolation": "Consolatie",
     "formatConsolationDesc": "Hoofdtabel + consolatietabel voor vroeg uitgeschakelde teams",
-    "stepEyebrow": "Step 1 / 4",
-    "stepEyebrow2": "Step 2 / 4",
-    "stepEyebrow3": "Step 3 / 4",
-    "stepEyebrow4": "Step 4 / 4"
+    "stepEyebrow": "Stap 1 / 4",
+    "stepEyebrow2": "Stap 2 / 4",
+    "stepEyebrow3": "Stap 3 / 4",
+    "stepEyebrow4": "Stap 4 / 4"
   },
   "groups": {
     "drawTitle": "Loting",
@@ -883,7 +883,7 @@
       "cancelled": "Geannuleerd"
     },
     "statusAria": "Status van de wedstrijd",
-    "liveScore": "Live score",
+    "liveScore": "Livescore",
     "fullEntry": "Volledige invoer",
     "finishMatch": "Wedstrijd beëindigen",
     "tbd": "Nog te bepalen",
@@ -1172,7 +1172,7 @@
     "beFirst": "Wees het eerste Team dat zich aanmeldt!",
     "podium": "Ereprijzen",
     "topScorer": "Topscorer",
-    "fairPlay": "Fair Play",
+    "fairPlay": "Fair play",
     "registrationConfirmed": "Je registratie is bevestigd.",
     "programmeComingSoon": "Het programma wordt binnenkort gepubliceerd.",
     "viewRules": "Reglement bekijken",
@@ -1189,7 +1189,7 @@
     "rules": "Reglement",
     "finalStandings": "Eindstand",
     "allResults": "Alle resultaten",
-    "registrationOpensAt": "Registration opens on {{date}}"
+    "registrationOpensAt": "Inschrijving opent op {{date}}"
   },
   "flights": {
     "title": "Flights / finalefasen",
@@ -1218,7 +1218,7 @@
       "consolation": "Hoofd / Troostronde"
     },
     "dist": {
-      "twoFlights": "2 Flights (top + rest)",
+      "twoFlights": "2 poules (top + rest)",
       "twoFlightsBalanced": "2 gebalanceerde Flights",
       "threeFlights": "3 Flights (elite + 2 niveaus)",
       "threeEqual": "3 gelijke Flights",
@@ -1238,7 +1238,7 @@
       "consolationDesc": "Maakt 2 flights: Hoofd (groepswinnaars) en Troostronde (verliezers). Klaar om op te slaan."
     },
     "public": {
-      "empty": "No flights configured yet.",
+      "empty": "Er zijn nog geen poules ingesteld.",
       "noMatches": "Matches will be generated after group stage."
     },
     "templatesDesc": {
@@ -1581,22 +1581,22 @@
     "phaseFinal": "Finale"
   },
   "rulesAi": {
-    "generate": "Générer un règlement avec lIA",
+    "generate": "Reglement genereren met AI",
     "modalTitle": "Règlement proposé",
-    "modalDescription": "Prévisualise, puis insère ou régénère.",
+    "modalDescription": "Bekijk de preview en voeg in of genereer opnieuw.",
     "insert": "Insérer dans le règlement",
     "regenerate": "Regénérer",
     "close": "Fermer",
     "loading": "Génération en cours…",
-    "rateLimited": "Limite quotidienne atteinte. Voici un modèle de base.",
+    "rateLimited": "Daglimiet bereikt. Hier is een basisreglement.",
     "error": "Génération indisponible. Voici un modèle de base."
   },
   "coachInsightsAi": {
     "refresh": "Actualiser",
     "refreshing": "Actualisation…",
     "refreshDone": "Insights mis à jour",
-    "refreshLimited": "Tu as déjà actualisé aujourdhui. Réessaie demain.",
-    "refreshError": "Impossible dactualiser pour le moment."
+    "refreshLimited": "Je hebt vandaag al vernieuwd. Probeer het morgen opnieuw.",
+    "refreshError": "Kan momenteel niet vernieuwen."
   },
   "pricing": {
     "metaTitle": "Toernooifacturatie — Clubero",

@@ -12,7 +12,7 @@
     "error": "Errore",
     "networkError": "Errore di rete",
     "required": "Campo obbligatorio",
-    "optional": "opzionale",
+    "optional": "facoltativo",
     "team": "Squadra",
     "teams": "Squadre",
     "match": "Partita",
@@ -53,7 +53,7 @@
       "flights": "Flights"
     },
     "sections": {
-      "live": "In diretta",
+      "live": "Live",
       "nowPlaying": "In corso",
       "upcoming": "Prossime partite",
       "recent": "Ultimi risultati",
@@ -112,7 +112,7 @@
     },
     "match": {
       "aet": "d.t.s.",
-      "pen": "PENNA"
+      "pen": "RIG"
     }
   },
   "register": {
@@ -205,7 +205,7 @@
     "accepted": "Invito accettato",
     "noAccountPrompt": "Per accettare questo invito, crea il tuo account Clubero con l'e-mail invitata o accedi se ne hai già uno.",
     "createAccount": "Crea il mio account",
-    "useExactEmail": "Use the email {{email}} so the invitation is recognized."
+    "useExactEmail": "Usa l'email {{email}} affinché l'invito venga riconosciuto."
   },
   "passSuccess": {
     "metaTitle": "Pass Torneo confermato — Clubero",
@@ -320,7 +320,7 @@
     "roleReferee": "Arbitro",
     "emailLabel": "Email",
     "emailPlaceholder": "nome@esempio.it",
-    "nameLabel": "Nome (opzionale)",
+    "nameLabel": "Nome (facoltativo)",
     "namePlaceholder": "Mario Rossi",
     "sendInvite": "Invia invito",
     "toastSent": "Invito inviato",
@@ -498,8 +498,8 @@
     "title": "Giocatori · {{team}}",
     "import": {
       "empty": "Nessun giocatore rilevato nel file.",
-      "blocked": "Import blocked: {{total}} players exceed the limit of {{max}}. Reduce the file or choose “Replace”.",
-      "ok": "{{n}} player(s) imported",
+      "blocked": "Importazione bloccata: {{total}} giocatori superano il limite di {{max}}. Riduci il file o scegli “Sostituisci”.",
+      "ok": "{{n}} giocatore/i importato/i",
       "button": "Importa CSV",
       "title": "Importa giocatori",
       "desc": "Formato CSV: nome, cognome, numero_maglia, posizione, è_capitano. Separatori , ; o scheda accettata.",
@@ -508,7 +508,7 @@
       "orPaste": "Oppure incolla il contenuto CSV:",
       "append": "Aggiungi all'elenco",
       "replace": "Sostituisci l'elenco",
-      "confirm": "Importare"
+      "confirm": "Importa"
     },
     "add": "Aggiungi",
     "empty": "Nessun giocatore. Aggiungi giocatori o importa un elenco.",
@@ -546,9 +546,9 @@
     "metaTitle": "Composizione dell'elenco",
     "invalidTitle": "Collegamento non valido",
     "invalidBody": "Questo collegamento all'elenco non è valido o è scaduto.",
-    "tooMany": "Roster limited to {{max}} players.",
+    "tooMany": "Convocati limitati a {{max}} giocatori.",
     "saved": "Elenco salvato",
-    "heading": "Roster — {{team}}",
+    "heading": "Convocati — {{team}}",
     "logo": {
       "none": "Nessun logo",
       "title": "Logo della squadra",
@@ -561,11 +561,11 @@
     },
     "pendingTitle": "Domanda in fase di revisione",
     "pendingBody": "Una volta che l'organizzazione avrà approvato la tua registrazione, potrai aggiungere o modificare giocatori da questo stesso link.",
-    "playersLabelMax": "Players ({{count}} / {{max}})",
-    "remaining": "{{n}} spot(s) left",
+    "playersLabelMax": "Giocatori ({{count}} / {{max}})",
+    "remaining": "{{n}} posto/i rimasto/i",
     "captain": "Capitano",
     "setCaptain": "Imposta il capitano",
-    "lastSaved": "Last saved: {{date}}",
+    "lastSaved": "Ultimo salvataggio: {{date}}",
     "save": "Salva"
   },
   "wizard": {
@@ -614,14 +614,14 @@
     "formatSwissDesc": "Accoppiamenti per classifica a ogni turno, numero di turni fisso",
     "swissRounds": "Numero di turni",
     "swissRoundsHint": "Consigliato: ceil(log₂(squadre)) — 8 ≈ 3, 16 ≈ 4, 32 ≈ 5.",
-    "formatFlightedFinals": "Finali a Flights",
+    "formatFlightedFinals": "Finali per fasce",
     "formatFlightedFinalsDesc": "Gironi seguiti da più tabelloni finali paralleli (Champions, Europa…)",
     "formatConsolation": "Consolazione",
     "formatConsolationDesc": "Tabellone principale + tabellone consolazione per le squadre eliminate presto",
-    "stepEyebrow": "Step 1 / 4",
-    "stepEyebrow2": "Step 2 / 4",
-    "stepEyebrow3": "Step 3 / 4",
-    "stepEyebrow4": "Step 4 / 4"
+    "stepEyebrow": "Passaggio 1 / 4",
+    "stepEyebrow2": "Passaggio 2 / 4",
+    "stepEyebrow3": "Passaggio 3 / 4",
+    "stepEyebrow4": "Passaggio 4 / 4"
   },
   "groups": {
     "drawTitle": "Sorteggio",
@@ -716,8 +716,8 @@
     "slotsGroups_one": "{{count}} girone",
     "slotsGroups_other": "{{count}} gironi",
     "slotsKnockout": "{{count}} posizioni",
-    "byes_one": "{{count}} riposo",
-    "byes_other": "{{count}} riposi",
+    "byes_one": "{{count}} bye",
+    "byes_other": "{{count}} bye",
     "tabAuto": "Automatico",
     "tabProgressive": "Progressivo",
     "tabManual": "Manuale",
@@ -883,7 +883,7 @@
       "cancelled": "Annullata"
     },
     "statusAria": "Stato della partita",
-    "liveScore": "Risultato in diretta",
+    "liveScore": "Punteggio live",
     "fullEntry": "Inserimento completo",
     "finishMatch": "Termina partita",
     "tbd": "Da definire",
@@ -1189,7 +1189,7 @@
     "rules": "Regolamento",
     "finalStandings": "Classifica finale",
     "allResults": "Tutti i risultati",
-    "registrationOpensAt": "Registration opens on {{date}}"
+    "registrationOpensAt": "Le iscrizioni aprono il {{date}}"
   },
   "flights": {
     "title": "Flights / fasi finali",
@@ -1218,7 +1218,7 @@
       "consolation": "Principale / Consolazione"
     },
     "dist": {
-      "twoFlights": "2 Flights (top + resto)",
+      "twoFlights": "2 fasce (migliori + resto)",
       "twoFlightsBalanced": "2 Flights equilibrati",
       "threeFlights": "3 Flights (élite + 2 livelli)",
       "threeEqual": "3 Flights uguali",
@@ -1238,7 +1238,7 @@
       "consolationDesc": "Crea 2 flights: Principale (vincitori dei gironi) e Consolazione (perdenti). Pronto da salvare."
     },
     "public": {
-      "empty": "No flights configured yet.",
+      "empty": "Nessuna fascia configurata al momento.",
       "noMatches": "Matches will be generated after group stage."
     },
     "templatesDesc": {
@@ -1280,7 +1280,7 @@
     },
     "counters": {
       "done": "Conclusi",
-      "live": "In corso",
+      "live": "Live",
       "upcoming": "Prossimi"
     },
     "settings": {
@@ -1581,22 +1581,22 @@
     "phaseFinal": "Finale"
   },
   "rulesAi": {
-    "generate": "Générer un règlement avec lIA",
+    "generate": "Genera un regolamento con l'IA",
     "modalTitle": "Règlement proposé",
-    "modalDescription": "Prévisualise, puis insère ou régénère.",
+    "modalDescription": "Visualizza l'anteprima, poi inserisci o rigenera.",
     "insert": "Insérer dans le règlement",
     "regenerate": "Regénérer",
     "close": "Fermer",
     "loading": "Génération en cours…",
-    "rateLimited": "Limite quotidienne atteinte. Voici un modèle de base.",
+    "rateLimited": "Limite giornaliero raggiunto. Ecco un modello di base.",
     "error": "Génération indisponible. Voici un modèle de base."
   },
   "coachInsightsAi": {
     "refresh": "Actualiser",
     "refreshing": "Actualisation…",
     "refreshDone": "Insights mis à jour",
-    "refreshLimited": "Tu as déjà actualisé aujourdhui. Réessaie demain.",
-    "refreshError": "Impossible dactualiser pour le moment."
+    "refreshLimited": "Hai già aggiornato oggi. Riprova domani.",
+    "refreshError": "Impossibile aggiornare per il momento."
   },
   "pricing": {
     "metaTitle": "Fatturazione tornei — Clubero",

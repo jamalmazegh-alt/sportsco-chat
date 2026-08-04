@@ -98,7 +98,7 @@
     "audClubsP1": "Teams en leden centraal beheren",
     "audClubsP2": "Multi-Team dashboard",
     "audClubsP3": "Statistieken over het seizoen",
-    "audCoaches": "Coaches",
+    "audCoaches": "Trainers",
     "audCoachesP1": "Oproepen in seconden",
     "audCoachesP2": "Aanwezigheid in realtime",
     "audCoachesP3": "Eigen chat voor elk evenement",
@@ -273,7 +273,7 @@
         "trust2": "Binnen enkele minuten klaar",
         "trust3": "Gehost in Europa",
         "audDirigeants": "Bestuur",
-        "audEducateurs": "Coaches",
+        "audEducateurs": "Trainers",
         "audParents": "Ouders",
         "audJoueurs": "Spelers",
         "mockTitle": "Jouw club, verbonden",
@@ -356,7 +356,7 @@
         "subtitle": "Clubero is gemaakt voor iedereen die de club draaiende houdt.",
         "w1Title": "Bestuur",
         "w1Body": "Bespaar tijd en centraliseer alles.",
-        "w2Title": "Coaches",
+        "w2Title": "Trainers",
         "w2Body": "Bereik je teams in één klik.",
         "w3Title": "Ouders",
         "w3Body": "Alle belangrijke info op één plek.",
@@ -368,7 +368,7 @@
         "subtitle": "Clubs en organisatoren die niet meer achter info aanhollen.",
         "anonymous": "Anonieme reactie",
         "r1": "Clubvoorzitter",
-        "r2": "Coach",
+        "r2": "Trainer",
         "r3": "Ouder",
         "r4": "Toernooi-organisator",
         "t1Quote": "We hebben de tijd voor de weekendplanning gehalveerd. Oproepen gaan binnen minuten uit en we weten wie er komt.",
@@ -606,7 +606,7 @@
     "shot1Body": "Geconsolideerd overzicht van trainingen en wedstrijden, per Speler en periode.",
     "shot2Title": "Ouder — Selectie",
     "shot2Body": "Antwoord met één klik, optionele reden, uniforme familiekalender.",
-    "shot3Title": "Club — Dashboard",
+    "shot3Title": "Club - Dashboard",
     "shot3Body": "Meerdere Teams, leden, centrale communicatie.",
     "shot4Title": "Speler — Startpagina",
     "shot4Body": "Volgende evenement, aanwezigheidsbevestiging, Team-prikbord.",
@@ -776,14 +776,14 @@
       "i3": "Open netwerk tussen clubs en spelers"
     },
     "challenges": {
-      "kicker": "Challenges & leaderboards",
-      "title": "Challenges tailored to your sport",
-      "body": "A curated catalog of challenges per sport (football, handball, rugby, volleyball, tennis…), with the right units: counts, accuracy, cumulative totals or personal-best records. Coaches can also build their own. Players watch the leaderboard live, with a badge that highlights every brand-new record.",
-      "b1": "Sport-aware catalog — passes, shots, aces, tackles, controls…",
-      "b2": "Fast stepper input, cumulative score or personal best",
-      "b3": "Live leaderboard with podium and 'New record' badge",
-      "b4": "Custom challenges built by the coach in 30 seconds",
-      "cta": "Explore challenges"
+      "kicker": "Challenges & klassementen",
+      "title": "Challenges afgestemd op jouw sport",
+      "body": "Een samengestelde catalogus met challenges per sport (voetbal, handbal, rugby, volleybal, tennis...), met de juiste eenheden: aantallen, nauwkeurigheid, totaalscores of persoonlijke records. Trainers kunnen ook hun eigen challenges maken. Spelers volgen het klassement live, met een badge die elk nieuw record uitlicht.",
+      "b1": "Sportgerichte catalogus - passes, schoten, aces, tackles, controles...",
+      "b2": "Snelle invoer, totaalscore of persoonlijk record",
+      "b3": "Live klassement met podium en badge 'Nieuw record'",
+      "b4": "Eigen challenges gemaakt door de trainer in 30 seconden",
+      "cta": "Challenges bekijken"
     },
     "modules": {
       "coordination": {
@@ -885,7 +885,7 @@
         ]
       },
       "stages": {
-        "title": "Stages",
+        "title": "Kampen",
         "subtitle": "Organiseer uw vakantiestages van A tot Z.",
         "items": [
           {
@@ -1989,7 +1989,7 @@
     "roleLabel": "Jouw rol",
     "rolePlaceholder": "— Kies —",
     "roles": {
-      "coach": "Coach",
+      "coach": "Trainer",
       "admin": "Clubbestuurder",
       "tournament_organizer": "Toernooi-organisator",
       "parent": "Ouder",
@@ -2051,17 +2051,17 @@
       "cta": "Ontdek"
     },
     "challenges": {
-      "badge": "Challenges & leaderboards",
-      "headline": "Turn every session into a friendly competition.",
-      "body": "Passing accuracy, shots on target, aces at serve… create challenges during your training sessions and matches, log scores live and watch a real-time leaderboard climb. Your players get hooked — and get better.",
-      "cta": "See the challenges",
-      "img_alt": "Animated Clubero challenge leaderboard with podium and medals",
+      "badge": "Challenges & klassementen",
+      "headline": "Maak van elke training een sportieve competitie.",
+      "body": "Passnauwkeurigheid, schoten op doel, aces bij de opslag... maak challenges tijdens trainingen en wedstrijden, voer scores live in en zie het realtime klassement stijgen. Je spelers raken gemotiveerd - en worden beter.",
+      "cta": "Bekijk de challenges",
+      "img_alt": "Geanimeerd Clubero-challengeklassement met podium en medailles",
       "live": "Live",
       "challenge_label": "Challenge",
-      "challenge_name": "Passing accuracy",
-      "players_count": "12 players",
-      "updated_now": "Updated just now",
-      "new_record": "★ New record",
+      "challenge_name": "Passnauwkeurigheid",
+      "players_count": "12 spelers",
+      "updated_now": "Net bijgewerkt",
+      "new_record": "★ Nieuw record",
       "floating_badge": "🏆 +1 record"
     },
     "parentResources": {
