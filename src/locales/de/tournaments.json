@@ -96,7 +96,7 @@
     "events": {
       "goal": "Tor",
       "own_goal": "Eigentor",
-      "assist": "Vorlage",
+      "assist": "Assist",
       "yellow": "Gelb",
       "red": "Rot",
       "second_yellow": "Gelb-Rot",
@@ -112,7 +112,7 @@
     },
     "match": {
       "aet": "n. V.",
-      "pen": "STIFT"
+      "pen": "PEN"
     }
   },
   "register": {
@@ -180,7 +180,7 @@
       "rank": "#",
       "team": "Team",
       "played": "J",
-      "won": "G",
+      "won": "S",
       "drawn": "U",
       "lost": "N",
       "diff": "+/-",
@@ -205,7 +205,7 @@
     "accepted": "Einladung angenommen",
     "noAccountPrompt": "Um diese Einladung anzunehmen, erstellen Sie Ihr Clubero-Konto mit der E-Mail-Adresse der eingeladenen Person oder melden Sie sich an, falls Sie bereits eines haben.",
     "createAccount": "Mein Konto erstellen",
-    "useExactEmail": "Use the email {{email}} so the invitation is recognized."
+    "useExactEmail": "Verwende die E-Mail {{email}}, damit die Einladung erkannt wird."
   },
   "passSuccess": {
     "metaTitle": "Turnier-Pass bestätigt — Clubero",
@@ -230,7 +230,7 @@
     "topQualifiers_other": "Top {{count}} qualifiziert",
     "team": "Team",
     "played": "J",
-    "won": "G",
+    "won": "S",
     "drawn": "U",
     "lost": "N",
     "diff": "+/-",
@@ -498,8 +498,8 @@
     "title": "Spieler · {{team}}",
     "import": {
       "empty": "In der Datei wurden keine Spieler gefunden.",
-      "blocked": "Import blocked: {{total}} players exceed the limit of {{max}}. Reduce the file or choose “Replace”.",
-      "ok": "{{n}} player(s) imported",
+      "blocked": "Import blockiert: {{total}} Spieler überschreiten das Limit von {{max}}. Reduziere die Datei oder wähle „Ersetzen“.",
+      "ok": "{{n}} Spieler importiert",
       "button": "CSV importieren",
       "title": "Spieler importieren",
       "desc": "CSV-Format: Vorname, Nachname, Trikotnummer, Position, ist_Kapitän. Trennzeichen , ; oder Tab akzeptiert.",
@@ -508,7 +508,7 @@
       "orPaste": "Oder fügen Sie CSV-Inhalte ein:",
       "append": "Zur Liste hinzufügen",
       "replace": "Dienstplan ersetzen",
-      "confirm": "Import"
+      "confirm": "Importieren"
     },
     "add": "Hinzufügen",
     "empty": "Keine Spieler. Füge Spieler hinzu oder importiere eine Liste.",
@@ -546,9 +546,9 @@
     "metaTitle": "Zusammensetzung des Dienstplans",
     "invalidTitle": "Ungültiger Link",
     "invalidBody": "Dieser Dienstplan-Link ist ungültig oder abgelaufen.",
-    "tooMany": "Roster limited to {{max}} players.",
+    "tooMany": "Kader auf {{max}} Spieler begrenzt.",
     "saved": "Dienstplan gespeichert",
-    "heading": "Roster — {{team}}",
+    "heading": "Kader — {{team}}",
     "logo": {
       "none": "Kein Logo",
       "title": "Teamlogo",
@@ -561,11 +561,11 @@
     },
     "pendingTitle": "Antrag wird geprüft",
     "pendingBody": "Sobald die Organisation Ihre Registrierung genehmigt hat, können Sie über denselben Link Spieler hinzufügen oder bearbeiten.",
-    "playersLabelMax": "Players ({{count}} / {{max}})",
-    "remaining": "{{n}} spot(s) left",
+    "playersLabelMax": "Spieler ({{count}} / {{max}})",
+    "remaining": "{{n}} Plätze frei",
     "captain": "Kapitän",
     "setCaptain": "Kapitän eingestellt",
-    "lastSaved": "Last saved: {{date}}",
+    "lastSaved": "Zuletzt gespeichert: {{date}}",
     "save": "Speichern"
   },
   "wizard": {
@@ -578,7 +578,7 @@
     "categoryPlaceholder": "U13, Senioren, Gemischt…",
     "logoOptional": "Logo / Titelbild (optional)",
     "datesAndPlace": "Termine und Ort",
-    "start": "Beginn",
+    "start": "Start",
     "end": "Ende",
     "place": "Ort",
     "placePlaceholder": "Stadtsporthalle, Stadt…",
@@ -595,7 +595,7 @@
     "rowName": "Name",
     "rowSport": "Sport",
     "rowCategory": "Kategorie",
-    "rowStart": "Beginn",
+    "rowStart": "Start",
     "rowEnd": "Ende",
     "rowFormat": "Format",
     "rowTeams": "Teams",
@@ -618,10 +618,10 @@
     "formatFlightedFinalsDesc": "Gruppenphase gefolgt von mehreren parallelen Finalturnieren (Champions, Europa…)",
     "formatConsolation": "Trostrunde",
     "formatConsolationDesc": "Hauptturnier + Trostrunde für früh ausgeschiedene Teams",
-    "stepEyebrow": "Step 1 / 4",
-    "stepEyebrow2": "Step 2 / 4",
-    "stepEyebrow3": "Step 3 / 4",
-    "stepEyebrow4": "Step 4 / 4"
+    "stepEyebrow": "Schritt 1 / 4",
+    "stepEyebrow2": "Schritt 2 / 4",
+    "stepEyebrow3": "Schritt 3 / 4",
+    "stepEyebrow4": "Schritt 4 / 4"
   },
   "groups": {
     "drawTitle": "Auslosung",
@@ -720,7 +720,7 @@
     "byes_other": "{{count}} Freilose",
     "tabAuto": "Auto",
     "tabProgressive": "Progressiv",
-    "tabManual": "Manuel",
+    "tabManual": "Manuell",
     "autoDesc": "Vollständige Zufallsauslosung auf einmal.",
     "launch": "Auslosung starten",
     "progressiveDesc": "Enthüllt Mannschaften eine nach der anderen mit Animation.",
@@ -798,7 +798,7 @@
     "accentColor": "Akzentfarbe",
     "sponsorsTitle": "Titre bloc sponsors",
     "sponsorsTitlePlaceholder": "Mit Unterstützung unserer Partner",
-    "sponsorsBlockTitle": "Sponsors & partenaires",
+    "sponsorsBlockTitle": "Sponsoren & Partner",
     "pdfTitle": "PDF-Regelwerk",
     "pdfHint": "Erzeugt ein offizielles PDF auf Basis der gespeicherten Regeln. Denk daran, deine Änderungen vor dem Generieren zu speichern.",
     "generatePdf": "PDF generieren",
@@ -834,7 +834,7 @@
     "events": {
       "goal": "Tor",
       "own_goal": "Eigentor",
-      "assist": "Vorlage",
+      "assist": "Assist",
       "yellow_card": "Gelb",
       "second_yellow": "Gelb-Rot",
       "red_card": "Rot",
@@ -883,7 +883,7 @@
       "cancelled": "Abgesagt"
     },
     "statusAria": "Status des Spiels",
-    "liveScore": "Live-Ergebnis",
+    "liveScore": "Live-Spielstand",
     "fullEntry": "Vollständige Eingabe",
     "finishMatch": "Spiel beenden",
     "tbd": "Noch offen",
@@ -1166,13 +1166,13 @@
     "tabConfigure": "Konfigurieren",
     "tabManage": "Verwalten",
     "tabPlay": "Jouer",
-    "liveNow": "🔴 LÄUFT",
+    "liveNow": "🔴 LIVE",
     "teamsRegistered": "{{count}} Mannschaften angemeldet von {{total}}",
     "teamsRegisteredNoMax": "{{count}} Teams angemeldet",
     "beFirst": "Sei das erste Team, das sich anmeldet!",
     "podium": "Ehrungen",
     "topScorer": "Bester Torschütze",
-    "fairPlay": "Fair-play",
+    "fairPlay": "Fair Play",
     "registrationConfirmed": "Deine Anmeldung ist bestätigt.",
     "programmeComingSoon": "Das Programm wird in Kürze veröffentlicht.",
     "viewRules": "Regelwerk ansehen",
@@ -1189,7 +1189,7 @@
     "rules": "Regelwerk",
     "finalStandings": "Endtabelle",
     "allResults": "Alle Ergebnisse",
-    "registrationOpensAt": "Registration opens on {{date}}"
+    "registrationOpensAt": "Anmeldung öffnet am {{date}}"
   },
   "flights": {
     "title": "Flights / Finalrunden",
@@ -1218,7 +1218,7 @@
       "consolation": "Haupt / Trostrunde"
     },
     "dist": {
-      "twoFlights": "2 Flights (Top + Rest)",
+      "twoFlights": "2 Flights (oben + Rest)",
       "twoFlightsBalanced": "2 ausgeglichene Flights",
       "threeFlights": "3 Flights (Elite + 2 Stufen)",
       "threeEqual": "3 gleiche Flights",
@@ -1238,7 +1238,7 @@
       "consolationDesc": "Erstellt 2 Flights: Haupt (Gruppensieger) und Trostrunde (Verlierer). Speicherbereit."
     },
     "public": {
-      "empty": "No flights configured yet.",
+      "empty": "Noch keine Flights konfiguriert.",
       "noMatches": "Matches will be generated after group stage."
     },
     "templatesDesc": {
@@ -1363,7 +1363,7 @@
       "teams": "{{n}} Teams",
       "match": "{{min}} Min. Spiele",
       "pause": "{{min}} Min. Pause",
-      "lunch": "Mittag {{range}}",
+      "lunch": "Mittagspause {{range}}",
       "fairPlay": "Fair Play",
       "terrains": "{{n}} Plätze",
       "pools284": "2 Gruppen à 4",
@@ -1574,29 +1574,29 @@
     "lunchNone": "Aucune",
     "lunchMin": "{{min}} min",
     "lunchStart": "Début",
-    "startTime": "Beginn",
+    "startTime": "Start",
     "finalAt": "Finale",
     "phasePools": "Gruppen",
     "phaseSemi": "Semifinale",
     "phaseFinal": "Finale"
   },
   "rulesAi": {
-    "generate": "Générer un règlement avec lIA",
+    "generate": "Reglement mit KI erstellen",
     "modalTitle": "Règlement proposé",
-    "modalDescription": "Prévisualise, puis insère ou régénère.",
+    "modalDescription": "Vorschau anzeigen, dann einfügen oder neu generieren.",
     "insert": "Insérer dans le règlement",
     "regenerate": "Regénérer",
     "close": "Fermer",
     "loading": "Génération en cours…",
-    "rateLimited": "Limite quotidienne atteinte. Voici un modèle de base.",
+    "rateLimited": "Tageslimit erreicht. Hier ist eine Basisvorlage.",
     "error": "Génération indisponible. Voici un modèle de base."
   },
   "coachInsightsAi": {
     "refresh": "Actualiser",
     "refreshing": "Actualisation…",
     "refreshDone": "Insights mis à jour",
-    "refreshLimited": "Tu as déjà actualisé aujourdhui. Réessaie demain.",
-    "refreshError": "Impossible dactualiser pour le moment."
+    "refreshLimited": "Du hast heute bereits aktualisiert. Versuche es morgen erneut.",
+    "refreshError": "Aktualisierung derzeit nicht möglich."
   },
   "pricing": {
     "metaTitle": "Turnier-Abrechnung — Clubero",

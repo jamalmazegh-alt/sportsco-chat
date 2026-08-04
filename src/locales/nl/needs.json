@@ -52,8 +52,8 @@
     "publish": "Publiceren",
     "republish": "Opnieuw publiceren",
     "assign": "Asignar",
-    "resend": "Notify everyone again",
-    "notifyNew": "Notify new recipients"
+    "resend": "Iedereen opnieuw verwittigen",
+    "notifyNew": "Nieuwe ontvangers verwittigen"
   },
   "errors": {
     "forbidden": "Actie niet toegestaan.",
@@ -117,22 +117,22 @@
     "team_parents": "Ouders van een ploeg",
     "team_educators": "Trainers van een ploeg",
     "category_educators": "Trainers van een categorie",
-    "customGroups": "Custom groups",
-    "eventRelevant": "Suggested for this event",
-    "otherAudiences": "Other audiences",
+    "customGroups": "Eigen groepen",
+    "eventRelevant": "Aanbevolen voor dit evenement",
+    "otherAudiences": "Andere doelgroepen",
     "add": "Toevoegen",
-    "pickKind": "Pick a type…",
-    "pickParam": "Pick one…",
-    "noGroups": "No custom group is active. Create one in Settings → Club groups to target a precise audience.",
+    "pickKind": "Kies een type...",
+    "pickParam": "Kies er een...",
+    "noGroups": "Er is geen eigen groep actief. Maak er een aan in Instellingen → Clubgroepen om een specifieke doelgroep te bereiken.",
     "selected": {
-      "title": "Selected audience",
-      "empty": "No audience selected — add at least one criterion below.",
-      "emptyConvocation": "The call-up hasn't been sent yet — send call-ups first, or choose a different audience.",
-      "loading": "Computing…",
-      "count_one": "{{count}} person will be notified",
-      "count_other": "{{count}} people will be notified",
-      "removeAria": "Remove {{label}}",
-      "takenAria": "Already selected"
+      "title": "Geselecteerde doelgroep",
+      "empty": "Geen doelgroep geselecteerd - voeg hieronder minstens één criterium toe.",
+      "emptyConvocation": "De oproep is nog niet verstuurd - verstuur eerst de oproepen of kies een andere doelgroep.",
+      "loading": "Berekenen...",
+      "count_one": "{{count}} persoon krijgt een melding",
+      "count_other": "{{count}} personen krijgen een melding",
+      "removeAria": "{{label}} verwijderen",
+      "takenAria": "Al geselecteerd"
     },
     "preassign": {
       "title": "Personen vooraf toewijzen",
@@ -317,8 +317,8 @@
     "closeNeed": "Behoefte sluiten",
     "cancelNeed": "Behoefte annuleren",
     "delete": "Verwijderen",
-    "editAudience": "Edit recipients",
-    "viewRecipients": "View recipients",
+    "editAudience": "Ontvangers bewerken",
+    "viewRecipients": "Ontvangers bekijken",
     "reopenNeed": "Behoefte heropenen"
   },
   "assignNotification": {
@@ -342,37 +342,37 @@
   },
   "myFeed": {
     "title": "Mijn hulp",
-    "engagementsCount_one": "{{count}} commitment",
-    "engagementsCount_other": "{{count}} commitments",
-    "nextLabel": "Next",
-    "plusOthers_one": "+ {{count}} other commitment",
-    "plusOthers_other": "+ {{count}} other commitments"
+    "engagementsCount_one": "{{count}} toezegging",
+    "engagementsCount_other": "{{count}} toezeggingen",
+    "nextLabel": "Volgende",
+    "plusOthers_one": "+ {{count}} andere toezegging",
+    "plusOthers_other": "+ {{count}} andere toezeggingen"
   },
   "resend": {
-    "title": "Re-notify recipients",
-    "success_one": "{{count}} recipient re-notified",
-    "success_other": "{{count}} recipients re-notified"
+    "title": "Ontvangers opnieuw verwittigen",
+    "success_one": "{{count}} ontvanger opnieuw verwittigd",
+    "success_other": "{{count}} ontvangers opnieuw verwittigd"
   },
   "editAudience": {
-    "title": "Edit recipients",
-    "desc": "Add or replace audiences. Only people who have never been notified will receive an alert.",
-    "deltaHint": "Only new people will be notified. Those already reached won't get another alert.",
-    "success_one": "{{count}} new recipient notified",
-    "success_other": "{{count}} new recipients notified",
-    "successNoDelta": "Selection updated — nobody new to notify."
+    "title": "Ontvangers bewerken",
+    "desc": "Voeg doelgroepen toe of vervang ze. Alleen mensen die nog nooit een melding kregen, ontvangen een bericht.",
+    "deltaHint": "Alleen nieuwe mensen krijgen een melding. Wie al bereikt is, krijgt geen extra bericht.",
+    "success_one": "{{count}} nieuwe ontvanger verwittigd",
+    "success_other": "{{count}} nieuwe ontvangers verwittigd",
+    "successNoDelta": "Selectie bijgewerkt - niemand nieuw om te verwittigen."
   },
   "recipients": {
-    "title": "Notified recipients",
-    "desc": "People who received a notification for \"{{need}}\".",
-    "empty": "No notification has been sent for this need yet.",
-    "count_one": "{{count}} person notified",
-    "count_other": "{{count}} people notified"
+    "title": "Verwittigde ontvangers",
+    "desc": "Mensen die een melding ontvingen voor \"{{need}}\".",
+    "empty": "Er is nog geen melding verstuurd voor deze behoefte.",
+    "count_one": "{{count}} persoon verwittigd",
+    "count_other": "{{count}} personen verwittigd"
   },
   "withdrawDialog": {
-    "title": "Withdraw?",
-    "description": "Withdraw from {{need}} for {{event}}? The staff will be notified.",
-    "confirm": "Withdraw",
-    "abort": "Cancel"
+    "title": "Intrekken?",
+    "description": "Je terugtrekken uit {{need}} voor {{event}}? De staf krijgt hiervan bericht.",
+    "confirm": "Intrekken",
+    "abort": "Annuleren"
   },
   "insight": {
     "available": "Beschikbaar",

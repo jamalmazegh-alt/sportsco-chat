@@ -52,8 +52,8 @@
     "publish": "Publicar",
     "republish": "Volver a publicar",
     "assign": "Asignar",
-    "resend": "Notify everyone again",
-    "notifyNew": "Notify new recipients"
+    "resend": "Avisar de nuevo a todos",
+    "notifyNew": "Avisar a nuevos destinatarios"
   },
   "errors": {
     "forbidden": "Acción no autorizada.",
@@ -117,22 +117,22 @@
     "team_parents": "Padres de un equipo",
     "team_educators": "Entrenadores de un equipo",
     "category_educators": "Entrenadores de una categoría",
-    "customGroups": "Custom groups",
-    "eventRelevant": "Suggested for this event",
-    "otherAudiences": "Other audiences",
+    "customGroups": "Grupos personalizados",
+    "eventRelevant": "Sugerido para este evento",
+    "otherAudiences": "Otras audiencias",
     "add": "Añadir",
-    "pickKind": "Pick a type…",
-    "pickParam": "Pick one…",
-    "noGroups": "No custom group is active. Create one in Settings → Club groups to target a precise audience.",
+    "pickKind": "Elige un tipo…",
+    "pickParam": "Elige uno…",
+    "noGroups": "No hay ningún grupo personalizado activo. Crea uno en Ajustes → Grupos del club para dirigirte a una audiencia concreta.",
     "selected": {
-      "title": "Selected audience",
-      "empty": "No audience selected — add at least one criterion below.",
-      "emptyConvocation": "The call-up hasn't been sent yet — send call-ups first, or choose a different audience.",
-      "loading": "Computing…",
-      "count_one": "{{count}} person will be notified",
-      "count_other": "{{count}} people will be notified",
-      "removeAria": "Remove {{label}}",
-      "takenAria": "Already selected"
+      "title": "Audiencia seleccionada",
+      "empty": "No hay audiencia seleccionada — añade al menos un criterio abajo.",
+      "emptyConvocation": "La convocatoria aún no se ha enviado — envía primero las convocatorias o elige otra audiencia.",
+      "loading": "Calculando…",
+      "count_one": "Se avisará a {{count}} persona",
+      "count_other": "Se avisará a {{count}} personas",
+      "removeAria": "Quitar {{label}}",
+      "takenAria": "Ya seleccionado"
     },
     "preassign": {
       "title": "Preasignar personas",
@@ -317,8 +317,8 @@
     "closeNeed": "Cerrar la necesidad",
     "cancelNeed": "Anular la necesidad",
     "delete": "Eliminar",
-    "editAudience": "Edit recipients",
-    "viewRecipients": "View recipients",
+    "editAudience": "Editar destinatarios",
+    "viewRecipients": "Ver destinatarios",
     "reopenNeed": "Reabrir necesidad"
   },
   "assignNotification": {
@@ -342,37 +342,37 @@
   },
   "myFeed": {
     "title": "Mis manos amigas",
-    "engagementsCount_one": "{{count}} commitment",
-    "engagementsCount_other": "{{count}} commitments",
-    "nextLabel": "Next",
-    "plusOthers_one": "+ {{count}} other commitment",
-    "plusOthers_other": "+ {{count}} other commitments"
+    "engagementsCount_one": "{{count}} compromiso",
+    "engagementsCount_other": "{{count}} compromisos",
+    "nextLabel": "Siguiente",
+    "plusOthers_one": "+ {{count}} compromiso más",
+    "plusOthers_other": "+ {{count}} compromisos más"
   },
   "resend": {
-    "title": "Re-notify recipients",
-    "success_one": "{{count}} recipient re-notified",
-    "success_other": "{{count}} recipients re-notified"
+    "title": "Volver a avisar a los destinatarios",
+    "success_one": "{{count}} destinatario avisado de nuevo",
+    "success_other": "{{count}} destinatarios avisados de nuevo"
   },
   "editAudience": {
-    "title": "Edit recipients",
-    "desc": "Add or replace audiences. Only people who have never been notified will receive an alert.",
-    "deltaHint": "Only new people will be notified. Those already reached won't get another alert.",
-    "success_one": "{{count}} new recipient notified",
-    "success_other": "{{count}} new recipients notified",
-    "successNoDelta": "Selection updated — nobody new to notify."
+    "title": "Editar destinatarios",
+    "desc": "Añade o reemplaza audiencias. Solo recibirán una alerta las personas que nunca hayan sido avisadas.",
+    "deltaHint": "Solo se avisará a las personas nuevas. Quienes ya fueron contactados no recibirán otra alerta.",
+    "success_one": "{{count}} nuevo destinatario avisado",
+    "success_other": "{{count}} nuevos destinatarios avisados",
+    "successNoDelta": "Selección actualizada — no hay nadie nuevo a quien avisar."
   },
   "recipients": {
-    "title": "Notified recipients",
-    "desc": "People who received a notification for \"{{need}}\".",
-    "empty": "No notification has been sent for this need yet.",
-    "count_one": "{{count}} person notified",
-    "count_other": "{{count}} people notified"
+    "title": "Destinatarios avisados",
+    "desc": "Personas que recibieron una notificación por \"{{need}}\".",
+    "empty": "Todavía no se ha enviado ninguna notificación para esta necesidad.",
+    "count_one": "{{count}} persona avisada",
+    "count_other": "{{count}} personas avisadas"
   },
   "withdrawDialog": {
-    "title": "Withdraw?",
-    "description": "Withdraw from {{need}} for {{event}}? The staff will be notified.",
-    "confirm": "Withdraw",
-    "abort": "Cancel"
+    "title": "¿Retirarte?",
+    "description": "¿Retirarte de {{need}} para {{event}}? Los responsables recibirán un aviso.",
+    "confirm": "Retirarme",
+    "abort": "Cancelar"
   },
   "insight": {
     "available": "Disponible",
