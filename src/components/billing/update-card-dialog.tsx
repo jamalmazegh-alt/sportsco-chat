@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
+import type { StripeElementLocale } from "@stripe/stripe-js";
 import { getPublicOrigin } from "@/lib/native-platform";
 import { loadStripe, type Stripe as StripeJs } from "@stripe/stripe-js";
 import { Elements, PaymentElement, useElements, useStripe } from "@stripe/react-stripe-js";
@@ -121,7 +122,16 @@ export function UpdateCardDialog({
     [state],
   );
 
-  const stripeLocale = (i18n.language || "en").slice(0, 2);
+  // Stripe n'accepte qu'une liste fermée de locales. On restreint aux sept que
+  // l'application sert, et on retombe sur l'anglais pour toute autre valeur —
+  // un code inconnu ferait échouer le typage et serait ignoré à l'exécution.
+  const SUPPORTED_STRIPE_LOCALES = ["fr", "en", "de", "es", "it", "nl", "pt"] as const;
+  const short = (i18n.language || "en").slice(0, 2);
+  const stripeLocale: StripeElementLocale = (
+    SUPPORTED_STRIPE_LOCALES as readonly string[]
+  ).includes(short)
+    ? (short as StripeElementLocale)
+    : "en";
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>

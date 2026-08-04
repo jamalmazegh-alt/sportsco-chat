@@ -180,7 +180,8 @@
     "tournament_manager": "Director del Torneo",
     "tournament_admin": "Administración del Torneo",
     "referee": "Árbitro",
-    "incompatibleWith": "No compatible con {{role}}"
+    "incompatibleWith": "No compatible con {{role}}",
+    "replaces": "Sustituye a {{roles}}"
   },
   "nav": {
     "home": "Inicio",

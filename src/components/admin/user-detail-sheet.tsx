@@ -352,7 +352,6 @@ export function UserDetailSheet({ userId, open, onOpenChange }: Props) {
                                       roles: replacedRoles
                                         .map((role) => t(`roles.${role}`, { defaultValue: role }))
                                         .join(", "),
-                                      defaultValue: `Remplace ${replacedRoles.join(", ")}`,
                                     })}
                                   </span>
                                 )}
@@ -370,7 +369,6 @@ export function UserDetailSheet({ userId, open, onOpenChange }: Props) {
                                     roles: replacedRoles
                                       .map((role) => t(`roles.${role}`, { defaultValue: role }))
                                       .join(", "),
-                                    defaultValue: `Remplace ${replacedRoles.join(", ")}`,
                                   })}
                                 </TooltipContent>
                               </Tooltip>
