@@ -187,7 +187,7 @@ function StatusTone({ status }: { status: string }) {
     return <StatusBadge tone="danger">{t("superadmin.components.failed")}</StatusBadge>;
   }
   if (status === "warning") {
-    return <StatusBadge tone="warning">{t("superadmin.components.statusWarning")}</StatusBadge>;
+    return <StatusBadge tone="warn">{t("superadmin.components.statusWarning")}</StatusBadge>;
   }
   return <StatusBadge tone="success">{t("superadmin.components.statusOk")}</StatusBadge>;
 }
