@@ -146,11 +146,11 @@
           "label": "Kasse & Fundraising"
         },
         "wall": {
-          "label": "Vereinspinnwand"
+          "label": "Clubpinnwand"
         },
         "player_social_network": {
           "label": "Soziales Netzwerk für Spieler",
-          "description": "Mit Spielern aus anderen Vereinen vernetzen"
+          "description": "Mit Spielern aus anderen Clubs vernetzen"
         },
         "public_player_profiles": {
           "label": "Öffentliche Spielerprofile",
@@ -162,7 +162,7 @@
         },
         "fundraising": {
           "label": "Sammelaktionen & Spenden",
-          "description": "Sammelaktionen für Verein oder Mannschaft starten"
+          "description": "Sammelaktionen für Club oder Mannschaft starten"
         }
       }
     },
@@ -204,7 +204,7 @@
       "email": "E-Mail",
       "emailRequired": "E-Mail (erforderlich)",
       "phone": "Telefon",
-      "club": "Vereinsname",
+      "club": "Clubname",
       "newsletter": "Ich möchte Clubero-News per E-Mail erhalten",
       "beta": "Ich möchte Clubero im Beta testen",
       "consentHint": "Einwilligungen werden separat gespeichert. Abbestellen mit einem Klick.",
@@ -212,7 +212,7 @@
       "lastName": "Nachname",
       "firstNameRequired": "Vorname (erforderlich)",
       "lastNameRequired": "Nachname (erforderlich)",
-      "clubRequired": "Vereinsname (erforderlich)",
+      "clubRequired": "Clubname (erforderlich)",
       "errorRequired": "Pflichtfeld"
     },
     "send": "Senden",
@@ -249,7 +249,7 @@
       "firstName": "Vorname",
       "email": "E-Mail",
       "phone": "Telefon",
-      "club": "Verein",
+      "club": "Club",
       "newsletter": "Newsletter",
       "beta": "Beta",
       "date": "Abgeschlossen am",

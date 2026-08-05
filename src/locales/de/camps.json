@@ -73,16 +73,16 @@
   },
   "meta": {
     "list": {
-      "title": "Vereins-Camps – Clubero",
-      "description": "Erstelle, veröffentliche und verwalte die Camps deines Vereins."
+      "title": "Club-Camps – Clubero",
+      "description": "Erstelle, veröffentliche und verwalte die Camps deines Clubs."
     },
     "edit": {
       "title": "Camp bearbeiten – Clubero"
     }
   },
   "list": {
-    "title": "Vereins-Camps",
-    "subtitle": "Erstelle und veröffentliche die Camps deines Vereins.",
+    "title": "Club-Camps",
+    "subtitle": "Erstelle und veröffentliche die Camps deines Clubs.",
     "new": "Neues Camp",
     "newTitle": "Neues Camp",
     "create": "Entwurf anlegen",
@@ -203,7 +203,7 @@
     "addTitle": "Dokument hinzufügen",
     "empty": "Noch keine Dokumente bereitgestellt.",
     "maxHint": "PDF, JPG oder PNG — max. 15 MB.",
-    "titlePlaceholder": "Z. B. Vereinsordnung",
+    "titlePlaceholder": "Z. B. Clubordnung",
     "tooLarge": "Datei zu groß (max. 15 MB).",
     "upload": "Hochladen",
     "uploaded": "Dokument hinzugefügt"
@@ -255,10 +255,10 @@
     "backToCamp": "Zurück zum Camp",
     "formTitle": "Anmeldung — {{title}}",
     "docsHint": "PDF, JPG oder PNG — max. 15 MB pro Datei.",
-    "consent": "Ich erlaube dem Verein, die übermittelten Daten (Identität des Kindes, Kontakt des Elternteils, Anhänge) zur Verwaltung dieser Camp-Anmeldung gemäß DSGVO zu nutzen. Die Daten werden bis zu {{months}} Monate nach Ende des Camps aufbewahrt und dann automatisch gelöscht.",
+    "consent": "Ich erlaube dem Club, die übermittelten Daten (Identität des Kindes, Kontakt des Elternteils, Anhänge) zur Verwaltung dieser Camp-Anmeldung gemäß DSGVO zu nutzen. Die Daten werden bis zu {{months}} Monate nach Ende des Camps aufbewahrt und dann automatisch gelöscht.",
     "submit": "Anmeldung absenden",
     "confirmTitle": "Anmeldung gesendet!",
-    "confirmBody": "Wir haben eure Unterlagen erhalten. Der Verein meldet sich in Kürze bei euch.",
+    "confirmBody": "Wir haben eure Unterlagen erhalten. Der Club meldet sich in Kürze bei euch.",
     "confirmRef": "Referenz: {{id}}",
     "section": {
       "child": "Teilnehmendes Kind",
@@ -272,7 +272,7 @@
       "lastName": "Nachname",
       "birthDate": "Geburtsdatum",
       "gender": "Geschlecht",
-      "clubName": "Heimatverein (optional)",
+      "clubName": "Heimatclub (optional)",
       "ageGroup": "Kategorie",
       "email": "Email",
       "phone": "Telefon",
@@ -379,15 +379,15 @@
       "lastName": "Nachname",
       "birthDate": "Geburt",
       "gender": "Geschlecht",
-      "clubName": "Heimatverein",
+      "clubName": "Heimatclub",
       "email": "E-Mail",
       "phone": "Telefon",
       "notes": "Notizen der Familie",
       "documents": "Hochgeladene Dokumente",
       "noDocs": "Keine Dokumente hochgeladen.",
       "sensitive": "Sensibel",
-      "coachSensitiveNote": "Sensible Dokumente sind auf Vereinsverantwortliche beschränkt.",
-      "notAllowed": "Sensibles Dokument — Zugriff nur für Vereinsverantwortliche.",
+      "coachSensitiveNote": "Sensible Dokumente sind auf Clubverantwortliche beschränkt.",
+      "notAllowed": "Sensibles Dokument — Zugriff nur für Clubverantwortliche.",
       "openDoc": "Öffnen",
       "approve": "Genehmigen",
       "reject": "Ablehnen",
@@ -442,7 +442,7 @@
       "birthDate": "Geburtsdatum",
       "age": "Alter",
       "gender": "Geschlecht",
-      "clubName": "Aktueller Verein",
+      "clubName": "Aktueller Club",
       "guardianFirstName": "Sorgeberechtigte Person - Vorname",
       "guardianLastName": "Sorgeberechtigte Person - Nachname",
       "email": "E-Mail",

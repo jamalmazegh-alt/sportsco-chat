@@ -252,14 +252,14 @@
     "heading": "Alle Funktionen freischalten",
     "body": "Wechsle zum Clubero-Plan für Mannschaften, Events, Einladungen, Stats und mehr — unbegrenzte Turniere inklusive.",
     "ctaSubscribe": "Clubero-Plan abonnieren",
-    "dialogTitle": "Verein erstellen",
-    "dialogDesc": "Um das Abonnement zu aktivieren, erstellen wir zuerst deinen Verein. Du wirst dessen Administrator und wirst zur Zahlungsseite weitergeleitet.",
-    "clubNameLabel": "Vereinsname",
+    "dialogTitle": "Club erstellen",
+    "dialogDesc": "Um das Abonnement zu aktivieren, erstellen wir zuerst deinen Club. Du wirst dessen Administrator und wirst zur Zahlungsseite weitergeleitet.",
+    "clubNameLabel": "Clubname",
     "clubNamePlaceholder": "FC United",
     "continue": "Weiter",
     "creationImpossible": "Erstellung nicht möglich",
-    "clubCreated": "Verein erstellt. Weiterleitung zum Abonnement…",
-    "creationError": "Fehler beim Erstellen des Vereins."
+    "clubCreated": "Club erstellt. Weiterleitung zum Abonnement…",
+    "creationError": "Fehler beim Erstellen des Clubs."
   },
   "bracket": {
     "empty": "Noch kein K.O.-Baum generiert.",
@@ -420,7 +420,7 @@
     },
     "stripeNotConnected": {
       "title": "Zahlungskonto nicht verbunden",
-      "description": "Für dieses Turnier ist eine Online-Zahlung erforderlich, aber dein Verein hat kein Stripe-Konto verknüpft. Teams können erst bezahlen, wenn das Konto eingerichtet ist.",
+      "description": "Für dieses Turnier ist eine Online-Zahlung erforderlich, aber dein Club hat kein Stripe-Konto verknüpft. Teams können erst bezahlen, wenn das Konto eingerichtet ist.",
       "cta": "Stripe-Konto verbinden"
     },
     "loadError": "Fehler beim Laden der Registrierungen"
@@ -454,7 +454,7 @@
       "name": "Name",
       "logo": "Mannschaftslogo (optional)",
       "logoEdit": "Logo",
-      "clubTeam": "Vereinsmannschaft",
+      "clubTeam": "Clubmannschaft",
       "selectPlaceholder": "— Auswählen —",
       "shortName": "Kurzname",
       "shortPlaceholder": "FCU",
@@ -965,7 +965,7 @@
     "noPassAvailable": "kein Pass verfügbar. Kaufe einen, um ein Turnier zu erstellen.",
     "emptyTitle": "Kein Turnier",
     "emptyDescManage": "Erstelle dein erstes Turnier, um einen Wettbewerb zu organisieren.",
-    "emptyDescView": "In diesem Verein läuft aktuell kein Turnier.",
+    "emptyDescView": "In diesem Club läuft aktuell kein Turnier.",
     "create": "Turnier erstellen",
     "ctaEyebrow": "Organisator",
     "ctaTitle": "Erstelle dein Turnier in 30 s mit KI",
@@ -1080,7 +1080,7 @@
     "save": "Speichern",
     "saved": "Einstellungen gespeichert",
     "saveError": "Speichern nicht möglich",
-    "personalTournamentWarning": "Dieses Turnier ist keinem Verein zugeordnet. Online-Zahlungen erfordern einen Verein mit aktiviertem Stripe-Konto.",
+    "personalTournamentWarning": "Dieses Turnier ist keinem Club zugeordnet. Online-Zahlungen erfordern einen Club mit aktiviertem Stripe-Konto.",
     "stripeRequired": "Verbinde dein Stripe-Konto, um Zahlungen zu aktivieren.",
     "connectStripe": "Stripe verbinden",
     "feeMinError": "Der Betrag muss größer oder gleich 0 sein.",

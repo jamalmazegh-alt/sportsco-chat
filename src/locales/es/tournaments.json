@@ -20,7 +20,7 @@
     "group": "Grupo",
     "groups": "Grupos",
     "tbd": "P.P.P.",
-    "live": "En vivo",
+    "live": "En directo",
     "ft": "F.T.",
     "aet": "Prórroga",
     "pen": "Penaltis",
@@ -34,8 +34,8 @@
   "public": {
     "metaTitle": "{{name}} — Partido de {{sport}} · Clubero",
     "metaTitleFallback": "Torneo {{slug}} — Clubero",
-    "metaDesc": "Sigue a {{name}} en vivo: Equipos, calendario, resultados y clasificación{{locationSuffix}}.",
-    "metaDescFallback": "Sigue este torneo en vivo: equipos, calendario, resultados y clasificaciones.",
+    "metaDesc": "Sigue a {{name}} en directo: Equipos, calendario, resultados y clasificación{{locationSuffix}}.",
+    "metaDescFallback": "Sigue este torneo en directo: equipos, calendario, resultados y clasificaciones.",
     "unavailableTitle": "Torneo no disponible",
     "unavailableBody": "Este torneo aún no se ha publicado o el enlace ha caducado. Si eres el organizador, abre tu torneo y haz clic en <1>Publicar</1>.",
     "backHome": "Volver a la página de inicio",
@@ -78,8 +78,8 @@
       "teamsCount_one": "{{count}} equipo",
       "teamsCount_other": "{{count}} equipos",
       "matchesPlayed": "{{played}}/{{total}} partidos jugados",
-      "liveCount_one": "{{count}} partido en vivo",
-      "liveCount_other": "{{count}} partidos en vivo"
+      "liveCount_one": "{{count}} partido en directo",
+      "liveCount_other": "{{count}} partidos en directo"
     },
     "round": {
       "group": "Fase de grupos",
@@ -106,7 +106,7 @@
     "sponsorsTitleDefault": "Con el apoyo de nuestros patrocinadores",
     "downloadRules": "Descargar reglamento (PDF)",
     "streams": {
-      "hint": "Elige una cancha para ver la transmisión en vivo.",
+      "hint": "Elige una campo para ver la retransmisión en directo.",
       "unsupported": "Plataforma no reconocida. Abre el enlace en una nueva pestaña.",
       "openExternal": "Abrir stream"
     },
@@ -165,7 +165,7 @@
       "noUpcoming": "No hay partidos programados",
       "standings": "Clasificación · {{group}}",
       "bracket": "Fase eliminatoria",
-      "scanForLive": "Escanear para seguir en vivo"
+      "scanForLive": "Escanear para seguir en directo"
     },
     "controls": {
       "previous": "Anterior",
@@ -299,7 +299,7 @@
     "unassigned": "No asignado",
     "unassignedSection": "No asignado",
     "assignPlaceholder": "Asignar",
-    "streamUrlPlaceholder": "URL de transmisión (YouTube, Twitch…)"
+    "streamUrlPlaceholder": "URL de retransmisión (YouTube, Twitch…)"
   },
   "collab": {
     "title": "Equipo de organización",
@@ -889,7 +889,7 @@
     "fullEntry": "Entrada completa",
     "finishMatch": "Finalizar partido",
     "tbd": "Por definir",
-    "startLive": "Iniciar partido en vivo",
+    "startLive": "Iniciar partido en directo",
     "fieldAndTime": "Campo / Hora",
     "field": "Campo",
     "fieldPlaceholder": "Campo 1",
@@ -926,7 +926,7 @@
     "penShort": "pen.",
     "lifecycle": {
       "scheduled": "Programado",
-      "live": "En vivo",
+      "live": "En directo",
       "submitted": "Pendiente",
       "validated": "Validado",
       "disputed": "Disputado"
@@ -1058,10 +1058,10 @@
     "staffAndOfficials": "Personal y Árbitros",
     "draw": "Sorteo",
     "groupsSchedule": "Grupos y Calendario",
-    "tvLive": "En vivo / TV",
-    "tvLiveTitle": "Presentación TV / En vivo",
-    "tvLiveHint": "Abre la pantalla completa para ver partidos y clasificaciones en vivo.",
-    "openTv": "Abrir pantalla en vivo",
+    "tvLive": "En directo / TV",
+    "tvLiveTitle": "Presentación TV / En directo",
+    "tvLiveHint": "Abre la pantalla completa para ver partidos y clasificaciones en directo.",
+    "openTv": "Abrir pantalla en directo",
     "flights": "Flights"
   },
   "staff": {
@@ -1251,7 +1251,7 @@
     },
     "regenConfirm": "Los partidos de las finales ya tienen resultados. La regeneración de cuadros BORRARÁ todos esos resultados. ¿Continuar?",
     "advancedDanger": "Opciones avanzadas (peligrosas)",
-    "regenWarn": "La regeneración de cuadros borra todos los resultados finales ya ingresados.",
+    "regenWarn": "La regeneración de cuadros borra todos los resultados finales ya introducidos.",
     "regenerate": "Regenerar cuadros",
     "fifthPlaceDisabled": "Habilitar el 3er lugar primero",
     "seventhPlaceDisabled": "Habilitar el quinto lugar primero"
@@ -1259,7 +1259,7 @@
   "controlCenter": {
     "nextAction": "Próxima acción",
     "liveCourts": "En directo",
-    "liveBadge": "EN VIVO",
+    "liveBadge": "EN DIRECTO",
     "nextMatches": "Próximos partidos",
     "flightsReady": "La fase de grupos ha terminado. Crea los Flights para generar los 3 cuadros.",
     "openSettingsForDraw": "Abre la configuración (⋯ › Formato) para sortear / generar partidos.",

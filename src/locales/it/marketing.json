@@ -228,9 +228,9 @@
     "tourn": {
       "kicker": "Modulo tornei — app completa",
       "title": "Una vera app di gestione tornei, dentro Clubero.",
-      "sub": "Iscrizioni, brackets, risultati live, pagina pubblica TV. Tutto ciò che serve a un organizzatore, senza software separato.",
+      "sub": "Iscrizioni, tabelloni, risultati live, pagina pubblica TV. Tutto ciò che serve a un organizzatore, senza software separato.",
       "b1": "Iscrizioni online, pagamento integrato",
-      "b2": "Tabelloni, gironi, brackets, risultati live",
+      "b2": "Sorteggi, gironi, tabelloni, risultati live",
       "b3": "Pagina pubblica TV per i tuoi spettatori",
       "b4": "Convocazioni e distinte incluse",
       "cta": "Avvia un torneo",

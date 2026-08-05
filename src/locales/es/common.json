@@ -1479,7 +1479,7 @@
     "statusActive": "Activo",
     "statusPending": "Pendiente",
     "userDetailTitle": "Detalles del usuario",
-    "memberships": "Membresías del Club",
+    "memberships": "Socios del club",
     "linkedPlayers": "Jugadores vinculados",
     "noLinkedPlayers": "No hay Jugadores vinculados.",
     "phone": "Teléfono",
@@ -1971,7 +1971,7 @@
       "shooting": "Tiro",
       "rebounding": "Rebote",
       "ball_handling": "Manejo del balón",
-      "court_vision": "Visión de la cancha",
+      "court_vision": "Visión de la campo",
       "pick_and_roll": "Pick & roll",
       "spacing": "Espaciado",
       "pivot_play": "Juego de pívot",
@@ -2289,8 +2289,8 @@
       "ogDescription": "Cambia fácilmente a Clubero. Migramos tu Club por ti."
     },
     "tournamentsPage": {
-      "title": "Torneos — Resultados en vivo, tablas públicas, modo TV | Clubero",
-      "description": "Organiza Torneos modernos con resultados en vivo, tablas públicas, modo Árbitro móvil y modo TV. Diseñado para organizadores, Jugadores, Padres/Madres y aficionados.",
+      "title": "Torneos — Resultados en directo, tablas públicas, modo TV | Clubero",
+      "description": "Organiza Torneos modernos con resultados en directo, tablas públicas, modo Árbitro móvil y modo TV. Diseñado para organizadores, Jugadores, Padres/Madres y aficionados.",
       "ogDescription": "Torneos modernos, vibrantes y públicos. Hechos para el campo y las pantallas."
     },
     "adminVenues": {
@@ -2336,7 +2336,7 @@
     "duplicate": "Este artículo ya existe.",
     "foreignKey": "Estos datos todavía se mencionan en otros lugares.",
     "missingField": "Falta un campo obligatorio.",
-    "invalidValue": "Un valor ingresado no es válido.",
+    "invalidValue": "Un valor introducido no es válido.",
     "inviteExpired": "Esta invitación ha caducado.",
     "inviteUsed": "Esta invitación ya ha sido utilizada.",
     "inviteInvalid": "Invitación no válida.",
@@ -2997,7 +2997,7 @@
     "maskedBadge": "Oculta para jugadores y padres",
     "visible": "Lista visible",
     "settingLabel": "Visibilidad de la lista de convocados",
-    "settingHelp": "Define quién puede ver la lista de convocados. El cálculo es en vivo: los eventos que heredan seguirán cualquier cambio futuro del ajuste de equipo o club.",
+    "settingHelp": "Define quién puede ver la lista de convocados. El cálculo es en directo: los eventos que heredan seguirán cualquier cambio futuro del ajuste de equipo o club.",
     "definedHere": "Definido aquí",
     "inheritedFromTeam": "Heredado del equipo",
     "inheritedFromClub": "Heredado del club",
@@ -3460,13 +3460,13 @@
       "cta": "Descubre el asistente",
       "assistantName": "Asistente Clubero",
       "online": "En línea",
-      "q1": "¿Quién aún no ha pagado su cuota de membresía?",
+      "q1": "¿Quién aún no ha pagado su cuota de socio?",
       "a1": "3 jugadores: Lucas M., Sarah B. y Tom D. ¿Debo enviar un correo electrónico de seguimiento?",
       "q2": "Sí, en inglés."
     },
     "tourn": {
       "b1": "Registro en línea, pago integrado",
-      "b2": "Tablas, grupos, cuadros, resultados en vivo.",
+      "b2": "Tablas, grupos, cuadros, resultados en directo.",
       "b3": "Página de TV pública para tus espectadores",
       "b4": "Convocatorias y hojas de partido incluidas.",
       "kicker": "Módulo de torneo: aplicación completa",
@@ -3663,7 +3663,7 @@
     "venue": "Lugar",
     "venuePlaceholder": "Elige un lugar",
     "venueNone": "— Ninguno —",
-    "facility": "Cancha/instalación",
+    "facility": "Campo/instalación",
     "facilityPlaceholder": "Opcional",
     "facilityNone": "— Ninguno —",
     "externalAddress": "Dirección",
@@ -3789,7 +3789,7 @@
     "relaunchFromFooterHint": "Sorteo completado. Utiliza «Reiniciar» en la parte inferior del cuadro de diálogo para generar uno nuevo (los resultados actuales se perderán)."
   },
   "fields": {
-    "streamUrlPlaceholder": "URL de transmisión (YouTube, Twitch…)"
+    "streamUrlPlaceholder": "URL de retransmisión (YouTube, Twitch…)"
   },
   "flights": {
     "savedToast": "Flights guardados",
@@ -3805,7 +3805,7 @@
     "intro": "Múltiples trofeos por torneo: Campeones/Europa, Copa/Plato, Oro/Plata/Bronce o personalizados.",
     "reconfigure": "Reconfigurar",
     "advancedDanger": "Opciones avanzadas (peligrosas)",
-    "regenWarn": "La regeneración de cuadros borra todos los resultados finales ya ingresados.",
+    "regenWarn": "La regeneración de cuadros borra todos los resultados finales ya introducidos.",
     "regenerate": "Regenerar cuadros",
     "generate": "Generar cuadros",
     "waitGroups": "Termina todos los partidos del grupo para generar cuadros.",
@@ -3902,7 +3902,7 @@
     }
   },
   "sections": {
-    "openTv": "Abrir pantalla en vivo (TV)",
+    "openTv": "Abrir pantalla en directo (TV)",
     "flights": "Flights"
   },
   "simulator": {
@@ -3914,7 +3914,7 @@
   },
   "actions": {
     "resolved_toast": "Ticket marcado como resuelto",
-    "reopened_toast": "Boleto reabierto",
+    "reopened_toast": "Ticket reabierto",
     "reopen": "Reabrir ticket",
     "mark_resolved": "Marcar como resuelto"
   },
@@ -4190,7 +4190,7 @@
     },
     "dashboard": {
       "title": "Vista general de la plataforma",
-      "subtitle": "Instantánea en vivo de operaciones e ingresos de Clubero.",
+      "subtitle": "Instantánea en directo de operaciones e ingresos de Clubero.",
       "failedToLoad": "No se pudo cargar",
       "businessFinance": "Negocio y finanzas",
       "allSubscriptions": "Todas las suscripciones →",
@@ -4323,7 +4323,7 @@
       "userOnboarding": "Activación del usuario",
       "account": "Cuenta",
       "relations": "Relations",
-      "noClubMemberships": "Sin membresías de club.",
+      "noClubMemberships": "Sin clubes asociados.",
       "noInvites": "Ninguna invitación coincide con el email de este usuario.",
       "noTeamAssignments": "Sin asignaciones directas a equipos.",
       "noPlayerProfile": "No hay perfil de jugador vinculado a este usuario.",
@@ -4337,7 +4337,7 @@
       "noPriorActions": "Sin acciones administrativas previas.",
       "impersonateTitle": "Suplantar usuario",
       "impersonateReasonPlaceholder": "ej.: Ticket #421 — el usuario informa de eventos ausentes",
-      "orphanHint": "Sin membresía de club, perfil de jugador ni vínculo de padre/madre.",
+      "orphanHint": "Sin club asociado, perfil de jugador ni vínculo de padre/madre.",
       "loading": "Cargando…"
     },
     "clubs": {
@@ -4496,7 +4496,7 @@
       "searchUserPlaceholder": "Buscar por nombre o teléfono…",
       "searchClubPlaceholder": "Buscar clubes por nombre…",
       "noMatches": "Sin resultados.",
-      "noClubMemberships": "Sin membresías de club.",
+      "noClubMemberships": "Sin clubes asociados.",
       "noAdmins": "Sin administradores.",
       "modeUser": "Usuario",
       "modeClub": "Club",

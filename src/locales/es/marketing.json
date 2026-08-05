@@ -83,7 +83,7 @@
     "feat4Title": "WhatsApp y email opcionales",
     "feat4Body": "Clubero es tu canal principal. Para todos los que prefieran usar WhatsApp o correo electrónico: comparte un enlace formateado con un clic.",
     "feat5Title": "Torneos llave en mano",
-    "feat5Body": "Crea un torneo con grupos, fases eliminatorias, calendario y clasificaciones. Comparte un enlace de TV público para resultados en vivo.",
+    "feat5Body": "Crea un torneo con grupos, fases eliminatorias, calendario y clasificaciones. Comparte un enlace de TV público para resultados en directo.",
     "feat6Title": "Resultados y estadísticas por deporte",
     "feat6Body": "Registra resultados y estadísticas (goles, ensayos, triples) adaptados a cada deporte.",
     "feat7Title": "Seguimiento de asistencia",
@@ -230,7 +230,7 @@
       "title": "Una verdadera app de gestión de torneos, dentro de Clubero.",
       "sub": "Inscripciones, cuadros, marcadores en directo, página pública TV. Todo lo que necesita un organizador, sin software aparte.",
       "b1": "Inscripciones en línea, pago integrado",
-      "b2": "Cuadros, grupos, cuadros, marcadores en vivo",
+      "b2": "Sorteos, grupos, cuadros, marcadores en directo",
       "b3": "Página pública TV para tus espectadores",
       "b4": "Convocatorias y actas de partido incluidas",
       "cta": "Iniciar un torneo",
@@ -301,7 +301,7 @@
         "b2Title": "Organización más fácil",
         "b2Body": "Gestiona asistencias, ausencias, calendarios, equipos y eventos sin saltar entre herramientas.",
         "b3Title": "Torneos profesionales",
-        "b3Body": "Crea torneos modernos con grupos, eliminatorias, campos, árbitros y resultados en vivo.",
+        "b3Body": "Crea torneos modernos con grupos, eliminatorias, campos, árbitros y resultados en directo.",
         "b4Title": "Comunidad más fuerte",
         "b4Body": "Da visibilidad a tus jugadores, entrenadores, equipos y eventos."
       },
@@ -333,7 +333,7 @@
         "f6": "Gestión de campos",
         "f7": "Gestión de árbitros",
         "f8": "Clasificaciones automáticas",
-        "f9": "Resultados en vivo",
+        "f9": "Resultados en directo",
         "f10": "Sorteos automáticos",
         "f11": "Reglamentos en PDF",
         "f12": "Pantallas públicas",
@@ -1235,10 +1235,10 @@
       "titlePre": "Organiza un ",
       "titleHighlight": "Torneo",
       "titlePost": " en minutos.",
-      "subtitle": "Un asistente IA te guía para configurar grupos, cuadros, pistas y duración. Inscripciones en línea, clasificaciones en directo, modo TV: todo incluido. Comparte un enlace público para seguir los marcadores en vivo.",
+      "subtitle": "Un asistente IA te guía para configurar grupos, cuadros, pistas y duración. Inscripciones en línea, clasificaciones en directo, modo TV: todo incluido. Comparte un enlace público para seguir los marcadores en directo.",
       "feat1Title": "Asistente IA y formato recomendado",
       "feat1Body": "Responde a unas preguntas (número de equipos, duración, jornada completa o no): la IA recomienda el formato adecuado (grupos + finales, eliminatoria, Suizo) y calcula automáticamente el calendario multi-pista y las clasificaciones.",
-      "feat2Title": "Clasificaciones en vivo",
+      "feat2Title": "Clasificaciones en directo",
       "feat2Body": "Los resultados se actualizan en tiempo real. Espectadores y equipos siguen todo desde el móvil.",
       "feat3Title": "Inscripciones y pagos en línea",
       "feat3Body": "Página de inscripción pública, aprobación por parte del organizador, límite de equipos, plantillas de jugadores y cobro de pagos a través de Stripe Connect.",
@@ -1252,7 +1252,7 @@
       "ctaFeatures": "Ver todas las funciones",
       "mockTournament": "Torneo de Pascua Sub-13",
       "mockPhase": "Fase de grupos · Grupo A",
-      "mockLive": "En vivo",
+      "mockLive": "En directo",
       "mockOngoing": "Partido en curso · Campo 2",
       "mockTvAvailable": "Modo TV disponible",
       "mockTeamsRegistered": "Equipos inscritos"
@@ -1693,10 +1693,10 @@
   "tournamentsPage": {
     "kicker": "Torneos",
     "title": "Torneos modernos, dinámicos y públicos.",
-    "subtitle": "Organiza tus torneos con resultados en vivo, clasificaciones públicas, función de árbitro móvil y experiencia comunitaria.",
+    "subtitle": "Organiza tus torneos con resultados en directo, clasificaciones públicas, función de árbitro móvil y experiencia comunitaria.",
     "ctaPrimary": "Crear un torneo",
     "ctaSecondary": "Ver demo",
-    "heroBadge": "En vivo · en directo",
+    "heroBadge": "En directo · en directo",
     "heroMatch": "Cuartos de final · Campo 2",
     "heroTeamA": "AS Riverside",
     "heroTeamB": "FC Lakeside",
@@ -1776,7 +1776,7 @@
       }
     ],
     "publicTitle": "Una experiencia pública y compartida.",
-    "publicSubtitle": "Padres, jugadores y aficionados siguen el torneo en vivo, desde cualquier lugar.",
+    "publicSubtitle": "Padres, jugadores y aficionados siguen el torneo en directo, desde cualquier lugar.",
     "publicPoints": [
       {
         "t": "Clasificaciones públicas",
@@ -1806,7 +1806,7 @@
     "tvTitle": "Modo TV y pantalla central.",
     "tvSubtitle": "Muestra el torneo a lo grande, en el pabellón, en la casa club o en el campo.",
     "tvPoints": [
-      "Clasificaciones en vivo en pantalla",
+      "Clasificaciones en directo en pantalla",
       "Programa de los próximos partidos",
       "Partidos en curso, campo por campo",
       "Modo de pantalla completa sin instalación"
