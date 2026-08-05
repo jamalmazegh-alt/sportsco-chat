@@ -569,7 +569,7 @@
     "enterpriseName": "Enterprise",
     "enterpriseSubtitle": "Voor grote organisaties.",
     "enterprisePrice": "Op maat",
-    "enterpriseBody": "Individuele prijsstelling op basis van uw behoeften.",
+    "enterpriseBody": "Prijs op maat, op basis van je behoeften.",
     "enterpriseCta": "Neem contact op met het verkoopteam",
     "footer": "Alle aanbiedingen omvatten EU-hosting, AVG-conformiteit en e-mailondersteuning.",
     "clubFeatures": [
@@ -890,7 +890,7 @@
       },
       "stages": {
         "title": "Kampen",
-        "subtitle": "Organiseer uw vakantiestages van A tot Z.",
+        "subtitle": "Organiseer je vakantiekampen van A tot Z.",
         "items": [
           {
             "title": "Aanmaken van stages",
@@ -946,7 +946,7 @@
       },
       "admin": {
         "title": "Administratie & branding",
-        "subtitle": "Een club die bij u past, eenvoudig te beheren.",
+        "subtitle": "Een club die bij je past, eenvoudig te beheren.",
         "items": [
           {
             "title": "Clubbranding",
@@ -2010,7 +2010,7 @@
   },
   "landing": {
     "hero": {
-      "headline": "De app waar uw club niet meer zonder kan.",
+      "headline": "De app waar je club niet meer zonder kan.",
       "tagline": "De club van morgen begint vandaag.",
       "subtitle": "Organisatie, communicatie en competities samengebracht in een modern, intelligent platform voor amateurclubs.",
       "cta_primary": "Gratis proberen",
@@ -2020,13 +2020,13 @@
     "wizard": {
       "badge": "In een paar klikken",
       "headline": "Maak een evenement in minder dan 30 seconden.",
-      "body": "Wedstrijd, training of eenmalig evenement — de Clubero-wizard begeleidt uw bestuur stap voor stap. Voorgevulde gegevens, automatische oproep. Terugkerend of eenmalig, alles wordt op dezelfde manier aangemaakt.",
+      "body": "Wedstrijd, training of eenmalig evenement — de Clubero-wizard begeleidt je bestuur stap voor stap. Voorgevulde gegevens, automatische oproep. Terugkerend of eenmalig, alles wordt op dezelfde manier aangemaakt.",
       "img_alt_coach": "Rustige trainer die zijn club met Clubero beheert langs het veld",
       "img_alt_screen": "Clubero-scherm — Alles klaar, evenement in een paar klikken aangemaakt"
     },
     "convocation": {
       "badge": "Automatische oproepen",
-      "headline": "Uw spelers in een oogwenk opgeroepen.",
+      "headline": "Je spelers in een oogwenk opgeroepen.",
       "body": "Zodra het evenement is aangemaakt, ontvangt elke speler zijn oproep op zijn telefoon. Beschikbaarheden, bevestigingen, herinneringen — Clubero regelt het.",
       "img_alt": "Speler die zijn Clubero-oproep ontvangt in de kleedkamer"
     },

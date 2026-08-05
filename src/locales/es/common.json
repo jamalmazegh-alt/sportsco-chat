@@ -50,7 +50,7 @@
     "updated": "Ausencia actualizada",
     "forPlayer": "¿Para qué jugador?",
     "dates": "Periodo de ausencia",
-    "pickRange": "Seleccione un período",
+    "pickRange": "Selecciona un período",
     "teamTable": {
       "title": "Ausencias del equipo",
       "empty": "No se han declarado ausencias próximas en este equipo.",
@@ -389,7 +389,7 @@
     "mediaStatus": "Estado",
     "allow": "Permitir",
     "deny": "Denegar",
-    "consentsHint": "El conmutador gestiona su consentimiento. Utilice “Leer documento” para ver cada texto.",
+    "consentsHint": "El conmutador gestiona tu consentimiento. Utiliza “Leer documento” para consultar cada texto.",
     "readDocument": "Leer documento"
   },
   "onboarding": {
@@ -668,12 +668,12 @@
       "paid": "Pagado",
       "exempt": "Eximir",
       "unpaid": "para recoger",
-      "cycleHint": "Haga clic para cambiar el estado de pago"
+      "cycleHint": "Haz clic para cambiar el estado de pago"
     },
     "row": {
       "noContact": "Sin contacto"
     },
-    "ageGroupRequired": "Elija una categoría de edad de la lista.",
+    "ageGroupRequired": "Elige una categoría de edad de la lista.",
     "player": "Jugador",
     "ageGroupLegacyHint": "Valor heredado: elija una categoría oficial (por ejemplo, U7). Un rango como U6-U7 puede permanecer en el nombre del equipo.",
     "staffWall": "Muro del personal",
@@ -1320,8 +1320,8 @@
     "pillUpcoming": "próximo",
     "notPlayedYet": "El partido aún no se ha jugado; el resultado se podrá anotar tras el pitido final.",
     "finishedTitle": "El partido ha terminado.",
-    "finishedHint": "Guarde la puntuación y los datos del partido.",
-    "enterResult": "Introduzca el resultado"
+    "finishedHint": "Guarda el resultado y los eventos del partido.",
+    "enterResult": "Introduce el resultado"
   },
   "channels": {
     "in_app": "en la aplicación",
@@ -2304,7 +2304,7 @@
     },
     "adminNotifications": {
       "title": "Notifications — Clubero",
-      "description": "Elija las notificaciones push enviadas a los miembros de su club."
+      "description": "Elige las notificaciones push enviadas a los miembros de tu club."
     },
     "adminSponsors": {
       "title": "Sponsors – Clubero",
@@ -2326,7 +2326,7 @@
   "errors": {
     "generic": "Ha ocurrido un error.",
     "clubCreateFailed": "No se pudo crear el club.",
-    "membershipsUnavailable": "No se pueden cargar sus clubes. Compruebe su conexión e inténtelo de nuevo.",
+    "membershipsUnavailable": "No se pueden cargar tus clubes. Comprueba tu conexión e inténtalo de nuevo.",
     "notAllowed": "No tienes permiso para realizar esta acción.",
     "invalidCredentials": "Correo electrónico o contraseña incorrectos.",
     "emailNotConfirmed": "Confirma tu correo electrónico antes de iniciar sesión.",
@@ -2340,7 +2340,7 @@
     "inviteExpired": "Esta invitación ha caducado.",
     "inviteUsed": "Esta invitación ya ha sido utilizada.",
     "inviteInvalid": "Invitación no válida.",
-    "network": "No se puede conectar. Verifique su red e inténtelo nuevamente.",
+    "network": "No se puede conectar. Verifica tu red e inténtalo de nuevo.",
     "timeout": "La operación duró demasiado.",
     "notFound": "Artículo no encontrado.",
     "fileTooLarge": "El archivo es demasiado grande.",
@@ -2355,7 +2355,7 @@
     "publishDatesRequired": "Se requieren fechas de inicio y finalización.",
     "publishDatesOrder": "La fecha de finalización debe ser posterior a la fecha de inicio.",
     "publishCapacityRequired": "Se requiere una capacidad positiva.",
-    "publishAgeGroupRequired": "Agregue al menos una categoría de edad antes de publicar."
+    "publishAgeGroupRequired": "Añade al menos una categoría de edad antes de publicar."
   },
   "respond": {
     "eyebrow": "Invitación",
@@ -2824,7 +2824,7 @@
     "range": {
       "dates": "Fechas del campamento",
       "pickEnd": "fecha de finalización",
-      "pickBoth": "Seleccione inicio y fin",
+      "pickBoth": "Selecciona inicio y fin",
       "startTime": "Hora de inicio",
       "endTime": "Hora de finalización",
       "defaultsHint": "Predeterminado 10:00 → 16:00. Ajústese a su campamento.",
@@ -3008,7 +3008,7 @@
   },
   "groups": {
     "title": "Grupos de clubes",
-    "subtitle": "Cree grupos personalizados (junta directiva, voluntarios…) para orientar sus comunicaciones.",
+    "subtitle": "Crea grupos personalizados (junta directiva, voluntarios…) para orientar tu comunicación.",
     "empty": "Aún no hay grupos.",
     "create": "Crear grupo",
     "edit": "Editar",
@@ -3207,7 +3207,7 @@
     "noCoachInClub": "No hay entrenador en este club.",
     "allAssigned": "Todos los entrenadores están asignados.",
     "addCoach": "Asignar un entrenador",
-    "searchPlaceholder": "Busque un entrenador…",
+    "searchPlaceholder": "Busca un entrenador…",
     "noResults": "No se encontró ningún entrenador.",
     "conflict": {
       "title": "Conflicto de disponibilidad",
@@ -3434,7 +3434,7 @@
     },
     "digit": {
       "f1Title": "Llamadas en 12 segundos",
-      "f1Body": "Envíe, haga seguimiento, rastree respuestas. Sin enviar mensajes de texto a todos individualmente.",
+      "f1Body": "Envía, haz seguimiento, rastrea respuestas. Sin enviar mensajes de texto uno por uno.",
       "f2Title": "Pagos en línea",
       "f2Body": "Tarifas, equipos, campamentos. Stripe integrado, recibos automáticos, seguimientos incluidos.",
       "f3Title": "Comunicación centralizada",
@@ -3560,7 +3560,7 @@
     },
     "pendingTitle": "Solicitud bajo revisión",
     "pendingBody": "Una vez que la organización haya aprobado tu inscripción, podrás agregar o editar jugadores desde este mismo enlace.",
-    "empty": "Aún no hay jugadores. Haga clic en Agregar o importar CSV.",
+    "empty": "Aún no hay jugadores. Haz clic en Añadir o importar CSV.",
     "captain": "Capitán",
     "setCaptain": "Capitán del set",
     "save": "Guardar",
@@ -3620,14 +3620,14 @@
     },
     "deadlineHint": "Opcional: debe ser antes de la fecha de inicio.",
     "optional": "opcional",
-    "venueHint": "Puede omitir este paso y agregarlo más tarde.",
+    "venueHint": "Puedes omitir este paso y añadirlo más tarde.",
     "ageGroupsEmpty": "Se requiere al menos una categoría para publicar. Puedes agregar más más tarde.",
     "summary": {
       "deadline": "fecha límite",
       "places": "manchas",
       "venueSet": "lugar establecido",
       "ageGroups": "Categorías",
-      "next": "El campamento se creará como un borrador. Puede agregar descripción, imagen, programa y documentos antes de publicar."
+      "next": "El campamento se creará como borrador. Puedes añadir descripción, imagen, programa y documentos antes de publicarlo."
     },
     "footerReady": "todo esta listo",
     "create": "Crear campamento",
@@ -3691,7 +3691,7 @@
     "save": "Guardar"
   },
   "ageGroups": {
-    "selectAll": "Seleccione las categorías relevantes",
+    "selectAll": "Selecciona las categorías relevantes",
     "customs": "Categorías personalizadas",
     "labelPlaceholder": "Etiqueta (por ejemplo, recreativa)",
     "yearMin": "Año mínimo",
@@ -3786,7 +3786,7 @@
     "flightsReady": "La fase de grupos ha terminado. Crear Flights para generar los 3 cuadros (Champions / Europa / Conference)."
   },
   "draw": {
-    "relaunchFromFooterHint": "Sorteo completado. Utilice \"Reiniciar\" en la parte inferior del cuadro de diálogo para generar uno nuevo (los resultados actuales se perderán)."
+    "relaunchFromFooterHint": "Sorteo completado. Utiliza «Reiniciar» en la parte inferior del cuadro de diálogo para generar uno nuevo (los resultados actuales se perderán)."
   },
   "fields": {
     "streamUrlPlaceholder": "URL de transmisión (YouTube, Twitch…)"
@@ -3898,7 +3898,7 @@
     "openTv": "pantalla de televisión",
     "autoScheduleCta": {
       "title": "Programar partidos automáticamente",
-      "subtitle": "Aún no hay cancha ni horario asignado. Ejecute la programación automática."
+      "subtitle": "Aún no hay campo ni horario asignado. Ejecuta la programación automática."
     }
   },
   "sections": {
@@ -3939,7 +3939,7 @@
   },
   "duplicate": {
     "done": "Campamento duplicado",
-    "hint": "Cree una copia borrador (sin registros).",
+    "hint": "Crea una copia en borrador (sin inscripciones).",
     "action": "Duplicado"
   },
   "delete": {
@@ -4073,7 +4073,7 @@
     "collectTitle": "Seguimiento y cobro — {{title}}",
     "loadError": "No se pudo cargar el seguimiento: {{message}}",
     "unknownError": "error desconocido",
-    "emptyObligations": "Ningún jugador tiene aún una obligación para este concepto. Compruebe que el destino (club / equipos / jugadores) incluye jugadores.",
+    "emptyObligations": "Ningún jugador tiene aún una obligación para este concepto. Comprueba que el destinatario (club / equipos / jugadores) contenga jugadores.",
     "payer": "Pagador: {{name}}",
     "payerUnlinked": "Pagador no vinculado",
     "remaining": "quedan {{amount}} {{currency}}",
@@ -4085,8 +4085,8 @@
     "reopened": "Obligación reabierta",
     "exemptTitle": "Eximir esta obligación",
     "cancelTitle": "Cancelar esta obligación",
-    "exemptDescription": "El jugador quedará exento de este pago. Indique el motivo (beca, situación familiar, etc.).",
-    "cancelDescription": "La obligación se cancelará y ya no podrá pagarse. Indique el motivo.",
+    "exemptDescription": "El jugador quedará exento de este pago. Indica el motivo (beca, situación familiar, etc.).",
+    "cancelDescription": "La obligación se cancelará y ya no podrá pagarse. Indica el motivo.",
     "cancelConfirm": "Cancelar la obligación",
     "exempted": "Obligación exenta",
     "cancelled": "Obligación cancelada",
@@ -4113,7 +4113,7 @@
   },
   "adminNotifications": {
     "title": "Notificaciones push",
-    "subtitle": "Elija las notificaciones enviadas en la aplicación móvil. Los correos no se ven afectados.",
+    "subtitle": "Elige las notificaciones enviadas en la aplicación móvil. Los correos no se ven afectados.",
     "sectionConvocations": "Convocatorias",
     "sectionEvents": "Eventos",
     "sectionWall": "Muro del club",
@@ -4482,7 +4482,7 @@
     },
     "support": {
       "title": "Centro de soporte",
-      "subtitle": "Busque usuarios y clubes, supervise las pruebas y los problemas de entrega.",
+      "subtitle": "Busca usuarios y clubes, supervisa las pruebas y los problemas de entrega.",
       "searchFailed": "Búsqueda fallida",
       "trialsEnding": "Pruebas que terminan en 7 días",
       "trialsSafe": "Todas las pruebas están bajo control.",

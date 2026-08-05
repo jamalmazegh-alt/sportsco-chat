@@ -304,14 +304,14 @@
     "registerWaitlistCta": "Op de wachtlijst",
     "tracking": {
       "invalidTitle": "Ongeldige of verlopen link",
-      "invalidBody": "Deze volglink is niet geldig. Controleer de link die u per e-mail ontving.",
+      "invalidBody": "Deze volglink is niet geldig. Controleer de link die je per e-mail ontving.",
       "title": "Inschrijving volgen",
       "participant": "Deelnemer",
       "bornOn": "Geboren op {{date}}",
       "campDates": "Kampdata: {{dates}}",
       "reason": "Reden: {{reason}}",
       "noDocs": "Geen documenten gevraagd.",
-      "personalLink": "Persoonlijke link — deel hem niet. Hij geeft toegang tot uw dossier en documenten.",
+      "personalLink": "Persoonlijke link — deel hem niet. Hij geeft toegang tot je dossier en documenten.",
       "status": {
         "pending": "Wacht op validatie",
         "under_review": "In behandeling",

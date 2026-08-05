@@ -389,7 +389,7 @@
     "mediaStatus": "Status",
     "allow": "Toestaan",
     "deny": "Weigeren",
-    "consentsHint": "De switch beheert uw toestemming. Gebruik “Document lezen” om elke tekst te bekijken.",
+    "consentsHint": "De schakelaar beheert je toestemming. Gebruik “Document lezen” om elke tekst te bekijken.",
     "readDocument": "Document lezen"
   },
   "onboarding": {
@@ -816,7 +816,7 @@
       "title": "Spelers importeren (CSV)",
       "intro": "Importeer je lijst uit een CSV-bestand. Verwachte kolommen: {{cols}}.",
       "template": "Sjabloon",
-      "parentsHint": "Maximaal 2 ouders per speler via het bestand. Voor meer opent u het spelerprofiel na de import.",
+      "parentsHint": "Maximaal 2 ouders per speler via het bestand. Voor meer open je het spelersprofiel na de import.",
       "fileLabel": "CSV-bestand",
       "pasteLabel": "of plak je regels",
       "submit": "Importeren",
@@ -1245,7 +1245,7 @@
     "played": "Gespeeld",
     "goalsFor": "Doelpunten voor",
     "goalsAgainst": "Doelpunten tegen",
-    "noPlayerLinked": "Er is geen speler aan uw account voor deze club gekoppeld.",
+    "noPlayerLinked": "Er is geen speler aan je account voor deze club gekoppeld.",
     "player": "Speler",
     "child": "kind",
     "matchesPlayed": "Wedstrijden gespeeld",
@@ -1585,7 +1585,7 @@
       "offsetAfter": "{{n}} d. erna",
       "remindersSaved": "Herinneringen opgeslagen",
       "remindersNote": "Opmerking: herinneringen gaan naar gekoppelde betalers, spelers en ouders/voogden. Elk gezin ontvangt slechts één e-mail per mijlpaal.",
-      "remindersNoteManual": "U kunt ook handmatig een herinnering sturen vanaf de pagina Betalingsitems via de knop « Herinneren »."
+      "remindersNoteManual": "Je kunt ook handmatig een herinnering sturen vanaf de pagina Betalingsitems via de knop « Herinneren »."
     },
     "branding": {
       "saved": "Clubkleur bijgewerkt",
@@ -1603,7 +1603,7 @@
     "hubVenues": "Locaties en velden",
     "hubVenuesHint": "Clublocaties en velden vooraf ingevuld bij het aanmaken",
     "hubCamps": "Kampen",
-    "hubCampsHint": "Creëer, publiceer en beheer kampen die door uw club worden aangeboden",
+    "hubCampsHint": "Maak, publiceer en beheer kampen die je club aanbiedt",
     "emailLanguage": "Communicatie e-mailtaal",
     "emailLanguageHint": "Taal die wordt gebruikt voor e-mails die door de club worden verzonden naar ontvangers die geen voorkeurstaal hebben ingesteld.",
     "inviteCooldown": "Uitnodiging al verzonden naar {{email}}. Je kunt over {{seconds}} s opnieuw verzenden.",
@@ -1634,7 +1634,7 @@
     "action": "Deze persoon melden",
     "also": "{{name}} ook melden",
     "title": "{{name}} melden",
-    "subtitle": "Uw rapport wordt verzonden naar de clubmanagers. De persoon wordt niet geïnformeerd.",
+    "subtitle": "Je melding wordt naar de clubbeheerders gestuurd. De persoon wordt niet geïnformeerd.",
     "already": "Je hebt deze persoon al gemeld.",
     "tabContent": "Inhoud",
     "tabMembers": "Leden",
@@ -1802,7 +1802,7 @@
   },
   "cookie": {
     "title": "Cookie-instellingen",
-    "description": "Wij gebruiken cookies om uw ervaring te verbeteren en inhoud te personaliseren.",
+    "description": "We gebruiken cookies om je ervaring te verbeteren en inhoud te personaliseren.",
     "showDetails": "Aanpassen",
     "hideDetails": "Details verbergen",
     "acceptAll": "Alles accepteren",
@@ -1815,11 +1815,11 @@
     },
     "analytics": {
       "title": "Analytisch",
-      "description": "Helpen ons te begrijpen hoe u de website gebruikt, om deze te verbeteren."
+      "description": "Helpen ons te begrijpen hoe je de website gebruikt, om deze te verbeteren."
     },
     "marketing": {
       "title": "Marketing",
-      "description": "Worden gebruikt om u gepersonaliseerde inhoud en aanbiedingen te tonen."
+      "description": "Worden gebruikt om je gepersonaliseerde inhoud en aanbiedingen te tonen."
     }
   },
   "billing": {
@@ -1909,7 +1909,7 @@
     },
     "storeManagedElsewhere": {
       "title": "Abonnement beheerd op het web",
-      "body": "Vanwege de regels van de appstores wordt het Clubero-abonnement afgesloten en beheerd via een browser, op de Clubero-website. Uw status en facturen blijven hier zichtbaar."
+      "body": "Vanwege de regels van de appstores wordt het Clubero-abonnement afgesloten en beheerd via een browser, op de Clubero-website. Je status en facturen blijven hier zichtbaar."
     },
     "updateCardTitle": "Bankkaart wijzigen",
     "updateCardDescription": "Je nieuwe kaart vervangt de huidige voor toekomstige afschrijvingen.",
@@ -2304,11 +2304,11 @@
     },
     "adminNotifications": {
       "title": "Notifications — Clubero",
-      "description": "Kies de pushmeldingen die naar leden van uw club worden verzonden."
+      "description": "Kies de pushmeldingen die naar leden van je club worden verzonden."
     },
     "adminSponsors": {
       "title": "Sponsors – Clubero",
-      "description": "Beheer de partners die worden weergegeven in de app van uw club."
+      "description": "Beheer de partners die worden weergegeven in de app van je club."
     }
   },
   "trial": {
@@ -2326,10 +2326,10 @@
   "errors": {
     "generic": "Er is een fout opgetreden.",
     "clubCreateFailed": "Club kon niet worden aangemaakt.",
-    "membershipsUnavailable": "Uw clubs konden niet worden geladen. Controleer uw verbinding en probeer het opnieuw.",
-    "notAllowed": "U heeft geen toestemming om deze actie uit te voeren.",
+    "membershipsUnavailable": "Je clubs konden niet worden geladen. Controleer je verbinding en probeer het opnieuw.",
+    "notAllowed": "Je hebt geen toestemming om deze actie uit te voeren.",
     "invalidCredentials": "Onjuist e-mailadres of wachtwoord.",
-    "emailNotConfirmed": "Bevestig uw e-mailadres voordat u zich aanmeldt.",
+    "emailNotConfirmed": "Bevestig je e-mailadres voordat je inlogt.",
     "emailAlreadyUsed": "Dit e-mailadres is al in gebruik.",
     "passwordTooShort": "Wachtwoord is te kort.",
     "rateLimited": "Te veel pogingen. Probeer het zo nog eens opnieuw.",
@@ -2340,7 +2340,7 @@
     "inviteExpired": "Deze uitnodiging is verlopen.",
     "inviteUsed": "Deze uitnodiging is al gebruikt.",
     "inviteInvalid": "Ongeldige uitnodiging.",
-    "network": "Kan geen verbinding maken. Controleer uw netwerk en probeer het opnieuw.",
+    "network": "Kan geen verbinding maken. Controleer je netwerk en probeer het opnieuw.",
     "timeout": "De operatie duurde te lang.",
     "notFound": "Artikel niet gevonden.",
     "fileTooLarge": "Het bestand is te groot.",
@@ -2355,7 +2355,7 @@
     "publishDatesRequired": "Begin- en einddatum vereist.",
     "publishDatesOrder": "De einddatum moet na de startdatum liggen.",
     "publishCapacityRequired": "Er is een positief vermogen vereist.",
-    "publishAgeGroupRequired": "Voeg ten minste één leeftijdscategorie toe voordat u deze publiceert."
+    "publishAgeGroupRequired": "Voeg ten minste één leeftijdscategorie toe voordat je publiceert."
   },
   "respond": {
     "eyebrow": "Uitnodiging",
@@ -2625,16 +2625,16 @@
     }
   },
   "tournamentToClub": {
-    "title": "Beheer uw club het hele jaar",
-    "subtitle": "Oproepen, aanwezigheid, carpool, discipline — alles wat u nodig heeft voor uw teams, niet alleen op turnooidagen.",
+    "title": "Beheer je club het hele jaar",
+    "subtitle": "Oproepen, aanwezigheid, carpool, discipline — alles wat je nodig hebt voor je teams, niet alleen op toernooidagen.",
     "ctaPrimary": "30 dagen gratis proberen",
     "ctaSecondary": "Meer informatie",
     "dismiss": "Sluiten"
   },
   "pricing": {
     "tournamentHero": {
-      "title": "U heeft een geweldig toernooi georganiseerd.",
-      "subtitle": "Zet de volgende stap: beheer uw club het hele jaar met Clubero."
+      "title": "Je hebt een geweldig toernooi georganiseerd.",
+      "subtitle": "Zet de volgende stap: beheer je club het hele jaar met Clubero."
     },
     "clubBenefits": [
       "Oproepen en aanwezigheid met één klik",
@@ -2815,7 +2815,7 @@
     },
     "backToAssistant": "Terug naar assistent",
     "confirmCloseTitle": "Vertrekken zonder te sparen?",
-    "expertAbandonConfirm": "Uw wijzigingen gaan verloren.",
+    "expertAbandonConfirm": "Je wijzigingen gaan verloren.",
     "meetingInternal": {
       "label": "Interne clubvergadering (geen team)",
       "subtitle": "Bestuur, commissie, docenten… zichtbaar voor beheerders en genodigden"
@@ -2827,7 +2827,7 @@
       "pickBoth": "Selecteer begin en einde",
       "startTime": "Begintijd",
       "endTime": "Eindtijd",
-      "defaultsHint": "Standaard 10:00 → 16:00. Pas het aan voor uw kamp.",
+      "defaultsHint": "Standaard 10:00 → 16:00. Pas het aan voor je kamp.",
       "sameHoursTitle": "Elke dag dezelfde uren",
       "sameHoursHint": "Schakel uit om van dag tot dag aan te passen"
     },
@@ -3008,7 +3008,7 @@
   },
   "groups": {
     "title": "Clubgroepen",
-    "subtitle": "Creëer aangepaste groepen (bestuur, vrijwilligers…) om uw communicatie doelgericht te maken.",
+    "subtitle": "Maak eigen groepen (bestuur, vrijwilligers…) om je communicatie doelgericht te maken.",
     "empty": "Nog geen groepen.",
     "create": "Groep aanmaken",
     "edit": "Bewerken",
@@ -3296,7 +3296,7 @@
       "rejectPlaceholder": "Bijvoorbeeld Voor deze leeftijdsgroep is het kamp vol.",
       "confirmReject": "Weigeren",
       "capacityFullTitle": "Kamp vol",
-      "capacityFullHelp": "De kampcapaciteit is bereikt. Wilt u dit gezin op de wachtlijst plaatsen?",
+      "capacityFullHelp": "De kampcapaciteit is bereikt. Wil je dit gezin op de wachtlijst plaatsen?",
       "placeOnWaitlist": "Plaats op wachtlijst",
       "docRejectTitle": "Dit document afwijzen?",
       "docRejectHelp": "De familie ontvangt de reden en kan een nieuwe versie uploaden vanaf hun trackingpagina.",
@@ -3425,7 +3425,7 @@
       "headline1": "Wij begrepen wat je nodig had",
       "headline2": "om tijd te besparen",
       "headline3": "en zich weer op de sport concentreren.",
-      "sub": "We hebben alles gedigitaliseerd wat uw avonden opslokt: oproepen, betalingen, toernooien, communicatie. Jij coacht, wij doen de rest.",
+      "sub": "We hebben alles gedigitaliseerd wat je avonden opslokt: oproepen, betalingen, toernooien, communicatie. Jij coacht, wij doen de rest.",
       "cta": "Probeer gratis",
       "ctaSecondary": "Zie kenmerken",
       "trust1": "Gratis proefperiode",
@@ -3445,17 +3445,17 @@
       "f5Body": "Kaarten, schorsingen en blessures worden automatisch bijgehouden per team en seizoen.",
       "f6Title": "Opstellingen en wedstrijdformulieren",
       "f6Body": "Bereid de opstelling voor, deel deze, exporteer het blad. De coach heeft alles op zijn telefoon.",
-      "kicker": "Wij hebben het voor u gedigitaliseerd",
+      "kicker": "We hebben het voor je gedigitaliseerd",
       "title": "Alles waar je uren over deed, nu in een paar klikken.",
       "sub": "Elke functie lost een echt vrijwilligersprobleem op: minder spreadsheets, minder berichten, meer tijd op het veld."
     },
     "ai": {
-      "b1": "Geeft een samenvatting van uw wedstrijden en stelt de volgende opstelling voor",
-      "b2": "Stelt uw communicatie op in één klik, in 7 talen",
+      "b1": "Geeft een samenvatting van je wedstrijden en stelt de volgende opstelling voor",
+      "b2": "Stelt je communicatie op in één klik, in 7 talen",
       "b3": "Detecteert automatisch de voortgang en spelerwaarschuwingen",
-      "b4": "Ingebouwde assistent: stel een vraag over uw club",
+      "b4": "Ingebouwde assistent: stel een vraag over je club",
       "kicker": "Ingebouwde kunstmatige intelligentie",
-      "title": "AI ondersteunt u elke dag.",
+      "title": "AI ondersteunt je elke dag.",
       "sub": "Geen gimmick. Echte hulp die repetitieve taken afhandelt, zodat vrijwilligers zich op de spelers kunnen concentreren.",
       "cta": "Ontdek de assistent",
       "assistantName": "Clubero-assistent",
@@ -3467,7 +3467,7 @@
     "tourn": {
       "b1": "Online registratie, geïntegreerde betaling",
       "b2": "Tabellen, groepen, beugels, live scores",
-      "b3": "Openbare tv-pagina voor uw toeschouwers",
+      "b3": "Openbare tv-pagina voor je toeschouwers",
       "b4": "Oproepen en wedstrijdformulieren inbegrepen",
       "kicker": "Toernooimodule — volledige app",
       "title": "Een echte app voor toernooibeheer, binnen Clubero.",
@@ -3486,7 +3486,7 @@
       "title": "Beyond management: we bouwden het netwerk voor spelers en coaches.",
       "sub": "Elke speler heeft een echt openbaar profiel: statistieken, carrière, media. Elke coach heeft een pagina. Iedereen kan volgen, ontdekken en verbinden.",
       "c1Title": "Openbaar spelersprofiel",
-      "c1Body": "Statistieken, carrière, media: deelbaar, gecertificeerd door uw clubs.",
+      "c1Body": "Statistieken, carrière, media: deelbaar, gecertificeerd door je clubs.",
       "c2Title": "Coachpagina",
       "c2Body": "Zichtbaarheid, tracking, rekrutering. Coaches zijn niet langer onzichtbaar.",
       "c3Title": "Volgers & volgen",
@@ -3494,7 +3494,7 @@
       "cta": "Maak mijn spelersprofiel aan"
     },
     "finalCta": {
-      "title": "Krijg uw tijd terug voor sport.",
+      "title": "Krijg je tijd terug voor sport.",
       "sub": "Gratis proefperiode. Geen creditcard. Gegevens gehost in Europa.",
       "club": "Creëer mijn club",
       "player": "Maak mijn spelersprofiel aan"
@@ -3504,12 +3504,12 @@
     "payNotFound": "Link niet gevonden",
     "securePayment": "Veilig betalen via Stripe.",
     "success": {
-      "settling": "Betaling ontvangen — finalisatie van uw inschrijving..."
+      "settling": "Betaling ontvangen — je inschrijving wordt afgerond…"
     },
     "addPlayer": "Toevoegen"
   },
   "invite": {
-    "noAccountPrompt": "Om deze uitnodiging te accepteren, maakt u uw Clubero-account aan met het uitgenodigde e-mailadres of logt u in als u er al een heeft.",
+    "noAccountPrompt": "Om deze uitnodiging te accepteren, maak je een Clubero-account aan met het uitgenodigde e-mailadres — of log je in als je er al een hebt.",
     "createAccount": "Maak mijn account aan"
   },
   "public": {
@@ -3559,7 +3559,7 @@
       "uploaded": "Logo opgeslagen"
     },
     "pendingTitle": "Aanvraag wordt beoordeeld",
-    "pendingBody": "Zodra de organisatie uw registratie heeft goedgekeurd, kunt u via dezelfde link spelers toevoegen of bewerken.",
+    "pendingBody": "Zodra de organisatie je registratie heeft goedgekeurd, kun je via dezelfde link spelers toevoegen of bewerken.",
     "empty": "Nog geen spelers. Klik op CSV toevoegen of importeren.",
     "captain": "Kapitein",
     "setCaptain": "Kapitein instellen",
@@ -3620,14 +3620,14 @@
     },
     "deadlineHint": "Optioneel: moet vóór de startdatum zijn.",
     "optional": "optioneel",
-    "venueHint": "U kunt deze stap overslaan en deze later toevoegen.",
+    "venueHint": "Je kunt deze stap overslaan en hem later toevoegen.",
     "ageGroupsEmpty": "Er is ten minste één categorie vereist om te publiceren. Je kunt later meer toevoegen.",
     "summary": {
       "deadline": "deadline",
       "places": "vlekken",
       "venueSet": "Locatie ingesteld",
       "ageGroups": "Categorieën",
-      "next": "Het kamp wordt als concept gemaakt. U kunt een beschrijving, afbeelding, programma en documenten toevoegen voordat u deze publiceert."
+      "next": "Het kamp wordt als concept aangemaakt. Je kunt een beschrijving, afbeelding, programma en documenten toevoegen voordat je het publiceert."
     },
     "footerReady": "Alles is klaar",
     "create": "Kamp creëren",
@@ -3638,14 +3638,14 @@
     "newTitle": "Nieuw kamp",
     "create": "Ontwerp maken",
     "title": "Clubkampen",
-    "subtitle": "Creëer en publiceer kampen die door uw club worden aangeboden.",
+    "subtitle": "Maak en publiceer de kampen die je club aanbiedt.",
     "new": "Nieuw kamp",
     "empty": "Nog geen kampen.",
     "hasVenue": "Locatie ingesteld",
     "active_only": "Actief",
     "show_all": "Alles bekijken",
     "no_active": "Er is nog geen activiteit gebruikt voor deze sessie.",
-    "show_all_hint": "Toont alle teamactiviteiten, zodat u er één kunt kiezen.",
+    "show_all_hint": "Toont alle teamactiviteiten, zodat je er één kunt kiezen.",
     "empty_hint": "Voeg een uitdaging of test toe aan deze sessie."
   },
   "form": {
@@ -3747,10 +3747,10 @@
   "waitlist": {
     "badge": "Binnenkort",
     "title": "Aankomende functies",
-    "subtitle": "Laat uw e-mailadres achter om op de hoogte te worden gesteld wanneer een functie beschikbaar komt. Geen verplichting, geen betaling.",
-    "success": "Bedankt! We schrijven u zodra het klaar is.",
-    "emailLabel": "Uw e-mail",
-    "featuresLabel": "Functies waarin u geïnteresseerd bent",
+    "subtitle": "Laat je e-mailadres achter om op de hoogte te worden gesteld zodra een functie beschikbaar is. Geen verplichting, geen betaling.",
+    "success": "Bedankt! We schrijven je zodra het klaar is.",
+    "emailLabel": "Je e-mail",
+    "featuresLabel": "Functies waarin je geïnteresseerd bent",
     "roleLabel": "Jouw rol",
     "rolePlaceholder": "— Kiezen —",
     "consent": "Ik ga ermee akkoord om Clubero-updates over aankomende functies te ontvangen. Met één klik uitschrijven.",
@@ -3805,7 +3805,7 @@
     "intro": "Meerdere trofeeën per toernooi: Kampioenen/Europa, Beker/Plaat, Goud/Zilver/Brons of aangepast.",
     "reconfigure": "Opnieuw configureren",
     "advancedDanger": "Geavanceerde opties (gevaarlijk)",
-    "regenWarn": "Als u de schema’s opnieuw genereert, worden alle reeds ingevoerde finaleresultaten gewist.",
+    "regenWarn": "Als je de schema’s opnieuw genereert, worden alle reeds ingevoerde finaleresultaten gewist.",
     "regenerate": "Herstel schema’s",
     "generate": "Genereer schema’s",
     "waitGroups": "Voltooi alle groepswedstrijden om schema’s te genereren.",
@@ -3841,7 +3841,7 @@
     "assignRefereeAction": "Wijs een scheidsrechter aan",
     "refereeOffline": "(geen account)",
     "lockedTitle": "Wedstrijd gevalideerd",
-    "lockedHelper": "Om de score te bewerken, moet u eerst de wedstrijd ongeldig maken.",
+    "lockedHelper": "Om de score te bewerken, moet je eerst de bevestiging van de wedstrijd ongedaan maken.",
     "nextMatch": "Volgende wedstrijd",
     "unvalidateToEdit": "Maak de validering ongedaan om te bewerken",
     "allMatchesEntered": "Alle wedstrijden zijn ingevoerd."
@@ -3875,7 +3875,7 @@
     }
   },
   "createChooser": {
-    "abandonConfirm": "De assistent verlaten? Uw antwoorden worden gewist. Je kunt ook sluiten om ze de volgende keer weer te vinden."
+    "abandonConfirm": "De assistent verlaten? Je antwoorden worden gewist. Je kunt de pagina ook sluiten om ze de volgende keer terug te vinden."
   },
   "pass": {
     "quantityLabel": "Aantal passen"
@@ -3893,7 +3893,7 @@
     "changeLogo": "Wijzig logo",
     "addLogo": "Voeg een logo toe",
     "teams": "ploegen",
-    "linkCopiedOpenBrowser": "Link gekopieerd – open deze in uw browser (Safari/Chrome).",
+    "linkCopiedOpenBrowser": "Link gekopieerd – open hem in je browser (Safari/Chrome).",
     "openPublic": "Openbare pagina",
     "openTv": "TV-scherm",
     "autoScheduleCta": {

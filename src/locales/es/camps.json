@@ -161,7 +161,7 @@
     "pickPreset": "Elegir U6 – U19",
     "allAdded": "Todas añadidas",
     "addCustom": "+ Categoría personalizada",
-    "selectAll": "Seleccione las categorías relevantes",
+    "selectAll": "Selecciona las categorías relevantes",
     "customs": "Categorías personalizadas"
   },
   "cover": {
@@ -293,7 +293,7 @@
       "ageMismatch": "La edad del menor no corresponde a la categoría elegida.",
       "generic": "Se ha producido un error. Inténtalo de nuevo.",
       "network": "Error de red. Comprueba tu conexión.",
-      "duplicate": "Este niño ya está inscrito en este stage. Consulte el correo recibido para seguir el expediente.",
+      "duplicate": "Este niño ya está inscrito en este campamento. Consulta el correo recibido para más detalles.",
       "loadFailed": "No se puede cargar este campus.",
       "notFound": "Campus no encontrado",
       "notFoundBody": "Este campus no está disponible o aún no se ha publicado.",
@@ -304,7 +304,7 @@
     "registerWaitlistCta": "Unirse a la lista de espera",
     "tracking": {
       "invalidTitle": "Enlace inválido o caducado",
-      "invalidBody": "Este enlace de seguimiento no es válido. Compruebe el enlace recibido por correo.",
+      "invalidBody": "Este enlace de seguimiento no es válido. Comprueba el enlace recibido por correo.",
       "title": "Seguimiento de inscripción",
       "participant": "Participante",
       "bornOn": "Nacido/a el {{date}}",

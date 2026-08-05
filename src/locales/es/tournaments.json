@@ -491,7 +491,7 @@
       "paid": "Pagado",
       "exempt": "Eximir",
       "unpaid": "para recoger",
-      "cycleHint": "Haga clic para cambiar el estado de pago"
+      "cycleHint": "Haz clic para cambiar el estado de pago"
     }
   },
   "roster": {
@@ -746,7 +746,7 @@
     "overwriteDesc": "Esta acción eliminará la composición actual (grupos/cuadro) y los partidos asociados. Los equipos inscritos se mantendrán.",
     "cancel": "Cancelar",
     "confirmRelaunch": "Confirmar y reiniciar",
-    "relaunchFromFooterHint": "Sorteo completado. Utilice \"Reiniciar\" en la parte inferior del cuadro de diálogo para generar uno nuevo (los resultados actuales se perderán)."
+    "relaunchFromFooterHint": "Sorteo completado. Utiliza «Reiniciar» en la parte inferior del cuadro de diálogo para generar uno nuevo (los resultados actuales se perderán)."
   },
   "rules": {
     "savedToast": "Reglas guardadas",
@@ -994,7 +994,7 @@
     "openTv": "pantalla de televisión",
     "autoScheduleCta": {
       "title": "Programar partidos automáticamente",
-      "subtitle": "Aún no hay cancha ni horario asignado. Ejecute la programación automática."
+      "subtitle": "Aún no hay campo ni horario asignado. Ejecuta la programación automática."
     }
   },
   "publishFlow": {
