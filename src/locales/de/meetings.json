@@ -4,11 +4,11 @@
     "count": "{{count}} Eingeladene"
   },
   "empty": {
-    "staff": "Keine Eingeladenen — nutzen Sie „Eingeladene verwalten“, um Gruppen oder Personen einzuladen.",
-    "member": "Sie sind zu diesem Meeting nicht eingeladen."
+    "staff": "Keine Eingeladenen — nutze „Eingeladene verwalten“, um Gruppen oder Personen einzuladen.",
+    "member": "Du bist zu diesem Meeting nicht eingeladen."
   },
   "self": {
-    "prompt": "Ihre Anwesenheit:"
+    "prompt": "Deine Anwesenheit:"
   },
   "source": {
     "manual": "manuell hinzugefügt"
@@ -30,7 +30,7 @@
   "manage": {
     "cta": "Eingeladene verwalten",
     "title": "Wen einladen?",
-    "desc": "Wählen Sie Gruppen, Teams oder Personen. Jede Person wird nur einmal eingeladen.",
+    "desc": "Wähle Gruppen, Teams oder Personen. Jede Person wird nur einmal eingeladen.",
     "save": "Speichern",
     "confirm": "Einladen"
   },
@@ -39,7 +39,7 @@
   },
   "confirmRemove": {
     "title": "Personen entfernen, die bereits geantwortet haben?",
-    "desc": "Diese Personen haben bereits geantwortet oder wurden erfasst. Beim Entfernen werden auch Antwort und Anwesenheit gelöscht. Sie bleiben eingeladen, bis Sie bestätigen.",
+    "desc": "Diese Personen haben bereits geantwortet oder wurden erfasst. Beim Entfernen werden auch Antwort und Anwesenheit gelöscht. Sie bleiben eingeladen, bis du bestätigst.",
     "keep": "Behalten",
     "confirm": "Trotzdem entfernen"
   }

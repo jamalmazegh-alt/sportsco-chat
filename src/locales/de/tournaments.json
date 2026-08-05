@@ -147,7 +147,7 @@
       "metaTitle": "Anmeldung bestätigt — {{slug}} · Clubero",
       "title": "Zahlung erhalten, Anmeldung bestätigt!",
       "body": "Eine Bestätigungs-E-Mail wurde dir gesendet. Bis bald auf dem Platz!",
-      "settling": "Zahlung erhalten – Abschluss Ihrer Registrierung…"
+      "settling": "Zahlung erhalten – deine Anmeldung wird abgeschlossen…"
     },
     "payMetaTitle": "Zahlung — {{slug}} · Clubero",
     "payNotFound": "Link nicht gefunden",
@@ -203,7 +203,7 @@
     "signIn": "Anmelden",
     "accept": "Einladung annehmen",
     "accepted": "Einladung angenommen",
-    "noAccountPrompt": "Um diese Einladung anzunehmen, erstellen Sie Ihr Clubero-Konto mit der E-Mail-Adresse der eingeladenen Person oder melden Sie sich an, falls Sie bereits eines haben.",
+    "noAccountPrompt": "Um diese Einladung anzunehmen, erstelle dein Clubero-Konto mit der E-Mail-Adresse der eingeladenen Person – oder melde dich an, falls du schon eines hast.",
     "createAccount": "Mein Konto erstellen",
     "useExactEmail": "Verwende die E-Mail {{email}}, damit die Einladung erkannt wird."
   },
@@ -409,8 +409,8 @@
     },
     "invite": {
       "success": "Einladung per E-Mail verschickt",
-      "button": "Laden Sie ein Team ein",
-      "title": "Laden Sie ein Team zum Bezahlen ein",
+      "button": "Team einladen",
+      "title": "Ein Team zum Bezahlen einladen",
       "description": "Das Team erhält eine personalisierte E-Mail mit seinem sicheren Zahlungslink.",
       "teamName": "Teamname",
       "contactName": "Kontaktname",
@@ -420,8 +420,8 @@
     },
     "stripeNotConnected": {
       "title": "Zahlungskonto nicht verbunden",
-      "description": "Für dieses Turnier ist eine Online-Zahlung erforderlich, aber Ihr Club hat kein Stripe-Konto verknüpft. Teams können erst bezahlen, wenn das Konto eingerichtet ist.",
-      "cta": "Verbinden Sie ein Stripe-Konto"
+      "description": "Für dieses Turnier ist eine Online-Zahlung erforderlich, aber dein Verein hat kein Stripe-Konto verknüpft. Teams können erst bezahlen, wenn das Konto eingerichtet ist.",
+      "cta": "Stripe-Konto verbinden"
     },
     "loadError": "Fehler beim Laden der Registrierungen"
   },
@@ -491,7 +491,7 @@
       "paid": "Bezahlt",
       "exempt": "Befreit",
       "unpaid": "Zum Sammeln",
-      "cycleHint": "Klicken Sie hier, um den Zahlungsstatus zu ändern"
+      "cycleHint": "Klicke hier, um den Zahlungsstatus zu ändern"
     }
   },
   "roster": {
@@ -505,7 +505,7 @@
       "desc": "CSV-Format: Vorname, Nachname, Trikotnummer, Position, ist_Kapitän. Trennzeichen , ; oder Tab akzeptiert.",
       "file": "Wähle eine Datei",
       "template": "Vorlage",
-      "orPaste": "Oder fügen Sie CSV-Inhalte ein:",
+      "orPaste": "Oder füge CSV-Inhalte ein:",
       "append": "Zur Liste hinzufügen",
       "replace": "Dienstplan ersetzen",
       "confirm": "Importieren"
@@ -554,13 +554,13 @@
       "title": "Teamlogo",
       "help": "PNG, JPG, WEBP oder SVG · 4 MB max",
       "change": "Ändern",
-      "upload": "Fügen Sie ein Logo hinzu",
+      "upload": "Logo hinzufügen",
       "removed": "Logo entfernt",
       "tooLarge": "Datei zu groß (maximal 4 MB)",
       "uploaded": "Logo gespeichert"
     },
     "pendingTitle": "Antrag wird geprüft",
-    "pendingBody": "Sobald die Organisation Ihre Registrierung genehmigt hat, können Sie über denselben Link Spieler hinzufügen oder bearbeiten.",
+    "pendingBody": "Sobald die Organisation deine Anmeldung genehmigt hat, kannst du über denselben Link Spieler hinzufügen oder bearbeiten.",
     "playersLabelMax": "Spieler ({{count}} / {{max}})",
     "remaining": "{{n}} Plätze frei",
     "captain": "Kapitän",
@@ -746,7 +746,7 @@
     "overwriteDesc": "Diese Aktion löscht die aktuelle Zusammenstellung (Gruppen/Turnierbaum) und die zugehörigen Spiele. Angemeldete Teams bleiben erhalten.",
     "cancel": "Abbrechen",
     "confirmRelaunch": "Bestätigen und neu starten",
-    "relaunchFromFooterHint": "Ziehung abgeschlossen. Verwenden Sie „Neu starten“ unten im Dialog, um ein neues zu erstellen (aktuelle Ergebnisse gehen verloren)."
+    "relaunchFromFooterHint": "Auslosung abgeschlossen. Nutze „Neu starten“ unten im Dialog, um eine neue zu erstellen (aktuelle Ergebnisse gehen verloren)."
   },
   "rules": {
     "savedToast": "Regeln gespeichert",
@@ -903,7 +903,7 @@
     "nextMatch": "Nächstes Spiel",
     "allMatchesEntered": "Alle Spiele wurden erfasst.",
     "errorGeneric": "Fehler",
-    "progressionFailedCommitted": "Ergebnis gespeichert. Die Turnierbaum-Fortschreibung konnte nicht abgeschlossen werden — wenden Sie sich an einen Administrator, bevor Sie fortfahren.",
+    "progressionFailedCommitted": "Ergebnis gespeichert. Die Fortschreibung im Turnierbaum konnte nicht abgeschlossen werden — wende dich an einen Administrator, bevor du fortfährst.",
     "validate": "Ergebnis bestätigen",
     "unvalidate": "Bestätigung aufheben",
     "unvalidateToEdit": "Zum Bearbeiten Bestätigung aufheben",
@@ -987,14 +987,14 @@
     "statusUpdated": "Status aktualisiert",
     "logoUpdated": "Logo aktualisiert",
     "changeLogo": "Logo ändern",
-    "addLogo": "Fügen Sie ein Logo hinzu",
+    "addLogo": "Logo hinzufügen",
     "teams": "Mannschaften",
-    "linkCopiedOpenBrowser": "Link kopiert – öffnen Sie ihn in Ihrem Browser (Safari/Chrome).",
+    "linkCopiedOpenBrowser": "Link kopiert – öffne ihn in deinem Browser (Safari/Chrome).",
     "openPublic": "Öffentliche Seite",
     "openTv": "Fernsehbildschirm",
     "autoScheduleCta": {
-      "title": "Planen Sie Spiele automatisch",
-      "subtitle": "Noch kein Gericht oder Zeitplan zugewiesen. Führen Sie die automatische Planung aus."
+      "title": "Spiele automatisch planen",
+      "subtitle": "Noch kein Platz und kein Zeitfenster zugewiesen. Starte die automatische Planung."
     }
   },
   "publishFlow": {
@@ -1081,7 +1081,7 @@
     "saved": "Einstellungen gespeichert",
     "saveError": "Speichern nicht möglich",
     "personalTournamentWarning": "Dieses Turnier ist keinem Verein zugeordnet. Online-Zahlungen erfordern einen Verein mit aktiviertem Stripe-Konto.",
-    "stripeRequired": "Verbinden Sie Ihr Stripe-Konto, um Zahlungen zu aktivieren.",
+    "stripeRequired": "Verbinde dein Stripe-Konto, um Zahlungen zu aktivieren.",
     "connectStripe": "Stripe verbinden",
     "feeMinError": "Der Betrag muss größer oder gleich 0 sein.",
     "feeInvalid": "Ungültiger Betrag.",
@@ -1253,8 +1253,8 @@
     "advancedDanger": "Erweiterte Optionen (gefährlich)",
     "regenWarn": "Durch die Neugenerierung der Klammern werden alle bereits eingegebenen Endergebnisse gelöscht.",
     "regenerate": "Klammern neu generieren",
-    "fifthPlaceDisabled": "Aktivieren Sie zuerst den 3. Platz",
-    "seventhPlaceDisabled": "Aktivieren Sie zuerst den 5. Platz"
+    "fifthPlaceDisabled": "Aktiviere zuerst den 3. Platz",
+    "seventhPlaceDisabled": "Aktiviere zuerst den 5. Platz"
   },
   "controlCenter": {
     "nextAction": "Nächste Aktion",
@@ -1321,7 +1321,7 @@
     "quickHint": "5 Screens, große Buttons, keine Überraschungen.",
     "simulatorLink": "Format vor dem Erstellen simulieren",
     "back": "Zurück",
-    "abandonConfirm": "Den Assistenten verlassen? Ihre Antworten werden gelöscht. Sie können die Seite auch schließen, um sie beim nächsten Mal wiederzufinden."
+    "abandonConfirm": "Den Assistenten verlassen? Deine Antworten werden gelöscht. Du kannst die Seite auch schließen, um sie beim nächsten Mal wiederzufinden."
   },
   "aiAssistant": {
     "intro": "Hi 👋 Wir richten dein Turnier Schritt für Schritt ein.",
@@ -1658,7 +1658,7 @@
     "openButton": "Gruppen manuell bearbeiten",
     "savedToast": "Gruppen aktualisiert",
     "title": "Gruppen bearbeiten",
-    "subtitle": "Ordnen Sie die Teams vor Spielbeginn neu zu. Die Spielpaarungen werden neu erstellt.",
+    "subtitle": "Ordne die Teams vor Spielbeginn neu zu. Die Spielpaarungen werden neu erstellt.",
     "locked": "Gruppenspiele haben bereits begonnen – Bearbeiten ist nicht möglich.",
     "teamsShort": "Tms",
     "empty": "Keine Teams",

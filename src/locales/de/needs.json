@@ -163,7 +163,7 @@
     "unassigned": "Zuweisung storniert",
     "fullTitle": "Kapazität erreicht",
     "unassignCta": "Entfernen",
-    "fullBlock": "Kapazität erreicht. Entfernen Sie zuerst eine bestätigte Person, um eine andere zuzuweisen."
+    "fullBlock": "Kapazität erreicht. Entferne zuerst eine bestätigte Person, um eine andere zuzuweisen."
   },
   "pendingApplications_one": "{{count}} offen",
   "pendingApplications_other": "{{count}} offen",
