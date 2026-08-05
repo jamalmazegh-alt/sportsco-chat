@@ -1320,7 +1320,7 @@
     "pillUpcoming": "aanstaande",
     "notPlayedYet": "De wedstrijd is nog niet gespeeld; de score kan na het laatste fluitsignaal worden ingevoerd.",
     "finishedTitle": "De wedstrijd is afgelopen.",
-    "finishedHint": "Bewaar de score en match feiten.",
+    "finishedHint": "Bewaar de score en wedstrijdgebeurtenissen.",
     "enterResult": "Resultaat invoeren"
   },
   "channels": {
@@ -2988,7 +2988,7 @@
       "facilityLabel": "Veld / accommodatie",
       "facilityPlaceholder": "Kies een veld",
       "noFacilitiesHint": "Geen veld geconfigureerd.",
-      "noFacilityOption": "Geen rechtbank"
+      "noFacilityOption": "Geen veld"
     },
     "surfacePlaceholder": "Gras, kunstgras, parket…"
   },
@@ -3663,7 +3663,7 @@
     "venue": "Locatie",
     "venuePlaceholder": "Kies een locatie",
     "venueNone": "— Geen —",
-    "facility": "Rechtbank / faciliteit",
+    "facility": "Veld / faciliteit",
     "facilityPlaceholder": "Optioneel",
     "facilityNone": "— Geen —",
     "externalAddress": "Adres",
@@ -3770,7 +3770,7 @@
   },
   "controlCenter": {
     "nextAction": "Volgende actie",
-    "byCourts": "Via de rechtbank",
+    "byCourts": "Via de veld",
     "liveBadge": "LIVE",
     "liveCourts": "Live",
     "nextMatches": "Volgende wedstrijden",
@@ -3783,7 +3783,7 @@
       "live": "Live",
       "upcoming": "Aankomend"
     },
-    "flightsReady": "Groepsfasen zijn afgerond. Maak vluchten aan om de 3 haakjes te genereren (Champions / Europa / Conference)."
+    "flightsReady": "Groepsfasen zijn afgerond. Maak Flights aan om de 3 schema’s te genereren (Champions / Europa / Conference)."
   },
   "draw": {
     "relaunchFromFooterHint": "Trekking voltooid. Gebruik “Opnieuw starten” onderaan het dialoogvenster om een ​​nieuwe te genereren (huidige resultaten gaan verloren)."
@@ -3792,26 +3792,26 @@
     "streamUrlPlaceholder": "Streaming-URL (YouTube, Twitch…)"
   },
   "flights": {
-    "savedToast": "Vluchten opgeslagen",
+    "savedToast": "Flights opgeslagen",
     "fallback": {
-      "empty": "Er is geen beugel gegenereerd: de structuur kwalificeert niet genoeg teams per vlucht. Pas de verdeling aan, gebruik een fallback-template (Troost/Medailles) of configureer vluchten handmatig.",
+      "empty": "Er is geen schema gegenereerd: de structuur kwalificeert niet genoeg teams per Flight. Pas de verdeling aan, gebruik een fallback-template (Troost/Medailles) of configureer Flights handmatig.",
       "error": "Generatie onmogelijk voor deze structuur. Probeer een andere sjabloon of handmatige modus.",
-      "title": "Dit formaat staat het automatisch genereren van de 3 vluchten niet toe",
-      "body": "De groepsstructuur (ongelijke of te kleine maten) is niet netjes opgesplitst in Champions / Europa / Conference. Kies een Consolation / Medals / Cup-Plate-sjabloon of pas vluchten handmatig aan."
+      "title": "Dit formaat staat het automatisch genereren van de 3 Flights niet toe",
+      "body": "De groepsstructuur (ongelijke of te kleine maten) is niet netjes opgesplitst in Champions / Europa / Conference. Kies een Consolation / Medals / Cup-Plate-sjabloon of pas Flights handmatig aan."
     },
-    "regenConfirm": "Finalewedstrijden hebben al uitslag. Het opnieuw genereren van haakjes zal al deze resultaten WISSEN. Doorgaan?",
-    "noGroups": "Creëer eerst de groepsfase. Vluchten worden achteraf gegenereerd.",
-    "title": "Vluchten / finales",
+    "regenConfirm": "Finalewedstrijden hebben al uitslag. Het opnieuw genereren van schema’s zal al deze resultaten WISSEN. Doorgaan?",
+    "noGroups": "Creëer eerst de groepsfase. Flights worden achteraf gegenereerd.",
+    "title": "Flights / finales",
     "intro": "Meerdere trofeeën per toernooi: Kampioenen/Europa, Beker/Plaat, Goud/Zilver/Brons of aangepast.",
     "reconfigure": "Opnieuw configureren",
     "advancedDanger": "Geavanceerde opties (gevaarlijk)",
-    "regenWarn": "Als u de haakjes opnieuw genereert, worden alle reeds ingevoerde finaleresultaten gewist.",
-    "regenerate": "Herstel haakjes",
-    "generate": "Genereer haakjes",
-    "waitGroups": "Voltooi alle groepswedstrijden om haakjes te genereren.",
+    "regenWarn": "Als u de schema’s opnieuw genereert, worden alle reeds ingevoerde finaleresultaten gewist.",
+    "regenerate": "Herstel schema’s",
+    "generate": "Genereer schema’s",
+    "waitGroups": "Voltooi alle groepswedstrijden om schema’s te genereren.",
     "preset": {
       "consolation": "Troostvoorinstelling (1 klik)",
-      "consolationDesc": "Creëert 2 vluchten: Main (groepswinnaars) en Consolation (verliezers). Configuratie klaar om op te slaan."
+      "consolationDesc": "Creëert 2 Flights: Main (groepswinnaars) en Consolation (verliezers). Configuratie klaar om op te slaan."
     },
     "wizard": {
       "template": "Naam sjabloon",
@@ -3819,7 +3819,7 @@
       "clean": "Schone beugels",
       "customize": "Pas aan",
       "back": "Terug",
-      "save": "Bespaar vluchten",
+      "save": "Flights opslaan",
       "distribution": "Verdeling ({{n}} teams)"
     },
     "rulesCount": "regels",
@@ -3829,8 +3829,8 @@
     "seventhPlaceDisabled": "Schakel eerst de 5e plaats in",
     "seventhPlace": "7e plaats",
     "public": {
-      "empty": "Er is nog geen vlucht geconfigureerd voor dit toernooi.",
-      "noMatches": "Wedstrijden voor deze vlucht worden na de groepsfase gegenereerd."
+      "empty": "Er is nog geen Flight geconfigureerd voor dit toernooi.",
+      "noMatches": "Wedstrijden voor deze Flight worden na de groepsfase gegenereerd."
     },
     "draftRulesSummary": "{{n}} kwalificatieregel(s) geconfigureerd",
     "generatedToast": "{{n}} wedstrijden aangemaakt"
@@ -3871,7 +3871,7 @@
     "summary": {
       "matchDuration": "Wedstrijdduur",
       "pause": "Pauze tussen wedstrijden",
-      "terrains": "Rechtbanken"
+      "terrains": "Velden"
     }
   },
   "createChooser": {
@@ -3898,7 +3898,7 @@
     "openTv": "TV-scherm",
     "autoScheduleCta": {
       "title": "Automatisch wedstrijden plannen",
-      "subtitle": "Nog geen rechtbank of schema toegewezen. Voer automatische planning uit."
+      "subtitle": "Nog geen veld of schema toegewezen. Voer automatische planning uit."
     }
   },
   "sections": {

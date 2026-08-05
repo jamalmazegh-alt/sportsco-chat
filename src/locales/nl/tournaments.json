@@ -994,7 +994,7 @@
     "openTv": "TV-scherm",
     "autoScheduleCta": {
       "title": "Automatisch wedstrijden plannen",
-      "subtitle": "Nog geen rechtbank of schema toegewezen. Voer automatische planning uit."
+      "subtitle": "Nog geen veld of schema toegewezen. Voer automatische planning uit."
     }
   },
   "publishFlow": {
@@ -1249,10 +1249,10 @@
       "medals": "Directe eliminatie met podium Goud / Zilver / Brons voor de top 3. Kort en klassiek format.",
       "consolation": "2 tableaus: Hoofd (groepswinnaars) en Troostronde (verliezers). Eenvoudige oplossing om iedereen te laten spelen."
     },
-    "regenConfirm": "Finalewedstrijden hebben al uitslag. Het opnieuw genereren van haakjes zal al deze resultaten WISSEN. Doorgaan?",
+    "regenConfirm": "Finalewedstrijden hebben al uitslag. Het opnieuw genereren van schema’s zal al deze resultaten WISSEN. Doorgaan?",
     "advancedDanger": "Geavanceerde opties (gevaarlijk)",
-    "regenWarn": "Als u de haakjes opnieuw genereert, worden alle reeds ingevoerde finaleresultaten gewist.",
-    "regenerate": "Herstel haakjes",
+    "regenWarn": "Als u de schema’s opnieuw genereert, worden alle reeds ingevoerde finaleresultaten gewist.",
+    "regenerate": "Herstel schema’s",
     "fifthPlaceDisabled": "Schakel eerst de 3e plaats in",
     "seventhPlaceDisabled": "Schakel eerst de 5e plaats in"
   },
@@ -1294,7 +1294,7 @@
       "fields": "Velden",
       "share": "Delen"
     },
-    "byCourts": "Via de rechtbank",
+    "byCourts": "Via de veld",
     "progress": "Voortgang"
   },
   "cockpit": {
@@ -1402,7 +1402,7 @@
       "simTerrains": "Velden",
       "matchDuration": "Wedstrijdduur",
       "pause": "Pauze tussen wedstrijden",
-      "terrains": "Rechtbanken"
+      "terrains": "Velden"
     },
     "footerSub": {
       "question": "De assistent blijft — aanpassen zonder iets te verliezen",

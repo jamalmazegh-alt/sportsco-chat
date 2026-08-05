@@ -1130,7 +1130,7 @@
       "invitePlayersFirstTitle": "Invita giocatori",
       "subtitle": "{{count}} giocatori convocati"
     },
-    "scoreDisabledCancelled": "Evento annullato: modifica del punteggio e dei fatti della partita disabilitata."
+    "scoreDisabledCancelled": "Evento annullato: modifica del punteggio e degli eventi della partita disabilitata."
   },
   "followUps": {
     "title": "Da ricordare",
@@ -1320,7 +1320,7 @@
     "pillUpcoming": "imminente",
     "notPlayedYet": "La partita non è ancora stata giocata: il punteggio può essere inserito dopo il fischio finale.",
     "finishedTitle": "La partita è finita.",
-    "finishedHint": "Salva il punteggio e i fatti della partita.",
+    "finishedHint": "Salva il punteggio e gli eventi della partita.",
     "enterResult": "Inserisci il risultato"
   },
   "channels": {
@@ -2988,7 +2988,7 @@
       "facilityLabel": "Campo / struttura",
       "facilityPlaceholder": "Scegli un campo",
       "noFacilitiesHint": "Nessun campo configurato.",
-      "noFacilityOption": "Nessun tribunale"
+      "noFacilityOption": "Nessun campo"
     },
     "surfacePlaceholder": "Erba, sintetico, parquet…"
   },
@@ -3466,7 +3466,7 @@
     },
     "tourn": {
       "b1": "Iscrizione online, pagamento integrato",
-      "b2": "Classifiche, gruppi, parentesi, risultati in tempo reale",
+      "b2": "Classifiche, gruppi, tabelloni, risultati in tempo reale",
       "b3": "Pagina della TV pubblica per i tuoi spettatori",
       "b4": "Convocazioni e resoconto partita inclusi",
       "kicker": "Modulo Torneo: app completa",
@@ -3770,7 +3770,7 @@
   },
   "controlCenter": {
     "nextAction": "Azione successiva",
-    "byCourts": "Per tribunale",
+    "byCourts": "Per campo",
     "liveBadge": "LIVE",
     "liveCourts": "Live",
     "nextMatches": "Prossime partite",
@@ -3783,7 +3783,7 @@
       "live": "Live",
       "upcoming": "Prossimamente"
     },
-    "flightsReady": "La fase a gironi è terminata. Crea Voli per generare i 3 gironi (Champions/Europa/Conference)."
+    "flightsReady": "La fase a gironi è terminata. Crea i Flights per generare i 3 tabelloni (Champions/Europa/Conference)."
   },
   "draw": {
     "relaunchFromFooterHint": "Sorteggio completato. Utilizzare \"Riavvia\" nella parte inferiore della finestra di dialogo per generarne uno nuovo (i risultati correnti andranno persi)."
@@ -3792,23 +3792,23 @@
     "streamUrlPlaceholder": "URL dello streaming (YouTube, Twitch...)"
   },
   "flights": {
-    "savedToast": "Voli salvati",
+    "savedToast": "Flights salvati",
     "fallback": {
-      "empty": "Nessuna fascia generata: la struttura non qualifica un numero sufficiente di squadre per volo. Modifica la distribuzione, utilizza un modello di riserva (Consolazione/Medaglie) o configura i voli manualmente.",
+      "empty": "Nessuna fascia generata: la struttura non qualifica un numero sufficiente di squadre per Flight. Modifica la distribuzione, utilizza un modello di riserva (Consolazione/Medaglie) o configura i Flights manualmente.",
       "error": "Generazione impossibile per questa struttura. Prova un altro modello o la modalità manuale.",
-      "title": "Questo formato non permette la generazione automatica dei 3 voli",
-      "body": "La struttura dei gironi (dimensioni irregolari o troppo piccole) non è divisa in modo netto in Champions/Europa/Conference. Scegli un modello di Consolazione / Medaglie / Coppa-Piatto o personalizza i voli manualmente."
+      "title": "Questo formato non permette la generazione automatica dei 3 Flights",
+      "body": "La struttura dei gironi (dimensioni irregolari o troppo piccole) non è divisa in modo netto in Champions/Europa/Conference. Scegli un modello di Consolazione / Medaglie / Coppa-Piatto o personalizza i Flights manualmente."
     },
-    "regenConfirm": "Le partite finali hanno già i risultati. La rigenerazione delle parentesi CANCELLERA' tutti questi risultati. Continuare?",
-    "noGroups": "Crea prima la fase a gironi. I voli vengono generati successivamente.",
-    "title": "Voli/finali",
+    "regenConfirm": "Le partite finali hanno già i risultati. La rigenerazione delle tabelloni CANCELLERA' tutti questi risultati. Continuare?",
+    "noGroups": "Crea prima la fase a gironi. I Flights vengono generati successivamente.",
+    "title": "Flights/finali",
     "intro": "Trofei multipli per torneo: Campioni/Europa, Coppa/Piatto, Oro/Argento/Bronzo o personalizzati.",
     "reconfigure": "Riconfigurare",
     "advancedDanger": "Opzioni avanzate (pericolose)",
-    "regenWarn": "La rigenerazione delle parentesi cancella tutti i risultati finali già inseriti.",
-    "regenerate": "Rigenerare le parentesi",
-    "generate": "Genera parentesi",
-    "waitGroups": "Completa tutte le partite del girone per generare parentesi.",
+    "regenWarn": "La rigenerazione delle tabelloni cancella tutti i risultati finali già inseriti.",
+    "regenerate": "Rigenerare le tabelloni",
+    "generate": "Genera tabelloni",
+    "waitGroups": "Completa tutte le partite del girone per generare tabelloni.",
     "preset": {
       "consolation": "Preimpostazione di consolazione (1 clic)",
       "consolationDesc": "Crea 2 flight: Principale (vincitori del girone) e Consolazione (perdenti). Configurazione pronta per il salvataggio."
@@ -3816,10 +3816,10 @@
     "wizard": {
       "template": "Modello di nome",
       "notEnough": "Sono necessarie almeno 4 squadre.",
-      "clean": "Parentesi pulite",
+      "clean": "Tabelloni pulite",
       "customize": "Personalizza",
       "back": "Indietro",
-      "save": "Salva voli",
+      "save": "Salva Flights",
       "distribution": "Ripartizione ({{n}} squadre)"
     },
     "rulesCount": "regole",
@@ -3829,8 +3829,8 @@
     "seventhPlaceDisabled": "Abilita prima il 5° posto",
     "seventhPlace": "7° posto",
     "public": {
-      "empty": "Nessun volo è stato ancora configurato per questo torneo.",
-      "noMatches": "Le partite per questo volo verranno generate dopo la fase a gironi."
+      "empty": "Nessun Flight è stato ancora configurato per questo torneo.",
+      "noMatches": "Le partite per questo Flight verranno generate dopo la fase a gironi."
     },
     "draftRulesSummary": "{{n}} regola/e di qualificazione configurata/e",
     "generatedToast": "{{n}} partite create"
@@ -3871,7 +3871,7 @@
     "summary": {
       "matchDuration": "Durata della partita",
       "pause": "Pausa tra le partite",
-      "terrains": "Tribunali"
+      "terrains": "Campi"
     }
   },
   "createChooser": {
@@ -3898,7 +3898,7 @@
     "openTv": "schermo televisivo",
     "autoScheduleCta": {
       "title": "Pianifica automaticamente le partite",
-      "subtitle": "Nessun tribunale o programma assegnato ancora. Esegui la pianificazione automatica."
+      "subtitle": "Nessun campo o programma assegnato ancora. Esegui la pianificazione automatica."
     }
   },
   "sections": {

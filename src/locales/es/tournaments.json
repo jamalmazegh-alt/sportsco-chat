@@ -1197,8 +1197,8 @@
     "title": "Flights / fases finales",
     "intro": "Varios trofeos por torneo: Campeones/Europa, Copa/Plato, Oro/Plata/Bronce o personalizado.",
     "reconfigure": "Reconfigurar",
-    "generate": "Generar brackets",
-    "waitGroups": "Completa todos los partidos de grupos para generar los brackets.",
+    "generate": "Generar cuadros",
+    "waitGroups": "Completa todos los partidos de grupos para generar los cuadros.",
     "noGroups": "Crea primero la fase de grupos. Los Flights se generan después.",
     "savedToast": "Flights guardados",
     "generatedToast": "{{n}} partidos creados",
@@ -1230,7 +1230,7 @@
       "template": "Plantilla de nombres",
       "distribution": "Distribución ({{n}} equipos)",
       "notEnough": "Se requieren al menos 4 equipos.",
-      "clean": "Brackets limpios",
+      "clean": "Cuadros limpios",
       "customize": "Personalizar",
       "back": "Atrás",
       "save": "Guardar Flights"
@@ -1249,10 +1249,10 @@
       "medals": "Eliminación directa con podio Oro / Plata / Bronce para los 3 primeros equipos. Formato corto y clásico.",
       "consolation": "2 cuadros: Principal (ganadores de grupo) y Consolación (perdedores). Solución simple para que todos sigan jugando."
     },
-    "regenConfirm": "Los partidos de las finales ya tienen resultados. La regeneración de brackets BORRARÁ todos esos resultados. ¿Continuar?",
+    "regenConfirm": "Los partidos de las finales ya tienen resultados. La regeneración de cuadros BORRARÁ todos esos resultados. ¿Continuar?",
     "advancedDanger": "Opciones avanzadas (peligrosas)",
-    "regenWarn": "La regeneración de brackets borra todos los resultados finales ya ingresados.",
-    "regenerate": "Regenerar brackets",
+    "regenWarn": "La regeneración de cuadros borra todos los resultados finales ya ingresados.",
+    "regenerate": "Regenerar cuadros",
     "fifthPlaceDisabled": "Habilitar el 3er lugar primero",
     "seventhPlaceDisabled": "Habilitar el quinto lugar primero"
   },
@@ -1402,7 +1402,7 @@
       "simTerrains": "Pistas",
       "matchDuration": "Duración del partido",
       "pause": "Pausa entre partidos",
-      "terrains": "Tribunales"
+      "terrains": "Campos"
     },
     "footerSub": {
       "question": "El asistente sigue aquí — ajusta sin perder nada",

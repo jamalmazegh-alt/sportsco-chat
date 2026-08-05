@@ -3466,7 +3466,7 @@
     },
     "tourn": {
       "b1": "Registro en línea, pago integrado",
-      "b2": "Tablas, grupos, corchetes, resultados en vivo.",
+      "b2": "Tablas, grupos, cuadros, resultados en vivo.",
       "b3": "Página de TV pública para tus espectadores",
       "b4": "Convocatorias y hojas de partido incluidas.",
       "kicker": "Módulo de torneo: aplicación completa",
@@ -3783,7 +3783,7 @@
       "live": "En directo",
       "upcoming": "Próximo"
     },
-    "flightsReady": "La fase de grupos ha terminado. Crear Vuelos para generar los 3 brackets (Champions / Europa / Conference)."
+    "flightsReady": "La fase de grupos ha terminado. Crear Flights para generar los 3 cuadros (Champions / Europa / Conference)."
   },
   "draw": {
     "relaunchFromFooterHint": "Sorteo completado. Utilice \"Reiniciar\" en la parte inferior del cuadro de diálogo para generar uno nuevo (los resultados actuales se perderán)."
@@ -3792,23 +3792,23 @@
     "streamUrlPlaceholder": "URL de transmisión (YouTube, Twitch…)"
   },
   "flights": {
-    "savedToast": "Vuelos guardados",
+    "savedToast": "Flights guardados",
     "fallback": {
-      "empty": "No se genera bracket: la estructura no clasifica suficientes equipos por tramo. Ajusta la distribución, utiliza una plantilla alternativa (Consolación/Medallas) o configura vuelos manualmente.",
+      "empty": "No se genera cuadro: la estructura no clasifica suficientes equipos por tramo. Ajusta la distribución, utiliza una plantilla alternativa (Consolación/Medallas) o configura Flights manualmente.",
       "error": "Generación imposible para esta estructura. Pruebe con otra plantilla o modo manual.",
-      "title": "Este formato no permite la generación automática de los 3 vuelos",
-      "body": "La estructura del grupo (tamaño desigual o demasiado pequeño) no se divide claramente entre Campeones/Europa/Conferencia. Elija una plantilla de Consolación / Medallas / Copa-Plato o personalice los vuelos manualmente."
+      "title": "Este formato no permite la generación automática de los 3 Flights",
+      "body": "La estructura del grupo (tamaño desigual o demasiado pequeño) no se divide claramente entre Campeones/Europa/Conferencia. Elija una plantilla de Consolación / Medallas / Copa-Plato o personalice los Flights manualmente."
     },
-    "regenConfirm": "Los partidos de las finales ya tienen resultados. La regeneración de brackets BORRARÁ todos esos resultados. ¿Continuar?",
-    "noGroups": "Primero crea la fase de grupos. Los vuelos se generan posteriormente.",
-    "title": "Vuelos / finales",
+    "regenConfirm": "Los partidos de las finales ya tienen resultados. La regeneración de cuadros BORRARÁ todos esos resultados. ¿Continuar?",
+    "noGroups": "Primero crea la fase de grupos. Los Flights se generan posteriormente.",
+    "title": "Flights / finales",
     "intro": "Múltiples trofeos por torneo: Campeones/Europa, Copa/Plato, Oro/Plata/Bronce o personalizados.",
     "reconfigure": "Reconfigurar",
     "advancedDanger": "Opciones avanzadas (peligrosas)",
-    "regenWarn": "La regeneración de brackets borra todos los resultados finales ya ingresados.",
-    "regenerate": "Regenerar brackets",
-    "generate": "Generar corchetes",
-    "waitGroups": "Termina todos los partidos del grupo para generar brackets.",
+    "regenWarn": "La regeneración de cuadros borra todos los resultados finales ya ingresados.",
+    "regenerate": "Regenerar cuadros",
+    "generate": "Generar cuadros",
+    "waitGroups": "Termina todos los partidos del grupo para generar cuadros.",
     "preset": {
       "consolation": "Preajuste de consolación (1 clic)",
       "consolationDesc": "Crea 2 tramos: Principal (ganadores de grupo) y Consolación (perdedores). Configuración lista para guardar."
@@ -3816,10 +3816,10 @@
     "wizard": {
       "template": "Plantilla de nombre",
       "notEnough": "Se requieren al menos 4 equipos.",
-      "clean": "Limpiar brackets",
+      "clean": "Limpiar cuadros",
       "customize": "Personalizar",
       "back": "Volver",
-      "save": "Guardar vuelos",
+      "save": "Guardar Flights",
       "distribution": "Reparto ({{n}} equipos)"
     },
     "rulesCount": "normas",
@@ -3829,8 +3829,8 @@
     "seventhPlaceDisabled": "Habilitar el quinto lugar primero",
     "seventhPlace": "7mo lugar",
     "public": {
-      "empty": "Aún no se ha configurado ningún vuelo para este torneo.",
-      "noMatches": "Los partidos para este vuelo se generarán después de la fase de grupos."
+      "empty": "Aún no se ha configurado ningún Flight para este torneo.",
+      "noMatches": "Los partidos para este Flight se generarán después de la fase de grupos."
     },
     "draftRulesSummary": "{{n}} regla(s) de clasificación configurada(s)",
     "generatedToast": "{{n}} partidos creados"
@@ -3871,7 +3871,7 @@
     "summary": {
       "matchDuration": "Duración del partido",
       "pause": "Pausa entre partidos",
-      "terrains": "Tribunales"
+      "terrains": "Campos"
     }
   },
   "createChooser": {

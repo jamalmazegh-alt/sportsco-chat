@@ -994,7 +994,7 @@
     "openTv": "schermo televisivo",
     "autoScheduleCta": {
       "title": "Pianifica automaticamente le partite",
-      "subtitle": "Nessun tribunale o programma assegnato ancora. Esegui la pianificazione automatica."
+      "subtitle": "Nessun campo o programma assegnato ancora. Esegui la pianificazione automatica."
     }
   },
   "publishFlow": {
@@ -1249,10 +1249,10 @@
       "medals": "Eliminazione diretta con podio Oro / Argento / Bronzo per le prime 3 squadre. Formato breve e classico.",
       "consolation": "2 tabelloni: Principale (vincitori dei gironi) e Consolazione (perdenti). Soluzione semplice per far giocare tutti."
     },
-    "regenConfirm": "Le partite finali hanno già i risultati. La rigenerazione delle parentesi CANCELLERA' tutti questi risultati. Continuare?",
+    "regenConfirm": "Le partite finali hanno già i risultati. La rigenerazione delle tabelloni CANCELLERA' tutti questi risultati. Continuare?",
     "advancedDanger": "Opzioni avanzate (pericolose)",
-    "regenWarn": "La rigenerazione delle parentesi cancella tutti i risultati finali già inseriti.",
-    "regenerate": "Rigenerare le parentesi",
+    "regenWarn": "La rigenerazione delle tabelloni cancella tutti i risultati finali già inseriti.",
+    "regenerate": "Rigenerare le tabelloni",
     "fifthPlaceDisabled": "Abilita prima il 3° posto",
     "seventhPlaceDisabled": "Abilita prima il 5° posto"
   },
@@ -1294,7 +1294,7 @@
       "fields": "Campi",
       "share": "Condividi"
     },
-    "byCourts": "Per tribunale",
+    "byCourts": "Per campo",
     "progress": "Progressi"
   },
   "cockpit": {
@@ -1402,7 +1402,7 @@
       "simTerrains": "Campi",
       "matchDuration": "Durata della partita",
       "pause": "Pausa tra le partite",
-      "terrains": "Tribunali"
+      "terrains": "Campi"
     },
     "footerSub": {
       "question": "L'assistente resta qui — modifica senza perdere nulla",
