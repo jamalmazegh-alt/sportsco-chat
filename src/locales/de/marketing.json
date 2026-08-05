@@ -31,12 +31,12 @@
     "rights": "© {{year}} Clubero. Alle Rechte vorbehalten.",
     "tagline2": "Gedacht für Vereine, Trainer, Eltern und Spieler.",
     "banner": {
-      "line1": "Die App, auf die Ihr Verein",
+      "line1": "Die App, auf die dein Verein",
       "accent": "nicht mehr",
       "line2": "verzichten kann.",
       "sub": "Der Verein von morgen beginnt",
       "subAccent": "heute.",
-      "follow": "Folgen Sie uns",
+      "follow": "Folge uns",
       "contact": "Kontakt"
     },
     "buildClubero": "Feedback geben"
@@ -183,10 +183,10 @@
     "tile_ai_b": "Handlungsvorschläge, Spielzusammenfassungen, Saisonanalysen — die KI im Dienst des Trainers.",
     "hero": {
       "kicker": "Von und für Amateurvereine entwickelt",
-      "headline1": "Wir haben verstanden, was Sie brauchen",
+      "headline1": "Wir haben verstanden, was du brauchst",
       "headline2": "um Zeit zu gewinnen",
       "headline3": "und sich wieder auf den Sport zu konzentrieren.",
-      "sub": "Clubero digitalisiert alles, was Ihnen ganze Abende kostet: Aufgebote, Zahlungen, Kommunikation, Statistiken. Sie sind wieder Verein, nicht Verwaltung.",
+      "sub": "Clubero digitalisiert alles, was dich ganze Abende kostet: Aufgebote, Zahlungen, Kommunikation, Statistiken. Du bist wieder Verein, nicht Verwaltung.",
       "cta": "Kostenlos testen",
       "ctaSecondary": "Funktionen ansehen",
       "trust1": "Kostenlose Testphase",
@@ -194,9 +194,9 @@
       "trust3": "Daten in Europa gehostet"
     },
     "digit": {
-      "kicker": "Wir haben es für Sie digitalisiert",
+      "kicker": "Wir haben es für dich digitalisiert",
       "title": "Alles, was Stunden gedauert hat, jetzt mit wenigen Klicks.",
-      "sub": "Jede Funktion entstand aus einem echten Bedürfnis von Vereinen wie Ihrem.",
+      "sub": "Jede Funktion entstand aus einem echten Bedürfnis von Vereinen wie deinem.",
       "f1Title": "Aufgebote in 12 Sekunden",
       "f1Body": "Senden, erinnern, Antworten verfolgen. Ohne jeden einzeln per SMS hinterherzulaufen.",
       "f2Title": "Online-Zahlungen",
@@ -204,7 +204,7 @@
       "f3Title": "Zentrale Kommunikation",
       "f3Body": "Vereinswand, Event-Chat, mehrsprachige E-Mails. Schluss mit überquellenden WhatsApp-Gruppen.",
       "f4Title": "Statistiken & Spieler-Tracking",
-      "f4Body": "Anwesenheit, Trainer-Feedback, Entwicklung. Eine echte Karriere für Ihre Spieler.",
+      "f4Body": "Anwesenheit, Trainer-Feedback, Entwicklung. Eine echte Karriere für deine Spieler.",
       "f5Title": "Disziplin & Sperren",
       "f5Body": "Karten, Sperren, Verletzungen werden automatisch pro Team und Saison erfasst.",
       "f6Title": "Aufstellungen & Spielberichte",
@@ -212,12 +212,12 @@
     },
     "ai": {
       "kicker": "Integrierte künstliche Intelligenz",
-      "title": "Die KI unterstützt Sie im Alltag.",
-      "sub": "Keine Spielerei: ein Assistent, der Ihren Verein, Ihre Spieler, Ihre Saison versteht — und Ihnen echte Zeit spart.",
-      "b1": "Fasst Ihre Spiele zusammen und schlägt die nächste Aufstellung vor",
-      "b2": "Verfasst Ihre Kommunikation mit einem Klick, in 7 Sprachen",
+      "title": "Die KI unterstützt dich im Alltag.",
+      "sub": "Keine Spielerei: ein Assistent, der deinen Verein, deine Spieler, deine Saison versteht — und dir echte Zeit spart.",
+      "b1": "Fasst deine Spiele zusammen und schlägt die nächste Aufstellung vor",
+      "b2": "Verfasst deine Kommunikation mit einem Klick, in 7 Sprachen",
       "b3": "Erkennt automatisch Fortschritte und Spieler-Warnungen",
-      "b4": "Integrierter Assistent: stellen Sie ihm eine Frage zu Ihrem Verein",
+      "b4": "Integrierter Assistent: stell ihm eine Frage zu deinem Verein",
       "cta": "Assistenten entdecken",
       "assistantName": "Clubero Assistent",
       "online": "Online",
@@ -231,31 +231,31 @@
       "sub": "Anmeldungen, Brackets, Live-Ergebnisse, öffentliche TV-Seite. Alles, was ein Organisator braucht, ohne separate Software.",
       "b1": "Online-Anmeldungen, integrierte Zahlung",
       "b2": "Tableaus, Gruppen, Brackets, Live-Ergebnisse",
-      "b3": "Öffentliche TV-Seite für Ihre Zuschauer",
+      "b3": "Öffentliche TV-Seite für deine Zuschauer",
       "b4": "Aufgebote & Spielberichte inklusive",
       "cta": "Turnier starten",
       "pricing": "Preise ansehen",
       "included": "Im Vereins-Abo enthalten",
       "includedDesc": "Unbegrenzte Turniere, keine Eventgebühr",
-      "includedBody": "Wenn Ihr Verein ein Clubero-Abo hat, können Sie beliebig viele Turniere ohne Aufpreis erstellen.",
+      "includedBody": "Wenn dein Verein ein Clubero-Abo hat, kannst du beliebig viele Turniere ohne Aufpreis erstellen.",
       "standalone": "Ohne Abo — pro Event",
-      "standaloneDesc": "Zahlen Sie 40 € pro Turnier, das war's",
-      "standaloneBody": "Organisieren Sie ein einmaliges Turnier? Aktivieren Sie das Modul für ein einzelnes Event, ohne Bindung."
+      "standaloneDesc": "Zahl 40 € pro Turnier, das war's",
+      "standaloneBody": "Organisierst du ein einmaliges Turnier? Aktiviere das Modul für ein einzelnes Turnier, ohne Bindung."
     },
     "social": {
       "kicker": "Das soziale Netzwerk des Amateursports",
       "title": "Über die Verwaltung hinaus: wir haben das Netzwerk für Spieler und Trainer gebaut.",
       "sub": "Öffentliche Profile, Follower, Community. Der Amateursport verdient sein eigenes Netzwerk — keinen im Lärm verlorenen Instagram-Feed.",
       "c1Title": "Öffentliches Spielerprofil",
-      "c1Body": "Statistiken, Karriere, Medien — teilbar, von Ihren Vereinen zertifiziert.",
+      "c1Body": "Statistiken, Karriere, Medien — teilbar, von deinen Vereinen zertifiziert.",
       "c2Title": "Trainer-Seite",
       "c2Body": "Sichtbarkeit, Verfolgung, Rekrutierung. Trainer sind nicht mehr unsichtbar.",
       "c3Title": "Follower & Abonnements",
-      "c3Body": "Folgen Sie Ihren Lieblingsvereinen, Ihren Kindern, Ihren Freunden. Wie ein echtes Netzwerk.",
+      "c3Body": "Folge deinen Lieblingsvereinen, deinen Kindern, deinen Freunden. Wie ein echtes Netzwerk.",
       "cta": "Mein Spielerprofil erstellen"
     },
     "finalCta": {
-      "title": "Holen Sie sich Zeit für den Sport zurück.",
+      "title": "Hol dir Zeit für den Sport zurück.",
       "sub": "Kostenlose Testphase. Keine Kreditkarte. Daten in Europa gehostet.",
       "club": "Meinen Verein erstellen",
       "player": "Mein Spielerprofil erstellen"
@@ -266,7 +266,7 @@
         "titleA": "Der ganze Verein.",
         "titleB": "Eine App.",
         "subtitle": "Amateursport, endlich an einem Ort vereint.",
-        "body": "Kommunikation, Aufgebote, Termine, Anwesenheiten, Dokumente, Turniere und Vereinsleben: alles, was Ihren Verein lebendig hält, in einer modernen, klaren Plattform für den Platz.",
+        "body": "Kommunikation, Aufgebote, Termine, Anwesenheiten, Dokumente, Turniere und Vereinsleben: alles, was deinen Verein lebendig hält, in einer modernen, klaren Plattform für den Platz.",
         "ctaPrimary": "Kostenlos testen",
         "ctaSecondary": "Demo ansehen",
         "trust1": "Keine Kreditkarte nötig",
@@ -276,14 +276,14 @@
         "audEducateurs": "Trainer",
         "audParents": "Eltern",
         "audJoueurs": "Spieler",
-        "mockTitle": "Ihr Verein, vernetzt",
+        "mockTitle": "Dein Verein, vernetzt",
         "mockLive": "Live",
         "mockBadge": "Der ganze Verein. Eine App.",
         "mockLine": "Vom Vorstand bis zum Spieler — alle am selben Ort."
       },
       "problems": {
-        "kicker": "Kommt Ihnen das bekannt vor?",
-        "title": "Läuft Ihr Verein noch so?",
+        "kicker": "Kommt dir das bekannt vor?",
+        "title": "Läuft dein Verein noch so?",
         "p1": "12 verschiedene WhatsApp-Gruppen",
         "p2": "Aufgebote, die im Chat untergehen",
         "p3": "Absagen in letzter Minute",
@@ -294,8 +294,8 @@
         "outro": "Ehrenamtliche geben ohnehin schon viel Zeit für ihren Verein. Clubero bringt alles an einen Ort."
       },
       "benefits": {
-        "title": "Konzentrieren Sie sich auf den Platz. Clubero macht den Rest.",
-        "subtitle": "Eine Plattform, um Zeit zu sparen, besser zu kommunizieren und Ihren Verein wachsen zu lassen.",
+        "title": "Konzentrier dich auf den Platz. Clubero macht den Rest.",
+        "subtitle": "Eine Plattform, um Zeit zu sparen, besser zu kommunizieren und deinen Verein wachsen zu lassen.",
         "b1Title": "Einfachere Kommunikation",
         "b1Body": "Ankündigungen, Aufgebote, Termine und Dokumente aus einer Hand verschicken.",
         "b2Title": "Leichtere Organisation",
@@ -307,10 +307,10 @@
       },
       "whatsapp": {
         "kicker": "100% WhatsApp-kompatibel",
-        "title": "Sie müssen WhatsApp nicht aufgeben.",
-        "subtitle": "Steigen Sie in Ihrem Tempo bei Clubero ein.",
-        "body": "Die meisten Vereine nutzen schon WhatsApp — das ist völlig okay. Clubero verlangt keinen Bruch über Nacht. Behalten Sie WhatsApp, wenn Sie möchten. Clubero ergänzt einfach das, was fehlt.",
-        "outro": "Beginnen Sie mit einem Team oder einem Turnier. Erweitern Sie die Nutzung, wenn Sie bereit sind.",
+        "title": "Du musst WhatsApp nicht aufgeben.",
+        "subtitle": "Steig in deinem Tempo bei Clubero ein.",
+        "body": "Die meisten Vereine nutzen schon WhatsApp — das ist völlig okay. Clubero verlangt keinen Bruch über Nacht. Behalte WhatsApp, wenn du möchtest. Clubero ergänzt einfach das, was fehlt.",
+        "outro": "Fang mit einem Team oder einem Turnier an. Erweitere die Nutzung, wenn du bereit bist.",
         "addsTitle": "Was Clubero zusätzlich zu WhatsApp bietet",
         "add1": "Aufgebote",
         "add2": "Anwesenheitsverwaltung",
@@ -324,7 +324,7 @@
       "tournaments": {
         "kicker": "Turnierplattform",
         "title": "Eine Turnierplattform für Organisatoren.",
-        "body": "Organisieren Sie Ihre Turniere ohne Excel, ohne Papier und ohne Stress.",
+        "body": "Organisiere deine Turniere ohne Excel, ohne Papier und ohne Stress.",
         "f1": "Gruppenphasen",
         "f2": "K.-o.-Runden",
         "f3": "Flighted Finals",
@@ -337,7 +337,7 @@
         "f10": "Automatische Auslosung",
         "f11": "PDF-Reglements",
         "f12": "Öffentliche Anzeigen",
-        "outro": "Weniger Zeit für Orga, mehr Zeit für Ihr Event.",
+        "outro": "Weniger Zeit für Orga, mehr Zeit für dein Turnier.",
         "cta": "Turnier starten"
       },
       "social": {
@@ -359,7 +359,7 @@
         "w1Title": "Vorstand",
         "w1Body": "Zeit sparen und alles bündeln.",
         "w2Title": "Trainer",
-        "w2Body": "Ihre Teams mit einem Klick erreichen.",
+        "w2Body": "Deine Teams mit einem Klick erreichen.",
         "w3Title": "Eltern",
         "w3Body": "Alle wichtigen Infos an einem Ort.",
         "w4Title": "Turnierorganisatoren",
@@ -393,14 +393,14 @@
         "ctaAll": "Alle Tarife ansehen"
       },
       "finalCta": {
-        "title": "Bereit, Ihren Verein zu vereinfachen?",
-        "body": "Schließen Sie sich den Vereinen an, die mehr Zeit auf dem Platz und weniger in der Verwaltung verbringen.",
+        "title": "Bereit, deinen Verein zu vereinfachen?",
+        "body": "Schließ dich den Vereinen an, die mehr Zeit auf dem Platz und weniger in der Verwaltung verbringen.",
         "cta": "Verein kostenlos anlegen",
         "ctaDemo": "Demo ansehen"
       }
     },
     "tile_sponsors_t": "Sponsoren & Partner",
-    "tile_sponsors_b": "Rotierendes Sponsoren-Banner in der App zur Refinanzierung Ihres Abos.",
+    "tile_sponsors_b": "Rotierendes Sponsoren-Banner in der App zur Refinanzierung deines Abos.",
     "paymentsSoon": "Vereinszahlungen (Stripe Connect, Mitgliedsbeiträge, Spendenaktionen) – bald verfügbar."
   },
   "whatsapp": {
@@ -763,13 +763,13 @@
     ],
     "sponsors": {
       "kicker": "Sponsoren & Partner",
-      "title": "Ein Sponsoren-Banner, das Ihr Abo refinanziert.",
-      "body": "Binden Sie lokale Partner in die App Ihres Vereins ein: ein rotierendes Sponsoren-Banner wird Ihren Mitgliedern angezeigt, Impressionen und Klicks werden erfasst. Genug, um Ihr Clubero-Abo zu finanzieren – oder sogar zu übertreffen.",
+      "title": "Ein Sponsoren-Banner, das dein Abo refinanziert.",
+      "body": "Bind lokale Partner in die App deines Vereins ein: ein rotierendes Sponsoren-Banner wird deinen Mitgliedern angezeigt, Impressionen und Klicks werden erfasst. Genug, um dein Clubero-Abo zu finanzieren – oder sogar zu übertreffen.",
       "b1": "Rotierendes Sponsoren-Banner auf der Vereins-Startseite",
       "b2": "Automatisches Impressions- und Klick-Tracking",
       "b3": "Mehrere Partner, Reihenfolge und Logos im Admin verwaltet",
       "cta": "Sponsorenverwaltung entdecken",
-      "demoName": "Ihr Partner"
+      "demoName": "Dein Partner"
     },
     "future": {
       "badge": "Demnächst",
@@ -890,7 +890,7 @@
       },
       "stages": {
         "title": "Camps",
-        "subtitle": "Organisieren Sie Ihre Ferien-Camps von A bis Z.",
+        "subtitle": "Organisiere deine Feriencamps von A bis Z.",
         "items": [
           {
             "title": "Erstellung von Camps",
@@ -946,7 +946,7 @@
       },
       "admin": {
         "title": "Verwaltung & Branding",
-        "subtitle": "Ein Verein, der zu Ihnen passt, einfach zu verwalten.",
+        "subtitle": "Ein Verein, der zu dir passt, einfach zu verwalten.",
         "items": [
           {
             "title": "Vereins-Branding",
@@ -1563,12 +1563,12 @@
       }
     ],
     "ctaTitle": "Noch eine offene Frage?",
-    "ctaBody": "Unser Team und Ihr Verein helfen Ihnen gerne bei einem entspannten Start.",
+    "ctaBody": "Unser Team und dein Verein helfen dir gerne bei einem entspannten Start.",
     "ctaPrimary": "Team kontaktieren",
     "ctaSecondary": "Anmelden",
     "download": {
-      "title": "Installieren Sie die App auf Ihrem Handy",
-      "body": "Clubero installiert sich wie eine App, direkt aus dem Browser — ohne App Store. Behalten Sie Aufgebote und Benachrichtigungen auf Ihrem Startbildschirm.",
+      "title": "Installiere die App auf deinem Handy",
+      "body": "Clubero installiert sich wie eine App, direkt aus dem Browser — ohne App Store. Behalte Aufgebote und Benachrichtigungen auf deinem Startbildschirm.",
       "iosHint": "iPhone / iPad (Safari): Teilen → Zum Home-Bildschirm → Hinzufügen.",
       "cta": "Installationsanleitung"
     }
@@ -1975,7 +1975,7 @@
     "emptyDescription": "Ich kann Clubero erklären, Preise nennen oder eine Demo organisieren.",
     "demoCta": "Direkt eine Demo anfragen",
     "thinking": "Denke nach...",
-    "placeholder": "Stellen Sie Ihre Frage...",
+    "placeholder": "Stell deine Frage …",
     "suggestions": [
       "Was ist Clubero in einem Satz?",
       "Was kostet es?",
@@ -2014,7 +2014,7 @@
   },
   "landing": {
     "hero": {
-      "headline": "Die App, ohne die Ihr Verein nicht mehr auskommt.",
+      "headline": "Die App, ohne die dein Verein nicht mehr auskommt.",
       "tagline": "Der Verein von morgen beginnt heute.",
       "subtitle": "Organisation, Kommunikation und Wettkämpfe vereint in einer modernen, intelligenten Plattform für Amateurvereine.",
       "cta_primary": "Kostenlos testen",
@@ -2023,14 +2023,14 @@
     },
     "wizard": {
       "badge": "In wenigen Klicks",
-      "headline": "Erstellen Sie ein Ereignis in unter 30 Sekunden.",
-      "body": "Spiel, Training oder einmaliges Event — der Clubero-Assistent führt Ihre Verantwortlichen Schritt für Schritt. Vorausgefüllte Daten, automatische Einberufung. Wiederkehrend oder einmalig — alles wird auf dieselbe Weise erstellt.",
+      "headline": "Erstelle einen Termin in unter 30 Sekunden.",
+      "body": "Spiel, Training oder einmaliger Termin — der Clubero-Assistent führt deine Verantwortlichen Schritt für Schritt. Vorausgefüllte Daten, automatische Einberufung. Wiederkehrend oder einmalig — alles wird auf dieselbe Weise erstellt.",
       "img_alt_coach": "Entspannter Trainer, der seinen Verein mit Clubero am Spielfeldrand führt",
       "img_alt_screen": "Clubero-Bildschirm — alles bereit, Event in wenigen Klicks erstellt"
     },
     "convocation": {
       "badge": "Automatische Einberufungen",
-      "headline": "Ihre Spieler im Handumdrehen einberufen.",
+      "headline": "Deine Spieler im Handumdrehen einberufen.",
       "body": "Sobald das Event erstellt ist, erhält jeder Spieler seine Einberufung auf dem Handy. Verfügbarkeiten, Bestätigungen, Erinnerungen — Clubero kümmert sich darum.",
       "img_alt": "Spieler erhält seine Clubero-Einberufung in der Kabine"
     },
@@ -2042,8 +2042,8 @@
     },
     "tournament": {
       "badge": "Turnier in 30 Sekunden",
-      "headline": "Erstellen Sie Ihr Turnier in 30 Sekunden dank KI.",
-      "body": "Unser KI-Assistent konfiguriert Ihr Turnier in wenigen Fragen: Gruppen, K.-o.-Runden, Zeitplan, Plätze, Schiedsrichter. Am Spieltag ist Ihr Kontrollzentrum in Ihrer Tasche.",
+      "headline": "Erstelle dein Turnier in 30 Sekunden dank KI.",
+      "body": "Unser KI-Assistent konfiguriert dein Turnier in wenigen Fragen: Gruppen, K.-o.-Runden, Zeitplan, Plätze, Schiedsrichter. Am Spieltag ist dein Kontrollzentrum in deiner Tasche.",
       "img_alt": "Panoramablick auf ein mit Clubero organisiertes Amateurturnier",
       "cta_organize": "Mein Turnier in 30 s erstellen",
       "cta_learn_more": "Mehr erfahren"
@@ -2051,13 +2051,13 @@
     "coming_soon": {
       "badge": "Demnächst",
       "headline": "Der Verein von morgen beginnt heute.",
-      "body": "Spielernetzwerk, öffentliche Profile, Sammelaktionen, Meisterschaften über mehrere Spieltage — die nächste Clubero-Generation kommt. Seien Sie die Ersten, die es erfahren.",
+      "body": "Spielernetzwerk, öffentliche Profile, Sammelaktionen, Meisterschaften über mehrere Spieltage — die nächste Clubero-Generation kommt. Sei der Erste, der davon erfährt.",
       "img_alt": "Clubero-Vision — vernetzter, gut organisierter Verein"
     },
     "sponsors": {
       "badge": "Sponsoren & Partner",
-      "headline": "Lassen Sie Ihre Sponsoren das Abo bezahlen",
-      "body": "Ein dezentes Banner oben auf der Startseite präsentiert Ihre Partner allen Mitgliedern. Impressions und Klicks automatisch gezählt, Rotation von Ihren Admins verwaltet. Genug, um Clubero zu finanzieren — oft sogar mehr.",
+      "headline": "Lass deine Sponsoren das Abo bezahlen",
+      "body": "Ein dezentes Banner oben auf der Startseite präsentiert deine Partner allen Mitgliedern. Impressionen und Klicks automatisch gezählt, Rotation von deinen Admins verwaltet. Genug, um Clubero zu finanzieren — oft sogar mehr.",
       "tag": "Danke an unseren Partner",
       "cta": "Mehr erfahren"
     },
@@ -2078,7 +2078,7 @@
     "parentResources": {
       "kicker": "Für Eltern",
       "title": "Gut starten mit Clubero.",
-      "subtitle": "Finden Sie die wichtigsten Anleitungen und installieren Sie die App in wenigen Minuten auf Ihrem Handy.",
+      "subtitle": "Finde die wichtigsten Anleitungen und installiere die App in wenigen Minuten auf deinem Handy.",
       "guide": {
         "title": "Schritt-für-Schritt-Leitfaden für Eltern",
         "body": "Konto, Kind, Aufgebote, Abwesenheiten, Benachrichtigungen, Mitfahrgelegenheiten, Pinnwand und Mithilfe: Jede Anleitung wird mit echten Screenshots erklärt.",
@@ -2086,7 +2086,7 @@
       },
       "install": {
         "title": "Clubero-App installieren",
-        "body": "Fügen Sie Clubero auf iPhone, iPad oder Android zu Ihrem Startbildschirm hinzu und erhalten Sie Ihre Benachrichtigungen in Echtzeit.",
+        "body": "Füg Clubero auf iPhone, iPad oder Android zu deinem Startbildschirm hinzu und erhalte deine Benachrichtigungen in Echtzeit.",
         "cta": "Installationsanleitung ansehen"
       }
     }
@@ -2099,7 +2099,7 @@
   "publicPlayers": {
     "eyebrow": "Öffentliches Verzeichnis",
     "title": "Die Clubero-Spieler",
-    "subtitle": "Durchsuchen Sie die öffentlichen Profile, die Spieler freigegeben haben: Erfolge, sportlicher Werdegang, Verein. Nur für volljährige Spieler mit aktiviertem Profil.",
+    "subtitle": "Durchsuche die öffentlichen Profile, die Spieler freigegeben haben: Erfolge, sportlicher Werdegang, Verein. Nur für volljährige Spieler mit aktiviertem Profil.",
     "searchPlaceholder": "Name des Spielers oder Vereins…",
     "allSports": "Alle Sportarten",
     "allClubs": "Alle Vereine",
@@ -2111,11 +2111,11 @@
     "page": "Seite {{page}} / {{total}}",
     "error": "Das Verzeichnis kann derzeit nicht geladen werden.",
     "emptyTitle": "Kein passendes Profil",
-    "emptyBody": "Verfeinern Sie Ihre Filter oder schauen Sie bald wieder vorbei – jede Woche teilen neue Spieler ihr Profil.",
+    "emptyBody": "Verfeinere deine Filter oder schau bald wieder vorbei – jede Woche teilen neue Spieler ihr Profil.",
     "prev": "Zurück",
     "next": "Weiter",
-    "ctaTitle": "Sie sind Spieler? Erstellen Sie Ihr öffentliches Profil.",
-    "ctaBody": "Teilen Sie Ihre Erfolge, Saisons und Ihren Werdegang über einen einzigen Link. Kostenlos, freiwillig, unter Ihrer Kontrolle.",
+    "ctaTitle": "Du bist Spieler? Erstell dein öffentliches Profil.",
+    "ctaBody": "Teil deine Erfolge, Saisons und deinen Werdegang über einen einzigen Link. Kostenlos, freiwillig, unter deiner Kontrolle.",
     "ctaJoin": "Konto erstellen",
     "ctaFeatures": "Funktionen ansehen"
   },

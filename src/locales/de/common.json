@@ -2309,7 +2309,7 @@
     },
     "adminNotifications": {
       "title": "Notifications — Clubero",
-      "description": "Wähle die Push-Benachrichtigungen aus, die an Mitglieder Ihres Clubs gesendet werden."
+      "description": "Wähle die Push-Benachrichtigungen aus, die an Mitglieder deines Vereins gesendet werden."
     },
     "adminSponsors": {
       "title": "Sponsors – Clubero",
@@ -2649,7 +2649,7 @@
     ],
     "successTitle": "Zahlung bestätigt",
     "metaTitle": "Turnierabrechnung – Clubero",
-    "metaDesc": "Wähle Ihren Plan zur Organisation eines Turniers mit Clubero – 39 € pro Veranstaltung oder 149 €/Jahr unbegrenzt."
+    "metaDesc": "Wähle deinen Plan zur Organisation eines Turniers mit Clubero – 39 € pro Veranstaltung oder 149 €/Jahr unbegrenzt."
   },
   "eventCreateChooser": {
     "title": "Neue Veranstaltung",
@@ -3802,7 +3802,7 @@
       "empty": "Keine Gruppe generiert: Die Struktur qualifiziert nicht genügend Teams pro Flug. Passen Sie die Verteilung an, verwenden Sie eine Fallback-Vorlage (Trost/Medaillen) oder konfigurieren Sie Flüge manuell.",
       "error": "Generierung für diese Struktur unmöglich. Probieren Sie eine andere Vorlage oder den manuellen Modus aus.",
       "title": "Dieses Format ermöglicht keine automatische Generierung der 3 Flüge",
-      "body": "Die Gruppenstruktur (ungleiche oder zu kleine Größen) teilt sich nicht sauber in Champions / Europa / Conference auf. Wähle eine Trost-/Medaillen-/Cup-Plate-Vorlage oder passen Sie die Flüge manuell an."
+      "body": "Die Gruppenstruktur (ungleiche oder zu kleine Größen) teilt sich nicht sauber in Champions / Europa / Conference auf. Wähle eine Trost-/Medaillen-/Cup-Plate-Vorlage oder pass die Flights manuell an."
     },
     "regenConfirm": "Bei den Finalspielen liegen bereits Ergebnisse vor. Durch die Neugenerierung von Klammern werden alle diese Ergebnisse gelöscht. Weitermachen?",
     "noGroups": "Erstellen Sie zuerst die Gruppenphase. Anschließend werden Flüge generiert.",

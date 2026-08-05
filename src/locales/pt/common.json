@@ -614,7 +614,7 @@
     "coachDetach": "Remover",
     "coachDetachConfirm": "Remover este treinador da equipa?",
     "coachDetached": "Treinador removido",
-    "noAvailableCoach": "Nenhum treinador disponível. Convide um treinador primeiro em Admin → Usuários.",
+    "noAvailableCoach": "Nenhum treinador disponível. Convide um treinador primeiro em Admin → Utilizadores.",
     "noCoachYet": "Nenhum treinador atribuído. Clique em Atribuir para adicionar um.",
     "emptyHintAdmin": "Crie a sua primeira equipa para agendar treinos e jogos.",
     "emptyHintMember": "Atualmente não está em nenhuma equipa. Peça a um administrador para o adicionar.",
@@ -675,7 +675,7 @@
     },
     "ageGroupRequired": "Escolha uma categoria de idade na lista.",
     "player": "Jogador",
-    "ageGroupLegacyHint": "Valor legado — escolha uma categoria oficial (por exemplo, U7). Uma faixa como U6-U7 pode permanecer no nome do time.",
+    "ageGroupLegacyHint": "Valor legado — escolha uma categoria oficial (por exemplo, U7). Uma faixa como U6-U7 pode permanecer no nome da equipa.",
     "staffWall": "Mural de funcionários",
     "staffWallHint": "Espaço privativo para educadores e líderes da equipe. Não visível para jogadores ou pais.",
     "myProfile": "Meu perfil",
@@ -1790,7 +1790,7 @@
     "title": "Assistente Clubero",
     "subtitle": "Pergunte qualquer coisa sobre o aplicativo ou seus dados",
     "emptyTitle": "Como posso ajudar?",
-    "emptyHint": "Conheço seu clube, times e eventos futuros.",
+    "emptyHint": "Conheço o seu clube, as suas equipas e os eventos futuros.",
     "placeholder": "A tua pergunta…",
     "thinking": "A pensar…",
     "error": "Ocorreu um erro.",
@@ -2074,7 +2074,7 @@
   },
   "permissions": {
     "clubRoles": "Funções do clube",
-    "clubRolesHint": "Um usuário pode desempenhar diversas funções.",
+    "clubRolesHint": "Um utilizador pode desempenhar diversas funções.",
     "atLeastOneRole": "Pelo menos uma função é necessária"
   },
   "tournamentMembers": {
@@ -3615,7 +3615,7 @@
       },
       "summary": {
         "title": "Pronto para criar",
-        "hint": "Rascunho criado – publique na próxima tela"
+        "hint": "Rascunho criado – publique no próximo ecrã"
       }
     },
     "deadlineHint": "Opcional — deve ser anterior à data de início.",
@@ -3895,14 +3895,14 @@
     "teams": "equipes",
     "linkCopiedOpenBrowser": "Link copiado – abra-o no seu navegador (Safari/Chrome).",
     "openPublic": "Página pública",
-    "openTv": "Tela de televisão",
+    "openTv": "Ecrã de televisão",
     "autoScheduleCta": {
       "title": "Agendar partidas automaticamente",
       "subtitle": "Nenhum tribunal ou cronograma atribuído ainda. Execute o agendamento automático."
     }
   },
   "sections": {
-    "openTv": "Abrir tela ao vivo (TV)",
+    "openTv": "Abrir ecrã em direto (TV)",
     "flights": "Flights"
   },
   "simulator": {
@@ -4282,7 +4282,7 @@
     },
     "users": {
       "title": "Utilizadores",
-      "subtitle": "Pesquise, inspecione e atue em qualquer usuário da plataforma.",
+      "subtitle": "Pesquise, inspecione e atue em qualquer utilizador da plataforma.",
       "searchPlaceholder": "Nome, email ou telefone…",
       "filterInPage": "Nesta página",
       "filterActive": "Ativos",
@@ -4296,7 +4296,7 @@
       "neverSignedIn": "nunca iniciou sessão",
       "quickActions": "Ações rápidas",
       "actionDone": "{{label}} ✓",
-      "empty": "Nenhum usuário.",
+      "empty": "Nenhum utilizador.",
       "colClubsRoles": "Clubes e funções",
       "never": "nunca",
       "disabled": "desativado",
