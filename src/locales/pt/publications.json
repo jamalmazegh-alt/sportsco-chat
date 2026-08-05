@@ -21,8 +21,8 @@
     "visibilityStaffDesc": "A equipa técnica vê quem votou em quê. Os votantes veem apenas os totais.",
     "audienceLabel": "Destinatários",
     "audienceEmpty": "Nenhum destinatário selecionado",
-    "chooseTeam": "Escolha uma equipa…",
-    "chooseGroup": "Escolha um grupo…",
+    "chooseTeam": "Escolhe uma equipa…",
+    "chooseGroup": "Escolhe um grupo…",
     "deliveryLabel": "Modo de envio",
     "wall": "Mural + notificação push",
     "wallDesc": "Aparece no feed do clube e envia uma notificação push aos destinatários.",
@@ -68,7 +68,7 @@
     "player": "Jogador",
     "confirmVote": "Confirmar: {{option}}",
     "pollClosed": "Sondagem fechada",
-    "multipleHint": "São permitidas respostas múltiplas — toque para adicionar ou remover.",
+    "multipleHint": "São permitidas respostas múltiplas — toca para adicionar ou remover.",
     "saveVote": "Guardar as minhas respostas",
     "member": "Membro do clube",
     "roleCoach": "Treinador",
@@ -91,7 +91,7 @@
     "emailOnly": "Apenas email",
     "alsoSendEmail": "Enviar também por email",
     "emailBodyLabel": "Corpo do email (opcional)",
-    "emailBodyHelp": "Deixe em branco para reutilizar o conteúdo da publicação."
+    "emailBodyHelp": "Deixa em branco para reutilizar o conteúdo da publicação."
   },
   "actions": {
     "publish": "Publicar",
@@ -123,7 +123,7 @@
     "optionsHint": "2 options minimum",
     "addOption": "Adicionar uma opção",
     "removeOption": "Remover",
-    "minTwoOptions": "Adicione pelo menos duas opções."
+    "minTwoOptions": "Adiciona pelo menos duas opções."
   },
   "state": {
     "deleted": "Publicação eliminada",
@@ -155,7 +155,7 @@
     "picker": "Quem notificar?",
     "recipientsCount_one": "{{count}} destinatário",
     "recipientsCount_other": "{{count}} destinatários",
-    "empty": "Nenhum público selecionado — adicione pelo menos um critério abaixo.",
+    "empty": "Nenhum público selecionado — adiciona pelo menos um critério abaixo.",
     "convocationsMissing": "Ainda não há convocatória para este evento — público vazio.",
     "categoryLabel": "Escalão",
     "seasonLabel": "Época",
@@ -179,14 +179,14 @@
     "groupsHint": "Grupos transversais criados na admin do clube",
     "selectedTitle": "Destinatários selecionados",
     "teamsBlock": "Equipas",
-    "teamsHint": "Escolha jogadores e/ou encarregados por equipa",
+    "teamsHint": "Escolhe jogadores e/ou encarregados por equipa",
     "staff": "Staff"
   },
   "form": {
     "titleLabel": "Título",
     "titlePlaceholder": "Reunião de direção, estágio de verão, alteração de horário…",
     "contentLabel": "Message",
-    "contentPlaceholder": "Escreva a sua mensagem. Pode adicionar imagens e documentos abaixo.",
+    "contentPlaceholder": "Escreve a tua mensagem. Podes adicionar imagens e documentos abaixo.",
     "questionLabel": "Question",
     "questionPlaceholder": "Disponível no sábado? Horário A ou B?",
     "descriptionLabel": "Descrição (opcional)",
@@ -195,7 +195,7 @@
   },
   "email": {
     "pollSubject": "{{title}}",
-    "pollIntro": "Olá, responda a esta sondagem.",
+    "pollIntro": "Olá, responde a esta sondagem.",
     "pollClosedNotice": "Esta sondagem está fechada.",
     "messageSubject": "{{title}}",
     "openInApp": "Abrir no Clubero",
@@ -209,13 +209,13 @@
   "push": {
     "messageTitle": "{{club}} — {{title}}",
     "pollTitle": "Sondagem: {{title}}",
-    "voteChanged": "Obrigado, o seu voto foi atualizado."
+    "voteChanged": "Obrigado, o teu voto foi atualizado."
   },
   "errors": {
     "pollClosed": "Esta sondagem está fechada.",
-    "forbidden": "Não tem autorização para fazer isto.",
-    "deliveryRequired": "Escolha pelo menos um canal de envio.",
-    "audienceEmpty": "Adicione pelo menos um público.",
+    "forbidden": "Não tens autorização para fazer isto.",
+    "deliveryRequired": "Escolhe pelo menos um canal de envio.",
+    "audienceEmpty": "Adiciona pelo menos um público.",
     "optionsMin": "Uma sondagem requer pelo menos 2 opções.",
     "optionHasVotes": "Não pode editar uma opção que já recebeu votos.",
     "visibilityLocked": "A visibilidade do voto já não pode ser alterada depois de um voto ter sido registado.",
