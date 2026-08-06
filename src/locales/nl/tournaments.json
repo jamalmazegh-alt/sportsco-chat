@@ -498,7 +498,7 @@
     "title": "Speler · {{team}}",
     "import": {
       "empty": "Er zijn geen spelers gedetecteerd in het bestand.",
-      "blocked": "Import geblokkeerd: {{total}} spelers overschrijden de limiet van {{max}}. Verklein het bestand of kies \"Vervangen\".",
+      "blocked": "Import geblokkeerd: {{total}} spelers overschrijden de limiet van {{max}}. Verklein het bestand of kies ‘Vervangen’.",
       "ok": "{{n}} speler(s) geïmporteerd",
       "button": "CSV importeren",
       "title": "Spelers importeren",
@@ -657,7 +657,7 @@
     "noFields": "Geen plaatsen",
     "removeField": "{{name}} verwijderen",
     "newFieldPlaceholder": "Naam plaats (bijv. Centraal Veld)",
-    "fieldsHint": "Meerdere plaatsen = parallelle wedstrijden. Per wedstrijd opnieuw toe te wijzen in het tabblad \"Wedstrijden\".",
+    "fieldsHint": "Meerdere plaatsen = parallelle wedstrijden. Per wedstrijd opnieuw toe te wijzen in het tabblad ‘Wedstrijden’.",
     "lunchBreak": "Lunchpauze (geen wedstrijden in deze periode)",
     "lunchStart": "Start pauze",
     "lunchEnd": "Einde pauze",
@@ -746,7 +746,7 @@
     "overwriteDesc": "Deze actie verwijdert de huidige samenstelling (groepen/schema) en de bijbehorende wedstrijden. Aangemelde Teams blijven behouden.",
     "cancel": "Annuleren",
     "confirmRelaunch": "Bevestigen en opnieuw starten",
-    "relaunchFromFooterHint": "Trekking voltooid. Gebruik “Opnieuw starten” onderaan het dialoogvenster om een ​​nieuwe te genereren (huidige resultaten gaan verloren)."
+    "relaunchFromFooterHint": "Trekking voltooid. Gebruik ‘Opnieuw starten’ onderaan het dialoogvenster om een ​​nieuwe te genereren (huidige resultaten gaan verloren)."
   },
   "rules": {
     "savedToast": "Regels opgeslagen",

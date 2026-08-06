@@ -463,7 +463,7 @@
       "reserved": "Gereserveerd (72u)",
       "remaining": "Resterende plekken",
       "pending": "In behandeling zijnde verzoeken",
-      "expiredHint": "{{count}} reservering(en) van 72 uur verlopen - gebruik \"Verlengen\" om de plaats vast te houden."
+      "expiredHint": "{{count}} reservering(en) van 72 uur verlopen - gebruik ‘Verlengen’ om de plaats vast te houden."
     },
     "searchPlaceholder": "Zoeken (naam, e-mail…)",
     "col": {

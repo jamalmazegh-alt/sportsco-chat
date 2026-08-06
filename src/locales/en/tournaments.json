@@ -351,7 +351,7 @@
   "registrations": {
     "disabledBanner": {
       "title": "Online registrations are disabled",
-      "body": "No \"Register\" button appears on the public page. Enable them to receive applications.",
+      "body": "No “Register” button appears on the public page. Enable them to receive applications.",
       "cta": "Enable"
     },
     "count_one": "{{count}} registration",
@@ -657,7 +657,7 @@
     "noFields": "No fields",
     "removeField": "Remove {{name}}",
     "newFieldPlaceholder": "Field name (e.g. Center court)",
-    "fieldsHint": "Multiple fields = parallel matches. Reassignable per match in the \"Matches\" tab.",
+    "fieldsHint": "Multiple fields = parallel matches. Reassignable per match in the “Matches” tab.",
     "lunchBreak": "Lunch break (no match during slot)",
     "lunchStart": "Break start",
     "lunchEnd": "Break end",
@@ -1071,7 +1071,7 @@
   "registrationSettings": {
     "title": "Online registrations",
     "enableLabel": "Open registrations to the public",
-    "enableHint": "Adds a \"Register\" button on the public tournament page.",
+    "enableHint": "Adds a “Register” button on the public tournament page.",
     "publicLink": "Public registration link",
     "linkCopied": "Link copied"
   },

@@ -657,7 +657,7 @@
     "noFields": "Keine Plätze",
     "removeField": "{{name}} entfernen",
     "newFieldPlaceholder": "Platzname (z. B. Center Court)",
-    "fieldsHint": "Mehrere Plätze = parallele Spiele. Pro Spiel im Tab \"Spiele\" neu zuweisbar.",
+    "fieldsHint": "Mehrere Plätze = parallele Spiele. Pro Spiel im Tab „Spiele“ neu zuweisbar.",
     "lunchBreak": "Mittagspause (keine Spiele in diesem Zeitraum)",
     "lunchStart": "Beginn der Pause",
     "lunchEnd": "Ende der Pause",

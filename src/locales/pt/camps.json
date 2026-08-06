@@ -463,7 +463,7 @@
       "reserved": "Reservado (72h)",
       "remaining": "Vagas restantes",
       "pending": "Solicitações pendentes",
-      "expiredHint": "{{count}} reserva(s) de 72 h expiraram — usa “Prolongar” para manter a vaga."
+      "expiredHint": "{{count}} reserva(s) de 72 h expiraram — usa «Prolongar» para manter a vaga."
     },
     "searchPlaceholder": "Pesquisa (nome, e-mail…)",
     "col": {

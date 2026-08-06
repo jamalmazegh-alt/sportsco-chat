@@ -389,7 +389,7 @@
     "mediaStatus": "Status",
     "allow": "Toestaan",
     "deny": "Weigeren",
-    "consentsHint": "De schakelaar beheert je toestemming. Gebruik “Document lezen” om elke tekst te bekijken.",
+    "consentsHint": "De schakelaar beheert je toestemming. Gebruik ‘Document lezen’ om elke tekst te bekijken.",
     "readDocument": "Document lezen"
   },
   "onboarding": {
@@ -1585,7 +1585,7 @@
       "offsetAfter": "{{n}} d. erna",
       "remindersSaved": "Herinneringen opgeslagen",
       "remindersNote": "Opmerking: herinneringen gaan naar gekoppelde betalers, spelers en ouders/voogden. Elk gezin ontvangt slechts één e-mail per mijlpaal.",
-      "remindersNoteManual": "Je kunt ook handmatig een herinnering sturen vanaf de pagina Betalingsitems via de knop « Herinneren »."
+      "remindersNoteManual": "Je kunt ook handmatig een herinnering sturen vanaf de pagina Betalingsitems via de knop ‘Herinneren’."
     },
     "branding": {
       "saved": "Clubkleur bijgewerkt",
@@ -3122,11 +3122,11 @@
     "iosStep3After": "om de lijst uit te klappen",
     "iosStep4Before": "Kies",
     "iosStep4Icon": "Zet op beginscherm",
-    "iosStep4After": "en tik op „Voeg toe“",
+    "iosStep4After": "en tik op ‘Voeg toe’",
     "androidStepsTitle": "Op Android (Chrome)",
     "androidStepsSubtitle": "3 stappen om Clubero te installeren",
     "androidStep1": "Open het menu ⋮ rechtsboven in Chrome.",
-    "androidStep2": "Kies «App installeren» (of «Toevoegen aan startscherm»).",
+    "androidStep2": "Kies ‘App installeren’ (of ‘Toevoegen aan startscherm’).",
     "androidStep3": "Bevestig: het Clubero-pictogram verschijnt op je startscherm.",
     "ctaHint": "Op Android start deze knop de installatie meteen. Op iPhone volg je de Safari-stappen hieronder.",
     "bannerTitle": "Clubero installeren",
@@ -3141,7 +3141,7 @@
     "iosGuideTitleFull": "Installeren op iPhone / iPad",
     "iosGuideShareBefore": "Tik op",
     "iosGuideShareAfter": "onderaan in Safari",
-    "iosGuideAddConfirm": "Tik op «Voeg toe»",
+    "iosGuideAddConfirm": "Tik op ‘Voeg toe’",
     "androidGuideBefore": "Open het menu van je browser (⋮ rechtsboven) en kies",
     "androidGuideInstall": "App installeren",
     "androidGuideOr": "of",
@@ -3358,7 +3358,7 @@
       "reserved": "Gereserveerd (72u)",
       "remaining": "Resterende plekken",
       "pending": "In behandeling zijnde verzoeken",
-      "expiredHint": "{{count}} 72u-reservering(en) verlopen — gebruik « Verlengen » om de plaats te behouden."
+      "expiredHint": "{{count}} 72u-reservering(en) verlopen — gebruik ‘Verlengen’ om de plaats te behouden."
     },
     "searchPlaceholder": "Zoeken (naam, e-mail…)",
     "filters": {
@@ -3403,7 +3403,7 @@
     "loadError": "Fout bij het laden van registraties",
     "disabledBanner": {
       "title": "Online registraties zijn uitgeschakeld",
-      "body": "Er verschijnt geen knop “Registreren” op de openbare pagina. Schakel registraties in om aanvragen te ontvangen."
+      "body": "Er verschijnt geen knop ‘Registreren’ op de openbare pagina. Schakel registraties in om aanvragen te ontvangen."
     },
     "draftHint": "Inschrijvingen verschijnen hier nadat het kamp is gepubliceerd.",
     "docsSummary": "{{ok}}/{{total}} documenten"
@@ -3545,7 +3545,7 @@
       "append": "Toevoegen aan rooster",
       "replace": "Rooster vervangen",
       "confirm": "Importeren",
-      "blocked": "Import geblokkeerd: {{total}} spelers overschrijden de limiet van {{max}}. Verklein het bestand of kies « Vervangen ».",
+      "blocked": "Import geblokkeerd: {{total}} spelers overschrijden de limiet van {{max}}. Verklein het bestand of kies ‘Vervangen’.",
       "ok": "{{n}} speler(s) geïmporteerd"
     },
     "logo": {
@@ -3786,7 +3786,7 @@
     "flightsReady": "Groepsfasen zijn afgerond. Maak Flights aan om de 3 schema’s te genereren (Champions / Europa / Conference)."
   },
   "draw": {
-    "relaunchFromFooterHint": "Trekking voltooid. Gebruik “Opnieuw starten” onderaan het dialoogvenster om een ​​nieuwe te genereren (huidige resultaten gaan verloren)."
+    "relaunchFromFooterHint": "Trekking voltooid. Gebruik ‘Opnieuw starten’ onderaan het dialoogvenster om een ​​nieuwe te genereren (huidige resultaten gaan verloren)."
   },
   "fields": {
     "streamUrlPlaceholder": "Streaming-URL (YouTube, Twitch…)"

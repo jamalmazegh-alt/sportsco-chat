@@ -463,7 +463,7 @@
       "reserved": "Riservato (72h)",
       "remaining": "Posti rimanenti",
       "pending": "Richieste in sospeso",
-      "expiredHint": "{{count}} prenotazione/i di 72 h scaduta/e — usa “Estendi” per mantenere il posto."
+      "expiredHint": "{{count}} prenotazione/i di 72 h scaduta/e — usa «Estendi» per mantenere il posto."
     },
     "searchPlaceholder": "Cerca (nome, email...)",
     "col": {

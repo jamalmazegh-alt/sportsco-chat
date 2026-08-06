@@ -463,7 +463,7 @@
       "reserved": "Reservado (72h)",
       "remaining": "Lugares restantes",
       "pending": "Solicitudes pendientes",
-      "expiredHint": "{{count}} reserva(s) de 72 h caducadas — usa “Ampliar” para mantener la plaza."
+      "expiredHint": "{{count}} reserva(s) de 72 h caducadas — usa «Ampliar» para mantener la plaza."
     },
     "searchPlaceholder": "Buscar (nombre, correo electrónico…)",
     "col": {

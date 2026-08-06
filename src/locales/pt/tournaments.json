@@ -498,7 +498,7 @@
     "title": "Jogadores · {{team}}",
     "import": {
       "empty": "Nenhum jogador detectado no arquivo.",
-      "blocked": "Importação bloqueada: {{total}} jogadores excedem o limite de {{max}}. Reduza o ficheiro ou escolhe “Substituir”.",
+      "blocked": "Importação bloqueada: {{total}} jogadores excedem o limite de {{max}}. Reduza o ficheiro ou escolhe «Substituir».",
       "ok": "{{n}} jogador(es) importado(s)",
       "button": "Importar CSV",
       "title": "Importar jogadores",
@@ -657,7 +657,7 @@
     "noFields": "Nenhum campo",
     "removeField": "Remover {{name}}",
     "newFieldPlaceholder": "Nome do campo (ex: Campo Central)",
-    "fieldsHint": "Vários campos = jogos paralelos. Reatribuível por jogo no separador \"Jogos\".",
+    "fieldsHint": "Vários campos = jogos paralelos. Reatribuível por jogo no separador «Jogos».",
     "lunchBreak": "Pausa para almoço (sem jogos neste período)",
     "lunchStart": "Início da pausa",
     "lunchEnd": "Fim da pausa",
@@ -746,7 +746,7 @@
     "overwriteDesc": "Esta ação irá apagar a composição atual (grupos/torneio) e os jogos associados. As Equipas inscritas permanecerão.",
     "cancel": "Cancelar",
     "confirmRelaunch": "Confirmar e reiniciar",
-    "relaunchFromFooterHint": "Sorteio concluído. Usa “Reiniciar” na parte inferior da caixa de diálogo para gerar um novo (os resultados atuais serão perdidos)."
+    "relaunchFromFooterHint": "Sorteio concluído. Usa «Reiniciar» na parte inferior da caixa de diálogo para gerar um novo (os resultados atuais serão perdidos)."
   },
   "rules": {
     "savedToast": "Regras guardadas",
@@ -1071,7 +1071,7 @@
   "registrationSettings": {
     "title": "Inscrições online",
     "enableLabel": "Abrir inscrições ao público",
-    "enableHint": "Ativa um botão \"Inscrever-se\" na página pública do torneio.",
+    "enableHint": "Ativa um botão «Inscrever-se» na página pública do torneio.",
     "publicLink": "Link público de inscrição",
     "linkCopied": "Link copiado"
   },
@@ -1164,7 +1164,7 @@
     "checkStartDate": "Uma data de início está definida",
     "programmePublished": "Programa publicado — Equipas notificadas",
     "publishConfirmTitle": "Publicar programa do Torneio?",
-    "publishConfirmBody": "Será enviado um e-mail a cada Equipa confirmada com o seu primeiro jogo. O Torneio passará para o estado \"a decorrer\" e novas inscrições serão encerradas. Esta ação é irreversível.",
+    "publishConfirmBody": "Será enviado um e-mail a cada Equipa confirmada com o seu primeiro jogo. O Torneio passará para o estado «a decorrer» e novas inscrições serão encerradas. Esta ação é irreversível.",
     "tabConfigure": "Configurar",
     "tabManage": "Gerir",
     "tabPlay": "Jogar",

@@ -280,7 +280,7 @@
     "capacityLabel": "Places",
     "modeLabel": "Validation",
     "commentLabel": "Commentaire ou consignes",
-    "audienceNote": "👥 L'audience se modifie via « Relancer » (la sélection y est rééditable avant l'envoi).",
+    "audienceNote": "👥 L'audience se modifie via « Relancer » (la sélection y est rééditable avant l'envoi).",
     "save": "Enregistrer",
     "cancel": "Annuler",
     "capacityBelowConfirmed_one": "Impossible de passer à {{capacity}} place : {{confirmed}} personne est déjà confirmée. Retirez d'abord un confirmé.",
@@ -363,7 +363,7 @@
   },
   "recipients": {
     "title": "Destinataires prévenus",
-    "desc": "Personnes qui ont reçu une notification pour « {{need}} ».",
+    "desc": "Personnes qui ont reçu une notification pour « {{need}} ».",
     "empty": "Aucune notification n'a encore été envoyée pour ce besoin.",
     "count_one": "{{count}} personne prévenue",
     "count_other": "{{count}} personnes prévenues"

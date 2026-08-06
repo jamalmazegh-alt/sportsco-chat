@@ -280,7 +280,7 @@
     "capacityLabel": "Spots",
     "modeLabel": "Approval",
     "commentLabel": "Comment or instructions",
-    "audienceNote": "👥 The audience is edited via \"Re-notify\" (the selection is editable before sending).",
+    "audienceNote": "👥 The audience is edited via “Re-notify” (the selection is editable before sending).",
     "save": "Save",
     "cancel": "Cancel",
     "capacityBelowConfirmed_one": "Can't reduce to {{capacity}} spot: {{confirmed}} person is already confirmed. Remove a confirmed volunteer first.",
@@ -363,7 +363,7 @@
   },
   "recipients": {
     "title": "Notified recipients",
-    "desc": "People who received a notification for \"{{need}}\".",
+    "desc": "People who received a notification for “{{need}}”.",
     "empty": "No notification has been sent for this need yet.",
     "count_one": "{{count}} person notified",
     "count_other": "{{count}} people notified"

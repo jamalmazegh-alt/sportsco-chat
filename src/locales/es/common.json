@@ -389,7 +389,7 @@
     "mediaStatus": "Estado",
     "allow": "Permitir",
     "deny": "Denegar",
-    "consentsHint": "El conmutador gestiona tu consentimiento. Utiliza “Leer documento” para consultar cada texto.",
+    "consentsHint": "El conmutador gestiona tu consentimiento. Utiliza «Leer documento» para consultar cada texto.",
     "readDocument": "Leer documento"
   },
   "onboarding": {
@@ -1585,7 +1585,7 @@
       "offsetAfter": "{{n}} d. después",
       "remindersSaved": "Recordatorios guardados",
       "remindersNote": "Nota: Los recordatorios se envían a pagadores, jugadores y padres/tutores vinculados. Cada familia recibe un solo email por hito.",
-      "remindersNoteManual": "También puede lanzar un recordatorio manual desde la página Conceptos de pago con el botón « Recordar »."
+      "remindersNoteManual": "También puede lanzar un recordatorio manual desde la página Conceptos de pago con el botón «Recordar»."
     },
     "branding": {
       "saved": "Color del Club actualizado",
@@ -3358,7 +3358,7 @@
       "reserved": "Reservado (72h)",
       "remaining": "Lugares restantes",
       "pending": "Solicitudes pendientes",
-      "expiredHint": "{{count}} reserva(s) de 72 h caducada(s) — usa « Prolongar » para conservar la plaza."
+      "expiredHint": "{{count}} reserva(s) de 72 h caducada(s) — usa «Prolongar» para conservar la plaza."
     },
     "searchPlaceholder": "Buscar (nombre, correo electrónico…)",
     "filters": {
@@ -3403,7 +3403,7 @@
     "loadError": "Error al cargar registros",
     "disabledBanner": {
       "title": "Las inscripciones online están deshabilitadas",
-      "body": "No aparece ningún botón \"Registrarse\" en la página pública. Habilitar registros para recibir solicitudes."
+      "body": "No aparece ningún botón «Registrarse» en la página pública. Habilitar registros para recibir solicitudes."
     },
     "draftHint": "Las inscripciones aparecerán aquí una vez publicado el campamento.",
     "docsSummary": "{{ok}}/{{total}} documentos"
@@ -3545,7 +3545,7 @@
       "append": "Agregar a la lista",
       "replace": "Reemplazar lista",
       "confirm": "Importar",
-      "blocked": "Importación bloqueada: {{total}} jugadores superan el límite de {{max}}. Reduce el archivo o elige « Reemplazar ».",
+      "blocked": "Importación bloqueada: {{total}} jugadores superan el límite de {{max}}. Reduce el archivo o elige «Reemplazar».",
       "ok": "{{n}} jugador(es) importado(s)"
     },
     "logo": {
@@ -3687,7 +3687,7 @@
     "sectionDocuments": "Documentos proporcionados",
     "sectionDocumentsHint": "Documentos que proporciona el club (normas, horario en PDF, mapa de acceso…). Formatos aceptados: PDF, JPG, PNG.",
     "sectionRequired": "Documentos a proporcionar",
-    "sectionRequiredHint": "Relación de documentos que deben subir los inscritos (certificado médico, autorización paterna…). Los documentos médicos se marcan automáticamente como \"sensibles\".",
+    "sectionRequiredHint": "Relación de documentos que deben subir los inscritos (certificado médico, autorización paterna…). Los documentos médicos se marcan automáticamente como «sensibles».",
     "save": "Guardar"
   },
   "ageGroups": {
@@ -3850,7 +3850,7 @@
     "linkCopied": "Enlace copiado",
     "title": "Inscripciones en línea",
     "enableLabel": "Inscripciones abiertas al público.",
-    "enableHint": "Habilita un botón \"Registrarse\" en la página pública del torneo.",
+    "enableHint": "Habilita un botón «Registrarse» en la página pública del torneo.",
     "publicLink": "Enlace de registro público"
   },
   "aiAssistant": {

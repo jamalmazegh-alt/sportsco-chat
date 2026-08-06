@@ -4,7 +4,7 @@
     "count": "{{count}} convocado(s)"
   },
   "empty": {
-    "staff": "Sem convocados — usa « Gerir convocados » para convidar grupos ou pessoas.",
+    "staff": "Sem convocados — usa «Gerir convocados» para convidar grupos ou pessoas.",
     "member": "Não está convocado para esta reunião."
   },
   "self": {

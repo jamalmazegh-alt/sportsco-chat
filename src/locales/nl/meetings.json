@@ -4,7 +4,7 @@
     "count": "{{count}} opgeroepene(n)"
   },
   "empty": {
-    "staff": "Geen opgeroepenen — gebruik « Opgeroepenen beheren » om groepen of personen uit te nodigen.",
+    "staff": "Geen opgeroepenen — gebruik ‘Opgeroepenen beheren’ om groepen of personen uit te nodigen.",
     "member": "Je bent niet opgeroepen voor deze vergadering."
   },
   "self": {

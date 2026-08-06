@@ -389,7 +389,7 @@
     "mediaStatus": "Estado",
     "allow": "Permitir",
     "deny": "Recusar",
-    "consentsHint": "O switch gerencia teu consentimento. Usa “Ler documento” para visualizar cada texto.",
+    "consentsHint": "O switch gerencia teu consentimento. Usa «Ler documento» para visualizar cada texto.",
     "readDocument": "Ler documento"
   },
   "onboarding": {
@@ -3358,7 +3358,7 @@
       "reserved": "Reservado (72h)",
       "remaining": "Vagas restantes",
       "pending": "Solicitações pendentes",
-      "expiredHint": "{{count}} reserva(s) de 72 h expirada(s) — usa « Prolongar » para manter o lugar."
+      "expiredHint": "{{count}} reserva(s) de 72 h expirada(s) — usa «Prolongar» para manter o lugar."
     },
     "searchPlaceholder": "Pesquisa (nome, e-mail…)",
     "filters": {
@@ -3403,7 +3403,7 @@
     "loadError": "Erro ao carregar cadastros",
     "disabledBanner": {
       "title": "As inscrições online estão desativadas",
-      "body": "Nenhum botão “Registrar” aparece na página pública. Habilite registros para receber inscrições."
+      "body": "Nenhum botão «Registrar» aparece na página pública. Habilite registros para receber inscrições."
     },
     "draftHint": "As inscrições aparecerão aqui após a publicação do estágio.",
     "docsSummary": "{{ok}}/{{total}} documentos"
@@ -3545,7 +3545,7 @@
       "append": "Adicionar à lista",
       "replace": "Substituir lista",
       "confirm": "Importar",
-      "blocked": "Importação bloqueada: {{total}} jogadores excedem o limite de {{max}}. Reduza o ficheiro ou escolhe « Substituir ».",
+      "blocked": "Importação bloqueada: {{total}} jogadores excedem o limite de {{max}}. Reduza o ficheiro ou escolhe «Substituir».",
       "ok": "{{n}} jogador(es) importado(s)"
     },
     "logo": {
@@ -3687,7 +3687,7 @@
     "sectionDocuments": "Documentos fornecidos",
     "sectionDocumentsHint": "Documentos que o clube fornece (regras, cronograma em PDF, mapa de acesso…). Formatos aceitos: PDF, JPG, PNG.",
     "sectionRequired": "Documentos a fornecer",
-    "sectionRequiredHint": "Lista de documentos que os inscritos devem carregar (atestado médico, autorização parental…). Os documentos médicos são automaticamente marcados como “sensíveis”.",
+    "sectionRequiredHint": "Lista de documentos que os inscritos devem carregar (atestado médico, autorização parental…). Os documentos médicos são automaticamente marcados como «sensíveis».",
     "save": "Guardar"
   },
   "ageGroups": {
@@ -3786,7 +3786,7 @@
     "flightsReady": "A fase de grupos está concluída. Cria Flights para gerar as 3 chaves (Champions/Europa/Conference)."
   },
   "draw": {
-    "relaunchFromFooterHint": "Sorteio concluído. Usa “Reiniciar” na parte inferior da caixa de diálogo para gerar um novo (os resultados atuais serão perdidos)."
+    "relaunchFromFooterHint": "Sorteio concluído. Usa «Reiniciar» na parte inferior da caixa de diálogo para gerar um novo (os resultados atuais serão perdidos)."
   },
   "fields": {
     "streamUrlPlaceholder": "URL de streaming (YouTube, Twitch…)"
@@ -3850,7 +3850,7 @@
     "linkCopied": "Link copiado",
     "title": "Inscrições on-line",
     "enableLabel": "Inscrições abertas ao público",
-    "enableHint": "Ativa um botão “Registrar” na página pública do torneio.",
+    "enableHint": "Ativa um botão «Registrar» na página pública do torneio.",
     "publicLink": "Link de registo público"
   },
   "aiAssistant": {

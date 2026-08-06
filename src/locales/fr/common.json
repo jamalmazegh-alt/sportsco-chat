@@ -266,7 +266,7 @@
     "confirmationResent": "E-mail de confirmation renvoyé.",
     "playerAlreadyLinked": "Cette fiche joueur est déjà associée à un autre compte. Contactez le club.",
     "emailFromInvite": "Adresse issue de votre invitation.",
-    "accountAlreadyExistsSignIn": "Un compte existe déjà avec cette adresse. Connectez-vous avec votre mot de passe habituel (ou utilisez « mot de passe oublié »).",
+    "accountAlreadyExistsSignIn": "Un compte existe déjà avec cette adresse. Connectez-vous avec votre mot de passe habituel (ou utilisez « mot de passe oublié »).",
     "inviteWrongAccount": "Cette invitation est destinée à une autre adresse. Déconnectez-vous, puis connectez-vous (ou créez un compte) avec l'e-mail invité.",
     "childNameRequired": "Nom de l'enfant requis",
     "birthDateRequired": "Date de naissance requise",
@@ -389,7 +389,7 @@
     "mediaStatus": "Statut",
     "allow": "Autoriser",
     "deny": "Refuser",
-    "consentsHint": "L'interrupteur gère votre consentement. Utilisez « Lire le document » pour consulter chaque texte.",
+    "consentsHint": "L'interrupteur gère votre consentement. Utilisez « Lire le document » pour consulter chaque texte.",
     "readDocument": "Lire le document"
   },
   "onboarding": {
@@ -861,10 +861,10 @@
     "childConsentTitle": "Activer l'accès plateforme de {{name}} ?",
     "childConsentBody": "Le joueur mineur recevra une invitation pour créer son propre accès Clubero, sous la responsabilité de son représentant légal.",
     "childConsentParent": "Je confirme être le représentant légal de ce joueur et j'autorise la création de son accès.",
-    "childConsentDoc": "Lire le document « Consentement parental »",
+    "childConsentDoc": "Lire le document « Consentement parental »",
     "childConsentConfirm": "Activer l'accès",
     "childAccessParentOnly": "Seul un parent ou représentant légal peut activer l'accès.",
-    "inviteAccountExists": "Un compte Clubero existe déjà avec cette adresse : la personne doit se connecter (ou utiliser « mot de passe oublié »).",
+    "inviteAccountExists": "Un compte Clubero existe déjà avec cette adresse : la personne doit se connecter (ou utiliser « mot de passe oublié »).",
     "publicProfile": {
       "enabled": "Profil public activé",
       "disabled": "Profil public désactivé",
@@ -1585,7 +1585,7 @@
       "offsetAfter": "{{n}} j. après",
       "remindersSaved": "Rappels enregistrés",
       "remindersNote": "Note : Les rappels sont envoyés aux payeurs, joueurs et parents/tuteurs reliés. Chaque famille ne reçoit qu'un email par jalon.",
-      "remindersNoteManual": "Vous pouvez également déclencher une relance manuelle depuis la page Items de paiement via le bouton « Relancer »."
+      "remindersNoteManual": "Vous pouvez également déclencher une relance manuelle depuis la page Items de paiement via le bouton « Relancer »."
     },
     "branding": {
       "saved": "Couleur du club mise à jour",
@@ -3122,11 +3122,11 @@
     "iosStep3After": "pour dérouler la liste",
     "iosStep4Before": "Choisissez",
     "iosStep4Icon": "Sur l'écran d'accueil",
-    "iosStep4After": "puis appuyez sur « Ajouter »",
+    "iosStep4After": "puis appuyez sur « Ajouter »",
     "androidStepsTitle": "Sur Android (Chrome)",
     "androidStepsSubtitle": "3 étapes pour installer Clubero",
     "androidStep1": "Ouvrez le menu ⋮ en haut à droite de Chrome.",
-    "androidStep2": "Choisissez « Installer l'application » (ou « Ajouter à l'écran d'accueil »).",
+    "androidStep2": "Choisissez « Installer l'application » (ou « Ajouter à l'écran d'accueil »).",
     "androidStep3": "Confirmez : l'icône Clubero apparaît sur votre écran d'accueil.",
     "ctaHint": "Sur Android, ce bouton lance directement l'installation. Sur iPhone, suivez les étapes Safari ci-dessous.",
     "bannerTitle": "Installer Clubero",
@@ -3141,7 +3141,7 @@
     "iosGuideTitleFull": "Installer sur iPhone / iPad",
     "iosGuideShareBefore": "Appuyez sur",
     "iosGuideShareAfter": "en bas de Safari",
-    "iosGuideAddConfirm": "Appuyez sur « Ajouter »",
+    "iosGuideAddConfirm": "Appuyez sur « Ajouter »",
     "androidGuideBefore": "Ouvrez le menu de votre navigateur (⋮ en haut à droite) puis choisissez",
     "androidGuideInstall": "Installer l'application",
     "androidGuideOr": "ou",
@@ -3358,7 +3358,7 @@
       "reserved": "Réservées (72h)",
       "remaining": "Places restantes",
       "pending": "Demandes en attente",
-      "expiredHint": "{{count}} réservation(s) 72 h expirée(s) — utilisez « Prolonger » pour retenir la place."
+      "expiredHint": "{{count}} réservation(s) 72 h expirée(s) — utilisez « Prolonger » pour retenir la place."
     },
     "searchPlaceholder": "Rechercher (nom, email…)",
     "filters": {
@@ -3403,7 +3403,7 @@
     "loadError": "Erreur de chargement des inscriptions",
     "disabledBanner": {
       "title": "Les inscriptions en ligne sont désactivées",
-      "body": "Aucun bouton « S'inscrire » n'apparaît sur la page publique. Active-les pour recevoir des candidatures."
+      "body": "Aucun bouton « S'inscrire » n'apparaît sur la page publique. Active-les pour recevoir des candidatures."
     },
     "draftHint": "Les inscriptions apparaîtront ici après publication du stage.",
     "docsSummary": "{{ok}}/{{total}} pièces"
@@ -3545,7 +3545,7 @@
       "append": "Ajouter à l'effectif",
       "replace": "Remplacer l'effectif",
       "confirm": "Importer",
-      "blocked": "Import bloqué : {{total}} joueurs dépassent la limite de {{max}}. Réduisez le fichier ou choisissez « Remplacer ».",
+      "blocked": "Import bloqué : {{total}} joueurs dépassent la limite de {{max}}. Réduisez le fichier ou choisissez « Remplacer ».",
       "ok": "{{n}} joueur(s) importé(s)"
     },
     "logo": {
@@ -3687,7 +3687,7 @@
     "sectionDocuments": "Documents fournis",
     "sectionDocumentsHint": "Documents que le club met à disposition (règlement, planning PDF, plan d'accès…). Formats acceptés : PDF, JPG, PNG.",
     "sectionRequired": "Pièces à fournir",
-    "sectionRequiredHint": "Liste des documents que les inscrits devront téléverser (certificat médical, autorisation parentale…). Les pièces médicales sont automatiquement marquées « sensible ».",
+    "sectionRequiredHint": "Liste des documents que les inscrits devront téléverser (certificat médical, autorisation parentale…). Les pièces médicales sont automatiquement marquées « sensible ».",
     "save": "Enregistrer"
   },
   "ageGroups": {
@@ -3786,7 +3786,7 @@
     "flightsReady": "Les poules sont terminées. Crée les Flights pour générer les 3 tableaux (Champions / Europa / Conference)."
   },
   "draw": {
-    "relaunchFromFooterHint": "Tirage effectué. Utilisez « Relancer » en bas du dialog pour en générer un nouveau (les résultats actuels seront perdus)."
+    "relaunchFromFooterHint": "Tirage effectué. Utilisez « Relancer » en bas du dialog pour en générer un nouveau (les résultats actuels seront perdus)."
   },
   "fields": {
     "streamUrlPlaceholder": "URL de streaming (YouTube, Twitch…)"
@@ -3850,7 +3850,7 @@
     "linkCopied": "Lien copié",
     "title": "Inscriptions en ligne",
     "enableLabel": "Ouvrir les inscriptions au public",
-    "enableHint": "Active un bouton « S'inscrire » sur la page publique du tournoi.",
+    "enableHint": "Active un bouton « S'inscrire » sur la page publique du tournoi.",
     "publicLink": "Lien public d'inscription"
   },
   "aiAssistant": {

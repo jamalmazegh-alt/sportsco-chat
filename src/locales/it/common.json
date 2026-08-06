@@ -389,7 +389,7 @@
     "mediaStatus": "Stato",
     "allow": "Consenti",
     "deny": "Nega",
-    "consentsHint": "Lo switch gestisce il tuo consenso. Utilizzare \"Leggi documento\" per visualizzare ciascun testo.",
+    "consentsHint": "Lo switch gestisce il tuo consenso. Utilizzare «Leggi documento» per visualizzare ciascun testo.",
     "readDocument": "Leggi il documento"
   },
   "onboarding": {
@@ -1585,7 +1585,7 @@
       "offsetAfter": "{{n}} g. dopo",
       "remindersSaved": "Promemoria salvati",
       "remindersNote": "Nota: i promemoria vengono inviati a pagatori, giocatori e genitori/tutori collegati. Ogni famiglia riceve una sola email per traguardo.",
-      "remindersNoteManual": "È anche possibile avviare un sollecito manuale dalla pagina Voci di pagamento con il pulsante « Sollecita »."
+      "remindersNoteManual": "È anche possibile avviare un sollecito manuale dalla pagina Voci di pagamento con il pulsante «Sollecita»."
     },
     "branding": {
       "saved": "Colore del Club aggiornato",
@@ -3358,7 +3358,7 @@
       "reserved": "Riservato (72h)",
       "remaining": "Posti rimanenti",
       "pending": "Richieste in sospeso",
-      "expiredHint": "{{count}} prenotazione/i di 72 h scaduta/e — usa « Prolunga » per mantenere il posto."
+      "expiredHint": "{{count}} prenotazione/i di 72 h scaduta/e — usa «Prolunga» per mantenere il posto."
     },
     "searchPlaceholder": "Cerca (nome, email...)",
     "filters": {
@@ -3403,7 +3403,7 @@
     "loadError": "Errore durante il caricamento delle registrazioni",
     "disabledBanner": {
       "title": "Le registrazioni online sono disabilitate",
-      "body": "Nessun pulsante \"Registrati\" viene visualizzato nella pagina pubblica. Abilita le registrazioni per ricevere le candidature."
+      "body": "Nessun pulsante «Registrati» viene visualizzato nella pagina pubblica. Abilita le registrazioni per ricevere le candidature."
     },
     "draftHint": "Le registrazioni appariranno qui dopo la pubblicazione del campo.",
     "docsSummary": "{{ok}}/{{total}} documenti"
@@ -3545,7 +3545,7 @@
       "append": "Aggiungi all'elenco",
       "replace": "Sostituisci l'elenco",
       "confirm": "Importa",
-      "blocked": "Import bloccato: {{total}} giocatori superano il limite di {{max}}. Riduci il file o scegli « Sostituisci ».",
+      "blocked": "Import bloccato: {{total}} giocatori superano il limite di {{max}}. Riduci il file o scegli «Sostituisci».",
       "ok": "{{n}} giocatore/i importato/i"
     },
     "logo": {
@@ -3687,7 +3687,7 @@
     "sectionDocuments": "Documenti forniti",
     "sectionDocumentsHint": "Documenti forniti dal club (regolamento, programma in PDF, mappa di accesso…). Formati accettati: PDF, JPG, PNG.",
     "sectionRequired": "Documenti da fornire",
-    "sectionRequiredHint": "Elenco dei documenti che gli iscritti dovranno caricare (certificato medico, autorizzazione dei genitori…). I documenti medici vengono automaticamente contrassegnati come “sensibili”.",
+    "sectionRequiredHint": "Elenco dei documenti che gli iscritti dovranno caricare (certificato medico, autorizzazione dei genitori…). I documenti medici vengono automaticamente contrassegnati come «sensibili».",
     "save": "Salva"
   },
   "ageGroups": {
@@ -3786,7 +3786,7 @@
     "flightsReady": "La fase a gironi è terminata. Crea i Flights per generare i 3 tabelloni (Champions/Europa/Conference)."
   },
   "draw": {
-    "relaunchFromFooterHint": "Sorteggio completato. Utilizzare \"Riavvia\" nella parte inferiore della finestra di dialogo per generarne uno nuovo (i risultati correnti andranno persi)."
+    "relaunchFromFooterHint": "Sorteggio completato. Utilizzare «Riavvia» nella parte inferiore della finestra di dialogo per generarne uno nuovo (i risultati correnti andranno persi)."
   },
   "fields": {
     "streamUrlPlaceholder": "URL dello streaming (YouTube, Twitch...)"
@@ -3850,7 +3850,7 @@
     "linkCopied": "Link copiato",
     "title": "Registrazioni on-line",
     "enableLabel": "Iscrizioni aperte al pubblico",
-    "enableHint": "Abilita un pulsante \"Registrati\" sulla pagina pubblica del torneo.",
+    "enableHint": "Abilita un pulsante «Registrati» sulla pagina pubblica del torneo.",
     "publicLink": "Link di registrazione pubblica"
   },
   "aiAssistant": {

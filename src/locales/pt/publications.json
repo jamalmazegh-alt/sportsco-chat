@@ -112,7 +112,7 @@
     "anonymous": "Voto anónimo",
     "isAnonymous": "Esta sondagem é anónima",
     "isStaffVisible": "Esta sondagem é identificada",
-    "youVoted": "Votou em \"{{option}}\"",
+    "youVoted": "Votou em «{{option}}»",
     "closed": "Sondagem fechada",
     "closedAt": "Fechada em {{date}}",
     "closesAt": "Fecha em {{date}}",
@@ -138,7 +138,7 @@
     },
     "delete": {
       "title": "Eliminar esta publicação?",
-      "body": "Os votos são mantidos, mas a publicação desaparece do mural. As ligações de email mostrarão \"Publicação eliminada\"."
+      "body": "Os votos são mantidos, mas a publicação desaparece do mural. As ligações de email mostrarão «Publicação eliminada»."
     },
     "resend": {
       "title": "Reenviar a todos?",

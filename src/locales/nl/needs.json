@@ -280,7 +280,7 @@
     "capacityLabel": "Plekken",
     "modeLabel": "Bevestiging",
     "commentLabel": "Opmerking of instructies",
-    "audienceNote": "👥 De doelgroep wijzig je via « Opnieuw vragen » (daar kun je de keuze aanpassen vóór het versturen).",
+    "audienceNote": "👥 De doelgroep wijzig je via ‘Opnieuw vragen’ (daar kun je de keuze aanpassen vóór het versturen).",
     "save": "Opslaan",
     "cancel": "Annuleren",
     "capacityBelowConfirmed_one": "Kan niet naar {{capacity}} plek: {{confirmed}} persoon is al bevestigd. Verwijder eerst een bevestigde persoon.",
@@ -363,7 +363,7 @@
   },
   "recipients": {
     "title": "Verwittigde ontvangers",
-    "desc": "Mensen die een melding ontvingen voor \"{{need}}\".",
+    "desc": "Mensen die een melding ontvingen voor ‘{{need}}’.",
     "empty": "Er is nog geen melding verstuurd voor deze behoefte.",
     "count_one": "{{count}} persoon verwittigd",
     "count_other": "{{count}} personen verwittigd"

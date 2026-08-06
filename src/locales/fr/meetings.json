@@ -4,7 +4,7 @@
     "count": "{{count}} convoqué(s)"
   },
   "empty": {
-    "staff": "Aucun convoqué — utilisez « Gérer les convoqués » pour inviter des groupes ou des personnes.",
+    "staff": "Aucun convoqué — utilisez « Gérer les convoqués » pour inviter des groupes ou des personnes.",
     "member": "Vous n'êtes pas convoqué à cette réunion."
   },
   "self": {

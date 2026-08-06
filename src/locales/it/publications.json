@@ -112,7 +112,7 @@
     "anonymous": "Voto anonimo",
     "isAnonymous": "Questo sondaggio è anonimo",
     "isStaffVisible": "Questo sondaggio è nominativo",
-    "youVoted": "Hai votato \"{{option}}\"",
+    "youVoted": "Hai votato «{{option}}»",
     "closed": "Sondaggio chiuso",
     "closedAt": "Chiuso il {{date}}",
     "closesAt": "Chiude il {{date}}",
@@ -138,7 +138,7 @@
     },
     "delete": {
       "title": "Eliminare questa pubblicazione?",
-      "body": "I voti vengono conservati, ma la pubblicazione scompare dalla bacheca. I link email mostreranno \"Pubblicazione eliminata\"."
+      "body": "I voti vengono conservati, ma la pubblicazione scompare dalla bacheca. I link email mostreranno «Pubblicazione eliminata»."
     },
     "resend": {
       "title": "Rimandare a tutti?",

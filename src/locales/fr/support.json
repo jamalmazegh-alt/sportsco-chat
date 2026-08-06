@@ -24,7 +24,7 @@
     "cancel": "Annuler",
     "send": "Envoyer",
     "sent": "Demande envoyée",
-    "sent_desc": "Nous reviendrons vers vous très vite. Vous pouvez suivre votre demande dans « Mes demandes ».",
+    "sent_desc": "Nous reviendrons vers vous très vite. Vous pouvez suivre votre demande dans « Mes demandes ».",
     "close": "Fermer",
     "view": "Voir le ticket",
     "file_too_large": "{{name}} dépasse 5 Mo",
