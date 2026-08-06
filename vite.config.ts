@@ -18,11 +18,30 @@ export default async function config(env: ConfigEnv) {
   const serverEnv = loadEnv(env.mode, process.cwd(), "");
   Object.assign(process.env, serverEnv);
 
+  // Filet de sécurité : si l'environnement de build ne fournit pas les
+  // variables Supabase publiques (cas constaté sur un déploiement prod où le
+  // bundle client sortait sans VITE_SUPABASE_*), on retombe sur les valeurs
+  // publiques du projet. Ce sont des clés publiables (anon), pas des secrets.
+  const FALLBACK_SUPABASE_URL = "https://woawmhuntajpiezmmgzm.supabase.co";
+  const FALLBACK_SUPABASE_PUBLISHABLE_KEY =
+    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndvYXdtaHVudGFqcGllem1tZ3ptIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg3MTExMTMsImV4cCI6MjA5NDI4NzExM30.XsVPX_ZlN8QVZZB5dbWy8xLbcJo-mKG3D1LOd7uWOWs";
+
+  const supabaseUrl =
+    process.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL || FALLBACK_SUPABASE_URL;
+  const supabasePublishableKey =
+    process.env.VITE_SUPABASE_PUBLISHABLE_KEY ||
+    process.env.SUPABASE_PUBLISHABLE_KEY ||
+    FALLBACK_SUPABASE_PUBLISHABLE_KEY;
+
+  process.env.VITE_SUPABASE_URL = supabaseUrl;
+  process.env.VITE_SUPABASE_PUBLISHABLE_KEY = supabasePublishableKey;
+
   // Build mobile (Capacitor) : produit un shell SPA statique à embarquer dans
   // l'app, le Worker Cloudflare restant le backend distant. Strictement opt-in —
   // `bun run build` et le build Lovable/Cloudflare ne définissent jamais cette
   // variable, et conservent donc le SSR à l'identique.
   const isMobileBuild = process.env.MOBILE_BUILD === "1";
+
 
   return defineLovableConfig({
     // Le build mobile n'a pas de serveur : c'est un shell statique embarqué dans
@@ -63,6 +82,11 @@ export default async function config(env: ConfigEnv) {
         cors: { origin: [defaultAllowedOrigins, "capacitor://localhost"] },
       },
       plugins: [mcpPlugin()],
+      define: {
+        "import.meta.env.VITE_SUPABASE_URL": JSON.stringify(supabaseUrl),
+        "import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY": JSON.stringify(supabasePublishableKey),
+      },
+
       resolve: {
         alias: {
           "entities/decode": path.resolve(__dirname, "node_modules/entities/lib/esm/decode.js"),
