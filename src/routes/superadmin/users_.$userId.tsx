@@ -480,7 +480,7 @@ function UserDetail() {
                           <li key={idx} className="text-xs">
                             {pa.parent_user_id ? (
                               <Link
-                                to="/superadmin/users_/$userId"
+                                to="/superadmin/users/$userId"
                                 params={{ userId: pa.parent_user_id }}
                                 className="font-medium hover:underline"
                               >
