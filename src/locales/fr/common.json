@@ -3830,7 +3830,7 @@
     "seventhPlace": "7e place",
     "public": {
       "empty": "Aucun flight n'a encore été configuré pour ce tournoi.",
-      "noMatches": "Les matchs de ce flight seront générés après la phase de poules."
+      "noMatches": "Les matchs seront générés après la phase de poules."
     },
     "draftRulesSummary": "{{n}} règle(s) de qualification configurée(s)",
     "generatedToast": "{{n}} matchs créés"

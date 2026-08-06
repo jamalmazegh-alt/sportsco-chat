@@ -11,8 +11,8 @@
     "copy": "Cópia"
   },
   "chooser": {
-    "title": "Novo camp",
-    "subtitle": "Como queres criar este camp?",
+    "title": "Novo estágio",
+    "subtitle": "Como queres criar este estágio?",
     "assistant": "Criar com o assistente",
     "assistantHint": "Guiado, passo a passo",
     "classic": "Criação rápida",
@@ -22,7 +22,7 @@
     "title": "Assistente de criação",
     "back": "Voltar",
     "next": "Seguinte",
-    "create": "Criar camp",
+    "create": "Criar estágio",
     "optional": "opcional",
     "deadlineHint": "Opcional — deve ser anterior à data de início.",
     "venueHint": "Podes saltar este passo e adicionar depois.",
@@ -39,7 +39,7 @@
     },
     "step": {
       "title": {
-        "title": "Nome do camp",
+        "title": "Nome do estágio",
         "hint": "O que as famílias verão"
       },
       "dates": {
@@ -68,31 +68,31 @@
       "places": "vagas",
       "venueSet": "Local definido",
       "ageGroups": "Categorias",
-      "next": "O camp será criado como rascunho. Podes adicionar descrição, imagem, programa e documentos antes de publicar."
+      "next": "O estágio será criado como rascunho. Podes adicionar descrição, imagem, programa e documentos antes de publicar."
     }
   },
   "meta": {
     "list": {
-      "title": "Camps do clube – Clubero",
-      "description": "Cria, publica e gere os camps organizados pelo teu clube."
+      "title": "Estágios do clube – Clubero",
+      "description": "Cria, publica e gere os estágios organizados pelo teu clube."
     },
     "edit": {
-      "title": "Editar camp – Clubero"
+      "title": "Editar estágio – Clubero"
     }
   },
   "list": {
-    "title": "Camps do clube",
-    "subtitle": "Cria e publica os camps organizados pelo teu clube.",
-    "new": "Novo camp",
-    "newTitle": "Novo camp",
+    "title": "Estágios do clube",
+    "subtitle": "Cria e publica os estágios organizados pelo teu clube.",
+    "new": "Novo estágio",
+    "newTitle": "Novo estágio",
     "create": "Criar rascunho",
-    "empty": "Ainda não há camps.",
+    "empty": "Ainda não há estágios.",
     "hasVenue": "Local definido"
   },
   "filters": {
     "searchPlaceholder": "Pesquisar…",
     "count": "{{shown}} / {{total}}",
-    "noResults": "Nenhum camp corresponde a estes filtros.",
+    "noResults": "Nenhum estágio corresponde a estes filtros.",
     "status": {
       "all": "Todos os estados"
     },
@@ -120,9 +120,9 @@
     "sectionRequired": "Documentos obrigatórios",
     "sectionRequiredHint": "O que cada família deve carregar na inscrição.",
     "title": "Título",
-    "titlePlaceholder": "Camp de Páscoa U9-U11",
+    "titlePlaceholder": "Estágio de Páscoa U9-U11",
     "slug": "Slug (URL)",
-    "slugHint": "Letras, dígitos e hífenes. Editável enquanto o camp for rascunho.",
+    "slugHint": "Letras, dígitos e hífenes. Editável enquanto o estágio for rascunho.",
     "slugLocked": "O slug fica bloqueado após publicação.",
     "description": "Descrição",
     "cover": "Imagem de capa",
@@ -174,11 +174,11 @@
   },
   "lifecycle": {
     "publish": "Publicar",
-    "published": "Camp publicado",
+    "published": "Estágio publicado",
     "close": "Fechar inscrições",
     "closed": "Inscrições fechadas",
     "archive": "Arquivar",
-    "archived": "Camp arquivado",
+    "archived": "Estágio arquivado",
     "publicUrl": "Link público",
     "publicUrlSoon": "página pública em breve",
     "openPublic": "Ver página pública",
@@ -186,7 +186,7 @@
   },
   "duplicate": {
     "action": "Duplicar",
-    "done": "Camp duplicado",
+    "done": "Estágio duplicado",
     "hint": "Criar uma cópia em rascunho (sem as inscrições)."
   },
   "program": {
@@ -232,7 +232,7 @@
     "slugInvalid": "Slug inválido.",
     "slugLocked": "O slug não pode mudar após a publicação.",
     "datesInvalid": "A data de fim deve ser posterior à de início.",
-    "notDraft": "O camp já não é um rascunho.",
+    "notDraft": "O estágio já não é um rascunho.",
     "deleteNotDraft": "Só rascunhos podem ser eliminados. Arquiva-o em vez disso.",
     "publishTitleRequired": "Título necessário para publicar.",
     "publishDatesRequired": "Datas de início e fim necessárias.",
@@ -255,7 +255,7 @@
     "backToCamp": "Voltar ao estágio",
     "formTitle": "Inscrição — {{title}}",
     "docsHint": "PDF, JPG ou PNG — máx. 15 MB por ficheiro.",
-    "consent": "Autorizo o clube a utilizar os dados transmitidos (identidade da criança, contacto do responsável, anexos) para gerir esta inscrição no stage, em conformidade com o RGPD. Os dados são conservados até {{months}} meses após o fim do stage e depois eliminados automaticamente.",
+    "consent": "Autorizo o clube a utilizar os dados transmitidos (identidade da criança, contacto do responsável, anexos) para gerir esta inscrição no estágio, em conformidade com o RGPD. Os dados são conservados até {{months}} meses após o fim do estágio e depois eliminados automaticamente.",
     "submit": "Enviar inscrição",
     "confirmTitle": "Inscrição enviada!",
     "confirmBody": "Recebemos o teu processo. O clube entrará em contacto consigo em breve.",
@@ -293,7 +293,7 @@
       "ageMismatch": "A idade da criança não corresponde ao escalão escolhido.",
       "generic": "Ocorreu um erro. Tenta novamente.",
       "network": "Erro de rede. Verifica a tua ligação.",
-      "duplicate": "Esta criança já está inscrita neste stage. Consulta o email recebido para acompanhar o processo.",
+      "duplicate": "Esta criança já está inscrita neste estágio. Consulta o email recebido para acompanhar o processo.",
       "loadFailed": "Não foi possível carregar este estágio.",
       "notFound": "Estágio não encontrado",
       "notFoundBody": "Este estágio não está disponível ou ainda não foi publicado.",

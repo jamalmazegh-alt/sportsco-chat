@@ -1241,7 +1241,7 @@
     },
     "public": {
       "empty": "Nessuna fascia configurata al momento.",
-      "noMatches": "Matches will be generated after group stage."
+      "noMatches": "Le partite saranno generate dopo la fase a gironi."
     },
     "templatesDesc": {
       "champions": "3 tabelloni paralleli per livello — tutte le squadre continuano a giocare, divise in Élite / Medio / Scoperta.",

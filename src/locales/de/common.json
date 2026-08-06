@@ -3835,7 +3835,7 @@
     "seventhPlace": "7. Platz",
     "public": {
       "empty": "Für dieses Turnier wurde noch kein Flight konfiguriert.",
-      "noMatches": "Spiele für diesen Flug werden nach der Gruppenphase generiert."
+      "noMatches": "Die Spiele werden nach der Gruppenphase generiert."
     },
     "draftRulesSummary": "{{n}} Qualifikationsregel(n) konfiguriert",
     "generatedToast": "{{n}} Spiele erstellt"

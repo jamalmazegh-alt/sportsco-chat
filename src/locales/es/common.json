@@ -3830,7 +3830,7 @@
     "seventhPlace": "7mo lugar",
     "public": {
       "empty": "Aún no se ha configurado ningún Flight para este torneo.",
-      "noMatches": "Los partidos para este Flight se generarán después de la fase de grupos."
+      "noMatches": "Los partidos se generarán después de la fase de grupos."
     },
     "draftRulesSummary": "{{n}} regla(s) de clasificación configurada(s)",
     "generatedToast": "{{n}} partidos creados"

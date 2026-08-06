@@ -11,8 +11,8 @@
     "copy": "Kopiëren"
   },
   "chooser": {
-    "title": "Nieuwe stage",
-    "subtitle": "Hoe wil je deze stage maken?",
+    "title": "Nieuw kamp",
+    "subtitle": "Hoe wil je dit kamp maken?",
     "assistant": "Maken met de assistent",
     "assistantHint": "Stap voor stap begeleid",
     "classic": "Snel aanmaken",
@@ -22,7 +22,7 @@
     "title": "Aanmaakassistent",
     "back": "Terug",
     "next": "Volgende",
-    "create": "Stage aanmaken",
+    "create": "Kamp aanmaken",
     "optional": "optioneel",
     "deadlineHint": "Optioneel — moet vóór de startdatum liggen.",
     "venueHint": "Je kunt deze stap overslaan en later toevoegen.",
@@ -39,7 +39,7 @@
     },
     "step": {
       "title": {
-        "title": "Naam van de stage",
+        "title": "Naam van het kamp",
         "hint": "Wat gezinnen zullen zien"
       },
       "dates": {
@@ -68,31 +68,31 @@
       "places": "plaatsen",
       "venueSet": "Locatie ingesteld",
       "ageGroups": "Categorieën",
-      "next": "De stage wordt als concept aangemaakt. Je kunt beschrijving, cover, programma en documenten toevoegen voor je publiceert."
+      "next": "Het kamp wordt als concept aangemaakt. Je kunt beschrijving, cover, programma en documenten toevoegen voor je publiceert."
     }
   },
   "meta": {
     "list": {
       "title": "Clubstages – Clubero",
-      "description": "Maak, publiceer en beheer de stages van je club."
+      "description": "Maak, publiceer en beheer de kampen van je club."
     },
     "edit": {
-      "title": "Stage bewerken – Clubero"
+      "title": "Kamp bewerken – Clubero"
     }
   },
   "list": {
     "title": "Clubstages",
-    "subtitle": "Maak en publiceer de stages van je club.",
-    "new": "Nieuwe stage",
-    "newTitle": "Nieuwe stage",
+    "subtitle": "Maak en publiceer de kampen van je club.",
+    "new": "Nieuw kamp",
+    "newTitle": "Nieuw kamp",
     "create": "Concept aanmaken",
-    "empty": "Nog geen stages.",
+    "empty": "Nog geen kampen.",
     "hasVenue": "Locatie ingesteld"
   },
   "filters": {
     "searchPlaceholder": "Zoeken…",
     "count": "{{shown}} / {{total}}",
-    "noResults": "Geen stages die aan deze filters voldoen.",
+    "noResults": "Geen kampen die aan deze filters voldoen.",
     "status": {
       "all": "Alle statussen"
     },
@@ -122,7 +122,7 @@
     "title": "Titel",
     "titlePlaceholder": "Paasstage U9-U11",
     "slug": "Slug (URL)",
-    "slugHint": "Letters, cijfers en streepjes. Bewerkbaar zolang de stage een concept is.",
+    "slugHint": "Letters, cijfers en streepjes. Bewerkbaar zolang het kamp een concept is.",
     "slugLocked": "Slug wordt vergrendeld na publicatie.",
     "description": "Beschrijving",
     "cover": "Coverafbeelding",
@@ -174,11 +174,11 @@
   },
   "lifecycle": {
     "publish": "Publiceren",
-    "published": "Stage gepubliceerd",
+    "published": "Kamp gepubliceerd",
     "close": "Inschrijvingen sluiten",
     "closed": "Inschrijvingen gesloten",
     "archive": "Archiveren",
-    "archived": "Stage gearchiveerd",
+    "archived": "Kamp gearchiveerd",
     "publicUrl": "Publieke link",
     "publicUrlSoon": "publieke pagina binnenkort beschikbaar",
     "openPublic": "Bekijk openbare pagina",
@@ -186,7 +186,7 @@
   },
   "duplicate": {
     "action": "Dupliceren",
-    "done": "Stage gedupliceerd",
+    "done": "Kamp gedupliceerd",
     "hint": "Maak een conceptkopie (zonder inschrijvingen)."
   },
   "program": {
@@ -232,7 +232,7 @@
     "slugInvalid": "Ongeldige slug.",
     "slugLocked": "Slug kan niet meer wijzigen na publicatie.",
     "datesInvalid": "Einddatum moet na de startdatum liggen.",
-    "notDraft": "De stage is geen concept meer.",
+    "notDraft": "Het kamp is geen concept meer.",
     "deleteNotDraft": "Alleen concepten kunnen verwijderd worden. Archiveer het anders.",
     "publishTitleRequired": "Titel vereist om te publiceren.",
     "publishDatesRequired": "Start- en einddatum vereist.",
@@ -255,7 +255,7 @@
     "backToCamp": "Terug naar het kamp",
     "formTitle": "Inschrijving - {{title}}",
     "docsHint": "PDF, JPG of PNG - max. 15 MB per bestand.",
-    "consent": "Ik machtig de club om de verzonden gegevens (identiteit van het kind, contact van de ouder, bijlagen) te gebruiken voor het beheer van deze stage-inschrijving, in overeenstemming met de AVG. De gegevens worden tot {{months}} maanden na het einde van de stage bewaard en daarna automatisch verwijderd.",
+    "consent": "Ik machtig de club om de verzonden gegevens (identiteit van het kind, contact van de ouder, bijlagen) te gebruiken voor het beheer van dit kamp-inschrijving, in overeenstemming met de AVG. De gegevens worden tot {{months}} maanden na het einde van het kamp bewaard en daarna automatisch verwijderd.",
     "submit": "Inschrijving versturen",
     "confirmTitle": "Inschrijving verstuurd!",
     "confirmBody": "We hebben je dossier ontvangen. De club neemt binnenkort contact met je op.",
@@ -293,10 +293,10 @@
       "ageMismatch": "De leeftijd van het kind past niet bij de gekozen categorie.",
       "generic": "Er is een fout opgetreden. Probeer het opnieuw.",
       "network": "Netwerkfout. Controleer je verbinding.",
-      "duplicate": "Dit kind is al ingeschreven voor deze stage. Raadpleeg de ontvangen e-mail om het dossier te volgen.",
-      "loadFailed": "Deze stage kon niet worden geladen.",
-      "notFound": "Stage niet gevonden",
-      "notFoundBody": "Deze stage is niet beschikbaar of nog niet gepubliceerd.",
+      "duplicate": "Dit kind is al ingeschreven voor dit kamp. Raadpleeg de ontvangen e-mail om het dossier te volgen.",
+      "loadFailed": "Dit kamp kon niet worden geladen.",
+      "notFound": "Kamp niet gevonden",
+      "notFoundBody": "Dit kamp is niet beschikbaar of nog niet gepubliceerd.",
       "formLoadFailed": "Het formulier kon niet worden geladen."
     },
     "full": "Vol — inschrijving mogelijk op wachtlijst",

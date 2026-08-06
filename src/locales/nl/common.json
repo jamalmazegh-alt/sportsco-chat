@@ -3830,7 +3830,7 @@
     "seventhPlace": "7e plaats",
     "public": {
       "empty": "Er is nog geen Flight geconfigureerd voor dit toernooi.",
-      "noMatches": "Wedstrijden voor deze Flight worden na de groepsfase gegenereerd."
+      "noMatches": "De wedstrijden worden na de groepsfase gegenereerd."
     },
     "draftRulesSummary": "{{n}} kwalificatieregel(s) geconfigureerd",
     "generatedToast": "{{n}} wedstrijden aangemaakt"

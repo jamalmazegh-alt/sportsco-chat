@@ -1241,7 +1241,7 @@
     },
     "public": {
       "empty": "Aucun flight n'a encore été configuré pour ce tournoi.",
-      "noMatches": "Matches will be generated after group stage."
+      "noMatches": "Les matchs seront générés après la phase de poules."
     },
     "templatesDesc": {
       "champions": "3 tableaux parallèles par niveau — toutes les équipes continuent à jouer, classées Élite / Intermédiaire / Découverte.",

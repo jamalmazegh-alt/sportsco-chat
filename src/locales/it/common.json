@@ -2850,7 +2850,7 @@
       "training": "Allenamento regolare",
       "match": "Partita ufficiale o amichevole",
       "meeting": "Riunione di club o squadra",
-      "other": "Stage, torneo, evento…"
+      "other": "Camp, torneo, evento…"
     },
     "halvesPlaceholder": "3x30",
     "gameformatPlaceholder": "6v6",
@@ -3830,7 +3830,7 @@
     "seventhPlace": "7° posto",
     "public": {
       "empty": "Nessun Flight è stato ancora configurato per questo torneo.",
-      "noMatches": "Le partite per questo Flight verranno generate dopo la fase a gironi."
+      "noMatches": "Le partite saranno generate dopo la fase a gironi."
     },
     "draftRulesSummary": "{{n}} regola/e di qualificazione configurata/e",
     "generatedToast": "{{n}} partite create"

@@ -1241,7 +1241,7 @@
     },
     "public": {
       "empty": "Todavía no hay grupos configurados.",
-      "noMatches": "Matches will be generated after group stage."
+      "noMatches": "Los partidos se generarán después de la fase de grupos."
     },
     "templatesDesc": {
       "champions": "3 cuadros paralelos por nivel — todos los equipos siguen jugando, divididos en Élite / Medio / Descubierta.",

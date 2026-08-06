@@ -3574,7 +3574,7 @@
     "share": "Compartilhar"
   },
   "chooser": {
-    "title": "Novo stage",
+    "title": "Novo estágio",
     "subtitle": "Como queres criar este estágio?",
     "assistant": "Criar com assistente",
     "assistantHint": "Guiado, passo a passo",
@@ -3635,11 +3635,11 @@
     "footerProgress": "Passo {{current}} de {{total}}"
   },
   "list": {
-    "newTitle": "Novo stage",
+    "newTitle": "Novo estágio",
     "create": "Criar rascunho",
     "title": "Estágios de clube",
     "subtitle": "Cria e publica estágios oferecidos pelo teu clube.",
-    "new": "Novo stage",
+    "new": "Novo estágio",
     "empty": "Ainda não há estágios.",
     "hasVenue": "Conjunto de local",
     "active_only": "Ativo",
@@ -3830,7 +3830,7 @@
     "seventhPlace": "7º lugar",
     "public": {
       "empty": "Nenhum voo foi configurado para este torneio ainda.",
-      "noMatches": "As partidas deste voo serão geradas após a fase de grupos."
+      "noMatches": "Os jogos serão gerados após a fase de grupos."
     },
     "draftRulesSummary": "{{n}} regra(s) de qualificação configurada(s)",
     "generatedToast": "{{n}} jogos criados"

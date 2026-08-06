@@ -1241,7 +1241,7 @@
     },
     "public": {
       "empty": "Noch keine Flights konfiguriert.",
-      "noMatches": "Matches will be generated after group stage."
+      "noMatches": "Die Spiele werden nach der Gruppenphase generiert."
     },
     "templatesDesc": {
       "champions": "3 parallele Tableaus nach Niveau — alle Teams spielen weiter, eingeteilt in Elite / Mittel / Entdeckung.",
