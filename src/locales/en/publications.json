@@ -112,7 +112,7 @@
     "anonymous": "Anonymous vote",
     "isAnonymous": "This poll is anonymous",
     "isStaffVisible": "This poll is named",
-    "youVoted": "You voted \"{{option}}\"",
+    "youVoted": "You voted “{{option}}”",
     "closed": "Poll closed",
     "closedAt": "Closed on {{date}}",
     "closesAt": "Closes on {{date}}",
@@ -138,7 +138,7 @@
     },
     "delete": {
       "title": "Delete this publication?",
-      "body": "Votes are kept, but the publication disappears from the wall. Email links will show \"Publication deleted\"."
+      "body": "Votes are kept, but the publication disappears from the wall. Email links will show “Publication deleted”."
     },
     "resend": {
       "title": "Resend to everyone?",

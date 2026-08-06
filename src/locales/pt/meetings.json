@@ -4,11 +4,11 @@
     "count": "{{count}} convocado(s)"
   },
   "empty": {
-    "staff": "Sem convocados — use « Gerir convocados » para convidar grupos ou pessoas.",
+    "staff": "Sem convocados — usa «Gerir convocados» para convidar grupos ou pessoas.",
     "member": "Não está convocado para esta reunião."
   },
   "self": {
-    "prompt": "A sua presença:"
+    "prompt": "A tua presença:"
   },
   "source": {
     "manual": "adicionado manualmente"
@@ -30,7 +30,7 @@
   "manage": {
     "cta": "Gerir convocados",
     "title": "Quem convocar?",
-    "desc": "Selecione grupos, equipas ou pessoas. Cada pessoa é convocada apenas uma vez.",
+    "desc": "Seleciona grupos, equipas ou pessoas. Cada pessoa é convocada apenas uma vez.",
     "save": "Guardar",
     "confirm": "Convocar"
   },

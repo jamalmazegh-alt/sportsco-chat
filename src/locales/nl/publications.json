@@ -112,7 +112,7 @@
     "anonymous": "Anonieme stem",
     "isAnonymous": "Deze peiling is anoniem",
     "isStaffVisible": "Deze peiling is op naam",
-    "youVoted": "Je stemde \"{{option}}\"",
+    "youVoted": "Je stemde ‘{{option}}’",
     "closed": "Peiling gesloten",
     "closedAt": "Gesloten op {{date}}",
     "closesAt": "Sluit op {{date}}",
@@ -138,7 +138,7 @@
     },
     "delete": {
       "title": "Deze publicatie verwijderen?",
-      "body": "Stemmen blijven bewaard, maar de publicatie verdwijnt van de clubmuur. E-maillinks tonen \"Publicatie verwijderd\"."
+      "body": "Stemmen blijven bewaard, maar de publicatie verdwijnt van de clubmuur. E-maillinks tonen ‘Publicatie verwijderd’."
     },
     "resend": {
       "title": "Opnieuw naar iedereen sturen?",

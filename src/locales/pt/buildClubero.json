@@ -1,7 +1,7 @@
 {
   "meta": {
     "title": "Vamos construir o Clubero juntos",
-    "description": "Ajude-nos a moldar o Clubero — 3 minutos de perguntas para desenhar a app que realmente facilita a sua vida."
+    "description": "Ajuda-nos a moldar o Clubero — 3 minutos de perguntas para desenhar a app que realmente facilita a tua vida."
   },
   "hero": {
     "badge": "≈ 3 minutos",
@@ -220,7 +220,7 @@
     "thanksTitle": "Enviado!",
     "thanksBody": "Obrigado pelo tempo. Até breve no Clubero.",
     "privacy": {
-      "notice": "Estes dados são usados apenas para lhe enviar a newsletter e/ou o acesso beta se marcar as caixas correspondentes. Veja a nossa <link>política de privacidade</link>.",
+      "notice": "Estes dados são usados apenas para lhe enviar a newsletter e/ou o acesso beta se marcar as caixas correspondentes. Vê a nossa <link>política de privacidade</link>.",
       "linkText": "política de privacidade"
     }
   },

@@ -50,10 +50,12 @@
     "updated": "Ausencia actualizada",
     "forPlayer": "¿Para qué jugador?",
     "dates": "Periodo de ausencia",
-    "pickRange": "Seleccione un período",
+    "pickRange": "Selecciona un período",
     "teamTable": {
       "title": "Ausencias del equipo",
-      "empty": "No se han declarado ausencias próximas en este equipo."
+      "empty": "No se han declarado ausencias próximas en este equipo.",
+      "days_one": "{{count}} d",
+      "days_other": "{{count}} d"
     },
     "calendar": {
       "open": "Ver calendario de ausencias",
@@ -116,7 +118,8 @@
   "notification": {
     "sanctionCreated_one": "{{name}} ha recibido una sanción de {{n}} partido.",
     "sanctionCreated_other": "{{name}} ha recibido una sanción de {{n}} partidos.",
-    "absenceDeclared": "{{name}} estará ausente desde el {{start}} hasta el {{end}}. Motivo: {{reason}}"
+    "absenceDeclared": "{{name}} estará ausente desde el {{start}} hasta el {{end}}. Motivo: {{reason}}",
+    "declaredBy": "declarado por {{name}}"
   },
   "suspension": {
     "title": "Sanción",
@@ -282,7 +285,8 @@
     "showPassword": "Mostrar contraseña",
     "hidePassword": "Ocultar contraseña",
     "inviteExpired": "Esta invitación ha caducado.",
-    "inviteUsed": "Esta invitación ya ha sido utilizada."
+    "inviteUsed": "Esta invitación ya ha sido utilizada.",
+    "invitedToTeam": "Registro — {{team}}"
   },
   "common": {
     "save": "Guardar",
@@ -342,7 +346,8 @@
     "copy": "Copiar",
     "moreActions": "Más acciones",
     "noResults": "Sin resultados",
-    "added": "añadido"
+    "added": "añadido",
+    "home": "Inicio"
   },
   "notFound": {
     "code": "404",
@@ -384,7 +389,7 @@
     "mediaStatus": "Estado",
     "allow": "Permitir",
     "deny": "Denegar",
-    "consentsHint": "El conmutador gestiona su consentimiento. Utilice “Leer documento” para ver cada texto.",
+    "consentsHint": "El conmutador gestiona tu consentimiento. Utiliza «Leer documento» para consultar cada texto.",
     "readDocument": "Leer documento"
   },
   "onboarding": {
@@ -663,12 +668,12 @@
       "paid": "Pagado",
       "exempt": "Eximir",
       "unpaid": "para recoger",
-      "cycleHint": "Haga clic para cambiar el estado de pago"
+      "cycleHint": "Haz clic para cambiar el estado de pago"
     },
     "row": {
       "noContact": "Sin contacto"
     },
-    "ageGroupRequired": "Elija una categoría de edad de la lista.",
+    "ageGroupRequired": "Elige una categoría de edad de la lista.",
     "player": "Jugador",
     "ageGroupLegacyHint": "Valor heredado: elija una categoría oficial (por ejemplo, U7). Un rango como U6-U7 puede permanecer en el nombre del equipo.",
     "staffWall": "Muro del personal",
@@ -847,7 +852,9 @@
       "errorRows": "fila(s) con error",
       "row": "Fila",
       "another": "Nueva importación",
-      "button": "Importar CSV"
+      "button": "Importar CSV",
+      "confirm_one": "Importar {{count}} jugador",
+      "confirm_other": "Importar {{count}} jugadores"
     },
     "inviteAlreadyActive": "Cuenta ya activa — no es necesario reenviar.",
     "parentActivationPending": "Esperando activación de la cuenta del padre/madre",
@@ -1313,8 +1320,8 @@
     "pillUpcoming": "próximo",
     "notPlayedYet": "El partido aún no se ha jugado; el resultado se podrá anotar tras el pitido final.",
     "finishedTitle": "El partido ha terminado.",
-    "finishedHint": "Guarde la puntuación y los datos del partido.",
-    "enterResult": "Introduzca el resultado"
+    "finishedHint": "Guarda el resultado y los eventos del partido.",
+    "enterResult": "Introduce el resultado"
   },
   "channels": {
     "in_app": "en la aplicación",
@@ -1472,7 +1479,7 @@
     "statusActive": "Activo",
     "statusPending": "Pendiente",
     "userDetailTitle": "Detalles del usuario",
-    "memberships": "Membresías del Club",
+    "memberships": "Socios del club",
     "linkedPlayers": "Jugadores vinculados",
     "noLinkedPlayers": "No hay Jugadores vinculados.",
     "phone": "Teléfono",
@@ -1578,7 +1585,7 @@
       "offsetAfter": "{{n}} d. después",
       "remindersSaved": "Recordatorios guardados",
       "remindersNote": "Nota: Los recordatorios se envían a pagadores, jugadores y padres/tutores vinculados. Cada familia recibe un solo email por hito.",
-      "remindersNoteManual": "También puede lanzar un recordatorio manual desde la página Conceptos de pago con el botón « Recordar »."
+      "remindersNoteManual": "También puede lanzar un recordatorio manual desde la página Conceptos de pago con el botón «Recordar»."
     },
     "branding": {
       "saved": "Color del Club actualizado",
@@ -1598,7 +1605,9 @@
     "hubCamps": "Campus",
     "hubCampsHint": "Crea, publica y gestiona los campamentos que ofrece tu club",
     "emailLanguage": "Idioma del correo electrónico de comunicación",
-    "emailLanguageHint": "Idioma utilizado para los correos electrónicos enviados por el club a destinatarios que no han establecido un idioma preferido."
+    "emailLanguageHint": "Idioma utilizado para los correos electrónicos enviados por el club a destinatarios que no han establecido un idioma preferido.",
+    "inviteCooldown": "Invitación ya enviada a {{email}}. Podrás reenviarla en {{seconds}} s.",
+    "inviteSentTo": "Invitación enviada a {{email}}. Podrás reenviarla en 60 s."
   },
   "attachments": {
     "add": "Añadir archivo",
@@ -1962,7 +1971,7 @@
       "shooting": "Tiro",
       "rebounding": "Rebote",
       "ball_handling": "Manejo del balón",
-      "court_vision": "Visión de la cancha",
+      "court_vision": "Visión de la campo",
       "pick_and_roll": "Pick & roll",
       "spacing": "Espaciado",
       "pivot_play": "Juego de pívot",
@@ -2280,8 +2289,8 @@
       "ogDescription": "Cambia fácilmente a Clubero. Migramos tu Club por ti."
     },
     "tournamentsPage": {
-      "title": "Torneos — Resultados en vivo, tablas públicas, modo TV | Clubero",
-      "description": "Organiza Torneos modernos con resultados en vivo, tablas públicas, modo Árbitro móvil y modo TV. Diseñado para organizadores, Jugadores, Padres/Madres y aficionados.",
+      "title": "Torneos — Resultados en directo, tablas públicas, modo TV | Clubero",
+      "description": "Organiza Torneos modernos con resultados en directo, tablas públicas, modo Árbitro móvil y modo TV. Diseñado para organizadores, Jugadores, Padres/Madres y aficionados.",
       "ogDescription": "Torneos modernos, vibrantes y públicos. Hechos para el campo y las pantallas."
     },
     "adminVenues": {
@@ -2295,7 +2304,7 @@
     },
     "adminNotifications": {
       "title": "Notifications — Clubero",
-      "description": "Elija las notificaciones push enviadas a los miembros de su club."
+      "description": "Elige las notificaciones push enviadas a los miembros de tu club."
     },
     "adminSponsors": {
       "title": "Sponsors – Clubero",
@@ -2317,7 +2326,7 @@
   "errors": {
     "generic": "Ha ocurrido un error.",
     "clubCreateFailed": "No se pudo crear el club.",
-    "membershipsUnavailable": "No se pueden cargar sus clubes. Compruebe su conexión e inténtelo de nuevo.",
+    "membershipsUnavailable": "No se pueden cargar tus clubes. Comprueba tu conexión e inténtalo de nuevo.",
     "notAllowed": "No tienes permiso para realizar esta acción.",
     "invalidCredentials": "Correo electrónico o contraseña incorrectos.",
     "emailNotConfirmed": "Confirma tu correo electrónico antes de iniciar sesión.",
@@ -2327,11 +2336,11 @@
     "duplicate": "Este artículo ya existe.",
     "foreignKey": "Estos datos todavía se mencionan en otros lugares.",
     "missingField": "Falta un campo obligatorio.",
-    "invalidValue": "Un valor ingresado no es válido.",
+    "invalidValue": "Un valor introducido no es válido.",
     "inviteExpired": "Esta invitación ha caducado.",
     "inviteUsed": "Esta invitación ya ha sido utilizada.",
     "inviteInvalid": "Invitación no válida.",
-    "network": "No se puede conectar. Verifique su red e inténtelo nuevamente.",
+    "network": "No se puede conectar. Verifica tu red e inténtalo de nuevo.",
     "timeout": "La operación duró demasiado.",
     "notFound": "Artículo no encontrado.",
     "fileTooLarge": "El archivo es demasiado grande.",
@@ -2346,7 +2355,7 @@
     "publishDatesRequired": "Se requieren fechas de inicio y finalización.",
     "publishDatesOrder": "La fecha de finalización debe ser posterior a la fecha de inicio.",
     "publishCapacityRequired": "Se requiere una capacidad positiva.",
-    "publishAgeGroupRequired": "Agregue al menos una categoría de edad antes de publicar."
+    "publishAgeGroupRequired": "Añade al menos una categoría de edad antes de publicar."
   },
   "respond": {
     "eyebrow": "Invitación",
@@ -2815,7 +2824,7 @@
     "range": {
       "dates": "Fechas del campamento",
       "pickEnd": "fecha de finalización",
-      "pickBoth": "Seleccione inicio y fin",
+      "pickBoth": "Selecciona inicio y fin",
       "startTime": "Hora de inicio",
       "endTime": "Hora de finalización",
       "defaultsHint": "Predeterminado 10:00 → 16:00. Ajústese a su campamento.",
@@ -2988,7 +2997,7 @@
     "maskedBadge": "Oculta para jugadores y padres",
     "visible": "Lista visible",
     "settingLabel": "Visibilidad de la lista de convocados",
-    "settingHelp": "Define quién puede ver la lista de convocados. El cálculo es en vivo: los eventos que heredan seguirán cualquier cambio futuro del ajuste de equipo o club.",
+    "settingHelp": "Define quién puede ver la lista de convocados. El cálculo es en directo: los eventos que heredan seguirán cualquier cambio futuro del ajuste de equipo o club.",
     "definedHere": "Definido aquí",
     "inheritedFromTeam": "Heredado del equipo",
     "inheritedFromClub": "Heredado del club",
@@ -2999,7 +3008,7 @@
   },
   "groups": {
     "title": "Grupos de clubes",
-    "subtitle": "Cree grupos personalizados (junta directiva, voluntarios…) para orientar sus comunicaciones.",
+    "subtitle": "Crea grupos personalizados (junta directiva, voluntarios…) para orientar tu comunicación.",
     "empty": "Aún no hay grupos.",
     "create": "Crear grupo",
     "edit": "Editar",
@@ -3198,7 +3207,7 @@
     "noCoachInClub": "No hay entrenador en este club.",
     "allAssigned": "Todos los entrenadores están asignados.",
     "addCoach": "Asignar un entrenador",
-    "searchPlaceholder": "Busque un entrenador…",
+    "searchPlaceholder": "Busca un entrenador…",
     "noResults": "No se encontró ningún entrenador.",
     "conflict": {
       "title": "Conflicto de disponibilidad",
@@ -3349,7 +3358,7 @@
       "reserved": "Reservado (72h)",
       "remaining": "Lugares restantes",
       "pending": "Solicitudes pendientes",
-      "expiredHint": "{{count}} reserva(s) de 72 h caducada(s) — usa « Prolongar » para conservar la plaza."
+      "expiredHint": "{{count}} reserva(s) de 72 h caducada(s) — usa «Prolongar» para conservar la plaza."
     },
     "searchPlaceholder": "Buscar (nombre, correo electrónico…)",
     "filters": {
@@ -3394,7 +3403,7 @@
     "loadError": "Error al cargar registros",
     "disabledBanner": {
       "title": "Las inscripciones online están deshabilitadas",
-      "body": "No aparece ningún botón \"Registrarse\" en la página pública. Habilitar registros para recibir solicitudes."
+      "body": "No aparece ningún botón «Registrarse» en la página pública. Habilitar registros para recibir solicitudes."
     },
     "draftHint": "Las inscripciones aparecerán aquí una vez publicado el campamento.",
     "docsSummary": "{{ok}}/{{total}} documentos"
@@ -3425,7 +3434,7 @@
     },
     "digit": {
       "f1Title": "Llamadas en 12 segundos",
-      "f1Body": "Envíe, haga seguimiento, rastree respuestas. Sin enviar mensajes de texto a todos individualmente.",
+      "f1Body": "Envía, haz seguimiento, rastrea respuestas. Sin enviar mensajes de texto uno por uno.",
       "f2Title": "Pagos en línea",
       "f2Body": "Tarifas, equipos, campamentos. Stripe integrado, recibos automáticos, seguimientos incluidos.",
       "f3Title": "Comunicación centralizada",
@@ -3451,13 +3460,13 @@
       "cta": "Descubre el asistente",
       "assistantName": "Asistente Clubero",
       "online": "En línea",
-      "q1": "¿Quién aún no ha pagado su cuota de membresía?",
+      "q1": "¿Quién aún no ha pagado su cuota de socio?",
       "a1": "3 jugadores: Lucas M., Sarah B. y Tom D. ¿Debo enviar un correo electrónico de seguimiento?",
       "q2": "Sí, en inglés."
     },
     "tourn": {
       "b1": "Registro en línea, pago integrado",
-      "b2": "Tablas, grupos, corchetes, resultados en vivo.",
+      "b2": "Tablas, grupos, cuadros, resultados en directo.",
       "b3": "Página de TV pública para tus espectadores",
       "b4": "Convocatorias y hojas de partido incluidas.",
       "kicker": "Módulo de torneo: aplicación completa",
@@ -3536,7 +3545,7 @@
       "append": "Agregar a la lista",
       "replace": "Reemplazar lista",
       "confirm": "Importar",
-      "blocked": "Importación bloqueada: {{total}} jugadores superan el límite de {{max}}. Reduce el archivo o elige « Reemplazar ».",
+      "blocked": "Importación bloqueada: {{total}} jugadores superan el límite de {{max}}. Reduce el archivo o elige «Reemplazar».",
       "ok": "{{n}} jugador(es) importado(s)"
     },
     "logo": {
@@ -3551,7 +3560,7 @@
     },
     "pendingTitle": "Solicitud bajo revisión",
     "pendingBody": "Una vez que la organización haya aprobado tu inscripción, podrás agregar o editar jugadores desde este mismo enlace.",
-    "empty": "Aún no hay jugadores. Haga clic en Agregar o importar CSV.",
+    "empty": "Aún no hay jugadores. Haz clic en Añadir o importar CSV.",
     "captain": "Capitán",
     "setCaptain": "Capitán del set",
     "save": "Guardar",
@@ -3611,14 +3620,14 @@
     },
     "deadlineHint": "Opcional: debe ser antes de la fecha de inicio.",
     "optional": "opcional",
-    "venueHint": "Puede omitir este paso y agregarlo más tarde.",
+    "venueHint": "Puedes omitir este paso y añadirlo más tarde.",
     "ageGroupsEmpty": "Se requiere al menos una categoría para publicar. Puedes agregar más más tarde.",
     "summary": {
       "deadline": "fecha límite",
       "places": "manchas",
       "venueSet": "lugar establecido",
       "ageGroups": "Categorías",
-      "next": "El campamento se creará como un borrador. Puede agregar descripción, imagen, programa y documentos antes de publicar."
+      "next": "El campamento se creará como borrador. Puedes añadir descripción, imagen, programa y documentos antes de publicarlo."
     },
     "footerReady": "todo esta listo",
     "create": "Crear campamento",
@@ -3654,7 +3663,7 @@
     "venue": "Lugar",
     "venuePlaceholder": "Elige un lugar",
     "venueNone": "— Ninguno —",
-    "facility": "Cancha/instalación",
+    "facility": "Campo/instalación",
     "facilityPlaceholder": "Opcional",
     "facilityNone": "— Ninguno —",
     "externalAddress": "Dirección",
@@ -3678,11 +3687,11 @@
     "sectionDocuments": "Documentos proporcionados",
     "sectionDocumentsHint": "Documentos que proporciona el club (normas, horario en PDF, mapa de acceso…). Formatos aceptados: PDF, JPG, PNG.",
     "sectionRequired": "Documentos a proporcionar",
-    "sectionRequiredHint": "Relación de documentos que deben subir los inscritos (certificado médico, autorización paterna…). Los documentos médicos se marcan automáticamente como \"sensibles\".",
+    "sectionRequiredHint": "Relación de documentos que deben subir los inscritos (certificado médico, autorización paterna…). Los documentos médicos se marcan automáticamente como «sensibles».",
     "save": "Guardar"
   },
   "ageGroups": {
-    "selectAll": "Seleccione las categorías relevantes",
+    "selectAll": "Selecciona las categorías relevantes",
     "customs": "Categorías personalizadas",
     "labelPlaceholder": "Etiqueta (por ejemplo, recreativa)",
     "yearMin": "Año mínimo",
@@ -3774,32 +3783,32 @@
       "live": "En directo",
       "upcoming": "Próximo"
     },
-    "flightsReady": "La fase de grupos ha terminado. Crear Vuelos para generar los 3 brackets (Champions / Europa / Conference)."
+    "flightsReady": "La fase de grupos ha terminado. Crear Flights para generar los 3 cuadros (Champions / Europa / Conference)."
   },
   "draw": {
-    "relaunchFromFooterHint": "Sorteo completado. Utilice \"Reiniciar\" en la parte inferior del cuadro de diálogo para generar uno nuevo (los resultados actuales se perderán)."
+    "relaunchFromFooterHint": "Sorteo completado. Utiliza «Reiniciar» en la parte inferior del cuadro de diálogo para generar uno nuevo (los resultados actuales se perderán)."
   },
   "fields": {
-    "streamUrlPlaceholder": "URL de transmisión (YouTube, Twitch…)"
+    "streamUrlPlaceholder": "URL de retransmisión (YouTube, Twitch…)"
   },
   "flights": {
-    "savedToast": "Vuelos guardados",
+    "savedToast": "Flights guardados",
     "fallback": {
-      "empty": "No se genera bracket: la estructura no clasifica suficientes equipos por tramo. Ajusta la distribución, utiliza una plantilla alternativa (Consolación/Medallas) o configura vuelos manualmente.",
+      "empty": "No se genera cuadro: la estructura no clasifica suficientes equipos por tramo. Ajusta la distribución, utiliza una plantilla alternativa (Consolación/Medallas) o configura Flights manualmente.",
       "error": "Generación imposible para esta estructura. Pruebe con otra plantilla o modo manual.",
-      "title": "Este formato no permite la generación automática de los 3 vuelos",
-      "body": "La estructura del grupo (tamaño desigual o demasiado pequeño) no se divide claramente entre Campeones/Europa/Conferencia. Elija una plantilla de Consolación / Medallas / Copa-Plato o personalice los vuelos manualmente."
+      "title": "Este formato no permite la generación automática de los 3 Flights",
+      "body": "La estructura del grupo (tamaño desigual o demasiado pequeño) no se divide claramente entre Campeones/Europa/Conferencia. Elija una plantilla de Consolación / Medallas / Copa-Plato o personalice los Flights manualmente."
     },
-    "regenConfirm": "Los partidos de las finales ya tienen resultados. La regeneración de brackets BORRARÁ todos esos resultados. ¿Continuar?",
-    "noGroups": "Primero crea la fase de grupos. Los vuelos se generan posteriormente.",
-    "title": "Vuelos / finales",
+    "regenConfirm": "Los partidos de las finales ya tienen resultados. La regeneración de cuadros BORRARÁ todos esos resultados. ¿Continuar?",
+    "noGroups": "Primero crea la fase de grupos. Los Flights se generan posteriormente.",
+    "title": "Flights / finales",
     "intro": "Múltiples trofeos por torneo: Campeones/Europa, Copa/Plato, Oro/Plata/Bronce o personalizados.",
     "reconfigure": "Reconfigurar",
     "advancedDanger": "Opciones avanzadas (peligrosas)",
-    "regenWarn": "La regeneración de brackets borra todos los resultados finales ya ingresados.",
-    "regenerate": "Regenerar brackets",
-    "generate": "Generar corchetes",
-    "waitGroups": "Termina todos los partidos del grupo para generar brackets.",
+    "regenWarn": "La regeneración de cuadros borra todos los resultados finales ya introducidos.",
+    "regenerate": "Regenerar cuadros",
+    "generate": "Generar cuadros",
+    "waitGroups": "Termina todos los partidos del grupo para generar cuadros.",
     "preset": {
       "consolation": "Preajuste de consolación (1 clic)",
       "consolationDesc": "Crea 2 tramos: Principal (ganadores de grupo) y Consolación (perdedores). Configuración lista para guardar."
@@ -3807,10 +3816,10 @@
     "wizard": {
       "template": "Plantilla de nombre",
       "notEnough": "Se requieren al menos 4 equipos.",
-      "clean": "Limpiar brackets",
+      "clean": "Limpiar cuadros",
       "customize": "Personalizar",
       "back": "Volver",
-      "save": "Guardar vuelos",
+      "save": "Guardar Flights",
       "distribution": "Reparto ({{n}} equipos)"
     },
     "rulesCount": "normas",
@@ -3820,8 +3829,8 @@
     "seventhPlaceDisabled": "Habilitar el quinto lugar primero",
     "seventhPlace": "7mo lugar",
     "public": {
-      "empty": "Aún no se ha configurado ningún vuelo para este torneo.",
-      "noMatches": "Los partidos para este vuelo se generarán después de la fase de grupos."
+      "empty": "Aún no se ha configurado ningún Flight para este torneo.",
+      "noMatches": "Los partidos se generarán después de la fase de grupos."
     },
     "draftRulesSummary": "{{n}} regla(s) de clasificación configurada(s)",
     "generatedToast": "{{n}} partidos creados"
@@ -3841,7 +3850,7 @@
     "linkCopied": "Enlace copiado",
     "title": "Inscripciones en línea",
     "enableLabel": "Inscripciones abiertas al público.",
-    "enableHint": "Habilita un botón \"Registrarse\" en la página pública del torneo.",
+    "enableHint": "Habilita un botón «Registrarse» en la página pública del torneo.",
     "publicLink": "Enlace de registro público"
   },
   "aiAssistant": {
@@ -3862,7 +3871,7 @@
     "summary": {
       "matchDuration": "Duración del partido",
       "pause": "Pausa entre partidos",
-      "terrains": "Tribunales"
+      "terrains": "Campos"
     }
   },
   "createChooser": {
@@ -3889,11 +3898,11 @@
     "openTv": "pantalla de televisión",
     "autoScheduleCta": {
       "title": "Programar partidos automáticamente",
-      "subtitle": "Aún no hay cancha ni horario asignado. Ejecute la programación automática."
+      "subtitle": "Aún no hay campo ni horario asignado. Ejecuta la programación automática."
     }
   },
   "sections": {
-    "openTv": "Abrir pantalla en vivo (TV)",
+    "openTv": "Abrir pantalla en directo (TV)",
     "flights": "Flights"
   },
   "simulator": {
@@ -3905,7 +3914,7 @@
   },
   "actions": {
     "resolved_toast": "Ticket marcado como resuelto",
-    "reopened_toast": "Boleto reabierto",
+    "reopened_toast": "Ticket reabierto",
     "reopen": "Reabrir ticket",
     "mark_resolved": "Marcar como resuelto"
   },
@@ -3930,7 +3939,7 @@
   },
   "duplicate": {
     "done": "Campamento duplicado",
-    "hint": "Cree una copia borrador (sin registros).",
+    "hint": "Crea una copia en borrador (sin inscripciones).",
     "action": "Duplicado"
   },
   "delete": {
@@ -4064,7 +4073,7 @@
     "collectTitle": "Seguimiento y cobro — {{title}}",
     "loadError": "No se pudo cargar el seguimiento: {{message}}",
     "unknownError": "error desconocido",
-    "emptyObligations": "Ningún jugador tiene aún una obligación para este concepto. Compruebe que el destino (club / equipos / jugadores) incluye jugadores.",
+    "emptyObligations": "Ningún jugador tiene aún una obligación para este concepto. Comprueba que el destinatario (club / equipos / jugadores) contenga jugadores.",
     "payer": "Pagador: {{name}}",
     "payerUnlinked": "Pagador no vinculado",
     "remaining": "quedan {{amount}} {{currency}}",
@@ -4076,8 +4085,8 @@
     "reopened": "Obligación reabierta",
     "exemptTitle": "Eximir esta obligación",
     "cancelTitle": "Cancelar esta obligación",
-    "exemptDescription": "El jugador quedará exento de este pago. Indique el motivo (beca, situación familiar, etc.).",
-    "cancelDescription": "La obligación se cancelará y ya no podrá pagarse. Indique el motivo.",
+    "exemptDescription": "El jugador quedará exento de este pago. Indica el motivo (beca, situación familiar, etc.).",
+    "cancelDescription": "La obligación se cancelará y ya no podrá pagarse. Indica el motivo.",
     "cancelConfirm": "Cancelar la obligación",
     "exempted": "Obligación exenta",
     "cancelled": "Obligación cancelada",
@@ -4104,7 +4113,7 @@
   },
   "adminNotifications": {
     "title": "Notificaciones push",
-    "subtitle": "Elija las notificaciones enviadas en la aplicación móvil. Los correos no se ven afectados.",
+    "subtitle": "Elige las notificaciones enviadas en la aplicación móvil. Los correos no se ven afectados.",
     "sectionConvocations": "Convocatorias",
     "sectionEvents": "Eventos",
     "sectionWall": "Muro del club",
@@ -4181,7 +4190,7 @@
     },
     "dashboard": {
       "title": "Vista general de la plataforma",
-      "subtitle": "Instantánea en vivo de operaciones e ingresos de Clubero.",
+      "subtitle": "Instantánea en directo de operaciones e ingresos de Clubero.",
       "failedToLoad": "No se pudo cargar",
       "businessFinance": "Negocio y finanzas",
       "allSubscriptions": "Todas las suscripciones →",
@@ -4314,7 +4323,7 @@
       "userOnboarding": "Activación del usuario",
       "account": "Cuenta",
       "relations": "Relations",
-      "noClubMemberships": "Sin membresías de club.",
+      "noClubMemberships": "Sin clubes asociados.",
       "noInvites": "Ninguna invitación coincide con el email de este usuario.",
       "noTeamAssignments": "Sin asignaciones directas a equipos.",
       "noPlayerProfile": "No hay perfil de jugador vinculado a este usuario.",
@@ -4328,7 +4337,7 @@
       "noPriorActions": "Sin acciones administrativas previas.",
       "impersonateTitle": "Suplantar usuario",
       "impersonateReasonPlaceholder": "ej.: Ticket #421 — el usuario informa de eventos ausentes",
-      "orphanHint": "Sin membresía de club, perfil de jugador ni vínculo de padre/madre.",
+      "orphanHint": "Sin club asociado, perfil de jugador ni vínculo de padre/madre.",
       "loading": "Cargando…"
     },
     "clubs": {
@@ -4473,7 +4482,7 @@
     },
     "support": {
       "title": "Centro de soporte",
-      "subtitle": "Busque usuarios y clubes, supervise las pruebas y los problemas de entrega.",
+      "subtitle": "Busca usuarios y clubes, supervisa las pruebas y los problemas de entrega.",
       "searchFailed": "Búsqueda fallida",
       "trialsEnding": "Pruebas que terminan en 7 días",
       "trialsSafe": "Todas las pruebas están bajo control.",
@@ -4487,7 +4496,7 @@
       "searchUserPlaceholder": "Buscar por nombre o teléfono…",
       "searchClubPlaceholder": "Buscar clubes por nombre…",
       "noMatches": "Sin resultados.",
-      "noClubMemberships": "Sin membresías de club.",
+      "noClubMemberships": "Sin clubes asociados.",
       "noAdmins": "Sin administradores.",
       "modeUser": "Usuario",
       "modeClub": "Club",

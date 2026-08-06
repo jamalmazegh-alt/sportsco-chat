@@ -363,7 +363,7 @@
   },
   "recipients": {
     "title": "Destinatari avvisati",
-    "desc": "Persone che hanno ricevuto una notifica per \"{{need}}\".",
+    "desc": "Persone che hanno ricevuto una notifica per «{{need}}».",
     "empty": "Nessuna notifica è stata ancora inviata per questa necessità.",
     "count_one": "{{count}} persona avvisata",
     "count_other": "{{count}} persone avvisate"

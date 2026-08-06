@@ -498,7 +498,7 @@
     "title": "Giocatori · {{team}}",
     "import": {
       "empty": "Nessun giocatore rilevato nel file.",
-      "blocked": "Importazione bloccata: {{total}} giocatori superano il limite di {{max}}. Riduci il file o scegli “Sostituisci”.",
+      "blocked": "Importazione bloccata: {{total}} giocatori superano il limite di {{max}}. Riduci il file o scegli «Sostituisci».",
       "ok": "{{n}} giocatore/i importato/i",
       "button": "Importa CSV",
       "title": "Importa giocatori",
@@ -657,7 +657,7 @@
     "noFields": "Nessun campo",
     "removeField": "Rimuovi {{name}}",
     "newFieldPlaceholder": "Nome campo (es. Campo Centrale)",
-    "fieldsHint": "Più campi = partite in parallelo. Riassegnabile per partita nella scheda \"Partite\".",
+    "fieldsHint": "Più campi = partite in parallelo. Riassegnabile per partita nella scheda «Partite».",
     "lunchBreak": "Pausa pranzo (nessuna partita in questo periodo)",
     "lunchStart": "Inizio pausa",
     "lunchEnd": "Fine pausa",
@@ -700,7 +700,9 @@
     "lunchBreakSubtitle": "Nessuna partita in questa fascia oraria",
     "addFieldShort": "+ Aggiungi campo",
     "fieldAddedToast": "Campo {{name}} aggiunto",
-    "regenFinalsConfirm": "La fase finale ha già dei risultati. La rigenerazione CANCELLERA' tutti questi risultati. Continuare?"
+    "regenFinalsConfirm": "La fase finale ha già dei risultati. La rigenerazione CANCELLERA' tutti questi risultati. Continuare?",
+    "drawLockedPublished": "Il torneo è pubblicato: il nuovo sorteggio è bloccato per preservare il calendario.",
+    "drawLockedStarted": "Il torneo è iniziato: il sorteggio è bloccato per preservare i risultati."
   },
   "draw": {
     "title": "Sorteggio",
@@ -744,7 +746,7 @@
     "overwriteDesc": "Questa azione eliminerà la composizione attuale (gironi/tabellone) e le partite associate. Le Squadre iscritte rimarranno.",
     "cancel": "Annulla",
     "confirmRelaunch": "Conferma e riavvia",
-    "relaunchFromFooterHint": "Sorteggio completato. Utilizzare \"Riavvia\" nella parte inferiore della finestra di dialogo per generarne uno nuovo (i risultati correnti andranno persi)."
+    "relaunchFromFooterHint": "Sorteggio completato. Utilizzare «Riavvia» nella parte inferiore della finestra di dialogo per generarne uno nuovo (i risultati correnti andranno persi)."
   },
   "rules": {
     "savedToast": "Regole salvate",
@@ -992,7 +994,7 @@
     "openTv": "schermo televisivo",
     "autoScheduleCta": {
       "title": "Pianifica automaticamente le partite",
-      "subtitle": "Nessun tribunale o programma assegnato ancora. Esegui la pianificazione automatica."
+      "subtitle": "Nessun campo o programma assegnato ancora. Esegui la pianificazione automatica."
     }
   },
   "publishFlow": {
@@ -1069,7 +1071,7 @@
   "registrationSettings": {
     "title": "Iscrizioni online",
     "enableLabel": "Apri le iscrizioni al pubblico",
-    "enableHint": "Attiva un pulsante \"Iscriviti\" sulla pagina pubblica del torneo.",
+    "enableHint": "Attiva un pulsante «Iscriviti» sulla pagina pubblica del torneo.",
     "publicLink": "Link pubblico per l'iscrizione",
     "linkCopied": "Link copiato"
   },
@@ -1162,7 +1164,7 @@
     "checkStartDate": "È stata impostata una data di inizio",
     "programmePublished": "Programma pubblicato - Squadre notificate",
     "publishConfirmTitle": "Pubblicare il programma del Torneo?",
-    "publishConfirmBody": "Verrà inviata un'e-mail a ogni Squadra confermata con la sua prima partita. Il Torneo passerà allo stato \"in corso\" e le nuove iscrizioni verranno chiuse. Questa azione è irreversibile.",
+    "publishConfirmBody": "Verrà inviata un'e-mail a ogni Squadra confermata con la sua prima partita. Il Torneo passerà allo stato «in corso» e le nuove iscrizioni verranno chiuse. Questa azione è irreversibile.",
     "tabConfigure": "Configura",
     "tabManage": "Gestisci",
     "tabPlay": "Gioca",
@@ -1239,7 +1241,7 @@
     },
     "public": {
       "empty": "Nessuna fascia configurata al momento.",
-      "noMatches": "Matches will be generated after group stage."
+      "noMatches": "Le partite saranno generate dopo la fase a gironi."
     },
     "templatesDesc": {
       "champions": "3 tabelloni paralleli per livello — tutte le squadre continuano a giocare, divise in Élite / Medio / Scoperta.",
@@ -1247,10 +1249,10 @@
       "medals": "Eliminazione diretta con podio Oro / Argento / Bronzo per le prime 3 squadre. Formato breve e classico.",
       "consolation": "2 tabelloni: Principale (vincitori dei gironi) e Consolazione (perdenti). Soluzione semplice per far giocare tutti."
     },
-    "regenConfirm": "Le partite finali hanno già i risultati. La rigenerazione delle parentesi CANCELLERA' tutti questi risultati. Continuare?",
+    "regenConfirm": "Le partite finali hanno già i risultati. La rigenerazione delle tabelloni CANCELLERA' tutti questi risultati. Continuare?",
     "advancedDanger": "Opzioni avanzate (pericolose)",
-    "regenWarn": "La rigenerazione delle parentesi cancella tutti i risultati finali già inseriti.",
-    "regenerate": "Rigenerare le parentesi",
+    "regenWarn": "La rigenerazione delle tabelloni cancella tutti i risultati finali già inseriti.",
+    "regenerate": "Rigenerare le tabelloni",
     "fifthPlaceDisabled": "Abilita prima il 3° posto",
     "seventhPlaceDisabled": "Abilita prima il 5° posto"
   },
@@ -1292,7 +1294,7 @@
       "fields": "Campi",
       "share": "Condividi"
     },
-    "byCourts": "Per tribunale",
+    "byCourts": "Per campo",
     "progress": "Progressi"
   },
   "cockpit": {
@@ -1400,7 +1402,7 @@
       "simTerrains": "Campi",
       "matchDuration": "Durata della partita",
       "pause": "Pausa tra le partite",
-      "terrains": "Tribunali"
+      "terrains": "Campi"
     },
     "footerSub": {
       "question": "L'assistente resta qui — modifica senza perdere nulla",

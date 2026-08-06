@@ -255,7 +255,7 @@
     "backToCamp": "Torna al campus",
     "formTitle": "Iscrizione — {{title}}",
     "docsHint": "PDF, JPG o PNG — massimo 15 MB per file.",
-    "consent": "Autorizzo il club a utilizzare i dati trasmessi (identità del bambino, contatto del genitore, allegati) per gestire questa iscrizione allo stage, conformemente al GDPR. I dati vengono conservati fino a {{months}} mesi dopo la fine dello stage, poi eliminati automaticamente.",
+    "consent": "Autorizzo il club a utilizzare i dati trasmessi (identità del bambino, contatto del genitore, allegati) per gestire questa iscrizione al camp, conformemente al GDPR. I dati vengono conservati fino a {{months}} mesi dopo la fine del camp, poi eliminati automaticamente.",
     "submit": "Invia iscrizione",
     "confirmTitle": "Iscrizione inviata!",
     "confirmBody": "Abbiamo ricevuto la tua pratica. Il club ti contatterà a breve.",
@@ -293,10 +293,10 @@
       "ageMismatch": "L'età del bambino non corrisponde alla categoria scelta.",
       "generic": "Si è verificato un errore. Riprova.",
       "network": "Errore di rete. Controlla la connessione.",
-      "duplicate": "Questo bambino è già iscritto a questo stage. Consulta l'email ricevuta per seguire il fascicolo.",
-      "loadFailed": "Impossibile caricare questo stage.",
-      "notFound": "Stage non trovato",
-      "notFoundBody": "Questo stage non è disponibile o non è ancora stato pubblicato.",
+      "duplicate": "Questo bambino è già iscritto a questo camp. Consulta l'email ricevuta per seguire il fascicolo.",
+      "loadFailed": "Impossibile caricare questo camp.",
+      "notFound": "Camp non trovato",
+      "notFoundBody": "Questo camp non è disponibile o non è ancora stato pubblicato.",
       "formLoadFailed": "Impossibile caricare il modulo."
     },
     "full": "Completo — iscrizione possibile in lista d'attesa",
@@ -308,7 +308,7 @@
       "title": "Monitoraggio iscrizione",
       "participant": "Partecipante",
       "bornOn": "Nato/a il {{date}}",
-      "campDates": "Date dello stage: {{dates}}",
+      "campDates": "Date del camp: {{dates}}",
       "reason": "Motivo: {{reason}}",
       "noDocs": "Nessun documento richiesto.",
       "personalLink": "Link personale — non condividerlo. Dà accesso al tuo fascicolo e ai documenti.",
@@ -463,7 +463,7 @@
       "reserved": "Riservato (72h)",
       "remaining": "Posti rimanenti",
       "pending": "Richieste in sospeso",
-      "expiredHint": "{{count}} prenotazione/i di 72 h scaduta/e — usa “Estendi” per mantenere il posto."
+      "expiredHint": "{{count}} prenotazione/i di 72 h scaduta/e — usa «Estendi» per mantenere il posto."
     },
     "searchPlaceholder": "Cerca (nome, email...)",
     "col": {

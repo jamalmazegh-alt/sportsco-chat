@@ -121,13 +121,13 @@
     "eventRelevant": "Sugerido para este evento",
     "otherAudiences": "Outros públicos",
     "add": "Adicionar",
-    "pickKind": "Escolha um tipo…",
-    "pickParam": "Escolha uma opção…",
-    "noGroups": "Nenhum grupo personalizado está ativo. Crie um em Definições → Grupos do clube para atingir um público específico.",
+    "pickKind": "Escolhe um tipo…",
+    "pickParam": "Escolhe uma opção…",
+    "noGroups": "Nenhum grupo personalizado está ativo. Cria um em Definições → Grupos do clube para atingir um público específico.",
     "selected": {
       "title": "Público selecionado",
-      "empty": "Nenhum público selecionado — adicione pelo menos um critério abaixo.",
-      "emptyConvocation": "A convocatória ainda não foi enviada — envie primeiro as convocatórias ou escolha outro público.",
+      "empty": "Nenhum público selecionado — adiciona pelo menos um critério abaixo.",
+      "emptyConvocation": "A convocatória ainda não foi enviada — envia primeiro as convocatórias ou escolhe outro público.",
       "loading": "A calcular…",
       "count_one": "{{count}} pessoa será notificada",
       "count_other": "{{count}} pessoas serão notificadas",
@@ -163,7 +163,7 @@
     "unassigned": "Atribuição cancelada",
     "fullTitle": "Capacidade atingida",
     "unassignCta": "Remover",
-    "fullBlock": "Capacidade atingida. Remova primeiro uma pessoa confirmada para atribuir outra."
+    "fullBlock": "Capacidade atingida. Remove primeiro uma pessoa confirmada para atribuir outra."
   },
   "pendingApplications_one": "{{count}} pendente",
   "pendingApplications_other": "{{count}} pendentes",
@@ -355,7 +355,7 @@
   },
   "editAudience": {
     "title": "Editar destinatários",
-    "desc": "Adicione ou substitua públicos. Apenas as pessoas que nunca foram notificadas receberão um alerta.",
+    "desc": "Adiciona ou substitua públicos. Apenas as pessoas que nunca foram notificadas receberão um alerta.",
     "deltaHint": "Apenas as novas pessoas serão notificadas. Quem já foi contactado não receberá outro alerta.",
     "success_one": "{{count}} novo destinatário notificado",
     "success_other": "{{count}} novos destinatários notificados",
@@ -363,7 +363,7 @@
   },
   "recipients": {
     "title": "Destinatários notificados",
-    "desc": "Pessoas que receberam uma notificação para \"{{need}}\".",
+    "desc": "Pessoas que receberam uma notificação para «{{need}}».",
     "empty": "Ainda não foi enviada nenhuma notificação para esta necessidade.",
     "count_one": "{{count}} pessoa notificada",
     "count_other": "{{count}} pessoas notificadas"

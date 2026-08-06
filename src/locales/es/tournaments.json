@@ -20,7 +20,7 @@
     "group": "Grupo",
     "groups": "Grupos",
     "tbd": "P.P.P.",
-    "live": "En vivo",
+    "live": "En directo",
     "ft": "F.T.",
     "aet": "Prórroga",
     "pen": "Penaltis",
@@ -34,8 +34,8 @@
   "public": {
     "metaTitle": "{{name}} — Partido de {{sport}} · Clubero",
     "metaTitleFallback": "Torneo {{slug}} — Clubero",
-    "metaDesc": "Sigue a {{name}} en vivo: Equipos, calendario, resultados y clasificación{{locationSuffix}}.",
-    "metaDescFallback": "Sigue este torneo en vivo: equipos, calendario, resultados y clasificaciones.",
+    "metaDesc": "Sigue a {{name}} en directo: Equipos, calendario, resultados y clasificación{{locationSuffix}}.",
+    "metaDescFallback": "Sigue este torneo en directo: equipos, calendario, resultados y clasificaciones.",
     "unavailableTitle": "Torneo no disponible",
     "unavailableBody": "Este torneo aún no se ha publicado o el enlace ha caducado. Si eres el organizador, abre tu torneo y haz clic en <1>Publicar</1>.",
     "backHome": "Volver a la página de inicio",
@@ -78,8 +78,8 @@
       "teamsCount_one": "{{count}} equipo",
       "teamsCount_other": "{{count}} equipos",
       "matchesPlayed": "{{played}}/{{total}} partidos jugados",
-      "liveCount_one": "{{count}} partido en vivo",
-      "liveCount_other": "{{count}} partidos en vivo"
+      "liveCount_one": "{{count}} partido en directo",
+      "liveCount_other": "{{count}} partidos en directo"
     },
     "round": {
       "group": "Fase de grupos",
@@ -106,7 +106,7 @@
     "sponsorsTitleDefault": "Con el apoyo de nuestros patrocinadores",
     "downloadRules": "Descargar reglamento (PDF)",
     "streams": {
-      "hint": "Elige una cancha para ver la transmisión en vivo.",
+      "hint": "Elige una campo para ver la retransmisión en directo.",
       "unsupported": "Plataforma no reconocida. Abre el enlace en una nueva pestaña.",
       "openExternal": "Abrir stream"
     },
@@ -165,7 +165,7 @@
       "noUpcoming": "No hay partidos programados",
       "standings": "Clasificación · {{group}}",
       "bracket": "Fase eliminatoria",
-      "scanForLive": "Escanear para seguir en vivo"
+      "scanForLive": "Escanear para seguir en directo"
     },
     "controls": {
       "previous": "Anterior",
@@ -299,7 +299,7 @@
     "unassigned": "No asignado",
     "unassignedSection": "No asignado",
     "assignPlaceholder": "Asignar",
-    "streamUrlPlaceholder": "URL de transmisión (YouTube, Twitch…)"
+    "streamUrlPlaceholder": "URL de retransmisión (YouTube, Twitch…)"
   },
   "collab": {
     "title": "Equipo de organización",
@@ -491,14 +491,14 @@
       "paid": "Pagado",
       "exempt": "Eximir",
       "unpaid": "para recoger",
-      "cycleHint": "Haga clic para cambiar el estado de pago"
+      "cycleHint": "Haz clic para cambiar el estado de pago"
     }
   },
   "roster": {
     "title": "Jugadores · {{team}}",
     "import": {
       "empty": "No se detectaron jugadores en el archivo.",
-      "blocked": "Importación bloqueada: {{total}} jugadores superan el límite de {{max}}. Reduce el archivo o elige “Reemplazar”.",
+      "blocked": "Importación bloqueada: {{total}} jugadores superan el límite de {{max}}. Reduce el archivo o elige «Reemplazar».",
       "ok": "{{n}} jugador(es) importado(s)",
       "button": "Importar CSV",
       "title": "Importar jugadores",
@@ -657,7 +657,7 @@
     "noFields": "Ningún campo",
     "removeField": "Eliminar {{name}}",
     "newFieldPlaceholder": "Nombre del campo (ej. Pista Central)",
-    "fieldsHint": "Varios campos = partidos paralelos. Se puede reasignar por partido en la pestaña \"Partidos\".",
+    "fieldsHint": "Varios campos = partidos paralelos. Se puede reasignar por partido en la pestaña «Partidos».",
     "lunchBreak": "Pausa para comer (sin partidos en este período)",
     "lunchStart": "Inicio de la pausa",
     "lunchEnd": "Fin de la pausa",
@@ -700,7 +700,9 @@
     "lunchBreakSubtitle": "No hay partidos en esta franja horaria",
     "addFieldShort": "+ Añadir campo",
     "fieldAddedToast": "Campo {{name}} añadido",
-    "regenFinalsConfirm": "La fase final ya tiene resultados. La regeneración BORRARÁ todos esos resultados. ¿Continuar?"
+    "regenFinalsConfirm": "La fase final ya tiene resultados. La regeneración BORRARÁ todos esos resultados. ¿Continuar?",
+    "drawLockedPublished": "El torneo está publicado: volver a sortear está bloqueado para preservar el calendario.",
+    "drawLockedStarted": "El torneo ha comenzado: el sorteo está bloqueado para preservar los resultados."
   },
   "draw": {
     "title": "Sorteo",
@@ -744,7 +746,7 @@
     "overwriteDesc": "Esta acción eliminará la composición actual (grupos/cuadro) y los partidos asociados. Los equipos inscritos se mantendrán.",
     "cancel": "Cancelar",
     "confirmRelaunch": "Confirmar y reiniciar",
-    "relaunchFromFooterHint": "Sorteo completado. Utilice \"Reiniciar\" en la parte inferior del cuadro de diálogo para generar uno nuevo (los resultados actuales se perderán)."
+    "relaunchFromFooterHint": "Sorteo completado. Utiliza «Reiniciar» en la parte inferior del cuadro de diálogo para generar uno nuevo (los resultados actuales se perderán)."
   },
   "rules": {
     "savedToast": "Reglas guardadas",
@@ -887,7 +889,7 @@
     "fullEntry": "Entrada completa",
     "finishMatch": "Finalizar partido",
     "tbd": "Por definir",
-    "startLive": "Iniciar partido en vivo",
+    "startLive": "Iniciar partido en directo",
     "fieldAndTime": "Campo / Hora",
     "field": "Campo",
     "fieldPlaceholder": "Campo 1",
@@ -924,7 +926,7 @@
     "penShort": "pen.",
     "lifecycle": {
       "scheduled": "Programado",
-      "live": "En vivo",
+      "live": "En directo",
       "submitted": "Pendiente",
       "validated": "Validado",
       "disputed": "Disputado"
@@ -992,7 +994,7 @@
     "openTv": "pantalla de televisión",
     "autoScheduleCta": {
       "title": "Programar partidos automáticamente",
-      "subtitle": "Aún no hay cancha ni horario asignado. Ejecute la programación automática."
+      "subtitle": "Aún no hay campo ni horario asignado. Ejecuta la programación automática."
     }
   },
   "publishFlow": {
@@ -1056,10 +1058,10 @@
     "staffAndOfficials": "Personal y Árbitros",
     "draw": "Sorteo",
     "groupsSchedule": "Grupos y Calendario",
-    "tvLive": "En vivo / TV",
-    "tvLiveTitle": "Presentación TV / En vivo",
-    "tvLiveHint": "Abre la pantalla completa para ver partidos y clasificaciones en vivo.",
-    "openTv": "Abrir pantalla en vivo",
+    "tvLive": "En directo / TV",
+    "tvLiveTitle": "Presentación TV / En directo",
+    "tvLiveHint": "Abre la pantalla completa para ver partidos y clasificaciones en directo.",
+    "openTv": "Abrir pantalla en directo",
     "flights": "Flights"
   },
   "staff": {
@@ -1162,7 +1164,7 @@
     "checkStartDate": "Se ha establecido una fecha de inicio",
     "programmePublished": "Programa publicado: equipos notificados",
     "publishConfirmTitle": "¿Publicar el programa del Torneo?",
-    "publishConfirmBody": "Se enviará un correo electrónico a cada equipo confirmado con su primer partido. El Torneo pasará al estado \"en curso\" y se cerrarán las nuevas inscripciones. Esta acción es irreversible.",
+    "publishConfirmBody": "Se enviará un correo electrónico a cada equipo confirmado con su primer partido. El Torneo pasará al estado «en curso» y se cerrarán las nuevas inscripciones. Esta acción es irreversible.",
     "tabConfigure": "Configurar",
     "tabManage": "Gestionar",
     "tabPlay": "Jugar",
@@ -1195,8 +1197,8 @@
     "title": "Flights / fases finales",
     "intro": "Varios trofeos por torneo: Campeones/Europa, Copa/Plato, Oro/Plata/Bronce o personalizado.",
     "reconfigure": "Reconfigurar",
-    "generate": "Generar brackets",
-    "waitGroups": "Completa todos los partidos de grupos para generar los brackets.",
+    "generate": "Generar cuadros",
+    "waitGroups": "Completa todos los partidos de grupos para generar los cuadros.",
     "noGroups": "Crea primero la fase de grupos. Los Flights se generan después.",
     "savedToast": "Flights guardados",
     "generatedToast": "{{n}} partidos creados",
@@ -1228,7 +1230,7 @@
       "template": "Plantilla de nombres",
       "distribution": "Distribución ({{n}} equipos)",
       "notEnough": "Se requieren al menos 4 equipos.",
-      "clean": "Brackets limpios",
+      "clean": "Cuadros limpios",
       "customize": "Personalizar",
       "back": "Atrás",
       "save": "Guardar Flights"
@@ -1239,7 +1241,7 @@
     },
     "public": {
       "empty": "Todavía no hay grupos configurados.",
-      "noMatches": "Matches will be generated after group stage."
+      "noMatches": "Los partidos se generarán después de la fase de grupos."
     },
     "templatesDesc": {
       "champions": "3 cuadros paralelos por nivel — todos los equipos siguen jugando, divididos en Élite / Medio / Descubierta.",
@@ -1247,17 +1249,17 @@
       "medals": "Eliminación directa con podio Oro / Plata / Bronce para los 3 primeros equipos. Formato corto y clásico.",
       "consolation": "2 cuadros: Principal (ganadores de grupo) y Consolación (perdedores). Solución simple para que todos sigan jugando."
     },
-    "regenConfirm": "Los partidos de las finales ya tienen resultados. La regeneración de brackets BORRARÁ todos esos resultados. ¿Continuar?",
+    "regenConfirm": "Los partidos de las finales ya tienen resultados. La regeneración de cuadros BORRARÁ todos esos resultados. ¿Continuar?",
     "advancedDanger": "Opciones avanzadas (peligrosas)",
-    "regenWarn": "La regeneración de brackets borra todos los resultados finales ya ingresados.",
-    "regenerate": "Regenerar brackets",
+    "regenWarn": "La regeneración de cuadros borra todos los resultados finales ya introducidos.",
+    "regenerate": "Regenerar cuadros",
     "fifthPlaceDisabled": "Habilitar el 3er lugar primero",
     "seventhPlaceDisabled": "Habilitar el quinto lugar primero"
   },
   "controlCenter": {
     "nextAction": "Próxima acción",
     "liveCourts": "En directo",
-    "liveBadge": "EN VIVO",
+    "liveBadge": "EN DIRECTO",
     "nextMatches": "Próximos partidos",
     "flightsReady": "La fase de grupos ha terminado. Crea los Flights para generar los 3 cuadros.",
     "openSettingsForDraw": "Abre la configuración (⋯ › Formato) para sortear / generar partidos.",
@@ -1400,7 +1402,7 @@
       "simTerrains": "Pistas",
       "matchDuration": "Duración del partido",
       "pause": "Pausa entre partidos",
-      "terrains": "Tribunales"
+      "terrains": "Campos"
     },
     "footerSub": {
       "question": "El asistente sigue aquí — ajusta sin perder nada",

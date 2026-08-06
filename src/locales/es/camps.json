@@ -161,7 +161,7 @@
     "pickPreset": "Elegir U6 – U19",
     "allAdded": "Todas añadidas",
     "addCustom": "+ Categoría personalizada",
-    "selectAll": "Seleccione las categorías relevantes",
+    "selectAll": "Selecciona las categorías relevantes",
     "customs": "Categorías personalizadas"
   },
   "cover": {
@@ -255,7 +255,7 @@
     "backToCamp": "Volver al campus",
     "formTitle": "Inscripción — {{title}}",
     "docsHint": "PDF, JPG o PNG — 15 MB máx. por archivo.",
-    "consent": "Autorizo al club a utilizar los datos enviados (identidad del niño, contacto del padre, archivos adjuntos) para gestionar esta inscripción al stage, conforme al RGPD. Los datos se conservan hasta {{months}} meses tras el fin del stage y luego se eliminan automáticamente.",
+    "consent": "Autorizo al club a utilizar los datos enviados (identidad del niño, contacto del padre, archivos adjuntos) para gestionar esta inscripción al campamento, conforme al RGPD. Los datos se conservan hasta {{months}} meses tras el fin del campamento y luego se eliminan automáticamente.",
     "submit": "Enviar inscripción",
     "confirmTitle": "¡Inscripción enviada!",
     "confirmBody": "Hemos recibido tu expediente. El club contactará contigo pronto.",
@@ -293,7 +293,7 @@
       "ageMismatch": "La edad del menor no corresponde a la categoría elegida.",
       "generic": "Se ha producido un error. Inténtalo de nuevo.",
       "network": "Error de red. Comprueba tu conexión.",
-      "duplicate": "Este niño ya está inscrito en este stage. Consulte el correo recibido para seguir el expediente.",
+      "duplicate": "Este niño ya está inscrito en este campamento. Consulta el correo recibido para más detalles.",
       "loadFailed": "No se puede cargar este campus.",
       "notFound": "Campus no encontrado",
       "notFoundBody": "Este campus no está disponible o aún no se ha publicado.",
@@ -304,11 +304,11 @@
     "registerWaitlistCta": "Unirse a la lista de espera",
     "tracking": {
       "invalidTitle": "Enlace inválido o caducado",
-      "invalidBody": "Este enlace de seguimiento no es válido. Compruebe el enlace recibido por correo.",
+      "invalidBody": "Este enlace de seguimiento no es válido. Comprueba el enlace recibido por correo.",
       "title": "Seguimiento de inscripción",
       "participant": "Participante",
       "bornOn": "Nacido/a el {{date}}",
-      "campDates": "Fechas del stage: {{dates}}",
+      "campDates": "Fechas del campamento: {{dates}}",
       "reason": "Motivo: {{reason}}",
       "noDocs": "No se solicitan documentos.",
       "personalLink": "Enlace personal — no lo comparta. Da acceso a su expediente y documentos.",
@@ -463,7 +463,7 @@
       "reserved": "Reservado (72h)",
       "remaining": "Lugares restantes",
       "pending": "Solicitudes pendientes",
-      "expiredHint": "{{count}} reserva(s) de 72 h caducadas — usa “Ampliar” para mantener la plaza."
+      "expiredHint": "{{count}} reserva(s) de 72 h caducadas — usa «Ampliar» para mantener la plaza."
     },
     "searchPlaceholder": "Buscar (nombre, correo electrónico…)",
     "col": {

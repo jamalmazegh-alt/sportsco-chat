@@ -2,7 +2,7 @@
   "fab": "Apoio",
   "page": {
     "title": "Os meus pedidos",
-    "subtitle": "Acompanhe os seus pedidos de suporte e relate um novo problema.",
+    "subtitle": "Acompanha os teus pedidos de suporte e relate um novo problema.",
     "new": "Novo",
     "empty": "Ainda não existem pedidos.",
     "report": "Comunicar um problema",
@@ -24,7 +24,7 @@
     "cancel": "Cancelar",
     "send": "Enviar",
     "sent": "Pedido enviado",
-    "sent_desc": "Entraremos em contacto o mais rapidamente possível. Pode acompanhar o estado em «Os meus pedidos».",
+    "sent_desc": "Entraremos em contacto o mais rapidamente possível. Podes acompanhar o estado em «Os meus pedidos».",
     "close": "Fechar",
     "view": "Ver ticket",
     "file_too_large": "{{name}} excede 5 MB",
@@ -40,7 +40,7 @@
   "status": {
     "open": "Aberto",
     "in_progress": "Em progresso",
-    "waiting_user": "A aguardar a sua resposta",
+    "waiting_user": "A aguardar a tua resposta",
     "resolved": "Resolvido",
     "closed": "Fechado"
   },

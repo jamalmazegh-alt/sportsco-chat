@@ -45,7 +45,7 @@
     "errors": {
       "missingPlayer": "Wähle einen Spieler aus.",
       "invalidRange": "Ungültige Daten.",
-      "overlap": "Für diese Termine ist bereits eine Abwesenheit gemeldet. Bearbeiten Sie stattdessen die vorhandene."
+      "overlap": "Für diese Termine ist bereits eine Abwesenheit gemeldet. Bearbeite stattdessen die vorhandene."
     },
     "updated": "Abwesenheit aktualisiert",
     "forPlayer": "Für welchen Spieler?",
@@ -53,7 +53,9 @@
     "pickRange": "Wähle einen Zeitraum aus",
     "teamTable": {
       "title": "Abwesenheiten im Team",
-      "empty": "In diesem Team wurden keine bevorstehenden Abwesenheiten gemeldet."
+      "empty": "In diesem Team wurden keine bevorstehenden Abwesenheiten gemeldet.",
+      "days_one": "{{count}} T",
+      "days_other": "{{count}} T"
     },
     "calendar": {
       "open": "Abwesenheitskalender anzeigen",
@@ -67,7 +69,7 @@
   },
   "discipline": {
     "title": "Disziplin",
-    "subtitle": "Vereinsweite Übersicht über aktive und vergangene Sperren.",
+    "subtitle": "Clubweite Übersicht über aktive und vergangene Sperren.",
     "active": "Aktive Sperren",
     "activeCount_one": "{{count}} aktive Sperre",
     "activeCount_other": "{{count}} aktive Sperren",
@@ -75,7 +77,7 @@
     "historyEmpty": "Keine Ergebnisse.",
     "stats": "Statistiken",
     "none": "✅ Keine aktive Sperre",
-    "noneInClub": "✅ Keine aktive Sperre im Verein.",
+    "noneInClub": "✅ Keine aktive Sperre im Club.",
     "createSanction": "Sperre anlegen",
     "viewAll": "Alle anzeigen",
     "matchesLeft_one": "{{count}} Spiel ausstehend",
@@ -116,7 +118,8 @@
   "notification": {
     "sanctionCreated_one": "{{name}} hat eine Sperre von {{n}} Spiel erhalten.",
     "sanctionCreated_other": "{{name}} hat eine Sperre von {{n}} Spielen erhalten.",
-    "absenceDeclared": "{{name}} ist vom {{start}} bis {{end}} abwesend. Grund: {{reason}}"
+    "absenceDeclared": "{{name}} ist vom {{start}} bis {{end}} abwesend. Grund: {{reason}}",
+    "declaredBy": "gemeldet von {{name}}"
   },
   "suspension": {
     "title": "Disziplin",
@@ -147,7 +150,7 @@
     "reason_red_card": "Rote Karte",
     "reason_accumulated_yellow_cards": "Gelb-Sperre",
     "reason_federation_sanction": "Verbandsstrafe",
-    "reason_club_sanction": "Vereinsstrafe",
+    "reason_club_sanction": "Clubstrafe",
     "reason_other": "Sonstiges",
     "selectTeam": "Team auswählen"
   },
@@ -163,7 +166,7 @@
     "confirmSendTitle": "Gesperrte Spieler einberufen?",
     "confirmSendOfficial": "Dieses Spiel ist offiziell. Das Einberufen eines gesperrten Spielers kann gegen die Regeln verstoßen.",
     "confirmSendNonOfficial": "Einige ausgewählte Spieler verfügen über eine aktive Sperre. Dieses Spiel zählt nicht für die Sperre.",
-    "confirmSendAction": "Rufen Sie trotzdem an"
+    "confirmSendAction": "Trotzdem anrufen"
   },
   "app": {
     "name": "Clubero",
@@ -193,7 +196,7 @@
     "admin": "Admin",
     "tournaments": "Turniere",
     "primary": "Hauptnavigation",
-    "manageClub": "Verein verwalten",
+    "manageClub": "Club verwalten",
     "manageClubSubtitle": "Einstellungen, Mitglieder, Abo",
     "viewStats": "Statistiken ansehen",
     "players": "Spieler",
@@ -202,7 +205,7 @@
   },
   "auth": {
     "playerSignupLink": "Du bist Spieler? Erstelle hier dein Profil →",
-    "publicSignupClubAdminOnly": "Diese Registrierung richtet sich an Vereinsverantwortliche. Spieler und Eltern treten Clubero per Einladung bei.",
+    "publicSignupClubAdminOnly": "Diese Registrierung richtet sich an Clubverantwortliche. Spieler und Eltern treten Clubero per Einladung bei.",
     "login": "Anmelden",
     "register": "Konto erstellen",
     "email": "E-Mail",
@@ -219,15 +222,15 @@
     "loginError": "Ungültige Anmeldedaten.",
     "weakPassword": "Verwende mindestens 8 Zeichen.",
     "signupAs": "Ich registriere mich als…",
-    "roleClubAdmin": "Vereinsverantwortlicher",
-    "roleClubAdminHint": "Erstelle und verwalte deinen Verein, Teams und Events.",
+    "roleClubAdmin": "Clubverantwortlicher",
+    "roleClubAdminHint": "Erstelle und verwalte deinen Club, Teams und Events.",
     "rolePlayer": "Spieler",
-    "rolePlayerHint": "Tritt deinem Verein über einen Einladungslink bei.",
+    "rolePlayerHint": "Tritt deinem Club über einen Einladungslink bei.",
     "roleParent": "Elternteil",
     "roleParentHint": "Beantworte Einladungen für dein Kind.",
     "invitedAsHint": "Du wurdest eingeladen — deine Rolle wird automatisch festgelegt.",
     "inviteCode": "Einladungscode",
-    "inviteHint": "Bitte deinen Vereinsadmin um einen Einladungslink oder -code.",
+    "inviteHint": "Bitte deinen Clubadmin um einen Einladungslink oder -code.",
     "inviteRequired": "Ein Einladungscode ist erforderlich.",
     "inviteInvalid": "Diese Einladung ist ungültig oder abgelaufen.",
     "forgotTitle": "Passwort vergessen",
@@ -253,15 +256,15 @@
     "resetSentTo": "Wir haben einen Zurücksetzungslink gesendet an",
     "resetSentHint": "Nicht erhalten? Überprüfe den Spam-Ordner oder versuche es in einer Minute erneut.",
     "useDifferentEmail": "Andere Adresse verwenden",
-    "weakPasswordPwned": "Dieses Passwort ist zu häufig oder wurde in einem Datenleck gefunden. Bitte wählen Sie ein anderes.",
+    "weakPasswordPwned": "Dieses Passwort ist zu häufig oder wurde in einem Datenleck gefunden. Bitte wähle ein anderes.",
     "emailAlreadyRegistered": "Ein Konto mit dieser E-Mail-Adresse existiert bereits.",
     "tooManyRequests": "Zu viele Versuche. Bitte in einigen Minuten erneut versuchen.",
     "invalidEmail": "Ungültige E-Mail-Adresse.",
     "signupError": "Konto konnte nicht erstellt werden. Bitte erneut versuchen.",
-    "emailNotConfirmed": "Ihre E-Mail wurde noch nicht bestätigt. Bitte prüfen Sie Ihren Posteingang (und Spam), um Ihr Konto zu aktivieren.",
+    "emailNotConfirmed": "Deine E-Mail wurde noch nicht bestätigt. Bitte prüfe deinen Posteingang (und Spam), um dein Konto zu aktivieren.",
     "resendConfirmation": "E-Mail erneut senden",
     "confirmationResent": "Bestätigungs-E-Mail erneut gesendet.",
-    "playerAlreadyLinked": "Dieses Spielerprofil ist bereits mit einem anderen Konto verknüpft. Kontaktiere den Verein.",
+    "playerAlreadyLinked": "Dieses Spielerprofil ist bereits mit einem anderen Konto verknüpft. Kontaktiere den Club.",
     "emailFromInvite": "E-Mail aus deiner Einladung.",
     "accountAlreadyExistsSignIn": "Für diese Adresse existiert bereits ein Konto. Melde dich mit deinem üblichen Passwort an (oder nutze „Passwort vergessen“).",
     "inviteWrongAccount": "Diese Einladung gilt für eine andere E-Mail-Adresse. Melde dich ab und dann mit der eingeladenen E-Mail an (oder erstelle ein Konto).",
@@ -277,12 +280,13 @@
     "childPhone": "Telefon des Kindes (optional)",
     "phone": "Telefon",
     "licenseNumber": "Lizenznummer (optional)",
-    "teamJoinHint": "Diese Angaben erstellen das Spielerprofil. Der Verein kann sie später ergänzen.",
+    "teamJoinHint": "Diese Angaben erstellen das Spielerprofil. Der Club kann sie später ergänzen.",
     "parentPhone": "Dein Telefon (Elternteil)",
     "showPassword": "Passwort anzeigen",
     "hidePassword": "Passwort verbergen",
     "inviteExpired": "Diese Einladung ist abgelaufen.",
-    "inviteUsed": "Diese Einladung wurde bereits verwendet."
+    "inviteUsed": "Diese Einladung wurde bereits verwendet.",
+    "invitedToTeam": "Registrierung — {{team}}"
   },
   "common": {
     "save": "Speichern",
@@ -335,14 +339,15 @@
     "confirm": "Bestätigen",
     "reset": "Zurücksetzen",
     "unauthorized": "Der Zugang ist für Reisebusse reserviert.",
-    "noClubSelected": "Kein Verein ausgewählt",
+    "noClubSelected": "Kein Club ausgewählt",
     "fileTooLarge": "Datei zu groß (maximal 5 MB)",
     "invalidImage": "Nicht unterstütztes Bildformat",
     "copyFailed": "Kopieren nicht möglich",
     "copy": "Kopie",
     "moreActions": "Weitere Aktionen",
     "noResults": "Keine Ergebnisse",
-    "added": "hinzugefügt"
+    "added": "hinzugefügt",
+    "home": "Startseite"
   },
   "notFound": {
     "code": "404",
@@ -384,19 +389,19 @@
     "mediaStatus": "Status",
     "allow": "Erlauben",
     "deny": "Ablehnen",
-    "consentsHint": "Der Schalter verwaltet Ihre Einwilligung. Über „Dokument lesen“ können Sie sich jeden Text ansehen.",
+    "consentsHint": "Der Schalter verwaltet deine Einwilligung. Über „Dokument lesen“ kannst du dir jeden Text ansehen.",
     "readDocument": "Dokument lesen"
   },
   "onboarding": {
-    "title": "Deinen Verein einrichten",
-    "subtitle": "Erstelle einen Verein, um deine Teams und Events zu verwalten.",
-    "clubName": "Vereinsname",
-    "createClub": "Verein erstellen",
+    "title": "Deinen Club einrichten",
+    "subtitle": "Erstelle einen Club, um deine Teams und Events zu verwalten.",
+    "clubName": "Clubname",
+    "createClub": "Club erstellen",
     "joinHint": "Schon Mitglied? Bitte deinen Administrator, dich einzuladen.",
     "joinClub": "Mit Code beitreten",
     "steps": {
       "logo": {
-        "label": "Vereinslogo hinzufügen",
+        "label": "Clublogo hinzufügen",
         "hint": "Personalisiere die App für eure Spieler und Eltern."
       },
       "team": {
@@ -409,10 +414,10 @@
       },
       "invites": {
         "label": "Eltern und Trainer einladen",
-        "hint": "Sie antworten auf Einladungen mit einem Tipp."
+        "hint": "Du beantwortest Einladungen mit einem Tipp."
       },
       "event": {
-        "label": "Veröffentlichen Sie Ihre erste Veranstaltung",
+        "label": "Veröffentliche deinen ersten Termin",
         "hint": "Training oder Spiel — teste den gesamten Ablauf."
       }
     },
@@ -425,7 +430,7 @@
     },
     "wizard": {
       "welcomeTitle": "Willkommen bei Clubero! 🎉",
-      "welcomeBody": "Deine kostenlose 30-Tage-Testphase ist bereits aktiv. Folgen wir den 4 Schritten zur Vorbereitung deines Vereins.",
+      "welcomeBody": "Deine kostenlose 30-Tage-Testphase ist bereits aktiv. Folgen wir den 4 Schritten zur Vorbereitung deines Clubs.",
       "welcomeCta": "Loslegen",
       "teamTitle": "Erstes Team erstellen",
       "teamBody": "U13, Senioren… gib ihm Name, Kategorie und Saison.",
@@ -499,7 +504,7 @@
   },
   "payments": {
     "title": "Meine Zahlungen",
-    "subtitle": "Mitgliedsbeiträge, Lizenzen und andere Beträge, die an deinen Verein zu zahlen sind.",
+    "subtitle": "Mitgliedsbeiträge, Lizenzen und andere Beträge, die an deinen Club zu zahlen sind.",
     "familyView": "Familienansicht",
     "simpleView": "Einfache Ansicht",
     "receipts": "Meine Belege",
@@ -514,14 +519,14 @@
     "alreadyPaid": "bereits gezahlt {{amount}}",
     "payAmount": "{{amount}} bezahlen",
     "partial": "Teilzahlung",
-    "onlineUnavailable": "Online-Zahlung ist für diesen Verein noch nicht aktiviert. Kontaktiere den Verein, um zu zahlen.",
-    "onlineUnavailableShort": "Online-Zahlung nicht verfügbar — kontaktiere den Verein.",
+    "onlineUnavailable": "Online-Zahlung ist für diesen Club noch nicht aktiviert. Kontaktiere den Club, um zu zahlen.",
+    "onlineUnavailableShort": "Online-Zahlung nicht verfügbar — kontaktiere den Club.",
     "amountLabel": "Betrag ({{currency}})",
     "remainingAfter": "Verbleibend nach dieser Zahlung: {{amount}}",
     "invalidAmount": "Ungültiger Betrag",
     "payHelloAsso": "Über HelloAsso bezahlen {{amount}}",
-    "helloAssoMissing": "Kontaktiere den Verein für den HelloAsso-Zahlungslink.",
-    "helloAssoExternal": "Zahlung wird außerhalb von Clubero abgewickelt — der Verein aktualisiert den Status nach Eingang.",
+    "helloAssoMissing": "Kontaktiere den Club für den HelloAsso-Zahlungslink.",
+    "helloAssoExternal": "Zahlung wird außerhalb von Clubero abgewickelt — der Club aktualisiert den Status nach Eingang.",
     "noReceipts": "Noch keine Belege",
     "viewPending": "Meine offenen Zahlungen ansehen",
     "receiptNumber": "Nr. {{number}}",
@@ -564,7 +569,7 @@
       "cancelledReason": "Storniert — {{reason}}",
       "transactions_one": "Zahlung ({{count}})",
       "transactions_other": "Zahlungen ({{count}})",
-      "recordedByClub": "(vom Verein erfasst)",
+      "recordedByClub": "(vom Club erfasst)",
       "refunded": "(erst. {{amount}})",
       "noRecordedPayment": "Noch keine Zahlung erfasst."
     },
@@ -609,8 +614,8 @@
     "coachDetach": "Entfernen",
     "coachDetachConfirm": "Diesen Trainer vom Team entfernen?",
     "coachDetached": "Trainer entfernt",
-    "noAvailableCoach": "Kein Trainer verfügbar. Laden Sie zunächst einen Trainer über Admin → Benutzer ein.",
-    "noCoachYet": "Noch kein Trainer angeschlossen. Klicken Sie auf „Anhängen“, um eines hinzuzufügen.",
+    "noAvailableCoach": "Kein Trainer verfügbar. Lade zunächst einen Trainer über Admin → Benutzer ein.",
+    "noCoachYet": "Noch kein Trainer zugeordnet. Klicke auf „Anhängen“, um einen hinzuzufügen.",
     "emptyHintAdmin": "Erstelle dein erstes Team, um Trainings und Spiele zu planen.",
     "emptyHintMember": "Du bist aktuell in keinem Team. Bitte einen Admin, dich hinzuzufügen.",
     "imageTooLarge": "Bild zu groß (maximal 5 MB).",
@@ -626,13 +631,13 @@
     "commModeHint": "Im reinen WhatsApp-Modus teilst du die Events, ohne Antworten in der App anzufordern.",
     "shareInvite": "Einladungslink teilen",
     "shareInviteTitle": "Zum Beitritt einladen",
-    "shareInviteHint": "Scanne den QR oder teile den Link. Neue Mitglieder treten dem Verein als Spieler bei.",
+    "shareInviteHint": "Scanne den QR oder teile den Link. Neue Mitglieder treten dem Club als Spieler bei.",
     "downloadPoster": "PDF-Plakat herunterladen",
     "posterReady": "Plakat bereit",
     "delete": "Team löschen",
     "deleteTitle": "Dieses Team löschen?",
     "deleteConfirm": "Dieses Team hat keine sportliche Historie. Es wird endgültig gelöscht.",
-    "deleteConfirmWithRoster": "Dieses Team hat keine sportliche Historie. Es wird gelöscht und {{count}} Spieler werden abgekoppelt (bleiben im Verein).",
+    "deleteConfirmWithRoster": "Dieses Team hat keine sportliche Historie. Es wird gelöscht und {{count}} Spieler werden abgekoppelt (bleiben im Club).",
     "deleted": "Team gelöscht",
     "deleteBlockedHasHistory": "Löschen nicht möglich: dieses Team hat bereits sportliche Historie. Archiviere es stattdessen.",
     "archive": "Team archivieren",
@@ -663,14 +668,14 @@
       "paid": "Bezahlt",
       "exempt": "Befreit",
       "unpaid": "Zum Sammeln",
-      "cycleHint": "Klicken Sie hier, um den Zahlungsstatus zu ändern"
+      "cycleHint": "Klicke hier, um den Zahlungsstatus zu ändern"
     },
     "row": {
       "noContact": "Kein Kontakt"
     },
     "ageGroupRequired": "Wähle eine Alterskategorie aus der Liste.",
     "player": "Spieler",
-    "ageGroupLegacyHint": "Legacy-Wert – wählen Sie eine offizielle Kategorie (z. B. U7). Ein Bereich wie U6-U7 kann im Teamnamen verbleiben.",
+    "ageGroupLegacyHint": "Alter Wert – wähle eine offizielle Kategorie (z. B. U7). Eine Spanne wie U6-U7 kann im Teamnamen bleiben.",
     "staffWall": "Stabswand",
     "staffWallHint": "Privater Bereich für die Ausbilder und Leiter des Teams. Für Spieler oder Eltern nicht sichtbar.",
     "myProfile": "Mein Profil",
@@ -707,25 +712,25 @@
     "errors": {
       "required": "Meisterschaft auswählen",
       "duplicate": "Diese Meisterschaft ist bereits für dieses Team konfiguriert",
-      "inUse": "Diese Meisterschaft kann nicht gelöscht werden, da sie von Spielen verwendet wird. Archivieren Sie es, um es aus neuen Ereignissen zu entfernen.",
+      "inUse": "Diese Meisterschaft kann nicht gelöscht werden, da sie von Spielen verwendet wird. Archiviere sie, um sie aus neuen Terminen zu entfernen.",
       "teamMismatch": "Diese Meisterschaft gehört nicht zu diesem Team",
-      "clubMismatch": "Diese Meisterschaft gehört nicht zu diesem Verein",
+      "clubMismatch": "Diese Meisterschaft gehört nicht zu diesem Club",
       "archived": "Diese Meisterschaft ist archiviert",
       "notFound": "Meisterschaft nicht gefunden"
     },
     "levelPlaceholder": "Landesliga 1"
   },
   "club": {
-    "logo": "Vereinslogo",
+    "logo": "Clublogo",
     "uploadLogo": "Logo hinzufügen",
     "changeLogo": "Logo ändern",
-    "logoUpdated": "Vereinslogo aktualisiert",
+    "logoUpdated": "Clublogo aktualisiert",
     "logoTooLarge": "Datei zu groß (maximal 5 MB)"
   },
   "clubSelector": {
-    "title": "Meine Vereine",
-    "noClub": "Kein Verein",
-    "label": "Verein wechseln"
+    "title": "Meine Clubs",
+    "noClub": "Kein Club",
+    "label": "Club wechseln"
   },
   "players": {
     "title": "Spieler",
@@ -799,7 +804,7 @@
     "tabNew": "Neu",
     "tabExisting": "Vorhandener Spieler",
     "existingTitle": "Vorhandenen Spieler hinzufügen",
-    "existingHint": "Ordne einen bereits im Verein vorhandenen Spieler diesem Team zu.",
+    "existingHint": "Ordne einen bereits im Club vorhandenen Spieler diesem Team zu.",
     "existingEmpty": "Kein Spieler verfügbar",
     "existingAlreadyIn": "Bereits in",
     "existingAttach": "Zum Team hinzufügen",
@@ -809,9 +814,9 @@
     "teamsLabel": "Teams",
     "import": {
       "title": "Spieler importieren (CSV)",
-      "intro": "Importieren Sie Ihre Liste aus einer CSV-Datei. Erwartete Spalten: {{cols}}.",
+      "intro": "Importiere deine Liste aus einer CSV-Datei. Erwartete Spalten: {{cols}}.",
       "template": "Vorlage",
-      "parentsHint": "Bis zu 2 Eltern pro Spieler über die Datei. Für weitere öffnen Sie das Spielerprofil nach dem Import.",
+      "parentsHint": "Bis zu 2 Eltern pro Spieler über die Datei. Für weitere öffne das Spielerprofil nach dem Import.",
       "fileLabel": "CSV-Datei",
       "pasteLabel": "oder Zeilen einfügen",
       "submit": "Importieren",
@@ -847,7 +852,9 @@
       "errorRows": "Zeile(n) mit Fehlern",
       "row": "Zeile",
       "another": "Neuer Import",
-      "button": "CSV-Import"
+      "button": "CSV-Import",
+      "confirm_one": "{{count}} Spieler importieren",
+      "confirm_other": "{{count}} Spieler importieren"
     },
     "inviteAlreadyActive": "Konto bereits aktiv — kein Neuversand nötig.",
     "parentActivationPending": "Warten auf Aktivierung des Elternkontos",
@@ -862,7 +869,7 @@
       "enabled": "Öffentliches Profil aktiviert",
       "disabled": "Öffentliches Profil deaktiviert",
       "title": "Öffentliches Profil",
-      "help": "Teilen Sie einen öffentlichen Link zu Erfolgen, Saisons und Timeline dieses Spielers. Nur als öffentlich markierte Inhalte sind sichtbar.",
+      "help": "Teile einen öffentlichen Link zu Erfolgen, Saisons und Verlauf dieses Spielers. Nur als öffentlich markierte Inhalte sind sichtbar.",
       "notFound": "Profil nicht gefunden",
       "notFoundBody": "Dieses Spielerprofil ist privat oder nicht mehr verfügbar.",
       "goHome": "Zu Clubero"
@@ -892,7 +899,7 @@
   "events": {
     "isOfficial": "Pflichtspiel",
     "isOfficialTournament": "Offizielles Turnier",
-    "isOfficialTournamentDescription": "Ergebnisse und Spielerstatistiken werden in die Vereinsbilanz eingerechnet.",
+    "isOfficialTournamentDescription": "Ergebnisse und Spielerstatistiken werden in die Clubbilanz eingerechnet.",
     "whatsappShare": {
       "modeWhatsappOnly": "Nur WhatsApp",
       "modeHybrid": "Hybride",
@@ -948,7 +955,7 @@
     "openInWaze": "In Waze öffnen",
     "attachments": "Anhänge",
     "meetingPoint": "Point de RDV",
-    "meetingPointHint": "Treffpunkt vor der Abfahrt (z. B. Vereinsparkplatz)",
+    "meetingPointHint": "Treffpunkt vor der Abfahrt (z. B. Clubparkplatz)",
     "venue": "Spielort",
     "home": "Heim",
     "away": "Auswärts",
@@ -1023,7 +1030,7 @@
     "cancelEventSuccess": "Event abgesagt und Aufgebotene benachrichtigt",
     "reschedule": "Verschieben",
     "rescheduleTitle": "Dieses Event verschieben",
-    "rescheduleDescription": "Wähle das neue Datum. Alle Aufgebotenen werden benachrichtigt (Benachrichtigung, E-Mail, Vereinspinnwand).",
+    "rescheduleDescription": "Wähle das neue Datum. Alle Aufgebotenen werden benachrichtigt (Benachrichtigung, E-Mail, Clubpinnwand).",
     "rescheduleNewDateLabel": "Neues Datum und Uhrzeit",
     "rescheduleReasonLabel": "Grund der Verschiebung (optional)",
     "rescheduleReasonPlaceholder": "z. B. Platz nicht verfügbar, Wetter…",
@@ -1091,7 +1098,7 @@
     "typeMeeting": "Besprechung",
     "typeOther": "Andere",
     "filters": "Filter",
-    "filtersDescription": "Verfeinern Sie die Liste der angezeigten Ereignisse.",
+    "filtersDescription": "Verfeinere die Liste der angezeigten Termine.",
     "filterConvocations": "Aufgebote",
     "convocAll": "Alle",
     "convocSent": "Gesendet",
@@ -1107,7 +1114,7 @@
     "dateTo": "Bis",
     "clearDates": "Klare Termine",
     "filterDisplay": "Anzeige",
-    "includePast": "Beziehen Sie vergangene Ereignisse mit ein",
+    "includePast": "Vergangene Termine einbeziehen",
     "includeCancelled": "Einschließen storniert",
     "hideInternalMeetings": "Interne Besprechungen ausblenden",
     "applyFilters": "Anwenden",
@@ -1186,8 +1193,8 @@
     "notSentYet": "Noch nicht gesendet",
     "confirmSend": "Versand bestätigen",
     "recipients": "Empfänger",
-    "reviewBeforeSend": "Überprüfen Sie es vor dem Senden",
-    "reviewBeforeSendHint": "Überprüfen Sie die Empfänger und Details – der Versand ist endgültig.",
+    "reviewBeforeSend": "Vor dem Senden prüfen",
+    "reviewBeforeSendHint": "Prüfe Empfänger und Details – der Versand ist endgültig.",
     "cooldownHint": "Noch {{m}} Min., bevor du erneut erinnern kannst",
     "remindIn": "In {{m}} Min. erinnern",
     "pendingCount_one": "{{count}} Spieler hat noch nicht geantwortet",
@@ -1243,7 +1250,7 @@
     "played": "Gespielt",
     "goalsFor": "Tore",
     "goalsAgainst": "Gegentore",
-    "noPlayerLinked": "Für diesen Verein ist kein Spieler mit Ihrem Konto verknüpft.",
+    "noPlayerLinked": "Für diesen Club ist kein Spieler mit deinem Konto verknüpft.",
     "player": "Spieler",
     "child": "Kind",
     "matchesPlayed": "Gespielte Spiele",
@@ -1318,7 +1325,7 @@
     "pillUpcoming": "bevorstehende",
     "notPlayedYet": "Das Spiel ist noch nicht gespielt – der Spielstand kann nach dem Schlusspfiff eingegeben werden.",
     "finishedTitle": "Das Spiel ist beendet.",
-    "finishedHint": "Speichern Sie die Punktzahl und gleichen Sie die Fakten ab.",
+    "finishedHint": "Speichere das Ergebnis und gleiche die Spielereignisse ab.",
     "enterResult": "Ergebnis eingeben"
   },
   "channels": {
@@ -1335,7 +1342,7 @@
   },
   "notificationsCenter": {
     "title": "Benachrichtigungen",
-    "subtitle": "Alle Erinnerungen, Erwähnungen und Warnungen deines Vereins.",
+    "subtitle": "Alle Erinnerungen, Erwähnungen und Warnungen deines Clubs.",
     "unreadBadge_one": "{{count}} ungelesen",
     "unreadBadge_other": "{{count}} ungelesen",
     "markAllRead": "Alle als gelesen markieren",
@@ -1421,9 +1428,9 @@
     "phoneFromPlayer": "Diese Nummer stammt aus deinem Spielerprofil."
   },
   "admin": {
-    "title": "Vereinseinstellungen",
+    "title": "Clubeinstellungen",
     "subtitle": "Globale Einstellungen für {{club}}.",
-    "openSettings": "Vereinseinstellungen",
+    "openSettings": "Clubeinstellungen",
     "convocationChannels": "Standard-Aufgebotskanäle",
     "convocationChannelsHint": "Standardmäßig verwendete Kanäle für Aufgebote und Erinnerungen.",
     "communications": "Kommunikation",
@@ -1435,23 +1442,23 @@
     "eventChatParents": "Eltern können auf Event-Chats zugreifen",
     "save": "Speichern",
     "saved": "Einstellungen gespeichert.",
-    "promoteToMember": "Zum Vereinsmitglied befördern",
+    "promoteToMember": "Zum Clubmitglied befördern",
     "parentOrPlayerOnly": "Dieser Benutzer ist nur Elternteil oder Spieler. Verwende die Schaltfläche unten für zusätzliche Rechte.",
     "hubSubscription": "Abonnement",
     "hubSubscriptionHint": "Plan, Rechnungen und Zahlungsmethode.",
     "hubConvocations": "Aufgebote",
     "hubConvocationsHint": "Standardkanäle für den Versand von Aufgeboten.",
     "hubCommunications": "Kommunikation",
-    "hubCommunicationsHint": "Vereinspinnwand und Chats für jedes Event.",
+    "hubCommunicationsHint": "Clubpinnwand und Chats für jedes Event.",
     "hubSocial": "Soziale Netzwerke",
-    "hubSocialHint": "Zeige deine Instagram-, Facebook- und X-Beiträge auf der Vereinspinnwand.",
+    "hubSocialHint": "Zeige deine Instagram-, Facebook- und X-Beiträge auf der Clubpinnwand.",
     "socialConnected": "Verbunden",
     "socialNotConnected": "Nicht verbunden",
     "socialConnect": "Verbinden",
     "socialDisconnect": "Trennen",
     "socialSync": "Synchronisieren",
     "socialLastSync": "Letzte Synchronisation {{when}}",
-    "socialAutoNote": "Die automatische Synchronisation läuft jede Stunde. Neue Beiträge erscheinen direkt an der Vereinspinnwand, chronologisch mit internen Ankündigungen vermischt.",
+    "socialAutoNote": "Die automatische Synchronisation läuft jede Stunde. Neue Beiträge erscheinen direkt an der Clubpinnwand, chronologisch mit internen Ankündigungen vermischt.",
     "socialDisconnectConfirm": "{{network}} trennen? Importierte Beiträge werden ausgeblendet.",
     "socialConnectSuccess": "{{network}} verbunden · Synchronisation läuft",
     "socialConnectError": "Verbindung fehlgeschlagen: {{reason}}",
@@ -1470,14 +1477,14 @@
     "remindersPreset24h": "24h vorher",
     "remindersPreset3h": "3h vorher",
     "usersTitle": "Nutzer der Plattform",
-    "usersSubtitle": "Alle Benutzer mit Zugriff auf diesen Verein, mit ihrer Rolle und ihrem Status.",
+    "usersSubtitle": "Alle Benutzer mit Zugriff auf diesen Club, mit ihrer Rolle und ihrem Status.",
     "searchUsersPlaceholder": "Nach Name oder E-Mail suchen…",
     "usersEmpty": "Kein Benutzer vorhanden.",
     "openUsers": "Benutzer verwalten",
     "statusActive": "Aktiv",
     "statusPending": "Ausstehend",
     "userDetailTitle": "Benutzerdetails",
-    "memberships": "Vereinsmitgliedschaften",
+    "memberships": "Clubmitgliedschaften",
     "linkedPlayers": "Verknüpfte Spieler",
     "noLinkedPlayers": "Keine verknüpften Spieler.",
     "phone": "Telefon",
@@ -1491,32 +1498,32 @@
     "enableUser": "Konto reaktivieren",
     "userDisabled": "Konto deaktiviert.",
     "userEnabled": "Konto reaktiviert.",
-    "removeFromClub": "Aus dem Verein entfernen",
-    "removeFromClubHint": "Entfernt alle Rollen dieses Benutzers in diesem Verein.",
-    "removedFromClub": "Benutzer aus dem Verein entfernt.",
+    "removeFromClub": "Aus dem Club entfernen",
+    "removeFromClubHint": "Entfernt alle Rollen dieses Benutzers in diesem Club.",
+    "removedFromClub": "Benutzer aus dem Club entfernt.",
     "sendPasswordReset": "Zurücksetzungslink senden",
     "passwordResetSent": "Zurücksetzungslink gesendet.",
     "accountStatus": "Kontostatus",
     "statusDisabled": "Deaktiviert",
     "confirmDisable": "Dieses Konto deaktivieren?",
-    "confirmRemove": "Diesen Benutzer aus dem Verein entfernen?",
-    "tabClubMembers": "Vereinsmitglieder",
+    "confirmRemove": "Diesen Benutzer aus dem Club entfernen?",
+    "tabClubMembers": "Clubmitglieder",
     "tabPlayersParents": "Spieler & Eltern",
-    "tabClubMembersEmpty": "Keine Vereinsmitglieder.",
+    "tabClubMembersEmpty": "Keine Clubmitglieder.",
     "tabPlayersParentsEmpty": "Keine Spieler oder Eltern.",
     "inviteUser": "Benutzer einladen",
     "inviteRole": "Rollen",
-    "inviteEmailAlreadyUser": "Diese Adresse verfügt bereits über ein Clubero-Konto. Bitten Sie sie, sich anzumelden, und fügen Sie sie dann über ihr Profil hinzu.",
+    "inviteEmailAlreadyUser": "Diese Adresse hat bereits ein Clubero-Konto. Bitte die Person, sich anzumelden, und füge sie dann über ihr Profil hinzu.",
     "inviteEmailFailed": "Einladung erstellt, aber E-Mail konnte nicht gesendet werden.",
     "inviteSent": "Einladung gesendet",
     "sendInvite": "Einladung senden",
     "hubBranding": "Erscheinungsbild",
-    "hubBrandingHint": "Primäre App-Farbe für Ihren Club",
+    "hubBrandingHint": "Primäre App-Farbe für deinen Club",
     "hubPayments": "Zahlungen",
-    "hubPaymentsHint": "Sammeln Sie Turnieranmeldungen über Stripe",
+    "hubPaymentsHint": "Turnieranmeldungen über Stripe einziehen",
     "payments": {
       "title": "Turnierzahlungen",
-      "subtitle": "Aktiviere Stripe, um Turniergebühren direkt auf das Vereinskonto einzuziehen.",
+      "subtitle": "Aktiviere Stripe, um Turniergebühren direkt auf das Clubkonto einzuziehen.",
       "notActivatedTitle": "Zahlungen nicht aktiviert",
       "notActivatedHint": "Erstelle ein Stripe Express-Konto, um Anmeldegebühren einzuziehen.",
       "activate": "Zahlungen aktivieren",
@@ -1583,10 +1590,10 @@
       "offsetAfter": "{{n}} T. danach",
       "remindersSaved": "Erinnerungen gespeichert",
       "remindersNote": "Hinweis: Erinnerungen gehen an verknüpfte Zahler, Spieler und Eltern/Erziehungsberechtigte. Jede Familie erhält nur eine E-Mail pro Meilenstein.",
-      "remindersNoteManual": "Sie können auch eine manuelle Erinnerung auf der Seite Zahlungsposten über die Schaltfläche „Erinnern“ auslösen."
+      "remindersNoteManual": "Du kannst auch eine manuelle Erinnerung auf der Seite Zahlungsposten über die Schaltfläche „Erinnern“ auslösen."
     },
     "branding": {
-      "saved": "Vereinsfarbe aktualisiert",
+      "saved": "Clubfarbe aktualisiert",
       "saveError": "Konnte nicht gespeichert werden",
       "title": "Erscheinungsbild",
       "subtitle": "Wähle die primäre App-Farbe. Es gilt überall, auch auf der Anmeldeseite.",
@@ -1603,7 +1610,9 @@
     "hubCamps": "Camps",
     "hubCampsHint": "Erstelle, veröffentliche und verwalte die Camps deines Clubs",
     "emailLanguage": "Kommunikations-E-Mail-Sprache",
-    "emailLanguageHint": "Sprache, die für E-Mails verwendet wird, die der Club an Empfänger sendet, die keine bevorzugte Sprache festgelegt haben."
+    "emailLanguageHint": "Sprache, die für E-Mails verwendet wird, die der Club an Empfänger sendet, die keine bevorzugte Sprache festgelegt haben.",
+    "inviteCooldown": "Einladung wurde bereits an {{email}} gesendet. Erneut senden in {{seconds}} s möglich.",
+    "inviteSentTo": "Einladung an {{email}} gesendet. Erneut senden in 60 s möglich."
   },
   "attachments": {
     "add": "Datei hinzufügen",
@@ -1612,7 +1621,7 @@
     "documentName": "Name des Dokuments",
     "documentNamePlaceholder": "Name des Dokuments (z. B. Trainingsplan)",
     "remove": "Entfernen",
-    "labelRequired": "Benennen Sie jedes Dokument vor der Veröffentlichung."
+    "labelRequired": "Benenne jedes Dokument vor der Veröffentlichung."
   },
   "mutes": {
     "action": "Diese Person ausblenden",
@@ -1630,7 +1639,7 @@
     "action": "Diese Person melden",
     "also": "{{name}} ebenfalls melden",
     "title": "{{name}} melden",
-    "subtitle": "Deine Meldung geht an die Verantwortlichen des Vereins. Die Person wird nicht informiert.",
+    "subtitle": "Deine Meldung geht an die Verantwortlichen des Clubs. Die Person wird nicht informiert.",
     "already": "Du hast diese Person bereits gemeldet.",
     "tabContent": "Inhalte",
     "tabMembers": "Mitglieder",
@@ -1643,17 +1652,17 @@
     "deleteMessage": "Nachricht löschen"
   },
   "wall": {
-    "title": "Vereinspinnwand",
+    "title": "Clubpinnwand",
     "subtitle": "Ankündigungen und Diskussionen.",
-    "placeholder": "Teile etwas mit dem Verein…",
+    "placeholder": "Teile etwas mit dem Club…",
     "post": "Veröffentlichen",
     "comment": "Antworten",
     "commentPlaceholder": "Eine Antwort schreiben…",
     "empty": "Noch keine Beiträge. Sei der Erste!",
-    "noClub": "Tritt einem Verein bei oder erstelle einen, um die Pinnwand zu sehen.",
+    "noClub": "Tritt einem Club bei oder erstelle einen, um die Pinnwand zu sehen.",
     "mentionTitle": "{{name}} hat dich erwähnt",
     "scope": {
-      "allClub": "Ganzer Verein",
+      "allClub": "Ganzer Club",
       "restricted": "Eingeschränkte Zielgruppe",
       "restrictedTitle": "Alle anvisierten Teams wurden gelöscht — nur für Admins sichtbar.",
       "plusOthers": "{{first}} + {{n}} weitere",
@@ -1676,10 +1685,10 @@
     },
     "report": {
       "title": "Diesen Inhalt melden",
-      "subtitle": "Deine Meldung geht an die Vereinsverantwortlichen. Der Autor wird nicht informiert.",
+      "subtitle": "Deine Meldung geht an die Clubverantwortlichen. Der Autor wird nicht informiert.",
       "action": "Melden",
       "submit": "Melden",
-      "sent": "Meldung an die Vereinsverantwortlichen gesendet.",
+      "sent": "Meldung an die Clubverantwortlichen gesendet.",
       "already": "Du hast diesen Inhalt bereits gemeldet.",
       "notFound": "Dieser Inhalt ist nicht mehr verfügbar.",
       "detailsPlaceholder": "Angaben (optional)",
@@ -1728,7 +1737,7 @@
       "empty": "Noch keine Dokumente. An Wandbeiträge angehängte Dateien erscheinen hier.",
       "loadMore": "Mehr anzeigen",
       "viewPost": "Beitrag ansehen",
-      "loadError": "Die Dokumente konnten nicht geladen werden. Bitte versuchen Sie es gleich erneut.",
+      "loadError": "Die Dokumente konnten nicht geladen werden. Bitte versuche es gleich erneut.",
       "rename": "Umbenennen",
       "renameError": "Umbenennen fehlgeschlagen. Bitte erneut versuchen.",
       "preview": "Vorschau",
@@ -1747,14 +1756,14 @@
     "staff": {
       "pickTeamRequired": "Wähle mindestens ein Team, um dessen Staff anzusprechen.",
       "placeholder": "Private Nachricht an das Staff dieses Teams…",
-      "audienceLocked": "Nur für Team-Staff und Vereins-Admins sichtbar.",
+      "audienceLocked": "Nur für Team-Staff und Club-Admins sichtbar.",
       "badgeTitle": "Private Nachricht an Team-Staff",
       "badge": "Team-Staff",
       "badgeWithTeam": "Team {{team}}"
     },
     "errorNoSession": "Deine Sitzung ist abgelaufen. Melde dich erneut an und versuche es noch einmal.",
-    "errorNotMember": "Du bist kein Mitglied dieses Vereins mehr. Wechsle den aktiven Verein und versuche es erneut.",
-    "errorNoPermission": "Du hast keine Berechtigung, hier zu posten. Prüfe deinen aktiven Verein und das ausgewählte Team.",
+    "errorNotMember": "Du bist kein Mitglied dieses Clubs mehr. Wechsle den aktiven Club und versuche es erneut.",
+    "errorNoPermission": "Du hast keine Berechtigung, hier zu posten. Prüfe deinen aktiven Club und das ausgewählte Team.",
     "newAttachment": "Neuer Anhang",
     "reactions": {
       "error": "Reaktion nicht möglich",
@@ -1779,14 +1788,14 @@
     "disabled": "Der Chat ist für dieses Event deaktiviert.",
     "you": "Du",
     "loadMore": "Mehr laden",
-    "noAccess": "Der Chat dieses Termins ist dem Staff vorbehalten. Bitte dein Verein, ihn für Eltern oder Spieler zu öffnen.",
+    "noAccess": "Der Chat dieses Termins ist dem Staff vorbehalten. Bitte dein Club, ihn für Eltern oder Spieler zu öffnen.",
     "sendFailed": "Nachricht nicht gesendet: Du hast keinen Zugriff auf diesen Chat."
   },
   "assistant": {
     "title": "Clubero-Assistent",
     "subtitle": "Stelle eine Frage zur App oder deinen Daten",
     "emptyTitle": "Wie kann ich helfen?",
-    "emptyHint": "Ich kenne Ihren Verein, Ihre Teams und bevorstehende Veranstaltungen.",
+    "emptyHint": "Ich kenne deinen Club, deine Teams und die anstehenden Termine.",
     "placeholder": "Deine Frage…",
     "thinking": "Denke nach…",
     "error": "Ein Fehler ist aufgetreten.",
@@ -1820,7 +1829,7 @@
   },
   "billing": {
     "title": "Abonnement",
-    "subtitle": "Verwalte das Clubero-Abonnement deines Vereins.",
+    "subtitle": "Verwalte das Clubero-Abonnement deines Clubs.",
     "status": "Aktueller Status",
     "noSubscription": "Kein Abonnement",
     "plan": "Plan",
@@ -1879,12 +1888,12 @@
     "confirmCancelAction": "Kündigen",
     "memberLocked": {
       "eyebrow": "Abonnement abgelaufen",
-      "title": "Der Verein muss sein Abonnement reaktivieren",
-      "body": "Der vollständige Zugriff auf {{club}} ist vorübergehend gesperrt. Ein Vereinsadmin muss das Abonnement aktualisieren, um Events, Teams und Nachrichten wieder zu öffnen.",
-      "fallbackClub": "dein Verein",
+      "title": "Der Club muss sein Abonnement reaktivieren",
+      "body": "Der vollständige Zugriff auf {{club}} ist vorübergehend gesperrt. Ein Clubadmin muss das Abonnement aktualisieren, um Events, Teams und Nachrichten wieder zu öffnen.",
+      "fallbackClub": "dein Club",
       "whatYouCanDo": "Was du tun kannst",
       "profileHint": "Dein Profil bleibt verfügbar.",
-      "adminHint": "Kontaktiere einen Vereinsadmin, damit das Abonnement reaktiviert wird.",
+      "adminHint": "Kontaktiere einen Clubadmin, damit das Abonnement reaktiviert wird.",
       "supportHint": "Der Clubero-Support kann helfen, wenn du nicht weißt, wen du kontaktieren sollst.",
       "profileCta": "Zum Profil",
       "supportCta": "Support kontaktieren",
@@ -1912,7 +1921,7 @@
     "errorCardSetup": "Kartenaktualisierung konnte nicht vorbereitet werden",
     "errorSaveCard": "Fehler beim Speichern der Karte",
     "exemptTitle": "Kostenloser Zugang",
-    "exemptBody": "Ihr Club hat kostenlosen Zugang zu allen Clubero-Funktionen.",
+    "exemptBody": "Dein Club hat kostenlosen Zugang zu allen Clubero-Funktionen.",
     "exemptReason": "Grund: {{reason}}"
   },
   "feedback": {
@@ -2009,13 +2018,13 @@
     "postMatchTitle": "Trainerfeedback",
     "rateLimit": "Zu viele Anfragen, bitte versuche es gleich erneut.",
     "refineChatFooter": "Jede Nachricht aktualisiert die angezeigte Zusammenfassung. Der Verlauf dieses Austauschs wird nicht gespeichert.",
-    "refineChatHint": "Beschreiben Sie, was Sie ändern möchten (Ton, Länge, Struktur…). Die Zusammenfassung wird nach jeder Nachricht aktualisiert.",
-    "refineChatPlaceholder": "Was möchten Sie ändern?",
+    "refineChatHint": "Beschreibe, was du ändern möchtest (Ton, Länge, Struktur…). Die Zusammenfassung wird nach jeder Nachricht aktualisiert.",
+    "refineChatPlaceholder": "Was möchtest du ändern?",
     "refineChatTitle": "Zusammenfassung mit KI verfeinern",
-    "refineDoneFallback": "Zusammenfassung basierend auf Ihrer Anfrage aktualisiert.",
-    "refineFailed": "Ich konnte Ihre Anfrage nicht umsetzen. Die Zusammenfassung wurde nicht geändert.",
+    "refineDoneFallback": "Zusammenfassung basierend auf deiner Anfrage aktualisiert.",
+    "refineFailed": "Ich konnte deine Anfrage nicht umsetzen. Die Zusammenfassung wurde nicht geändert.",
     "refineUpdated": "Zusammenfassung aktualisiert",
-    "refineWelcome": "Hallo 👋 Sagen Sie mir, was ich anpassen muss: Länge, Ton, Struktur, spezifischer Fokus ... Ich werde die Zusammenfassung mit jeder Nachricht neu schreiben.",
+    "refineWelcome": "Hallo 👋 Sag mir, was ich anpassen soll: Länge, Ton, Struktur, ein bestimmter Schwerpunkt … Ich schreibe die Zusammenfassung mit jeder Nachricht neu.",
     "refineWithAi": "Mit KI verfeinern",
     "refineWorking": "Die KI schreibt die Zusammenfassung neu…",
     "refineExample1": "In 5 Sätzen zusammenfassen",
@@ -2069,7 +2078,7 @@
     "shareUnavailable": "Aufstellung nicht verfügbar"
   },
   "permissions": {
-    "clubRoles": "Rollen im Verein",
+    "clubRoles": "Rollen im Club",
     "clubRolesHint": "Ein Benutzer kann mehrere Rollen haben.",
     "atLeastOneRole": "Mindestens eine Rolle ist erforderlich"
   },
@@ -2089,13 +2098,13 @@
     "copyLink": "Link kopieren",
     "linkCopied": "Link kopiert",
     "confirmRemoveTitle": "Dieses Mitglied entfernen?",
-    "confirmRemoveDesc": "Diese Person hat keinen Zugriff mehr auf das Turnier. Sie können sie später erneut einladen.",
+    "confirmRemoveDesc": "Diese Person hat keinen Zugriff mehr auf das Turnier. Du kannst sie später erneut einladen.",
     "confirmRemoveAction": "Entfernen",
     "offlineAdded": "Hinzugefügt (kein Konto)",
-    "emailHint": "Leer lassen, um ohne Konto hinzuzufügen. Sie können sie später einladen.",
+    "emailHint": "Leer lassen, um ohne Konto hinzuzufügen. Du kannst die Person später einladen.",
     "offline": "Kein Konto",
     "inviteOffline": "Per E-Mail einladen",
-    "convertDesc": "Senden Sie {{name}} eine E-Mail-Einladung, damit er/sie sich anmelden und Spiele bestätigen kann."
+    "convertDesc": "Sende {{name}} eine E-Mail-Einladung, damit sich die Person anmelden und Spiele bestätigen kann."
   },
   "insights": {
     "title": "Insights",
@@ -2126,7 +2135,7 @@
     },
     "home": {
       "title": "Startseite — Clubero",
-      "description": "Dashboard deines Vereins."
+      "description": "Dashboard deines Clubs."
     },
     "events": {
       "title": "Veranstaltungen – Clubero",
@@ -2158,7 +2167,7 @@
     },
     "admin": {
       "title": "Admin-Einstellungen — Clubero",
-      "description": "Vereinskonfiguration, Abonnement und Einstellungen."
+      "description": "Clubkonfiguration, Abonnement und Einstellungen."
     },
     "adminBranding": {
       "title": "Visuelle Identität — Clubero",
@@ -2166,7 +2175,7 @@
     },
     "adminUsers": {
       "title": "Utilisateurs — Clubero",
-      "description": "Verwalte die Mitglieder und Rollen deines Vereins."
+      "description": "Verwalte die Mitglieder und Rollen deines Clubs."
     },
     "tournaments": {
       "title": "Turniere — Clubero",
@@ -2186,7 +2195,7 @@
     },
     "inbox": {
       "title": "Mur — Clubero",
-      "description": "Neuigkeiten und Nachrichten deines Vereins."
+      "description": "Neuigkeiten und Nachrichten deines Clubs."
     },
     "notifications": {
       "title": "Benachrichtigungen — Clubero",
@@ -2198,7 +2207,7 @@
     },
     "assistant": {
       "title": "Assistant — Clubero",
-      "description": "KI-Assistent für die Verwaltung deines Vereins."
+      "description": "KI-Assistent für die Verwaltung deines Clubs."
     },
     "support": {
       "title": "Support — Clubero",
@@ -2210,15 +2219,15 @@
     },
     "stats": {
       "title": "Statistiken — Clubero",
-      "description": "Anwesenheitsstatistiken und Leistungen deines Vereins."
+      "description": "Anwesenheitsstatistiken und Leistungen deines Clubs."
     },
     "adminBilling": {
       "title": "Abonnement — Clubero",
-      "description": "Abonnement und Abrechnung des Vereins verwalten."
+      "description": "Abonnement und Abrechnung des Clubs verwalten."
     },
     "adminPayments": {
       "title": "Zahlungen — Clubero",
-      "description": "Aktiviere die Einziehung von Turniergebühren für deinen Verein."
+      "description": "Aktiviere die Einziehung von Turniergebühren für deinen Club."
     },
     "payments": {
       "title": "Meine Zahlungen — Clubero",
@@ -2243,8 +2252,8 @@
     },
     "contact": {
       "title": "Contact — Clubero",
-      "description": "Kontaktiere das Clubero-Team: Produktfragen, Demo, Partnerschaften oder Support für deinen Sportverein. Wir antworten innerhalb von 24 Stunden.",
-      "ogDescription": "Kontaktiere das Clubero-Team: Demo, Support und Partnerschaften für deinen Sportverein."
+      "description": "Kontaktiere das Clubero-Team: Produktfragen, Demo, Partnerschaften oder Support für deinen Sportclub. Wir antworten innerhalb von 24 Stunden.",
+      "ogDescription": "Kontaktiere das Clubero-Team: Demo, Support und Partnerschaften für deinen Sportclub."
     },
     "pricing": {
       "title": "Tarifs — Clubero",
@@ -2253,8 +2262,8 @@
     },
     "features": {
       "title": "Funktionen — Clubero",
-      "description": "Aufgebote, Anwesenheit, Kommunikation, Statistiken. Entdecke alles, was Clubero Vereinen, Trainern, Eltern und Spielern bietet.",
-      "ogDescription": "Alles, was dein Verein braucht. Nichts Überflüssiges."
+      "description": "Aufgebote, Anwesenheit, Kommunikation, Statistiken. Entdecke alles, was Clubero Clubs, Trainern, Eltern und Spielern bietet.",
+      "ogDescription": "Alles, was dein Club braucht. Nichts Überflüssiges."
     },
     "faq": {
       "title": "FAQ — Clubero",
@@ -2275,14 +2284,14 @@
       "description": "Vollständige Liste der von Clubero verwendeten Cookies, ihr Zweck und ihre Speicherdauer."
     },
     "publicHome": {
-      "title": "Clubero — Teamkoordination für Sportvereine",
-      "description": "Einladungen, Anwesenheit, Erinnerungen und Vereinskommunikation in einer mobilen App.",
+      "title": "Clubero — Teamkoordination für Sportclubs",
+      "description": "Einladungen, Anwesenheit, Erinnerungen und Clubkommunikation in einer mobilen App.",
       "ogDescription": "Aufgebote, Anwesenheit, Erinnerungen — alles in einem Tool. Mit einem Klick."
     },
     "onboarding": {
-      "title": "Einrichtung deines Vereins — Clubero",
-      "description": "Wir helfen dir, deinen Verein, deine Teams und deine Daten in wenigen Tagen zu Clubero zu migrieren. Persönliche Begleitung, Excel-Import und bestehende Tools.",
-      "ogDescription": "Wechsle einfach zu Clubero. Wir migrieren deinen Verein für dich."
+      "title": "Einrichtung deines Clubs — Clubero",
+      "description": "Wir helfen dir, deinen Club, deine Teams und deine Daten in wenigen Tagen zu Clubero zu migrieren. Persönliche Begleitung, Excel-Import und bestehende Tools.",
+      "ogDescription": "Wechsle einfach zu Clubero. Wir migrieren deinen Club für dich."
     },
     "tournamentsPage": {
       "title": "Turniere — Live-Ergebnisse, öffentliche Tabellen, TV-Modus | Clubero",
@@ -2291,7 +2300,7 @@
     },
     "adminVenues": {
       "title": "Veranstaltungsorte – Clubero",
-      "description": "Konfigurieren Sie Ihre Clubstandorte und -felder."
+      "description": "Konfiguriere die Standorte und Plätze deines Clubs."
     },
     "parentGuide": {
       "title": "Eltern-Guide — mit Clubero starten",
@@ -2300,11 +2309,11 @@
     },
     "adminNotifications": {
       "title": "Notifications — Clubero",
-      "description": "Wähle die Push-Benachrichtigungen aus, die an Mitglieder Ihres Clubs gesendet werden."
+      "description": "Wähle die Push-Benachrichtigungen aus, die an Mitglieder deines Clubs gesendet werden."
     },
     "adminSponsors": {
       "title": "Sponsors – Clubero",
-      "description": "Verwalten Sie die in der App Ihres Clubs angezeigten Partner."
+      "description": "Verwalte die Partner, die in der App deines Clubs angezeigt werden."
     }
   },
   "trial": {
@@ -2321,14 +2330,14 @@
   },
   "errors": {
     "generic": "Ein Fehler ist aufgetreten.",
-    "clubCreateFailed": "Verein konnte nicht erstellt werden.",
-    "membershipsUnavailable": "Ihre Vereine konnten nicht geladen werden. Prüfen Sie Ihre Verbindung und versuchen Sie es erneut.",
-    "notAllowed": "Sie haben keine Berechtigung, diese Aktion auszuführen.",
+    "clubCreateFailed": "Club konnte nicht erstellt werden.",
+    "membershipsUnavailable": "Deine Clubs konnten nicht geladen werden. Prüfe deine Verbindung und versuche es erneut.",
+    "notAllowed": "Du hast keine Berechtigung, diese Aktion auszuführen.",
     "invalidCredentials": "Falsche E-Mail-Adresse oder falsches Passwort.",
     "emailNotConfirmed": "Bestätige deine E-Mail, bevor du dich anmeldest.",
     "emailAlreadyUsed": "Diese E-Mail-Adresse wird bereits verwendet.",
     "passwordTooShort": "Das Passwort ist zu kurz.",
-    "rateLimited": "Zu viele Versuche, versuchen Sie es gleich noch einmal.",
+    "rateLimited": "Zu viele Versuche, versuche es gleich noch einmal.",
     "duplicate": "Dieser Artikel existiert bereits.",
     "foreignKey": "Auf diese Daten wird noch an anderer Stelle verwiesen.",
     "missingField": "Ein erforderliches Feld fehlt.",
@@ -2336,7 +2345,7 @@
     "inviteExpired": "Diese Einladung ist abgelaufen.",
     "inviteUsed": "Diese Einladung wurde bereits verwendet.",
     "inviteInvalid": "Ungültige Einladung.",
-    "network": "Es kann keine Verbindung hergestellt werden. Überprüfen Sie Ihr Netzwerk und versuchen Sie es erneut.",
+    "network": "Es kann keine Verbindung hergestellt werden. Prüfe dein Netzwerk und versuche es erneut.",
     "timeout": "Die Operation dauerte zu lange.",
     "notFound": "Artikel nicht gefunden.",
     "fileTooLarge": "Die Datei ist zu groß.",
@@ -2346,7 +2355,7 @@
     "slugTaken": "Diese Schnecke ist bereits vergeben.",
     "slugLocked": "Der Slug kann sich nach der Veröffentlichung nicht mehr ändern.",
     "notDraft": "Das Lager ist kein Entwurf mehr.",
-    "deleteNotDraft": "Nur ein Entwurf kann gelöscht werden. Archivieren Sie es stattdessen.",
+    "deleteNotDraft": "Nur ein Entwurf kann gelöscht werden. Archiviere ihn stattdessen.",
     "publishTitleRequired": "Titel zur Veröffentlichung erforderlich.",
     "publishDatesRequired": "Start- und Enddatum erforderlich.",
     "publishDatesOrder": "Das Enddatum muss nach dem Startdatum liegen.",
@@ -2373,7 +2382,7 @@
   },
   "carpool": {
     "tab": "Mitfahrgelegenheit",
-    "disclaimer": "Clubero vermittelt nur den Kontakt zwischen Eltern und Vereinsmitgliedern. Die Verantwortung für den Transport der Kinder liegt ausschließlich bei den teilnehmenden Erwachsenen.",
+    "disclaimer": "Clubero vermittelt nur den Kontakt zwischen Eltern und Clubmitgliedern. Die Verantwortung für den Transport der Kinder liegt ausschließlich bei den teilnehmenden Erwachsenen.",
     "coverage": "{{n}} / {{total}} Spieler haben bestätigten Transport",
     "noTransport": "Ohne Transport",
     "offerSeats": "Plätze anbieten",
@@ -2452,7 +2461,7 @@
       },
       "visibility": {
         "private": "Privat",
-        "club": "Verein",
+        "club": "Club",
         "public": "Öffentlich"
       },
       "fields": {
@@ -2486,7 +2495,7 @@
         "type": "Type"
       },
       "event": {
-        "joined_club": "Ist dem Verein beigetreten",
+        "joined_club": "Ist dem Club beigetreten",
         "joined_team": "Ist dem Team beigetreten",
         "first_match": "Erstes offizielles Spiel",
         "first_goal": "Erstes Tor",
@@ -2511,14 +2520,14 @@
   },
   "following": {
     "title": "Meine Abos",
-    "menuSubtitle": "Spieler, Trainer und Vereine, denen du folgst",
-    "summary": "Du folgst {{p}} Spieler, {{c}} Trainer, {{cl}} Verein(en)",
+    "menuSubtitle": "Spieler, Trainer und Clubs, denen du folgst",
+    "summary": "Du folgst {{p}} Spieler, {{c}} Trainer, {{cl}} Club(en)",
     "players": "Spieler",
     "coaches": "Trainer",
-    "clubs": "Vereine",
+    "clubs": "Clubs",
     "emptyPlayers": "Du folgst noch keinem Spieler.",
     "emptyCoaches": "Du folgst noch keinem Trainer.",
-    "emptyClubs": "Du folgst noch keinem Verein.",
+    "emptyClubs": "Du folgst noch keinem Club.",
     "discoverPlayers": "Spieler entdecken"
   },
   "widget": {
@@ -2536,15 +2545,15 @@
   },
   "notifications": {
     "coachAssigned": {
-      "title": "Sie wurden einem Team hinzugefügt",
-      "body": "Sie sind jetzt Trainer von {{teamName}} bei {{clubName}}."
+      "title": "Du wurdest einem Team hinzugefügt",
+      "body": "Du bist jetzt Trainer von {{teamName}} bei {{clubName}}."
     }
   },
   "fundraising": {
     "title": "Beitragseinzüge",
     "titleSingular": "Beitragseinzug",
     "metaSuffix": "Einzüge",
-    "subtitle": "Mitgliedsbeiträge, Lizenzen, Ausrüstung, Reisen… zugewiesen an den gesamten Verein, bestimmte Mannschaften oder Spieler. Beim Öffnen des Einzugs wird automatisch eine E-Mail an die betroffenen Mitglieder gesendet.",
+    "subtitle": "Mitgliedsbeiträge, Lizenzen, Ausrüstung, Reisen… zugewiesen an den gesamten Club, bestimmte Mannschaften oder Spieler. Beim Öffnen des Einzugs wird automatisch eine E-Mail an die betroffenen Mitglieder gesendet.",
     "newButton": "Neuer Einzug",
     "createTitle": "Beitragseinzug erstellen",
     "created": "Einzug erstellt — die betroffenen Mitglieder erhalten eine E-Mail",
@@ -2553,7 +2562,7 @@
     "remindersSent": "Erinnerungen gesendet ({{count}})",
     "empty": "Kein Beitragseinzug für diese Saison.",
     "noSeason": "Keine Saison konfiguriert",
-    "noSeasonHint": "Erstellen Sie eine Saison, bevor Sie einen Beitragseinzug hinzufügen.",
+    "noSeasonHint": "Erstelle eine Saison, bevor du einen Beitragseinzug hinzufügst.",
     "configureSeasons": "Saisons konfigurieren",
     "notFound": "Beitragseinzug nicht gefunden",
     "dashboardTitle": "Finanz-Dashboard",
@@ -2621,16 +2630,16 @@
     }
   },
   "tournamentToClub": {
-    "title": "Verwalten Sie Ihren Verein das ganze Jahr",
-    "subtitle": "Aufstellungen, Anwesenheit, Fahrgemeinschaften, Disziplin — alles was Sie für Ihre Mannschaften brauchen, nicht nur an Turniertagen.",
+    "title": "Verwalte deinen Club das ganze Jahr",
+    "subtitle": "Aufstellungen, Anwesenheit, Fahrgemeinschaften, Disziplin — alles, was du für deine Teams brauchst, nicht nur an Turniertagen.",
     "ctaPrimary": "30 Tage kostenlos testen",
     "ctaSecondary": "Mehr erfahren",
     "dismiss": "Schließen"
   },
   "pricing": {
     "tournamentHero": {
-      "title": "Sie haben ein großartiges Turnier organisiert.",
-      "subtitle": "Machen Sie den nächsten Schritt: Verwalten Sie Ihren Verein das ganze Jahr mit Clubero."
+      "title": "Du hast ein großartiges Turnier organisiert.",
+      "subtitle": "Mach den nächsten Schritt: Verwalte deinen Club das ganze Jahr mit Clubero."
     },
     "clubBenefits": [
       "Aufstellungen und Anwesenheit mit einem Klick",
@@ -2640,14 +2649,14 @@
     ],
     "successTitle": "Zahlung bestätigt",
     "metaTitle": "Turnierabrechnung – Clubero",
-    "metaDesc": "Wähle Ihren Plan zur Organisation eines Turniers mit Clubero – 39 € pro Veranstaltung oder 149 €/Jahr unbegrenzt."
+    "metaDesc": "Wähle deinen Plan zur Organisation eines Turniers mit Clubero – 39 € pro Veranstaltung oder 149 €/Jahr unbegrenzt."
   },
   "eventCreateChooser": {
     "title": "Neue Veranstaltung",
-    "subtitle": "Wie möchten Sie diese Veranstaltung gestalten?",
+    "subtitle": "Wie möchtest du diesen Termin anlegen?",
     "assistant": "Mit Assistent erstellen",
     "assistantHint": "Angeleitet, Frage für Frage",
-    "repeatTraining": "Wiederholen Sie das letzte Training",
+    "repeatTraining": "Letztes Training wiederholen",
     "repeatMatch": "Letztes Spiel wiederholen",
     "classic": "Klassische Form",
     "classicHint": "Das vollständige Formular auf einmal"
@@ -2692,7 +2701,7 @@
       "halves": "Format der Spielzeit.",
       "meetingtime": "Wann sollen die Spieler eintreffen?",
       "places": "Treffpunkt und Spielort.",
-      "name": "Geben Sie diesem Ereignis einen Namen.",
+      "name": "Gib diesem Termin einen Namen.",
       "audience": "Wen soll ich zu diesem Treffen einladen? (optional)"
     },
     "q": {
@@ -2708,7 +2717,7 @@
       "location": "Wo?",
       "convocation": "Spieler einladen?",
       "carpool": "Fahrgemeinschaft aktivieren?",
-      "comment": "Möchten Sie eine Nachricht hinzufügen?",
+      "comment": "Möchtest du eine Nachricht hinzufügen?",
       "gameformat": "Spielformat?",
       "halves": "Spielformat?",
       "meetingtime": "Treffzeit?",
@@ -2740,7 +2749,7 @@
     },
     "meeting": {
       "stadium": "Übliches Stadion",
-      "parking": "Vereinsparkplatz",
+      "parking": "Clubparkplatz",
       "custom": "Eigene Adresse",
       "address": "Adresse",
       "addressPlaceholder": "Adresse des Treffpunkts",
@@ -2811,9 +2820,9 @@
     },
     "backToAssistant": "Zurück zum Assistenten",
     "confirmCloseTitle": "Ohne zu sparen weggehen?",
-    "expertAbandonConfirm": "Ihre Änderungen gehen verloren.",
+    "expertAbandonConfirm": "Deine Änderungen gehen verloren.",
     "meetingInternal": {
-      "label": "Internes Vereinstreffen (kein Team)",
+      "label": "Internes Clubtreffen (kein Team)",
       "subtitle": "Vorstand, Ausschuss, Pädagogen … sichtbar für Administratoren und Eingeladene"
     },
     "namePlaceholder": "Z.B. Wintercamp, Freizeitturnier…",
@@ -2823,9 +2832,9 @@
       "pickBoth": "Wähle Start und Ende",
       "startTime": "Startzeit",
       "endTime": "Endzeit",
-      "defaultsHint": "Standard 10:00 → 16:00. Passen Sie sich Ihrem Lager an.",
+      "defaultsHint": "Standard 10:00 → 16:00. Pass die Zeiten an dein Camp an.",
       "sameHoursTitle": "Jeden Tag die gleichen Stunden",
-      "sameHoursHint": "Deaktivieren Sie die tagesaktuelle Anpassung"
+      "sameHoursHint": "Tagesgenaue Anpassung deaktivieren"
     },
     "awayAddressPlaceholder": "Adresse (Google-Autovervollständigung)",
     "meetingPreview": {
@@ -2845,7 +2854,7 @@
     "typeSubtitle": {
       "training": "Regelmäßiges Training",
       "match": "Offizielles oder Freundschaftsspiel",
-      "meeting": "Vereins- oder Teamtreffen",
+      "meeting": "Club- oder Teamtreffen",
       "other": "Camp, Turnier, Veranstaltung…"
     },
     "halvesPlaceholder": "3x30",
@@ -2872,7 +2881,7 @@
       "showMore_one": "+ {{count}} weiterer Artikel",
       "showMore_other": "+ {{count}} weitere Artikel",
       "title": "Insights",
-      "hint": "Wischen Sie, um fortzufahren"
+      "hint": "Wische, um fortzufahren"
     },
     "cta": {
       "respond": "Antworten",
@@ -2948,7 +2957,7 @@
       "logoSizeDefault": "Standard",
       "logoSizeLarge": "Groß",
       "logoSizePercent": "{{percent}} %",
-      "logoSizeHint": "Passen Sie die Größe so an, wie sie den Mitgliedern angezeigt wird.",
+      "logoSizeHint": "Passe die Größe so an, wie sie den Mitgliedern angezeigt wird.",
       "noUrl": "Kein Link",
       "targetUrlOptional": "Website-URL (optional)"
     }
@@ -2960,7 +2969,7 @@
     "editSite": "Standort bearbeiten",
     "addField": "Feld hinzufügen",
     "editField": "Platz bearbeiten",
-    "emptyState": "Keine Site konfiguriert. Fügen Sie eine hinzu, um Ihre Ereignisse vorab auszufüllen.",
+    "emptyState": "Kein Standort konfiguriert. Füge einen hinzu, um deine Termine vorauszufüllen.",
     "facilitiesTitle": "Felder/Anlagen",
     "noFacilities": "Kein Feld für diese Site.",
     "defaultBadge": "Standard",
@@ -2993,10 +3002,10 @@
     "maskedBadge": "Für Spieler und Eltern ausgeblendet",
     "visible": "Liste sichtbar",
     "settingLabel": "Sichtbarkeit der Aufgebotsliste",
-    "settingHelp": "Legt fest, wer die Aufgebotsliste sieht. Wird live berechnet: Events, die erben, folgen jeder späteren Änderung der Team- oder Vereinseinstellung.",
+    "settingHelp": "Legt fest, wer die Aufgebotsliste sieht. Wird live berechnet: Events, die erben, folgen jeder späteren Änderung der Team- oder Clubeinstellung.",
     "definedHere": "Hier festgelegt",
     "inheritedFromTeam": "Vom Team geerbt",
-    "inheritedFromClub": "Vom Verein geerbt",
+    "inheritedFromClub": "Vom Club geerbt",
     "inherit": "Erben",
     "optionVisible": "Für alle sichtbar",
     "optionMasked": "Verborgen (nur Staff)",
@@ -3004,7 +3013,7 @@
   },
   "groups": {
     "title": "Clubgruppen",
-    "subtitle": "Erstellen Sie benutzerdefinierte Gruppen (Vorstand, Freiwillige …), um Ihre Kommunikation gezielter zu gestalten.",
+    "subtitle": "Erstelle eigene Gruppen (Vorstand, Freiwillige …), um deine Kommunikation gezielter zu gestalten.",
     "empty": "Noch keine Gruppen.",
     "create": "Gruppe erstellen",
     "edit": "Bearbeiten",
@@ -3066,7 +3075,7 @@
       "delete": "Löschen"
     },
     "bulk": {
-      "club_members": "Alle Vereinsmitglieder",
+      "club_members": "Alle Clubmitglieder",
       "club_staff": "Gesamtes Team",
       "club_admins": "Administratoren",
       "club_educators": "Alle Trainer",
@@ -3082,14 +3091,14 @@
   },
   "install": {
     "meta": {
-      "title": "Clubero auf Ihrem Telefon installieren",
+      "title": "Clubero auf deinem Handy installieren",
       "description": "Installiere Clubero mit einem Tipp auf iPhone oder Android und erhalte Einberufungen, Erinnerungen und Echtzeit-Benachrichtigungen.",
-      "ogTitle": "Clubero auf Ihrem Telefon installieren",
-      "ogDescription": "Einberufungen, Anwesenheit und Erinnerungen in Echtzeit — installieren Sie Clubero auf deinem Startbildschirm."
+      "ogTitle": "Clubero auf deinem Handy installieren",
+      "ogDescription": "Aufgebote, Anwesenheit und Erinnerungen in Echtzeit — installiere Clubero auf deinem Startbildschirm."
     },
     "back": "Zurück",
     "title": "Clubero installieren",
-    "subtitle": "Die App wird mit 1 Tipp aus Ihrem Browser installiert — kein App Store oder Google Play nötig.",
+    "subtitle": "Die App wird mit 1 Tipp aus deinem Browser installiert — kein App Store und kein Google Play nötig.",
     "cta": "Auf meinem Telefon installieren",
     "notifTitle": "Echtzeit-Benachrichtigungen",
     "notifDesc": "Einberufungen, Erinnerungen und Trainer-Nachrichten, sobald sie gesendet werden.",
@@ -3100,31 +3109,31 @@
     "platformCompareTitle": "iPhone oder Android: Was ist der Unterschied?",
     "platformCompareSubtitle": "Das Ergebnis ist gleich (ein Symbol auf dem Startbildschirm), aber der Weg unterscheidet sich.",
     "platformAppleTitle": "iPhone / iPad",
-    "platformAppleDesc": "Safari bietet keine direkte Schaltfläche. Nutzen Sie das Teilen-Menü, dann Zum Home-Bildschirm.",
+    "platformAppleDesc": "Safari bietet keine direkte Schaltfläche. Nutze das Teilen-Menü, dann Zum Home-Bildschirm.",
     "platformAndroidTitle": "Android",
-    "platformAndroidDesc": "Chrome zeigt oft direkt eine Hinzufügen-Schaltfläche. Falls nicht, tippen Sie auf das ⋮-Menü oben rechts.",
+    "platformAndroidDesc": "Chrome zeigt oft direkt eine Hinzufügen-Schaltfläche. Falls nicht, tippe auf das ⋮-Menü oben rechts.",
     "platformCompareNote": "Egal welches Telefon: Sobald installiert, funktioniert Clubero wie eine normale App.",
     "alreadyInstalledTitle": "Bereits installiert?",
-    "alreadyInstalledDesc": "Öffnen Sie Clubero über das Symbol auf deinem Startbildschirm, um Benachrichtigungen zu aktivieren.",
+    "alreadyInstalledDesc": "Öffne Clubero über das Symbol auf deinem Startbildschirm, um Benachrichtigungen zu aktivieren.",
     "iosStepsTitle": "Auf iPhone / iPad (Safari)",
     "iosStepsSubtitle": "4 Schritte, um Clubero zum Home-Bildschirm hinzuzufügen",
-    "iosStep1Before": "Tippen Sie auf die",
+    "iosStep1Before": "Tippe auf die",
     "iosStep1Icon": "drei Punkte",
     "iosStep1After": "unten in Safari",
-    "iosStep2Before": "Wählen Sie",
+    "iosStep2Before": "Wähle",
     "iosStep2Icon": "Teilen",
-    "iosStep3Before": "Tippen Sie auf den Pfeil",
+    "iosStep3Before": "Tippe auf den Pfeil",
     "iosStep3Icon": "Mehr anzeigen",
     "iosStep3After": "um die Liste zu erweitern",
-    "iosStep4Before": "Wählen Sie",
+    "iosStep4Before": "Wähle",
     "iosStep4Icon": "Zum Home-Bildschirm",
-    "iosStep4After": "und tippen Sie auf „Hinzufügen“",
+    "iosStep4After": "und tippe auf „Hinzufügen“",
     "androidStepsTitle": "Auf Android (Chrome)",
     "androidStepsSubtitle": "3 Schritte zur Installation von Clubero",
-    "androidStep1": "Öffnen Sie das Menü ⋮ oben rechts in Chrome.",
+    "androidStep1": "Öffne das Menü ⋮ oben rechts in Chrome.",
     "androidStep2": "Wähle „App installieren“ (oder „Zum Startbildschirm hinzufügen“).",
     "androidStep3": "Bestätige: Das Clubero-Symbol erscheint auf deinem Startbildschirm.",
-    "ctaHint": "Auf Android startet dieser Button die Installation direkt. Auf dem iPhone folgen Sie den Safari-Schritten unten.",
+    "ctaHint": "Auf Android startet dieser Button die Installation direkt. Auf dem iPhone folge den Safari-Schritten unten.",
     "bannerTitle": "Clubero installieren",
     "bannerDescIos": "App installieren, um Benachrichtigungen zu aktivieren",
     "bannerDescAndroid": "Erhalte Einberufungen in Echtzeit",
@@ -3135,10 +3144,10 @@
     "gotIt": "Verstanden",
     "buttonLabel": "App installieren",
     "iosGuideTitleFull": "Auf iPhone / iPad installieren",
-    "iosGuideShareBefore": "Tippen Sie auf",
+    "iosGuideShareBefore": "Tippe auf",
     "iosGuideShareAfter": "unten in Safari",
-    "iosGuideAddConfirm": "Tippen Sie auf „Hinzufügen“",
-    "androidGuideBefore": "Öffnen Sie das Menü Ihres Browsers (⋮ oben rechts) und wählen Sie",
+    "iosGuideAddConfirm": "Tippe auf „Hinzufügen“",
+    "androidGuideBefore": "Öffne das Menü deines Browsers (⋮ oben rechts) und wähle",
     "androidGuideInstall": "App installieren",
     "androidGuideOr": "oder",
     "androidGuideAddHome": "Zum Startbildschirm hinzufügen"
@@ -3187,29 +3196,29 @@
   "voice": {
     "permissionDenied": "Mikrofon abgelehnt",
     "error": "Fehler beim Sprachdiktieren",
-    "stop": "Stoppen Sie das Diktat",
+    "stop": "Diktat stoppen",
     "start": "Diktieren"
   },
   "staffAssignment": {
     "title": "Personalbesetzung",
     "readOnlyHint": "Für diese Veranstaltung zuständiges Personal.",
     "assigned": "Trainer zugewiesen",
-    "notAssignableStaff": "Zuweisung abgelehnt: Diese Person hat keine Stabsrolle (Trainer, Assistent, Administrator oder Leiter) im Verein.",
+    "notAssignableStaff": "Zuweisung abgelehnt: Diese Person hat keine Stabsrolle (Trainer, Assistent, Administrator oder Leiter) im Club.",
     "removed": "Trainer entfernt",
     "reinforcement": "Verstärkung",
     "remove": "Entfernen",
-    "hint": "Beauftragen Sie für diese Veranstaltung Teampersonal oder eine Vereinsverstärkung.",
+    "hint": "Weise für diesen Termin Teampersonal oder eine Clubverstärkung zu.",
     "noneAssigned": "Für diese Veranstaltung ist kein Trainer zugewiesen.",
-    "noCoachInClub": "Kein Trainer in diesem Verein",
+    "noCoachInClub": "Kein Trainer in diesem Club",
     "allAssigned": "Alle Trainer sind zugeteilt",
-    "addCoach": "Weisen Sie einen Trainer zu",
+    "addCoach": "Trainer zuweisen",
     "searchPlaceholder": "Suche einen Trainer…",
     "noResults": "Kein Trainer gefunden.",
     "conflict": {
       "title": "Verfügbarkeitskonflikt",
       "body": "Dieser Trainer hat einen Konflikt auf diesem Slot. Weitermachen?"
     },
-    "assignNow": "Weisen Sie einen Trainer zu",
+    "assignNow": "Trainer zuweisen",
     "absentOn": "Abwesend am {{d}}",
     "absentRange": "Abwesend vom {{s}} bis {{e}}"
   },
@@ -3230,13 +3239,13 @@
     "teamTitle": "Staff-Verfügbarkeiten",
     "masked": "Nicht verfügbar",
     "errors": {
-      "noClub": "Kein aktiver Verein — Speichern nicht möglich."
+      "noClub": "Kein aktiver Club — Speichern nicht möglich."
     },
     "updated": "Unverfügbarkeit aktualisiert",
     "saved": "Unverfügbarkeit gespeichert",
     "edit": "Unverfügbarkeit bearbeiten",
     "declare": "Unverfügbarkeit melden",
-    "drawerHint": "Gilt für alle deine Teams im aktiven Verein. Das Staff wird benachrichtigt.",
+    "drawerHint": "Gilt für alle deine Teams im aktiven Club. Das Staff wird benachrichtigt.",
     "certainty": {
       "confirmed": "Bestätigt",
       "tentative": "Möglich"
@@ -3246,14 +3255,14 @@
     "title": "Meine Unverfügbarkeiten",
     "menuSubtitle": "Melde deine Abwesenheiten für alle deine Teams",
     "pageTitle": "Meine Unverfügbarkeiten — Clubero",
-    "pageDescription": "Melde deine Unverfügbarkeitszeiträume für alle deine Teams im aktiven Verein.",
+    "pageDescription": "Melde deine Unverfügbarkeitszeiträume für alle deine Teams im aktiven Club.",
     "cancelConfirm": "Diese Unverfügbarkeit löschen?",
     "cancelled": "Unverfügbarkeit gelöscht",
     "subtitle": "Zeiträume, in denen du deine Teams nicht betreuen kannst.",
     "declareCta": "Unverfügbarkeit melden",
     "empty": "Keine bevorstehende Unverfügbarkeit gemeldet.",
     "certaintyLabel": "Sicherheit",
-    "visibilityStaff": "Vereinsteam",
+    "visibilityStaff": "Clubteam",
     "visibilityAdminsOnly": "Nur Admins"
   },
   "registrations": {
@@ -3263,7 +3272,7 @@
       "birthDate": "Geburtsdatum",
       "age": "Alter",
       "gender": "Geschlecht",
-      "clubName": "Aktueller Verein",
+      "clubName": "Aktueller Club",
       "guardianFirstName": "Wächter – Vorname",
       "guardianLastName": "Vormund – Nachname",
       "email": "E-Mail",
@@ -3285,18 +3294,18 @@
       "docReset": "Entscheidung zurückgesetzt",
       "paymentUpdated": "Zahlung aktualisiert",
       "title": "Anmeldedetails",
-      "subtitle": "Überprüfen Sie die Informationen, überprüfen Sie Dokumente und ändern Sie den Status.",
+      "subtitle": "Prüfe die Angaben und Dokumente und ändere den Status.",
       "notes": "Familiennotizen",
       "rejectTitle": "Diese Registrierung ablehnen?",
-      "rejectHelp": "Der Grund wird der Familie in der Ablehnungs-E-Mail mitgeteilt. Seien Sie klar und freundlich.",
+      "rejectHelp": "Der Grund wird der Familie in der Ablehnungs-E-Mail mitgeteilt. Sei klar und freundlich.",
       "rejectPlaceholder": "Z.B. Das Camps ist für diese Altersgruppe voll.",
       "confirmReject": "Ablehnen",
       "capacityFullTitle": "Lager voll",
-      "capacityFullHelp": "Die Lagerkapazität ist erreicht. Möchten Sie diese Familie auf die Warteliste setzen?",
+      "capacityFullHelp": "Die Camp-Kapazität ist erreicht. Möchtest du diese Familie auf die Warteliste setzen?",
       "placeOnWaitlist": "Auf die Warteliste setzen",
       "docRejectTitle": "Dieses Dokument ablehnen?",
       "docRejectHelp": "Die Familie erhält den Grund und kann eine neue Version von ihrer Tracking-Seite hochladen.",
-      "docRejectPlaceholder": "Z.B. Dokument nicht lesbar, bitte senden Sie einen sauberen Scan.",
+      "docRejectPlaceholder": "Z. B. Dokument nicht lesbar, bitte sende einen sauberen Scan.",
       "confirmDocReject": "Dokument ablehnen",
       "currentReason": "Ablehnungsgrund",
       "trackingLink": "Familienanbindung",
@@ -3305,7 +3314,7 @@
       "lastName": "Nachname",
       "birthDate": "Geburtsdatum",
       "gender": "Geschlecht",
-      "clubName": "Heimatverein",
+      "clubName": "Heimatclub",
       "guardian": "Erziehungsberechtigter",
       "email": "E-Mail",
       "phone": "Telefon",
@@ -3330,7 +3339,7 @@
       "markPaid": "Als bezahlt markieren",
       "markUnpaid": "Als unbezahlt markieren",
       "markRefunded": "Als erstattet markieren",
-      "markPartialTitle": "Erfassen Sie eine Teilzahlung",
+      "markPartialTitle": "Teilzahlung erfassen",
       "markPartial": "Als teilweise markieren",
       "capacityLine": "Kapazität: {{approved}}/{{capacity}} bestätigt · {{remaining}} Plätze frei",
       "createdAt": "Eingegangen am {{date}}",
@@ -3382,8 +3391,8 @@
     },
     "invite": {
       "success": "Einladung per E-Mail verschickt",
-      "button": "Laden Sie ein Team ein",
-      "title": "Laden Sie ein Team zum Bezahlen ein",
+      "button": "Team einladen",
+      "title": "Ein Team zum Bezahlen einladen",
       "description": "Das Team erhält eine personalisierte E-Mail mit seinem sicheren Zahlungslink.",
       "teamName": "Teamname",
       "contactName": "Kontaktname",
@@ -3393,19 +3402,19 @@
     },
     "stripeNotConnected": {
       "title": "Zahlungskonto nicht verbunden",
-      "description": "Für dieses Turnier ist eine Online-Zahlung erforderlich, aber Ihr Club hat kein Stripe-Konto verknüpft. Teams können erst bezahlen, wenn das Konto eingerichtet ist.",
-      "cta": "Verbinden Sie ein Stripe-Konto"
+      "description": "Für dieses Turnier ist eine Online-Zahlung erforderlich, aber dein Club hat kein Stripe-Konto verknüpft. Teams können erst bezahlen, wenn das Konto eingerichtet ist.",
+      "cta": "Stripe-Konto verbinden"
     },
     "loadError": "Fehler beim Laden der Registrierungen",
     "disabledBanner": {
       "title": "Online-Registrierungen sind deaktiviert",
-      "body": "Auf der öffentlichen Seite erscheint keine Schaltfläche „Registrieren“. Aktivieren Sie Registrierungen, um Bewerbungen zu erhalten."
+      "body": "Auf der öffentlichen Seite erscheint keine Schaltfläche „Anmelden“. Aktiviere Anmeldungen, um Bewerbungen zu erhalten."
     },
     "draftHint": "Anmeldungen erscheinen hier nach Veröffentlichung des Camps.",
     "docsSummary": "{{ok}}/{{total}} Unterlagen"
   },
   "features": {
-    "learnMore": "Erfahren Sie mehr",
+    "learnMore": "Mehr erfahren",
     "modulesCount": "Merkmale",
     "includedV1": "Ab V1 enthalten"
   },
@@ -3417,11 +3426,11 @@
       }
     },
     "hero": {
-      "kicker": "Von und für Amateurvereine gemacht",
-      "headline1": "Wir haben verstanden, was Sie brauchten",
+      "kicker": "Von und für Amateurclubs gemacht",
+      "headline1": "Wir haben verstanden, was du brauchst",
       "headline2": "um Zeit zu sparen",
       "headline3": "und mich wieder auf den Sport konzentrieren.",
-      "sub": "Wir haben alles digitalisiert, was Ihre Abende verschlingt: Anrufe, Zahlungen, Turniere, Kommunikation. Sie coachen, wir kümmern uns um den Rest.",
+      "sub": "Wir haben alles digitalisiert, was deine Abende verschlingt: Aufgebote, Zahlungen, Turniere, Kommunikation. Du coachst, wir kümmern uns um den Rest.",
       "cta": "Kostenlos testen",
       "ctaSecondary": "Siehe Funktionen",
       "trust1": "Kostenlose Testversion",
@@ -3436,24 +3445,24 @@
       "f3Title": "Zentralisierte Kommunikation",
       "f3Body": "Clubwand, Event-Chat, mehrsprachige E-Mails. Keine überfüllten WhatsApp-Gruppen mehr.",
       "f4Title": "Statistiken und Spielerverfolgung",
-      "f4Body": "Anwesenheit, Trainer-Feedback, Fortschritt. Ein echter Karriereweg für Ihre Spieler.",
+      "f4Body": "Anwesenheit, Trainer-Feedback, Fortschritt. Ein echter Karriereweg für deine Spieler.",
       "f5Title": "Disziplin und Sperren",
       "f5Body": "Karten, Sperren und Verletzungen werden automatisch nach Team und Saison erfasst.",
       "f6Title": "Aufstellungen und Spielblätter",
-      "f6Body": "Bereiten Sie die Aufstellung vor, teilen Sie sie und exportieren Sie das Blatt. Der Trainer hat alles auf seinem Handy.",
-      "kicker": "Wir haben es für Sie digitalisiert",
-      "title": "Alles, wofür Sie Stunden gebraucht haben, jetzt mit nur wenigen Klicks.",
+      "f6Body": "Bereite die Aufstellung vor, teile sie und exportiere den Spielbericht. Der Trainer hat alles auf seinem Handy.",
+      "kicker": "Wir haben es für dich digitalisiert",
+      "title": "Alles, wofür du Stunden gebraucht hast, jetzt mit wenigen Klicks.",
       "sub": "Jede Funktion löst ein echtes Freiwilligenproblem: weniger Tabellenkalkulationen, weniger Nachrichten, mehr Zeit vor Ort."
     },
     "ai": {
       "b1": "Fasst deine Spiele zusammen und schlägt die nächste Aufstellung vor",
-      "b2": "Entwerfen Sie Ihre Kommunikation mit einem Klick in 7 Sprachen",
+      "b2": "Verfasst deine Kommunikation mit einem Klick, in 7 Sprachen",
       "b3": "Erkennt automatisch Fortschritte und Spielerwarnungen",
-      "b4": "Integrierter Assistent: Stellen Sie ihm eine Frage zu Ihrem Club",
+      "b4": "Integrierter Assistent: stell ihm eine Frage zu deinem Club",
       "kicker": "Eingebaute künstliche Intelligenz",
-      "title": "KI unterstützt Sie jeden Tag.",
+      "title": "Die KI unterstützt dich jeden Tag.",
       "sub": "Keine Spielerei. Echte Unterstützung, die wiederkehrende Aufgaben erledigt – damit sich Freiwillige auf die Spieler konzentrieren können.",
-      "cta": "Entdecken Sie den Assistenten",
+      "cta": "Den Assistenten entdecken",
       "assistantName": "Clubero-Assistent",
       "online": "Online",
       "q1": "Wer hat seinen Mitgliedsbeitrag noch nicht bezahlt?",
@@ -3463,34 +3472,34 @@
     "tourn": {
       "b1": "Online-Anmeldung, integrierte Bezahlung",
       "b2": "Tabellen, Gruppen, Klammern, Live-Ergebnisse",
-      "b3": "Öffentliche TV-Seite für Ihre Zuschauer",
+      "b3": "Öffentliche TV-Seite für deine Zuschauer",
       "b4": "Einberufungen und Spielberichte inklusive",
       "kicker": "Turniermodul – vollständige App",
       "title": "Eine echte Turniermanagement-App in Clubero.",
       "sub": "Kein Gimmick-Modul: ein professionelles Tool, das von Dutzenden Clubs und unabhängigen Organisatoren verwendet wird. Von Freundschaftsturnieren bis hin zu regionalen Wettbewerben.",
-      "cta": "Starten Sie ein Turnier",
+      "cta": "Ein Turnier starten",
       "pricing": "Siehe Preise",
       "included": "Im Club-Abonnement enthalten",
       "includedDesc": "Unbegrenzte Turniere, keine Gebühren pro Veranstaltung",
-      "includedBody": "Wenn Sie ein Clubero-Abonnement haben, organisieren Sie ohne zusätzliche Kosten so viele Turniere, wie Sie möchten.",
+      "includedBody": "Wenn du ein Clubero-Abo hast, organisierst du ohne Aufpreis so viele Turniere, wie du möchtest.",
       "standalone": "Ohne Abonnement – ​​pro Veranstaltung",
-      "standaloneDesc": "Zahlen Sie 40 € pro Turnier, das war's",
-      "standaloneBody": "Ein einmaliges Turnier ohne Verein veranstalten? Nutzen Sie Clubero nach Bedarf, ohne Verpflichtung."
+      "standaloneDesc": "Zahl 40 € pro Turnier, das war’s",
+      "standaloneBody": "Ein einmaliges Turnier ohne Club veranstalten? Nutze Clubero nach Bedarf, ohne Bindung."
     },
     "social": {
       "kicker": "Das soziale Netzwerk für den Amateursport",
       "title": "Über das Management hinaus: Wir haben das Netzwerk für Spieler und Trainer aufgebaut.",
       "sub": "Jeder Spieler hat ein echtes öffentliches Profil – Statistiken, Karriere, Medien. Jeder Trainer hat eine Seite. Jeder kann folgen, entdecken und sich vernetzen.",
       "c1Title": "Öffentliches Spielerprofil",
-      "c1Body": "Statistiken, Karriere, Medien – teilbar, zertifiziert von Ihren Clubs.",
+      "c1Body": "Statistiken, Karriere, Medien – teilbar, von deinen Clubs zertifiziert.",
       "c2Title": "Trainer-Seite",
       "c2Body": "Sichtbarkeit, Nachverfolgung, Rekrutierung. Trainer sind nicht mehr unsichtbar.",
       "c3Title": "Follower & Follower",
-      "c3Body": "Folgen Sie Ihren Lieblingsvereinen, Ihren Kindern, Ihren Freunden. Wie ein echtes Netzwerk.",
+      "c3Body": "Folge deinen Lieblingsclubs, deinen Kindern, deinen Freunden. Wie ein echtes Netzwerk.",
       "cta": "Erstelle mein Spielerprofil"
     },
     "finalCta": {
-      "title": "Holen Sie sich Ihre Zeit für den Sport zurück.",
+      "title": "Hol dir deine Zeit für den Sport zurück.",
       "sub": "Kostenlose Testversion. Keine Kreditkarte. In Europa gehostete Daten.",
       "club": "Erstelle meinen Club",
       "player": "Erstelle mein Spielerprofil"
@@ -3500,12 +3509,12 @@
     "payNotFound": "Link nicht gefunden",
     "securePayment": "Sichere Zahlung über Stripe.",
     "success": {
-      "settling": "Zahlung erhalten – Abschluss Ihrer Registrierung…"
+      "settling": "Zahlung erhalten – deine Anmeldung wird abgeschlossen…"
     },
     "addPlayer": "Hinzufügen"
   },
   "invite": {
-    "noAccountPrompt": "Um diese Einladung anzunehmen, erstellen Sie Ihr Clubero-Konto mit der E-Mail-Adresse der eingeladenen Person oder melden Sie sich an, falls Sie bereits eines haben.",
+    "noAccountPrompt": "Um diese Einladung anzunehmen, erstelle dein Clubero-Konto mit der E-Mail-Adresse der eingeladenen Person – oder melde dich an, falls du schon eines hast.",
     "createAccount": "Mein Konto erstellen"
   },
   "public": {
@@ -3537,7 +3546,7 @@
       "desc": "CSV-Format: Vorname, Nachname, Trikotnummer, Position, ist_Kapitän. Trennzeichen , ; oder Tab akzeptiert.",
       "file": "Wähle eine Datei",
       "template": "Vorlage",
-      "orPaste": "Oder fügen Sie CSV-Inhalte ein:",
+      "orPaste": "Oder füge CSV-Inhalte ein:",
       "append": "Zur Liste hinzufügen",
       "replace": "Dienstplan ersetzen",
       "confirm": "Importieren",
@@ -3549,14 +3558,14 @@
       "title": "Teamlogo",
       "help": "PNG, JPG, WEBP oder SVG · 4 MB max",
       "change": "Ändern",
-      "upload": "Fügen Sie ein Logo hinzu",
+      "upload": "Logo hinzufügen",
       "removed": "Logo entfernt",
       "tooLarge": "Datei zu groß (maximal 4 MB)",
       "uploaded": "Logo gespeichert"
     },
     "pendingTitle": "Antrag wird geprüft",
-    "pendingBody": "Sobald die Organisation Ihre Registrierung genehmigt hat, können Sie über denselben Link Spieler hinzufügen oder bearbeiten.",
-    "empty": "Noch keine Spieler. Klicken Sie auf „CSV hinzufügen oder importieren“.",
+    "pendingBody": "Sobald die Organisation deine Anmeldung genehmigt hat, kannst du über denselben Link Spieler hinzufügen oder bearbeiten.",
+    "empty": "Noch keine Spieler. Klicke auf „CSV hinzufügen oder importieren“.",
     "captain": "Kapitän",
     "setCaptain": "Kapitän eingestellt",
     "save": "Speichern",
@@ -3607,7 +3616,7 @@
       },
       "ageGroups": {
         "title": "Alterskategorien",
-        "hint": "Zur Veröffentlichung erforderlich – wählen Sie mindestens eine Kategorie aus"
+        "hint": "Zur Veröffentlichung erforderlich – wähle mindestens eine Kategorie aus"
       },
       "summary": {
         "title": "Bereit zum Erstellen",
@@ -3616,14 +3625,14 @@
     },
     "deadlineHint": "Optional – muss vor dem Startdatum liegen.",
     "optional": "optional",
-    "venueHint": "Sie können diesen Schritt überspringen und ihn später hinzufügen.",
-    "ageGroupsEmpty": "Für die Veröffentlichung ist mindestens eine Kategorie erforderlich. Sie können später weitere hinzufügen.",
+    "venueHint": "Du kannst diesen Schritt überspringen und ihn später ergänzen.",
+    "ageGroupsEmpty": "Für die Veröffentlichung ist mindestens eine Kategorie erforderlich. Du kannst später weitere hinzufügen.",
     "summary": {
       "deadline": "Frist",
       "places": "Flecken",
       "venueSet": "Veranstaltungsort festgelegt",
       "ageGroups": "Kategorien",
-      "next": "Das Camps wird als Entwurf erstellt. Sie können vor der Veröffentlichung Beschreibung, Bild, Programm und Dokumente hinzufügen."
+      "next": "Das Camp wird als Entwurf erstellt. Du kannst vor der Veröffentlichung Beschreibung, Bild, Programm und Dokumente ergänzen."
     },
     "footerReady": "Alles ist bereit",
     "create": "Lager errichten",
@@ -3634,15 +3643,15 @@
     "newTitle": "Neues Camps",
     "create": "Entwurf erstellen",
     "title": "Clubcamps",
-    "subtitle": "Erstellen und veröffentlichen Sie die von Ihrem Club angebotenen Camps.",
+    "subtitle": "Erstelle und veröffentliche die Camps deines Clubs.",
     "new": "Neues Camps",
     "empty": "Noch keine Camps.",
     "hasVenue": "Veranstaltungsort festgelegt",
     "active_only": "Aktiv",
     "show_all": "Alle anzeigen",
     "no_active": "Für diese Sitzung wurde noch keine Aktivität verwendet.",
-    "show_all_hint": "Zeigt alle Teamaktivitäten an, sodass Sie eine auswählen können.",
-    "empty_hint": "Fügen Sie dieser Sitzung eine Herausforderung oder einen Test hinzu."
+    "show_all_hint": "Zeigt alle Teamaktivitäten an, damit du eine auswählen kannst.",
+    "empty_hint": "Füge dieser Einheit eine Challenge oder einen Test hinzu."
   },
   "form": {
     "title": "Titel",
@@ -3692,7 +3701,7 @@
     "labelPlaceholder": "Label (z. B. Freizeit)",
     "yearMin": "Min. Jahr",
     "yearMax": "Maximales Jahr",
-    "addCustom": "+ Fügen Sie eine benutzerdefinierte Kategorie hinzu",
+    "addCustom": "+ Eigene Kategorie hinzufügen",
     "addTitle": "Neue Kategorie"
   },
   "cover": {
@@ -3700,14 +3709,14 @@
     "uploaded": "Bild aktualisiert",
     "empty": "Kein Titelbild",
     "replace": "Ersetzen",
-    "add": "Fügen Sie ein Bild hinzu",
+    "add": "Bild hinzufügen",
     "unsupported": "Nicht unterstütztes Format (JPG, PNG, WEBP)."
   },
   "documents": {
     "tooLarge": "Datei zu groß (maximal 15 MB)",
     "uploaded": "Dokument hinzugefügt",
     "empty": "Es liegen noch keine Unterlagen vor.",
-    "addTitle": "Fügen Sie ein Dokument hinzu",
+    "addTitle": "Dokument hinzufügen",
     "titlePlaceholder": "Titel anzeigen (optional – standardmäßig Dateiname)",
     "upload": "Hochladen (PDF, JPG, PNG)",
     "maxHint": "max. 15 MB"
@@ -3731,8 +3740,8 @@
     "mandatory": "Pflicht",
     "sensitive": "Sensible Daten",
     "sensitiveForced": "Für medizinische Dokumente erzwungen: Verschlüsselung und begrenzte Aufbewahrung.",
-    "sensitiveHint": "Aktivieren Sie diese Option, wenn das Dokument vertrauliche personenbezogene Daten enthält.",
-    "add": "Fügen Sie ein Dokument hinzu",
+    "sensitiveHint": "Aktiviere diese Option, wenn das Dokument sensible personenbezogene Daten enthält.",
+    "add": "Dokument hinzufügen",
     "mandatoryTag": "Pflicht",
     "optionalTag": "Optional",
     "sensitiveTag": "Sensibel"
@@ -3743,16 +3752,16 @@
   "waitlist": {
     "badge": "Demnächst",
     "title": "Kommende Funktionen",
-    "subtitle": "Hinterlassen Sie Ihre E-Mail-Adresse, um benachrichtigt zu werden, wenn eine Funktion verfügbar wird. Keine Verpflichtung, keine Zahlung.",
-    "success": "Danke! Wir schreiben Ihnen, sobald es fertig ist.",
-    "emailLabel": "Ihre E-Mail",
-    "featuresLabel": "Funktionen, die Sie interessieren",
+    "subtitle": "Hinterlasse deine E-Mail-Adresse, um benachrichtigt zu werden, sobald eine Funktion verfügbar ist. Keine Verpflichtung, keine Zahlung.",
+    "success": "Danke! Wir schreiben dir, sobald es so weit ist.",
+    "emailLabel": "Deine E-Mail",
+    "featuresLabel": "Funktionen, die dich interessieren",
     "roleLabel": "Deine Rolle",
     "rolePlaceholder": "— Auswählen —",
     "consent": "Ich bin damit einverstanden, Clubero-Updates über kommende Funktionen zu erhalten. Abmelden mit einem Klick.",
     "submitting": "Senden…",
-    "submit": "Benachrichtigen Sie mich",
-    "error": "Es ist ein Fehler aufgetreten. Versuchen Sie es gleich noch einmal."
+    "submit": "Benachrichtige mich",
+    "error": "Es ist ein Fehler aufgetreten. Versuche es gleich noch einmal."
   },
   "cockpit": {
     "alerts": {
@@ -3779,10 +3788,10 @@
       "live": "Live",
       "upcoming": "Demnächst"
     },
-    "flightsReady": "Die Gruppenphasen sind beendet. Erstellen Sie Flüge, um die 3 Klammern (Champions/Europa/Konferenz) zu generieren."
+    "flightsReady": "Die Gruppenphase ist beendet. Erstelle die Flights, um die 3 Tableaus (Champions/Europa/Conference) zu generieren."
   },
   "draw": {
-    "relaunchFromFooterHint": "Ziehung abgeschlossen. Verwenden Sie „Neu starten“ unten im Dialog, um ein neues zu erstellen (aktuelle Ergebnisse gehen verloren)."
+    "relaunchFromFooterHint": "Auslosung abgeschlossen. Nutze „Neu starten“ unten im Dialog, um eine neue zu erstellen (aktuelle Ergebnisse gehen verloren)."
   },
   "fields": {
     "streamUrlPlaceholder": "Streaming-URL (YouTube, Twitch…)"
@@ -3790,13 +3799,13 @@
   "flights": {
     "savedToast": "Flüge gespeichert",
     "fallback": {
-      "empty": "Keine Gruppe generiert: Die Struktur qualifiziert nicht genügend Teams pro Flug. Passen Sie die Verteilung an, verwenden Sie eine Fallback-Vorlage (Trost/Medaillen) oder konfigurieren Sie Flüge manuell.",
-      "error": "Generierung für diese Struktur unmöglich. Probieren Sie eine andere Vorlage oder den manuellen Modus aus.",
+      "empty": "Keine Gruppe generiert: Die Struktur qualifiziert nicht genügend Teams pro Flight. Pass die Verteilung an, nutze eine Fallback-Vorlage (Trost/Medaillen) oder konfiguriere die Flights manuell.",
+      "error": "Generierung für diese Struktur nicht möglich. Probier eine andere Vorlage oder den manuellen Modus.",
       "title": "Dieses Format ermöglicht keine automatische Generierung der 3 Flüge",
-      "body": "Die Gruppenstruktur (ungleiche oder zu kleine Größen) teilt sich nicht sauber in Champions / Europa / Conference auf. Wähle eine Trost-/Medaillen-/Cup-Plate-Vorlage oder passen Sie die Flüge manuell an."
+      "body": "Die Gruppenstruktur (ungleiche oder zu kleine Größen) teilt sich nicht sauber in Champions / Europa / Conference auf. Wähle eine Trost-/Medaillen-/Cup-Plate-Vorlage oder pass die Flights manuell an."
     },
     "regenConfirm": "Bei den Finalspielen liegen bereits Ergebnisse vor. Durch die Neugenerierung von Klammern werden alle diese Ergebnisse gelöscht. Weitermachen?",
-    "noGroups": "Erstellen Sie zuerst die Gruppenphase. Anschließend werden Flüge generiert.",
+    "noGroups": "Erstelle zuerst die Gruppenphase. Anschließend werden die Flights generiert.",
     "title": "Flüge / Finale",
     "intro": "Mehrere Trophäen pro Turnier: Champions/Europa, Pokal/Platte, Gold/Silber/Bronze oder individuell.",
     "reconfigure": "Neu konfigurieren",
@@ -3820,13 +3829,13 @@
     },
     "rulesCount": "Regeln",
     "thirdPlace": "3. Platz",
-    "fifthPlaceDisabled": "Aktivieren Sie zuerst den 3. Platz",
+    "fifthPlaceDisabled": "Aktiviere zuerst den 3. Platz",
     "fifthPlace": "5. Platz",
-    "seventhPlaceDisabled": "Aktivieren Sie zuerst den 5. Platz",
+    "seventhPlaceDisabled": "Aktiviere zuerst den 5. Platz",
     "seventhPlace": "7. Platz",
     "public": {
       "empty": "Für dieses Turnier wurde noch kein Flight konfiguriert.",
-      "noMatches": "Spiele für diesen Flug werden nach der Gruppenphase generiert."
+      "noMatches": "Die Spiele werden nach der Gruppenphase generiert."
     },
     "draftRulesSummary": "{{n}} Qualifikationsregel(n) konfiguriert",
     "generatedToast": "{{n}} Spiele erstellt"
@@ -3834,10 +3843,10 @@
   "matches": {
     "allMatches": "Alle Spiele",
     "myMatches": "Meine Streichhölzer",
-    "assignRefereeAction": "Weisen Sie einen Schiedsrichter zu",
+    "assignRefereeAction": "Schiedsrichter zuweisen",
     "refereeOffline": "(kein Konto)",
     "lockedTitle": "Übereinstimmung validiert",
-    "lockedHelper": "Um die Partitur zu bearbeiten, deaktivieren Sie zunächst die Übereinstimmung.",
+    "lockedHelper": "Um das Ergebnis zu bearbeiten, entsperre zuerst das Spiel.",
     "nextMatch": "Nächstes Spiel",
     "unvalidateToEdit": "Zum Bearbeiten aufheben",
     "allMatchesEntered": "Alle Übereinstimmungen wurden eingetragen."
@@ -3858,7 +3867,7 @@
       "customPausePlaceholder": "Andere…",
       "lunchLabel": "Mittagspause",
       "lunch0": "Keine",
-      "lunchAdd": "+ Fügen Sie eine Mittagspause hinzu",
+      "lunchAdd": "+ Mittagspause hinzufügen",
       "lunchStart": "Start",
       "lunchEnd": "Ende",
       "priceCustom": "Oder ein anderer Betrag:",
@@ -3871,7 +3880,7 @@
     }
   },
   "createChooser": {
-    "abandonConfirm": "Den Assistenten verlassen? Ihre Antworten werden gelöscht. Sie können die Seite auch schließen, um sie beim nächsten Mal wiederzufinden."
+    "abandonConfirm": "Den Assistenten verlassen? Deine Antworten werden gelöscht. Du kannst die Seite auch schließen, um sie beim nächsten Mal wiederzufinden."
   },
   "pass": {
     "quantityLabel": "Anzahl der Durchgänge"
@@ -3887,14 +3896,14 @@
     "viewPublic": "Öffentliche Seite anzeigen",
     "logoUpdated": "Logo aktualisiert",
     "changeLogo": "Logo ändern",
-    "addLogo": "Fügen Sie ein Logo hinzu",
+    "addLogo": "Logo hinzufügen",
     "teams": "Mannschaften",
-    "linkCopiedOpenBrowser": "Link kopiert – öffnen Sie ihn in Ihrem Browser (Safari/Chrome).",
+    "linkCopiedOpenBrowser": "Link kopiert – öffne ihn in deinem Browser (Safari/Chrome).",
     "openPublic": "Öffentliche Seite",
     "openTv": "Fernsehbildschirm",
     "autoScheduleCta": {
-      "title": "Planen Sie Spiele automatisch",
-      "subtitle": "Noch kein Gericht oder Zeitplan zugewiesen. Führen Sie die automatische Planung aus."
+      "title": "Spiele automatisch planen",
+      "subtitle": "Noch kein Platz und kein Zeitfenster zugewiesen. Starte die automatische Planung."
     }
   },
   "sections": {
@@ -3935,7 +3944,7 @@
   },
   "duplicate": {
     "done": "Lager dupliziert",
-    "hint": "Erstellen Sie ein Entwurfsexemplar (ohne Registrierungen).",
+    "hint": "Erstellt eine Kopie als Entwurf (ohne Anmeldungen).",
     "action": "Duplikat"
   },
   "delete": {
@@ -3998,9 +4007,9 @@
   },
   "offline": {
     "metaTitle": "Offline — Clubero",
-    "metaDescription": "Sie sind offline.",
-    "title": "Sie sind offline",
-    "description": "Stellen Sie die Internetverbindung wieder her, um Clubero zu nutzen."
+    "metaDescription": "Du bist offline.",
+    "title": "Du bist offline",
+    "description": "Stelle die Internetverbindung wieder her, um Clubero zu nutzen."
   },
   "convertClub": {
     "title": "Du nutzt Clubero im freien Organisator-Modus",
@@ -4069,7 +4078,7 @@
     "collectTitle": "Verfolgung & Einzug — {{title}}",
     "loadError": "Verfolgung konnte nicht geladen werden: {{message}}",
     "unknownError": "unbekannter Fehler",
-    "emptyObligations": "Noch kein Spieler hat eine Verpflichtung für diesen Posten. Prüfen Sie, ob die Zielgruppe (Verein / Teams / Spieler) Spieler enthält.",
+    "emptyObligations": "Noch kein Spieler hat eine Verpflichtung für diesen Posten. Prüfe, ob die Zielgruppe (Club / Teams / Spieler) Spieler enthält.",
     "payer": "Zahler: {{name}}",
     "payerUnlinked": "Kein Zahler verknüpft",
     "remaining": "noch {{amount}} {{currency}}",
@@ -4081,8 +4090,8 @@
     "reopened": "Verpflichtung wieder geöffnet",
     "exemptTitle": "Diese Verpflichtung befreien",
     "cancelTitle": "Diese Verpflichtung stornieren",
-    "exemptDescription": "Der Spieler wird von dieser Zahlung befreit. Geben Sie den Grund an (Stipendium, Familiensituation usw.).",
-    "cancelDescription": "Die Verpflichtung wird storniert und kann nicht mehr bezahlt werden. Geben Sie den Grund an.",
+    "exemptDescription": "Der Spieler wird von dieser Zahlung befreit. Gib den Grund an (Stipendium, familiäre Situation usw.).",
+    "cancelDescription": "Die Verpflichtung wird storniert und kann nicht mehr bezahlt werden. Gib den Grund an.",
     "cancelConfirm": "Verpflichtung stornieren",
     "exempted": "Verpflichtung befreit",
     "cancelled": "Verpflichtung storniert",
@@ -4112,7 +4121,7 @@
     "subtitle": "Wähle die Benachrichtigungen für die Mobile-App. E-Mails sind davon nicht betroffen.",
     "sectionConvocations": "Einberufungen",
     "sectionEvents": "Ereignisse",
-    "sectionWall": "Vereinswand",
+    "sectionWall": "Clubwand",
     "sectionTournaments": "Turniere",
     "convocationOnCreate": "Push bei Erstellung",
     "convocationOnCreateHint": "Benachrichtigt Spieler und Eltern, sobald eine Einberufung erstellt wird.",
@@ -4145,7 +4154,7 @@
     "backToAppShort": "← App",
     "nav": {
       "dashboard": "Dashboard",
-      "clubs": "Vereine",
+      "clubs": "Clubs",
       "users": "Benutzer",
       "importData": "Datenimport",
       "billing": "Abrechnung",
@@ -4168,7 +4177,7 @@
       "no": "nein",
       "status": "Status",
       "plan": "Plan",
-      "club": "Verein",
+      "club": "Club",
       "user": "Benutzer",
       "actions": "Aktionen",
       "date": "Datum",
@@ -4181,7 +4190,7 @@
       "all": "Alle",
       "none": "—",
       "by": "von",
-      "viewClub": "Verein anzeigen →",
+      "viewClub": "Club anzeigen →",
       "generatedAt": "Generiert am {{date}}"
     },
     "dashboard": {
@@ -4193,7 +4202,7 @@
       "loadingRevenue": "Umsatz wird geladen …",
       "mrr": "Monatlich wiederkehrender Umsatz",
       "arr": "ARR {{amount}}",
-      "payingClubs": "Zahlende Vereine",
+      "payingClubs": "Zahlende Clubs",
       "arpu": "ARPU {{amount}}",
       "trialConversion": "Testphasen-Konversion (30-Tage-Kohorte)",
       "newAndTrials": "{{new}} neu · {{trials}} aktive Testphasen",
@@ -4205,7 +4214,7 @@
       "operations": "Betrieb",
       "loadingMetrics": "Kennzahlen werden geladen …",
       "clubs": "Clubs",
-      "activeClubs": "Aktive Vereine",
+      "activeClubs": "Aktive Clubs",
       "withActiveSub": "Mit aktivem Abo",
       "users": "Benutzer",
       "activeSubsDb": "Aktive Abos (DB)",
@@ -4288,19 +4297,19 @@
       "colPlan": "Plan",
       "colLastSeen": "Zuletzt gesehen",
       "colStatus": "Status",
-      "noClub": "Kein Verein",
+      "noClub": "Kein Club",
       "neverSignedIn": "nie angemeldet",
       "quickActions": "Schnellaktionen",
       "actionDone": "{{label}} ✓",
       "empty": "Keine Benutzer.",
-      "colClubsRoles": "Vereine & Rollen",
+      "colClubsRoles": "Clubs & Rollen",
       "never": "nie",
       "disabled": "deaktiviert",
       "dormant": "inaktiv",
       "active": "aktiv",
       "unverified": "unverifiziert",
       "viewProfile": "Profil anzeigen",
-      "openClub": "Verein öffnen",
+      "openClub": "Club öffnen",
       "sendResetEmail": "Reset-E-Mail senden",
       "resendOnboarding": "Onboarding erneut senden",
       "reactivate": "Reaktivieren",
@@ -4319,7 +4328,7 @@
       "userOnboarding": "Benutzer-Onboarding",
       "account": "Konto",
       "relations": "Relations",
-      "noClubMemberships": "Keine Vereinsmitgliedschaften.",
+      "noClubMemberships": "Keine Clubmitgliedschaften.",
       "noInvites": "Keine Einladungen passen zur E-Mail dieses Benutzers.",
       "noTeamAssignments": "Keine direkten Teamzuweisungen.",
       "noPlayerProfile": "Kein Spielerprofil mit diesem Benutzer verknüpft.",
@@ -4333,19 +4342,19 @@
       "noPriorActions": "Keine früheren Admin-Aktionen.",
       "impersonateTitle": "Benutzer impersonieren",
       "impersonateReasonPlaceholder": "z. B. Ticket #421 — Benutzer meldet fehlende Ereignisse",
-      "orphanHint": "Keine Vereinsmitgliedschaft, kein Spielerprofil und kein Elternlink.",
+      "orphanHint": "Keine Clubmitgliedschaft, kein Spielerprofil und kein Elternlink.",
       "loading": "Wird geladen …"
     },
     "clubs": {
-      "title": "Vereine",
-      "searchPlaceholder": "Verein suchen…",
+      "title": "Clubs",
+      "searchPlaceholder": "Club suchen…",
       "colClub": "Club",
       "colContact": "Contact",
       "colMembers": "Mitglieder",
       "colActivity": "Aktivität",
       "colBilling": "Abrechnung",
       "colCreated": "Erstellt",
-      "empty": "Kein Verein gefunden.",
+      "empty": "Kein Club gefunden.",
       "noActivity": "Keine Aktivität",
       "noSubscription": "Kein Abo",
       "exempt": "Befreit",
@@ -4357,13 +4366,13 @@
       "otherStatus": "{{status}}"
     },
     "clubDetail": {
-      "notFound": "Verein nicht gefunden.",
+      "notFound": "Club nicht gefunden.",
       "archived": "Archiviert",
       "members": "Mitglieder",
       "teams": "Teams",
       "recentEvents": "Letzte Ereignisse",
       "whatsappTeams": "WhatsApp-Teams",
-      "clubOnboarding": "Vereins-Onboarding",
+      "clubOnboarding": "Club-Onboarding",
       "noStripeCustomer": "Kein Stripe-Kunde",
       "lifetimePaid": "Bisher gezahlt",
       "invoices": "Rechnungen",
@@ -4393,11 +4402,11 @@
       "hintNoInvite": "Noch keine Eltern-/Trainer-Einladung gesendet.",
       "hintNoEvent": "Noch kein veröffentlichtes Ereignis — probiere ein Training oder Spiel.",
       "hintNoPlan": "Kein aktiver Tarif erkannt.",
-      "allClubs": "Alle Vereine",
+      "allClubs": "Alle Clubs",
       "restore": "Wiederherstellen",
       "archive": "Archivieren",
-      "archiveClub": "Verein archivieren",
-      "restoreClub": "Verein wiederherstellen",
+      "archiveClub": "Club archivieren",
+      "restoreClub": "Club wiederherstellen",
       "financials": "Finanzen",
       "loadingInvoices": "Rechnungen werden geladen …",
       "viewInviteStatus": "Einladungsstatus anzeigen",
@@ -4412,7 +4421,7 @@
       "noAccount": "kein Konto",
       "eyebrow": "Roster",
       "subtitle": "Aktivierungsstatus des Kontos für jeden Spieler und jedes Elternteil.",
-      "backToClub": "← Zurück zum Verein",
+      "backToClub": "← Zurück zum Club",
       "empty": "Keine Ergebnisse.",
       "invited": "eingeladen",
       "invitedAt": "eingeladen {{date}}"
@@ -4444,8 +4453,8 @@
       "invitation": "Invitation",
       "email": "Email",
       "created": "Erstellt",
-      "subtitle": "E-Mail-Zustellstatus für jede in diesem Verein erstellte Einladung.",
-      "backToClub": "← Zurück zum Verein",
+      "subtitle": "E-Mail-Zustellstatus für jede in diesem Club erstellte Einladung.",
+      "backToClub": "← Zurück zum Club",
       "empty": "Keine Einladung passt zu den Filtern.",
       "loading": "Wird geladen …"
     },
@@ -4490,9 +4499,9 @@
       "allEmailsDelivered": "Alle E-Mails zugestellt.",
       "directLookup": "Direktsuche",
       "searchUserPlaceholder": "Nach Name oder Telefon suchen …",
-      "searchClubPlaceholder": "Vereine nach Name suchen …",
+      "searchClubPlaceholder": "Clubs nach Name suchen …",
       "noMatches": "Keine Treffer.",
-      "noClubMemberships": "Keine Vereinsmitgliedschaften.",
+      "noClubMemberships": "Keine Clubmitgliedschaften.",
       "noAdmins": "Keine Admins.",
       "modeUser": "Benutzer",
       "modeClub": "Club",
@@ -4500,11 +4509,11 @@
       "liveAlerts": "Live-Warnungen",
       "summary": "Zusammenfassung",
       "manage": "Verwalten",
-      "clubsCount": "Vereine ({{count}})",
+      "clubsCount": "Clubs ({{count}})",
       "archived": "(archiviert)",
       "openFullUser": "Vollständige Benutzerseite öffnen →",
       "admins": "Admins",
-      "openFullClub": "Vollständige Vereinsseite öffnen →"
+      "openFullClub": "Vollständige Clubseite öffnen →"
     },
     "tickets": {
       "eyebrow": "Support-Tickets",
@@ -4519,7 +4528,7 @@
       "allStatuses": "Alle Status",
       "allPriorities": "Alle Prioritäten",
       "allCategories": "Alle Kategorien",
-      "allClubs": "Alle Vereine",
+      "allClubs": "Alle Clubs",
       "empty": "Keine Tickets.",
       "updated": "Aktualisiert",
       "error": "Fehler",
@@ -4528,7 +4537,7 @@
       "context": "Kontext",
       "history": "Historie",
       "noActions": "Keine Aktionen aufgezeichnet.",
-      "viewClub": "Verein anzeigen →",
+      "viewClub": "Club anzeigen →",
       "locale": "Sprache",
       "intent": "Anliegen",
       "created": "Erstellt",
@@ -4544,7 +4553,7 @@
     },
     "emailDispatches": {
       "title": "Sammelversand",
-      "filterPlaceholder": "Nach Vorlage, Ereignis, Verein, Team, Autor filtern …",
+      "filterPlaceholder": "Nach Vorlage, Ereignis, Club, Team, Autor filtern …",
       "empty": "Kein Versand entspricht den Filtern.",
       "finalized": "Abgeschlossen",
       "noLog": "Kein Log",
@@ -4610,7 +4619,7 @@
     "inviteBatches": {
       "eyebrow": "Invitations",
       "title": "Einladungs-Batches",
-      "subtitle": "Gruppiert nach Verein + Vorlage + 2-Minuten-Fenster.",
+      "subtitle": "Gruppiert nach Club + Vorlage + 2-Minuten-Fenster.",
       "filterPlaceholder": "Vorlage filtern (z. B. player-invite)",
       "empty": "Kein Batch gefunden.",
       "total": "{{count}} total",
@@ -4628,14 +4637,14 @@
       "eyebrow": "Historie",
       "title": "Spielerhistorie",
       "subtitle": "Alle Profiländerungen, Einberufungen, Feedbacks, Sperren, Verfügbarkeiten und Meilensteine.",
-      "backToClubs": "← Zurück zu den Vereinen",
+      "backToClubs": "← Zurück zu den Clubs",
       "empty": "Keine Ereignisse.",
       "by": "von"
     },
     "onboardingImport": {
       "title": "Datenimport — Club-Onboarding",
-      "selectClub": "Verein auswählen",
-      "searchClub": "Nach einem Verein suchen …",
+      "selectClub": "Club auswählen",
+      "searchClub": "Nach einem Club suchen …",
       "chooseType": "Importtyp auswählen",
       "dropFile": "Datei ablegen oder klicken (xlsx/xls/csv, max. 5 MB)",
       "unsupportedFormat": "Nicht unterstütztes Format (nur xlsx/xls/csv)",
@@ -4669,8 +4678,8 @@
       "social_sync_succeeded": "Netzwerk-Sync OK",
       "social_sync_failed": "Netzwerk-Sync fehlgeschlagen",
       "wall_post_published": "Beitrag veröffentlicht",
-      "invite_club_sent": "Vereinseinladung",
-      "invite_club_accepted": "Vereinseinladung angenommen",
+      "invite_club_sent": "Clubeinladung",
+      "invite_club_accepted": "Clubeinladung angenommen",
       "invite_member_sent": "Mitgliedseinladung",
       "invite_member_accepted": "Mitgliedseinladung angenommen",
       "import_started": "Import gestartet",
@@ -4681,7 +4690,7 @@
       "impersonation_started": "Impersonation"
     },
     "clubOnboarding": {
-      "logo": "Vereinslogo hochgeladen",
+      "logo": "Clublogo hochgeladen",
       "logoHint": "Wird in App, Einladungen und E-Mails angezeigt.",
       "branding": "Markenfarbe gewählt",
       "brandingHint": "Kein eigenes Design festgelegt — Standardpalette wird verwendet.",
@@ -4691,7 +4700,7 @@
       "invites": "Mitglieder eingeladen",
       "event": "Erstes Ereignis veröffentlicht",
       "sponsor": "Sponsor hinzugefügt",
-      "sponsorHint": "Optional — sichtbar auf der Vereinspinnwand.",
+      "sponsorHint": "Optional — sichtbar auf der Clubpinnwand.",
       "payments": "Zahlungseinstellungen konfiguriert",
       "paymentsHint": "Erforderlich, um Beiträge / Zahlungen einzuziehen.",
       "subscription": "Aktives Abo / Testphase"
@@ -4709,7 +4718,7 @@
       "phoneHint": "Wird für SMS-/WhatsApp-Benachrichtigungen verwendet.",
       "language": "Bevorzugte Sprache gewählt",
       "languageHint": "Standardmäßig Browsersprache, bis sie festgelegt wird.",
-      "clubLink": "Mit einem Verein verknüpft"
+      "clubLink": "Mit einem Club verknüpft"
     },
     "components": {
       "ticketCreated": "Ticket erstellt",
@@ -4830,7 +4839,7 @@
       "clubExempt": "Club befreit",
       "noActiveExemption": "Keine aktive Ausnahme",
       "exemptBadge": "Befreit",
-      "intro": "Gewähren Sie diesem Club kostenlosen Zugriff für die Beta-Phase, eine Partnerschaft oder interne Tests. Der Club kann alle Funktionen ohne Stripe nutzen.",
+      "intro": "Gewähre diesem Club kostenlosen Zugriff für die Beta-Phase, eine Partnerschaft oder interne Tests. Der Club kann alle Funktionen ohne Stripe nutzen.",
       "grant": "Ausnahme gewähren",
       "reason": "Grund",
       "endDate": "Enddatum",
@@ -4879,13 +4888,13 @@
     "theUser": "der Benutzer",
     "inClub": " in {{club}}",
     "persona": "Persona",
-    "personaHint": "Muss einer echten Rolle entsprechen, die der Benutzer in diesem Verein hat.",
+    "personaHint": "Muss einer echten Rolle entsprechen, die der Benutzer in diesem Club hat.",
     "reason": "Grund (auditiert)",
     "reasonPlaceholder": "z. B. Ticket #123 — Zahlungsstatus prüfen",
     "duration": "Dauer (Min., max. 60)",
     "cancel": "Abbrechen",
     "startView": "Ansicht starten",
-    "reasonRequired": "Bitte beschreiben Sie, warum Sie diese Ansicht brauchen (min. 3 Zeichen).",
+    "reasonRequired": "Bitte beschreibe, warum du diese Ansicht brauchst (mind. 3 Zeichen).",
     "startFailed": "Sitzung konnte nicht gestartet werden",
     "sessionUnavailable": "Support-Sitzung nicht verfügbar",
     "unknownError": "Unbekannter Fehler",
@@ -4896,7 +4905,7 @@
     "expiresIn": "Läuft ab in {{time}}",
     "bannerAs": "als {{name}} · {{club}} · {{persona}}",
     "userFallback": "Benutzer",
-    "clubFallback": "Verein"
+    "clubFallback": "Club"
   },
   "coach": {
     "unavailableTitle": "Profil nicht verfügbar",

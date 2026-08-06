@@ -351,7 +351,7 @@
   "registrations": {
     "disabledBanner": {
       "title": "Les inscriptions en ligne sont désactivées",
-      "body": "Aucun bouton « S'inscrire » n'apparaît sur la page publique. Active-les pour recevoir des candidatures.",
+      "body": "Aucun bouton « S'inscrire » n'apparaît sur la page publique. Active-les pour recevoir des candidatures.",
       "cta": "Activer"
     },
     "count_one": "{{count}} inscription",
@@ -498,7 +498,7 @@
     "title": "Joueurs · {{team}}",
     "import": {
       "empty": "Aucun joueur détecté dans le fichier.",
-      "blocked": "Import bloqué : {{total}} joueurs dépassent la limite de {{max}}. Réduisez le fichier ou choisissez « Remplacer ».",
+      "blocked": "Import bloqué : {{total}} joueurs dépassent la limite de {{max}}. Réduisez le fichier ou choisissez « Remplacer ».",
       "ok": "{{n}} joueur(s) importé(s)",
       "button": "Importer CSV",
       "title": "Importer des joueurs",
@@ -657,7 +657,7 @@
     "noFields": "Aucun terrain",
     "removeField": "Retirer {{name}}",
     "newFieldPlaceholder": "Nom du terrain (ex. Court central)",
-    "fieldsHint": "Plusieurs terrains = matchs en parallèle. Réassignable par match dans l'onglet \"Matchs\".",
+    "fieldsHint": "Plusieurs terrains = matchs en parallèle. Réassignable par match dans l'onglet « Matchs ».",
     "lunchBreak": "Pause déjeuner (aucun match sur la plage)",
     "lunchStart": "Début pause",
     "lunchEnd": "Fin pause",
@@ -700,7 +700,9 @@
     "lunchBreakSubtitle": "Aucun match pendant ce créneau",
     "addFieldShort": "+ Ajouter un terrain",
     "fieldAddedToast": "Terrain {{name}} ajouté",
-    "regenFinalsConfirm": "La phase finale a déjà des résultats. Régénérer EFFACERA tous ces résultats. Continuer ?"
+    "regenFinalsConfirm": "La phase finale a déjà des résultats. Régénérer EFFACERA tous ces résultats. Continuer ?",
+    "drawLockedPublished": "Le tournoi est publié — la relance du tirage est verrouillée pour préserver le programme.",
+    "drawLockedStarted": "Le tournoi a démarré — le tirage est verrouillé pour préserver les résultats."
   },
   "draw": {
     "title": "Tirage au sort",
@@ -1069,7 +1071,7 @@
   "registrationSettings": {
     "title": "Inscriptions en ligne",
     "enableLabel": "Ouvrir les inscriptions au public",
-    "enableHint": "Active un bouton « S'inscrire » sur la page publique du tournoi.",
+    "enableHint": "Active un bouton « S'inscrire » sur la page publique du tournoi.",
     "publicLink": "Lien public d'inscription",
     "linkCopied": "Lien copié"
   },
@@ -1239,7 +1241,7 @@
     },
     "public": {
       "empty": "Aucun flight n'a encore été configuré pour ce tournoi.",
-      "noMatches": "Matches will be generated after group stage."
+      "noMatches": "Les matchs seront générés après la phase de poules."
     },
     "templatesDesc": {
       "champions": "3 tableaux parallèles par niveau — toutes les équipes continuent à jouer, classées Élite / Intermédiaire / Découverte.",

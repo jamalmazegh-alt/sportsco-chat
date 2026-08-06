@@ -463,7 +463,7 @@
       "reserved": "Réservées (72h)",
       "remaining": "Places restantes",
       "pending": "Demandes en attente",
-      "expiredHint": "{{count}} réservation(s) 72 h expirée(s) — utilisez « Prolonger » pour retenir la place."
+      "expiredHint": "{{count}} réservation(s) 72 h expirée(s) — utilisez « Prolonger » pour retenir la place."
     },
     "searchPlaceholder": "Rechercher (nom, email…)",
     "col": {

@@ -53,7 +53,9 @@
     "pickRange": "Seleziona un periodo",
     "teamTable": {
       "title": "Assenze della squadra",
-      "empty": "Nessuna assenza imminente dichiarata in questa squadra."
+      "empty": "Nessuna assenza imminente dichiarata in questa squadra.",
+      "days_one": "{{count}} g",
+      "days_other": "{{count}} g"
     },
     "calendar": {
       "open": "Visualizza il calendario delle assenze",
@@ -116,7 +118,8 @@
   "notification": {
     "sanctionCreated_one": "{{name}} ha ricevuto una Squalifica di {{n}} partita.",
     "sanctionCreated_other": "{{name}} ha ricevuto una Squalifica di {{n}} partite.",
-    "absenceDeclared": "{{name}} sarà assente dal {{start}} al {{end}}. Motivo: {{reason}}"
+    "absenceDeclared": "{{name}} sarà assente dal {{start}} al {{end}}. Motivo: {{reason}}",
+    "declaredBy": "dichiarato da {{name}}"
   },
   "suspension": {
     "title": "Squalifica",
@@ -282,7 +285,8 @@
     "showPassword": "Mostra password",
     "hidePassword": "Nascondi password",
     "inviteExpired": "Questo invito è scaduto.",
-    "inviteUsed": "Questo invito è già stato utilizzato."
+    "inviteUsed": "Questo invito è già stato utilizzato.",
+    "invitedToTeam": "Iscrizione — {{team}}"
   },
   "common": {
     "save": "Salva",
@@ -342,7 +346,8 @@
     "copy": "Copia",
     "moreActions": "Altre azioni",
     "noResults": "Nessun risultato",
-    "added": "aggiunto"
+    "added": "aggiunto",
+    "home": "Home"
   },
   "notFound": {
     "code": "404",
@@ -384,7 +389,7 @@
     "mediaStatus": "Stato",
     "allow": "Consenti",
     "deny": "Nega",
-    "consentsHint": "Lo switch gestisce il tuo consenso. Utilizzare \"Leggi documento\" per visualizzare ciascun testo.",
+    "consentsHint": "Lo switch gestisce il tuo consenso. Utilizzare «Leggi documento» per visualizzare ciascun testo.",
     "readDocument": "Leggi il documento"
   },
   "onboarding": {
@@ -847,7 +852,9 @@
       "errorRows": "riga/righe con errori",
       "row": "Riga",
       "another": "Nuova importazione",
-      "button": "Importa CSV"
+      "button": "Importa CSV",
+      "confirm_one": "Importa {{count}} giocatore",
+      "confirm_other": "Importa {{count}} giocatori"
     },
     "inviteAlreadyActive": "Account già attivo — non serve rinviare.",
     "parentActivationPending": "In attesa dell'attivazione dell'account genitore",
@@ -1123,7 +1130,7 @@
       "invitePlayersFirstTitle": "Invita giocatori",
       "subtitle": "{{count}} giocatori convocati"
     },
-    "scoreDisabledCancelled": "Evento annullato: modifica del punteggio e dei fatti della partita disabilitata."
+    "scoreDisabledCancelled": "Evento annullato: modifica del punteggio e degli eventi della partita disabilitata."
   },
   "followUps": {
     "title": "Da ricordare",
@@ -1313,7 +1320,7 @@
     "pillUpcoming": "imminente",
     "notPlayedYet": "La partita non è ancora stata giocata: il punteggio può essere inserito dopo il fischio finale.",
     "finishedTitle": "La partita è finita.",
-    "finishedHint": "Salva il punteggio e i fatti della partita.",
+    "finishedHint": "Salva il punteggio e gli eventi della partita.",
     "enterResult": "Inserisci il risultato"
   },
   "channels": {
@@ -1578,7 +1585,7 @@
       "offsetAfter": "{{n}} g. dopo",
       "remindersSaved": "Promemoria salvati",
       "remindersNote": "Nota: i promemoria vengono inviati a pagatori, giocatori e genitori/tutori collegati. Ogni famiglia riceve una sola email per traguardo.",
-      "remindersNoteManual": "È anche possibile avviare un sollecito manuale dalla pagina Voci di pagamento con il pulsante « Sollecita »."
+      "remindersNoteManual": "È anche possibile avviare un sollecito manuale dalla pagina Voci di pagamento con il pulsante «Sollecita»."
     },
     "branding": {
       "saved": "Colore del Club aggiornato",
@@ -1598,7 +1605,9 @@
     "hubCamps": "Campus",
     "hubCampsHint": "Crea, pubblica e gestisci i campi offerti dal tuo club",
     "emailLanguage": "Linguaggio della posta elettronica di comunicazione",
-    "emailLanguageHint": "Lingua utilizzata per le email inviate dal club ai destinatari che non hanno impostato una lingua preferita."
+    "emailLanguageHint": "Lingua utilizzata per le email inviate dal club ai destinatari che non hanno impostato una lingua preferita.",
+    "inviteCooldown": "Invito già inviato a {{email}}. Potrai rinviarlo tra {{seconds}} s.",
+    "inviteSentTo": "Invito inviato a {{email}}. Potrai rinviarlo tra 60 s."
   },
   "attachments": {
     "add": "Aggiungi file",
@@ -2841,7 +2850,7 @@
       "training": "Allenamento regolare",
       "match": "Partita ufficiale o amichevole",
       "meeting": "Riunione di club o squadra",
-      "other": "Stage, torneo, evento…"
+      "other": "Camp, torneo, evento…"
     },
     "halvesPlaceholder": "3x30",
     "gameformatPlaceholder": "6v6",
@@ -2979,7 +2988,7 @@
       "facilityLabel": "Campo / struttura",
       "facilityPlaceholder": "Scegli un campo",
       "noFacilitiesHint": "Nessun campo configurato.",
-      "noFacilityOption": "Nessun tribunale"
+      "noFacilityOption": "Nessun campo"
     },
     "surfacePlaceholder": "Erba, sintetico, parquet…"
   },
@@ -3349,7 +3358,7 @@
       "reserved": "Riservato (72h)",
       "remaining": "Posti rimanenti",
       "pending": "Richieste in sospeso",
-      "expiredHint": "{{count}} prenotazione/i di 72 h scaduta/e — usa « Prolunga » per mantenere il posto."
+      "expiredHint": "{{count}} prenotazione/i di 72 h scaduta/e — usa «Prolunga» per mantenere il posto."
     },
     "searchPlaceholder": "Cerca (nome, email...)",
     "filters": {
@@ -3394,7 +3403,7 @@
     "loadError": "Errore durante il caricamento delle registrazioni",
     "disabledBanner": {
       "title": "Le registrazioni online sono disabilitate",
-      "body": "Nessun pulsante \"Registrati\" viene visualizzato nella pagina pubblica. Abilita le registrazioni per ricevere le candidature."
+      "body": "Nessun pulsante «Registrati» viene visualizzato nella pagina pubblica. Abilita le registrazioni per ricevere le candidature."
     },
     "draftHint": "Le registrazioni appariranno qui dopo la pubblicazione del campo.",
     "docsSummary": "{{ok}}/{{total}} documenti"
@@ -3457,7 +3466,7 @@
     },
     "tourn": {
       "b1": "Iscrizione online, pagamento integrato",
-      "b2": "Classifiche, gruppi, parentesi, risultati in tempo reale",
+      "b2": "Classifiche, gruppi, tabelloni, risultati in tempo reale",
       "b3": "Pagina della TV pubblica per i tuoi spettatori",
       "b4": "Convocazioni e resoconto partita inclusi",
       "kicker": "Modulo Torneo: app completa",
@@ -3536,7 +3545,7 @@
       "append": "Aggiungi all'elenco",
       "replace": "Sostituisci l'elenco",
       "confirm": "Importa",
-      "blocked": "Import bloccato: {{total}} giocatori superano il limite di {{max}}. Riduci il file o scegli « Sostituisci ».",
+      "blocked": "Import bloccato: {{total}} giocatori superano il limite di {{max}}. Riduci il file o scegli «Sostituisci».",
       "ok": "{{n}} giocatore/i importato/i"
     },
     "logo": {
@@ -3678,7 +3687,7 @@
     "sectionDocuments": "Documenti forniti",
     "sectionDocumentsHint": "Documenti forniti dal club (regolamento, programma in PDF, mappa di accesso…). Formati accettati: PDF, JPG, PNG.",
     "sectionRequired": "Documenti da fornire",
-    "sectionRequiredHint": "Elenco dei documenti che gli iscritti dovranno caricare (certificato medico, autorizzazione dei genitori…). I documenti medici vengono automaticamente contrassegnati come “sensibili”.",
+    "sectionRequiredHint": "Elenco dei documenti che gli iscritti dovranno caricare (certificato medico, autorizzazione dei genitori…). I documenti medici vengono automaticamente contrassegnati come «sensibili».",
     "save": "Salva"
   },
   "ageGroups": {
@@ -3761,7 +3770,7 @@
   },
   "controlCenter": {
     "nextAction": "Azione successiva",
-    "byCourts": "Per tribunale",
+    "byCourts": "Per campo",
     "liveBadge": "LIVE",
     "liveCourts": "Live",
     "nextMatches": "Prossime partite",
@@ -3774,32 +3783,32 @@
       "live": "Live",
       "upcoming": "Prossimamente"
     },
-    "flightsReady": "La fase a gironi è terminata. Crea Voli per generare i 3 gironi (Champions/Europa/Conference)."
+    "flightsReady": "La fase a gironi è terminata. Crea i Flights per generare i 3 tabelloni (Champions/Europa/Conference)."
   },
   "draw": {
-    "relaunchFromFooterHint": "Sorteggio completato. Utilizzare \"Riavvia\" nella parte inferiore della finestra di dialogo per generarne uno nuovo (i risultati correnti andranno persi)."
+    "relaunchFromFooterHint": "Sorteggio completato. Utilizzare «Riavvia» nella parte inferiore della finestra di dialogo per generarne uno nuovo (i risultati correnti andranno persi)."
   },
   "fields": {
     "streamUrlPlaceholder": "URL dello streaming (YouTube, Twitch...)"
   },
   "flights": {
-    "savedToast": "Voli salvati",
+    "savedToast": "Flights salvati",
     "fallback": {
-      "empty": "Nessuna fascia generata: la struttura non qualifica un numero sufficiente di squadre per volo. Modifica la distribuzione, utilizza un modello di riserva (Consolazione/Medaglie) o configura i voli manualmente.",
+      "empty": "Nessuna fascia generata: la struttura non qualifica un numero sufficiente di squadre per Flight. Modifica la distribuzione, utilizza un modello di riserva (Consolazione/Medaglie) o configura i Flights manualmente.",
       "error": "Generazione impossibile per questa struttura. Prova un altro modello o la modalità manuale.",
-      "title": "Questo formato non permette la generazione automatica dei 3 voli",
-      "body": "La struttura dei gironi (dimensioni irregolari o troppo piccole) non è divisa in modo netto in Champions/Europa/Conference. Scegli un modello di Consolazione / Medaglie / Coppa-Piatto o personalizza i voli manualmente."
+      "title": "Questo formato non permette la generazione automatica dei 3 Flights",
+      "body": "La struttura dei gironi (dimensioni irregolari o troppo piccole) non è divisa in modo netto in Champions/Europa/Conference. Scegli un modello di Consolazione / Medaglie / Coppa-Piatto o personalizza i Flights manualmente."
     },
-    "regenConfirm": "Le partite finali hanno già i risultati. La rigenerazione delle parentesi CANCELLERA' tutti questi risultati. Continuare?",
-    "noGroups": "Crea prima la fase a gironi. I voli vengono generati successivamente.",
-    "title": "Voli/finali",
+    "regenConfirm": "Le partite finali hanno già i risultati. La rigenerazione delle tabelloni CANCELLERA' tutti questi risultati. Continuare?",
+    "noGroups": "Crea prima la fase a gironi. I Flights vengono generati successivamente.",
+    "title": "Flights/finali",
     "intro": "Trofei multipli per torneo: Campioni/Europa, Coppa/Piatto, Oro/Argento/Bronzo o personalizzati.",
     "reconfigure": "Riconfigurare",
     "advancedDanger": "Opzioni avanzate (pericolose)",
-    "regenWarn": "La rigenerazione delle parentesi cancella tutti i risultati finali già inseriti.",
-    "regenerate": "Rigenerare le parentesi",
-    "generate": "Genera parentesi",
-    "waitGroups": "Completa tutte le partite del girone per generare parentesi.",
+    "regenWarn": "La rigenerazione delle tabelloni cancella tutti i risultati finali già inseriti.",
+    "regenerate": "Rigenerare le tabelloni",
+    "generate": "Genera tabelloni",
+    "waitGroups": "Completa tutte le partite del girone per generare tabelloni.",
     "preset": {
       "consolation": "Preimpostazione di consolazione (1 clic)",
       "consolationDesc": "Crea 2 flight: Principale (vincitori del girone) e Consolazione (perdenti). Configurazione pronta per il salvataggio."
@@ -3807,10 +3816,10 @@
     "wizard": {
       "template": "Modello di nome",
       "notEnough": "Sono necessarie almeno 4 squadre.",
-      "clean": "Parentesi pulite",
+      "clean": "Tabelloni pulite",
       "customize": "Personalizza",
       "back": "Indietro",
-      "save": "Salva voli",
+      "save": "Salva Flights",
       "distribution": "Ripartizione ({{n}} squadre)"
     },
     "rulesCount": "regole",
@@ -3820,8 +3829,8 @@
     "seventhPlaceDisabled": "Abilita prima il 5° posto",
     "seventhPlace": "7° posto",
     "public": {
-      "empty": "Nessun volo è stato ancora configurato per questo torneo.",
-      "noMatches": "Le partite per questo volo verranno generate dopo la fase a gironi."
+      "empty": "Nessun Flight è stato ancora configurato per questo torneo.",
+      "noMatches": "Le partite saranno generate dopo la fase a gironi."
     },
     "draftRulesSummary": "{{n}} regola/e di qualificazione configurata/e",
     "generatedToast": "{{n}} partite create"
@@ -3841,7 +3850,7 @@
     "linkCopied": "Link copiato",
     "title": "Registrazioni on-line",
     "enableLabel": "Iscrizioni aperte al pubblico",
-    "enableHint": "Abilita un pulsante \"Registrati\" sulla pagina pubblica del torneo.",
+    "enableHint": "Abilita un pulsante «Registrati» sulla pagina pubblica del torneo.",
     "publicLink": "Link di registrazione pubblica"
   },
   "aiAssistant": {
@@ -3862,7 +3871,7 @@
     "summary": {
       "matchDuration": "Durata della partita",
       "pause": "Pausa tra le partite",
-      "terrains": "Tribunali"
+      "terrains": "Campi"
     }
   },
   "createChooser": {
@@ -3889,7 +3898,7 @@
     "openTv": "schermo televisivo",
     "autoScheduleCta": {
       "title": "Pianifica automaticamente le partite",
-      "subtitle": "Nessun tribunale o programma assegnato ancora. Esegui la pianificazione automatica."
+      "subtitle": "Nessun campo o programma assegnato ancora. Esegui la pianificazione automatica."
     }
   },
   "sections": {

@@ -25,7 +25,7 @@
     "test:e2e:ui": "playwright test --ui",
     "test:e2e:headed": "playwright test --headed",
     "seed:e2e": "bun run scripts/seed-e2e.ts",
-    "check:i18n": "node scripts/check-i18n-parity.mjs && node scripts/check-i18n-ns-separator.mjs",
+    "check:i18n": "node scripts/check-i18n-parity.mjs && node scripts/check-i18n-ns-separator.mjs && node scripts/check-i18n-missing-keys.mjs",
     "check:guards": "node scripts/check-server-fn-guards.mjs",
     "prepare": "husky"
   },

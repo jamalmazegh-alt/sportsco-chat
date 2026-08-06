@@ -24,7 +24,7 @@
     "cancel": "Cancel",
     "send": "Send",
     "sent": "Request sent",
-    "sent_desc": "We'll get back to you shortly. You can follow up under \"My requests\".",
+    "sent_desc": "We'll get back to you shortly. You can follow up under “My requests”.",
     "close": "Close",
     "view": "View ticket",
     "file_too_large": "{{name}} is larger than 5 MB",

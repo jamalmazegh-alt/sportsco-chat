@@ -147,7 +147,7 @@
       "metaTitle": "Aanmelding bevestigd — {{slug}} · Clubero",
       "title": "Betaling ontvangen, aanmelding bevestigd!",
       "body": "Er is een bevestigingsmail naar je verzonden. Tot snel op het veld!",
-      "settling": "Betaling ontvangen — finalisatie van uw inschrijving..."
+      "settling": "Betaling ontvangen — je inschrijving wordt afgerond…"
     },
     "payMetaTitle": "Betaling — {{slug}} · Clubero",
     "payNotFound": "Link niet gevonden",
@@ -203,7 +203,7 @@
     "signIn": "Aanmelden",
     "accept": "Uitnodiging accepteren",
     "accepted": "Uitnodiging geaccepteerd",
-    "noAccountPrompt": "Om deze uitnodiging te accepteren, maakt u uw Clubero-account aan met het uitgenodigde e-mailadres of logt u in als u er al een heeft.",
+    "noAccountPrompt": "Om deze uitnodiging te accepteren, maak je een Clubero-account aan met het uitgenodigde e-mailadres — of log je in als je er al een hebt.",
     "createAccount": "Maak mijn account aan",
     "useExactEmail": "Gebruik het e-mailadres {{email}} zodat de uitnodiging wordt herkend."
   },
@@ -498,7 +498,7 @@
     "title": "Speler · {{team}}",
     "import": {
       "empty": "Er zijn geen spelers gedetecteerd in het bestand.",
-      "blocked": "Import geblokkeerd: {{total}} spelers overschrijden de limiet van {{max}}. Verklein het bestand of kies \"Vervangen\".",
+      "blocked": "Import geblokkeerd: {{total}} spelers overschrijden de limiet van {{max}}. Verklein het bestand of kies ‘Vervangen’.",
       "ok": "{{n}} speler(s) geïmporteerd",
       "button": "CSV importeren",
       "title": "Spelers importeren",
@@ -560,7 +560,7 @@
       "uploaded": "Logo opgeslagen"
     },
     "pendingTitle": "Aanvraag wordt beoordeeld",
-    "pendingBody": "Zodra de organisatie uw registratie heeft goedgekeurd, kunt u via dezelfde link spelers toevoegen of bewerken.",
+    "pendingBody": "Zodra de organisatie je registratie heeft goedgekeurd, kun je via dezelfde link spelers toevoegen of bewerken.",
     "playersLabelMax": "Spelers ({{count}} / {{max}})",
     "remaining": "{{n}} plaats(en) over",
     "captain": "Kapitein",
@@ -657,7 +657,7 @@
     "noFields": "Geen plaatsen",
     "removeField": "{{name}} verwijderen",
     "newFieldPlaceholder": "Naam plaats (bijv. Centraal Veld)",
-    "fieldsHint": "Meerdere plaatsen = parallelle wedstrijden. Per wedstrijd opnieuw toe te wijzen in het tabblad \"Wedstrijden\".",
+    "fieldsHint": "Meerdere plaatsen = parallelle wedstrijden. Per wedstrijd opnieuw toe te wijzen in het tabblad ‘Wedstrijden’.",
     "lunchBreak": "Lunchpauze (geen wedstrijden in deze periode)",
     "lunchStart": "Start pauze",
     "lunchEnd": "Einde pauze",
@@ -700,7 +700,9 @@
     "lunchBreakSubtitle": "Geen wedstrijd in dit tijdslot",
     "addFieldShort": "+ Plaats toevoegen",
     "fieldAddedToast": "Plaats {{name}} toegevoegd",
-    "regenFinalsConfirm": "De finalefase heeft al resultaat. Door opnieuw te genereren WISSEN al deze resultaten. Doorgaan?"
+    "regenFinalsConfirm": "De finalefase heeft al resultaat. Door opnieuw te genereren WISSEN al deze resultaten. Doorgaan?",
+    "drawLockedPublished": "Het toernooi is gepubliceerd — opnieuw loten is vergrendeld om het schema te behouden.",
+    "drawLockedStarted": "Het toernooi is begonnen — de loting is vergrendeld om de resultaten te behouden."
   },
   "draw": {
     "title": "Loting",
@@ -744,7 +746,7 @@
     "overwriteDesc": "Deze actie verwijdert de huidige samenstelling (groepen/schema) en de bijbehorende wedstrijden. Aangemelde Teams blijven behouden.",
     "cancel": "Annuleren",
     "confirmRelaunch": "Bevestigen en opnieuw starten",
-    "relaunchFromFooterHint": "Trekking voltooid. Gebruik “Opnieuw starten” onderaan het dialoogvenster om een ​​nieuwe te genereren (huidige resultaten gaan verloren)."
+    "relaunchFromFooterHint": "Trekking voltooid. Gebruik ‘Opnieuw starten’ onderaan het dialoogvenster om een ​​nieuwe te genereren (huidige resultaten gaan verloren)."
   },
   "rules": {
     "savedToast": "Regels opgeslagen",
@@ -901,12 +903,12 @@
     "nextMatch": "Volgende wedstrijd",
     "allMatchesEntered": "Alle wedstrijden zijn ingevoerd.",
     "errorGeneric": "Fout",
-    "progressionFailedCommitted": "Resultaat opgeslagen. De bracketvoortgang kon niet worden voltooid — neem contact op met een beheerder voordat u verdergaat.",
+    "progressionFailedCommitted": "Resultaat opgeslagen. De voortgang in het schema kon niet worden voltooid — neem contact op met een beheerder voordat je verdergaat.",
     "validate": "Resultaat bevestigen",
     "unvalidate": "Bevestiging ongedaan maken",
     "unvalidateToEdit": "Bevestiging ongedaan maken om te bewerken",
     "lockedTitle": "Wedstrijd bevestigd",
-    "lockedHelper": "Om het resultaat te wijzigen, moet u eerst de bevestiging van de wedstrijd ongedaan maken.",
+    "lockedHelper": "Om het resultaat te wijzigen, moet je eerst de bevestiging van de wedstrijd ongedaan maken.",
     "validateTitle": "Definitief resultaat bevestigen",
     "unvalidateTitle": "Terug naar een te bevestigen resultaat (fout corrigeren)",
     "raiseDispute": "Bezwaar indienen",
@@ -987,12 +989,12 @@
     "changeLogo": "Wijzig logo",
     "addLogo": "Voeg een logo toe",
     "teams": "ploegen",
-    "linkCopiedOpenBrowser": "Link gekopieerd – open deze in uw browser (Safari/Chrome).",
+    "linkCopiedOpenBrowser": "Link gekopieerd – open hem in je browser (Safari/Chrome).",
     "openPublic": "Openbare pagina",
     "openTv": "TV-scherm",
     "autoScheduleCta": {
       "title": "Automatisch wedstrijden plannen",
-      "subtitle": "Nog geen rechtbank of schema toegewezen. Voer automatische planning uit."
+      "subtitle": "Nog geen veld of schema toegewezen. Voer automatische planning uit."
     }
   },
   "publishFlow": {
@@ -1239,7 +1241,7 @@
     },
     "public": {
       "empty": "Er zijn nog geen poules ingesteld.",
-      "noMatches": "Matches will be generated after group stage."
+      "noMatches": "De wedstrijden worden na de groepsfase gegenereerd."
     },
     "templatesDesc": {
       "champions": "3 parallelle tableaus per niveau — alle teams blijven spelen, verdeeld in Elite / Midden / Ontdekking.",
@@ -1247,10 +1249,10 @@
       "medals": "Directe eliminatie met podium Goud / Zilver / Brons voor de top 3. Kort en klassiek format.",
       "consolation": "2 tableaus: Hoofd (groepswinnaars) en Troostronde (verliezers). Eenvoudige oplossing om iedereen te laten spelen."
     },
-    "regenConfirm": "Finalewedstrijden hebben al uitslag. Het opnieuw genereren van haakjes zal al deze resultaten WISSEN. Doorgaan?",
+    "regenConfirm": "Finalewedstrijden hebben al uitslag. Het opnieuw genereren van schema’s zal al deze resultaten WISSEN. Doorgaan?",
     "advancedDanger": "Geavanceerde opties (gevaarlijk)",
-    "regenWarn": "Als u de haakjes opnieuw genereert, worden alle reeds ingevoerde finaleresultaten gewist.",
-    "regenerate": "Herstel haakjes",
+    "regenWarn": "Als je de schema’s opnieuw genereert, worden alle reeds ingevoerde finaleresultaten gewist.",
+    "regenerate": "Herstel schema’s",
     "fifthPlaceDisabled": "Schakel eerst de 3e plaats in",
     "seventhPlaceDisabled": "Schakel eerst de 5e plaats in"
   },
@@ -1292,7 +1294,7 @@
       "fields": "Velden",
       "share": "Delen"
     },
-    "byCourts": "Via de rechtbank",
+    "byCourts": "Via de veld",
     "progress": "Voortgang"
   },
   "cockpit": {
@@ -1319,7 +1321,7 @@
     "quickHint": "5 schermen, grote knoppen, geen verrassingen.",
     "simulatorLink": "Simuleer een format voordat je aanmaakt",
     "back": "Terug",
-    "abandonConfirm": "De assistent verlaten? Uw antwoorden worden gewist. Je kunt ook sluiten om ze de volgende keer weer te vinden."
+    "abandonConfirm": "De assistent verlaten? Je antwoorden worden gewist. Je kunt de pagina ook sluiten om ze de volgende keer terug te vinden."
   },
   "aiAssistant": {
     "intro": "Hoi 👋 We stellen je toernooi stap voor stap in.",
@@ -1400,7 +1402,7 @@
       "simTerrains": "Velden",
       "matchDuration": "Wedstrijdduur",
       "pause": "Pauze tussen wedstrijden",
-      "terrains": "Rechtbanken"
+      "terrains": "Velden"
     },
     "footerSub": {
       "question": "De assistent blijft — aanpassen zonder iets te verliezen",

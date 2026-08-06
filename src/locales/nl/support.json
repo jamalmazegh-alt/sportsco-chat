@@ -40,7 +40,7 @@
   "status": {
     "open": "Open",
     "in_progress": "Bezig",
-    "waiting_user": "Wacht op uw antwoord",
+    "waiting_user": "Wacht op je antwoord",
     "resolved": "Opgelost",
     "closed": "Gesloten"
   },
