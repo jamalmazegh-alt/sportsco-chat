@@ -32,9 +32,12 @@ export const Route = createFileRoute("/support-view/$sessionId")({
   // both child loaders (ensureQueryData) AND the React provider share the
   // exact same instance. Without this, loaders would hit the superadmin's
   // global cache and leak simulated data.
+  // @ts-expect-error — le QueryClient n'est volontairement pas sérialisable :
+  // il ne sert que côté client, partagé entre loaders et provider.
   beforeLoad: ({ params }) => ({
     queryClient: getSupportQueryClient(params.sessionId),
   }),
+
   loader: async ({ params }) => {
     try {
       const session = await getSupportViewSession({ data: { session_id: params.sessionId } });
