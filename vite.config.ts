@@ -82,6 +82,11 @@ export default async function config(env: ConfigEnv) {
         cors: { origin: [defaultAllowedOrigins, "capacitor://localhost"] },
       },
       plugins: [mcpPlugin()],
+      define: {
+        "import.meta.env.VITE_SUPABASE_URL": JSON.stringify(supabaseUrl),
+        "import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY": JSON.stringify(supabasePublishableKey),
+      },
+
       resolve: {
         alias: {
           "entities/decode": path.resolve(__dirname, "node_modules/entities/lib/esm/decode.js"),
