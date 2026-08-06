@@ -37,3 +37,14 @@ dist-ssr
 .env
 .env.*
 !.env.example
+
+# Secrets de signature et de push — irremplaçables, ne doivent jamais entrer
+# dans le dépôt. Le keystore Android vit hors du projet (~/), mais rien
+# n'empêchait jusqu'ici de déposer une clé APNs ou un compte de service ici.
+*.p8
+*.p12
+*.jks
+*.keystore
+*.mobileprovision
+keystore.properties
+**/google-service-account*.json
