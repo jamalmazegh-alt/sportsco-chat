@@ -9,6 +9,7 @@
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
 import { VAPID_PUBLIC_KEY } from "@/lib/pwa";
 import { isFcmConfigured, sendFcmToToken } from "@/lib/push-fcm.server";
+import { isApnsConfigured, sendApnsToToken } from "@/lib/push-apns.server";
 
 export interface PushPayload {
   title: string;
@@ -409,7 +410,23 @@ export async function sendPushToUser(
   for (const s of subs as RawSubscription[]) {
     // Routage par canal. `endpoint` d'une ligne fcm/apns est un token opaque,
     // pas une URL : le chemin Web Push (new URL, VAPID) ne doit jamais le voir.
-    if (s.channel === "fcm" || s.channel === "apns") {
+    // iOS parle directement à APNs : le plugin Capacitor renvoie un jeton
+    // d'appareil APNs, que FCM n'accepte pas dans son champ `token`.
+    if (s.channel === "apns") {
+      if (!isApnsConfigured()) {
+        console.log("[push] APNs not configured, skipping iOS token");
+        continue;
+      }
+      try {
+        const result = await sendApnsToToken(s.endpoint, payload);
+        if (result.status >= 200 && result.status < 300) sent++;
+        else if (result.unregistered) toPrune.push(s.endpoint);
+      } catch (e) {
+        console.warn("[push] APNs send threw", (e as Error).message);
+      }
+      continue;
+    }
+    if (s.channel === "fcm") {
       if (!isFcmConfigured()) {
         // Environnement sans identifiants FCM (dev, CI) : on trace sans
         // compter d'échec, le canal `web` continue de fonctionner seul.
