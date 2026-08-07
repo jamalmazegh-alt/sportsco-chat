@@ -956,6 +956,7 @@ function EventDetail() {
               clubName,
               clubLogoUrl,
               locale: pickEmailLocale(clubDefaultLang),
+              tz: ((clubRow as any)?.clubs?.timezone as string | null | undefined) ?? null,
             },
           } as any).catch(() => undefined);
 
@@ -1247,6 +1248,7 @@ function EventDetail() {
               respondUrl: `${origin}/r/${token}`,
               lineup: lineupEmail,
               locale: pickEmailLocale(clubDefaultLang),
+              tz: ((clubRow as any)?.clubs?.timezone as string | null | undefined) ?? null,
             },
           });
 
@@ -1593,6 +1595,7 @@ function EventDetail() {
             clubName,
             clubLogoUrl,
             locale: pickEmailLocale(clubDefaultLang),
+            tz: ((teamRow as any)?.clubs?.timezone as string | null | undefined) ?? null,
           },
         }).catch(() => undefined);
 
@@ -1806,6 +1809,7 @@ function EventDetail() {
             clubName,
             clubLogoUrl,
             locale: pickEmailLocale(clubDefaultLang),
+            tz: ((teamRow as any)?.clubs?.timezone as string | null | undefined) ?? null,
           },
         }).catch(() => undefined);
 
@@ -2039,6 +2043,7 @@ function EventDetail() {
             })),
             lineup: lineupEmail,
             locale: pickEmailLocale(clubDefaultLang),
+            tz: ((clubRow as any)?.clubs?.timezone as string | null | undefined) ?? null,
           },
         });
 
