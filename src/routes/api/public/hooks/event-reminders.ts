@@ -245,6 +245,7 @@ export const Route = createFileRoute("/api/public/hooks/event-reminders")({
               const timeStr = startDt.toLocaleTimeString("fr-FR", {
                 hour: "2-digit",
                 minute: "2-digit",
+                timeZone: clubTz,
               });
               let headline: string;
               if (isMatch && opponent) {
