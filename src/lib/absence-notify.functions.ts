@@ -1,4 +1,3 @@
-import { resolveClubTz } from "@/lib/time/club-tz";
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
@@ -173,7 +172,6 @@ export const notifyCoachesOfAbsence = createServerFn({ method: "POST" })
     if (teamIds.length === 0) return { sent: 0 };
     const clubDefaultLang =
       (tm ?? []).map((r: any) => r?.teams?.clubs?.default_language).find(Boolean) ?? null;
-    const clubTz = (tm ?? []).map((r: any) => r?.teams?.clubs?.timezone).find(Boolean) ?? null;
 
     // Coaches/admins
     const { data: coaches } = await supabaseAdmin
@@ -201,11 +199,13 @@ export const notifyCoachesOfAbsence = createServerFn({ method: "POST" })
       const bcp = locale === "en" ? "en-GB" : `${locale}-${locale.toUpperCase()}`;
       return (d: string) => {
         try {
-          return new Date(`${d}T00:00:00`).toLocaleDateString(bcp, {
+          // Date seule : on la parse en UTC et on l'affiche en UTC pour que le
+          // jour calendaire reste identique quel que soit le fuseau du club.
+          return new Date(`${d}T00:00:00Z`).toLocaleDateString(bcp, {
             weekday: "long",
             day: "numeric",
             month: "long",
-            timeZone: resolveClubTz(clubTz),
+            timeZone: "UTC",
           });
         } catch {
           return d;
