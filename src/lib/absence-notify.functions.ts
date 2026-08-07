@@ -172,7 +172,6 @@ export const notifyCoachesOfAbsence = createServerFn({ method: "POST" })
     if (teamIds.length === 0) return { sent: 0 };
     const clubDefaultLang =
       (tm ?? []).map((r: any) => r?.teams?.clubs?.default_language).find(Boolean) ?? null;
-    const clubTz = (tm ?? []).map((r: any) => r?.teams?.clubs?.timezone).find(Boolean) ?? null;
 
     // Coaches/admins
     const { data: coaches } = await supabaseAdmin
