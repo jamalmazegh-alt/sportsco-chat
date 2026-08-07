@@ -34,6 +34,20 @@ const MAX_AGE_MS = 24 * 60 * 60 * 1000;
  */
 const MAX_ENTRY_BYTES = 100_000;
 
+/**
+ * `true` si la donnée contient une `Map` ou un `Set`, à quelque profondeur que
+ * ce soit. JSON les aplatit en objets vides sans le signaler — la valeur
+ * restaurée garde alors la forme attendue mais perd ses méthodes.
+ */
+function containsMapOrSet(value: unknown, depth = 0): boolean {
+  if (depth > 6 || value === null || typeof value !== "object") return false;
+  if (value instanceof Map || value instanceof Set) return true;
+  if (Array.isArray(value)) return value.some((v) => containsMapOrSet(v, depth + 1));
+  return Object.values(value as Record<string, unknown>).some((v) =>
+    containsMapOrSet(v, depth + 1),
+  );
+}
+
 export function installNativeQueryCache(queryClient: QueryClient): void {
   if (!isNativePlatform()) return;
 
@@ -50,15 +64,28 @@ export function installNativeQueryCache(queryClient: QueryClient): void {
       // Le cache est lié au code qui l'a produit : une nouvelle version peut
       // avoir changé la forme des données. On repart alors de zéro plutôt que
       // d'hydrater des objets devenus incompatibles.
-      buster: import.meta.env.VITE_BUILD_ID ?? "",
+      // Incrémenter à CHAQUE changement de ce qu'on persiste. Un cache déjà
+      // écrit sur un appareil survit à la mise à jour de l'application : sans
+      // ce marqueur, les utilisateurs qui ont enregistré une Map aplatie en
+      // `{}` continueraient de planter malgré le correctif. `VITE_BUILD_ID`
+      // seul ne suffit pas — il n'est pas défini sur tous les builds.
+      buster: `v2-${import.meta.env.VITE_BUILD_ID ?? ""}`,
       dehydrateOptions: {
         shouldDehydrateQuery: (query) => {
           if (query.state.status !== "success") return false;
           try {
-            return JSON.stringify(query.state.data).length <= MAX_ENTRY_BYTES;
+            const json = JSON.stringify(query.state.data);
+            if (json.length > MAX_ENTRY_BYTES) return false;
+            // JSON ne sait pas représenter Map ni Set : il les rend en `{}`.
+            // Restaurée, la donnée aurait la bonne forme apparente mais plus
+            // aucune méthode — `counts.get(...)` casse l'écran d'accueil, où
+            // une requête renvoie `{ sent: Set, counts: Map }`. Détecté en
+            // production. On écarte ces entrées : mieux vaut les recharger que
+            // les ressusciter mutilées.
+            return !containsMapOrSet(query.state.data);
           } catch {
-            // Donnée non sérialisable : l'écarter plutôt que de faire échouer
-            // l'écriture de tout le cache.
+            // Donnée non sérialisable du tout : l'écarter plutôt que de faire
+            // échouer l'écriture de tout le cache.
             return false;
           }
         },
