@@ -666,22 +666,12 @@ const ConvocationInviteEmail = ({
       {squadList && squadList.length > 0 ? (
         <Section style={squadCard}>
           <Text style={squadTitle}>{t.squadTitle(squadList.length)}</Text>
-          <Row>
-            <Column style={{ width: "50%", verticalAlign: "top" }}>
-              {squadList.slice(0, Math.ceil(squadList.length / 2)).map((name, i) => (
-                <Text key={`sq-a-${i}`} style={squadLine}>
-                  {name}
-                </Text>
-              ))}
-            </Column>
-            <Column style={{ width: "50%", verticalAlign: "top" }}>
-              {squadList.slice(Math.ceil(squadList.length / 2)).map((name, i) => (
-                <Text key={`sq-b-${i}`} style={squadLine}>
-                  {name}
-                </Text>
-              ))}
-            </Column>
-          </Row>
+          {squadList.map((name, i) => (
+            <Text key={`sq-${i}`} style={squadLine}>
+              {name}
+            </Text>
+          ))}
+
         </Section>
       ) : null}
 
