@@ -82,3 +82,44 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }
 
 }
+
+/// Ouvre l'onglet Notifications des réglages de l'application.
+///
+/// `app-settings:` — l'équivalent d'`openSettingsURLString` — n'ouvre que la
+/// RACINE des réglages de l'app : l'utilisateur doit encore taper
+/// « Notifications ». Apple expose depuis iOS 16 une constante qui y mène
+/// directement, mais uniquement depuis du code natif.
+///
+/// On lit parfois des URL du type `app-settings:root=NOTIFICATIONS`. Elles ne
+/// sont PAS documentées et valent régulièrement un rejet à la revue : on s'en
+/// tient à l'API publique, avec repli sur la racine des réglages avant iOS 16.
+///
+/// La classe vit dans ce fichier plutôt que dans le sien pour éviter d'ajouter
+/// une référence au projet Xcode — Capacitor découvre les plugins par le
+/// runtime Objective-C, peu importe le fichier qui les contient.
+@objc(NotificationSettingsPlugin)
+public class NotificationSettingsPlugin: CAPPlugin, CAPBridgedPlugin {
+    public let identifier = "NotificationSettingsPlugin"
+    public let jsName = "NotificationSettings"
+    public let pluginMethods: [CAPPluginMethod] = [
+        CAPPluginMethod(name: "open", returnType: CAPPluginReturnPromise)
+    ]
+
+    @objc func open(_ call: CAPPluginCall) {
+        DispatchQueue.main.async {
+            let target: String
+            if #available(iOS 16.0, *) {
+                target = UIApplication.openNotificationSettingsURLString
+            } else {
+                target = UIApplication.openSettingsURLString
+            }
+            guard let url = URL(string: target) else {
+                call.reject("invalid settings url")
+                return
+            }
+            UIApplication.shared.open(url) { opened in
+                if opened { call.resolve() } else { call.reject("cannot open settings") }
+            }
+        }
+    }
+}
