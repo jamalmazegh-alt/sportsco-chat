@@ -468,8 +468,10 @@ couverture de `nl` étant inégale, la vérifier avant d'ajouter des clés.
 
 ### Tests
 
-- Concurrence : deux créations d'équipe simultanées au dernier crédit → une seule réussit.
-- Concurrence : deux ajouts de joueur simultanés à 24/25 → jamais 26.
+- Concurrence : deux créations d'équipe simultanées sur la dernière place disponible
+  (2/3 équipes, `team_credits = 3`) → une seule réussit, jamais 4.
+- Concurrence : deux ajouts de joueur simultanés à 29/30 → une seule opération réussit,
+  effectif final 30, jamais 31.
 - Formule Club (`team_credits IS NULL`) : aucun verrou pris, aucune limite.
 - Import CSV dépassant la limite → lot entièrement refusé.
 - Réduction de crédits avec équipes en excès → refusée.
