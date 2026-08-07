@@ -530,85 +530,105 @@ const ConvocationInviteEmail = ({
         {clubName ? <> ({clubName})</> : null}.
       </Text>
 
-      <Section style={card}>
-        <Text style={cardKicker}>
+      {/* En-tête événement */}
+      <Section style={headerBlock}>
+        <Text style={kicker}>
           {eventType?.toUpperCase() ?? t.cardKickerDefault}
+          {teamName ? ` · ${teamName}` : ""}
           {competitionName ? ` · ${competitionName}` : ""}
         </Text>
-        <Text style={cardTitle}>{eventTitle}</Text>
-        {eventDateFmt ? <Text style={cardMeta}>📅 {eventDateFmt}</Text> : null}
-        {convocationTimeFmt ? (
-          <Text style={cardMeta}>
-            ⏰ {t.meetingTime}: <strong>{convocationTimeFmt}</strong>
-          </Text>
-        ) : null}
-        {eventLocation ? (
-          <Text style={cardMeta}>
-            📍 {eventLocation}
-            <br />
-            <a
-              href={
-                locationMapsUrl ??
-                `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(eventLocation)}`
-              }
-              style={mapsLink}
-            >
-              🗺️ Google Maps
-            </a>
-            {" · "}
-            <a
-              href={`https://www.waze.com/ul?q=${encodeURIComponent(eventLocation)}&navigate=yes`}
-              style={mapsLink}
-            >
-              🚗 Waze
-            </a>
-          </Text>
-        ) : null}
-        {meetingPoint ? (
-          <Text style={cardMeta}>
-            🚌 {t.meetingPointLabel}: {meetingPoint}
-            <br />
-            <a
-              href={
-                meetingPointMapsUrl ??
-                `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(meetingPoint)}`
-              }
-              style={mapsLink}
-            >
-              🗺️ Google Maps
-            </a>
-            {" · "}
-            <a
-              href={`https://www.waze.com/ul?q=${encodeURIComponent(meetingPoint)}&navigate=yes`}
-              style={mapsLink}
-            >
-              🚗 Waze
-            </a>
-          </Text>
-        ) : null}
-        {coachNames && coachNames.length > 0 ? (
-          <Text style={cardMeta}>
-            👤 {t.coachLabel}
-            {coachNames.length > 1 ? "s" : ""}: {coachNames.join(", ")}
-          </Text>
-        ) : coachName ? (
-          <Text style={cardMeta}>
-            👤 {t.coachLabel}: {coachName}
-          </Text>
-        ) : null}
-        {eventDescription ? (
-          <Text
-            style={{
-              ...cardMeta,
-              marginTop: 10,
-              whiteSpace: "pre-wrap" as const,
-              color: "#0f172a",
-            }}
-          >
-            📝 {eventDescription}
-          </Text>
+        <Text style={bigTitle}>{eventTitle}</Text>
+        {dateOnly ? (
+          <Text style={dateLine}>🗓️ {dateOnly}</Text>
+        ) : eventDateFmt ? (
+          <Text style={dateLine}>🗓️ {eventDateFmt}</Text>
         ) : null}
       </Section>
+
+      {/* Déroulé : point de RDV puis lieu de l'événement */}
+      {meetingPoint || convocationTimeFmt ? (
+        <Section style={{ margin: "0 0 10px" }}>
+          <Row>
+            <Column style={railCol}>
+              {rdvTime ? <Text style={railTime}>{rdvTime}</Text> : null}
+              <Text style={railLabelAccent}>{t2.rdvLabel}</Text>
+            </Column>
+            <Column>
+              <Section style={meetingCard}>
+                <Text style={meetingKicker}>{t2.meetingKicker}</Text>
+                <Text style={placeName}>{meetingPoint ?? convocationTimeFmt}</Text>
+                {!rdvTime && meetingPoint && convocationTimeFmt ? (
+                  <Text style={placeSub}>
+                    ⏰ {t.meetingTime}: {convocationTimeFmt}
+                  </Text>
+                ) : null}
+                {meetingPoint ? (
+                  <Text style={linksLine}>
+                    <a href={mapsHref(meetingPoint, meetingPointMapsUrl)} style={mapsLink}>
+                      {t2.maps}
+                    </a>
+                    {" · "}
+                    <a href={wazeHref(meetingPoint)} style={mapsLink}>
+                      {t2.waze}
+                    </a>
+                  </Text>
+                ) : null}
+              </Section>
+            </Column>
+          </Row>
+        </Section>
+      ) : null}
+
+      {eventLocation || startTime ? (
+        <Section style={{ margin: "0 0 16px" }}>
+          <Row>
+            <Column style={railCol}>
+              {startTime ? <Text style={railTime}>{startTime}</Text> : null}
+              <Text style={railLabel}>
+                {(eventType?.toUpperCase() || t2.startLabel).slice(0, 12)}
+              </Text>
+            </Column>
+            <Column>
+              <Section style={venueCard}>
+                <Text style={venueKicker}>
+                  {meetingPoint ? t2.venueKicker : t2.venueKickerOnSite}
+                </Text>
+                <Text style={placeName}>{eventLocation ?? eventTitle}</Text>
+                {eventLocation ? (
+                  <Text style={linksLine}>
+                    <a href={mapsHref(eventLocation, locationMapsUrl)} style={mapsLink}>
+                      {t2.maps}
+                    </a>
+                    {" · "}
+                    <a href={wazeHref(eventLocation)} style={mapsLink}>
+                      {t2.waze}
+                    </a>
+                  </Text>
+                ) : null}
+                {coachNames && coachNames.length > 0 ? (
+                  <Text style={placeSub}>
+                    👤 {t.coachLabel}
+                    {coachNames.length > 1 ? "s" : ""}: {coachNames.join(", ")}
+                  </Text>
+                ) : coachName ? (
+                  <Text style={placeSub}>
+                    👤 {t.coachLabel}: {coachName}
+                  </Text>
+                ) : null}
+              </Section>
+            </Column>
+          </Row>
+        </Section>
+      ) : null}
+
+      {eventDescription ? (
+        <Section style={noteCard}>
+          <Text style={noteText}>
+            💬 <strong>{t2.coachNote} — </strong>
+            <span style={{ whiteSpace: "pre-wrap" as const }}>{eventDescription}</span>
+          </Text>
+        </Section>
+      ) : null}
 
       <Text style={text}>{t.respondPrompt}</Text>
 
@@ -632,16 +652,30 @@ const ConvocationInviteEmail = ({
         </Row>
       </Section>
 
+      <Text style={smallText}>{t.foot}</Text>
+
       {squadList && squadList.length > 0 ? (
         <Section style={squadCard}>
           <Text style={squadTitle}>{t.squadTitle(squadList.length)}</Text>
-          {squadList.map((name, i) => (
-            <Text key={i} style={squadLine}>
-              • {name}
-            </Text>
-          ))}
+          <Row>
+            <Column style={{ width: "50%", verticalAlign: "top" }}>
+              {squadList.slice(0, Math.ceil(squadList.length / 2)).map((name, i) => (
+                <Text key={`sq-a-${i}`} style={squadLine}>
+                  {name}
+                </Text>
+              ))}
+            </Column>
+            <Column style={{ width: "50%", verticalAlign: "top" }}>
+              {squadList.slice(Math.ceil(squadList.length / 2)).map((name, i) => (
+                <Text key={`sq-b-${i}`} style={squadLine}>
+                  {name}
+                </Text>
+              ))}
+            </Column>
+          </Row>
         </Section>
       ) : null}
+
 
       {lineup && ((lineup.starting?.length ?? 0) > 0 || (lineup.bench?.length ?? 0) > 0) ? (
         <Section style={lineupCard}>
