@@ -1,3 +1,4 @@
+import { resolveClubTz } from "@/lib/time/club-tz";
 /**
  * Replay convocation emails that reached the DLQ for a given event.
  *
@@ -36,7 +37,7 @@ function resolveLocale(...candidates: Array<string | null | undefined>): string 
   }
   return "fr";
 }
-function fmtDate(iso: string, locale: string) {
+function fmtDate(iso: string, locale: string, tz?: string | null) {
   const bcp = locale === "en" ? "en-GB" : `${locale}-${locale.toUpperCase()}`;
   return new Date(iso).toLocaleDateString(bcp, {
     weekday: "long",
@@ -44,6 +45,7 @@ function fmtDate(iso: string, locale: string) {
     month: "long",
     hour: "2-digit",
     minute: "2-digit",
+    timeZone: resolveClubTz(tz),
   });
 }
 
@@ -302,6 +304,8 @@ export const replayEventDlq = createServerFn({ method: "POST" })
       for (const c of convs ?? []) convByPlayer.set((c as any).player_id, c);
 
       const clubLang = (ev as any).teams?.clubs?.default_language as string | null | undefined;
+
+      const clubTz = resolveClubTz((ev as any).teams?.clubs?.timezone as string | null | undefined);
       const baseUrl = process.env.SITE_URL || "https://www.clubero.app";
       const locationMapsUrl = (ev as any).location
         ? ((ev as any).location_url ??
@@ -407,6 +411,7 @@ export const replayEventDlq = createServerFn({ method: "POST" })
               respondUrl,
               isReminder: true,
               locale,
+              tz: clubTz,
             },
           });
           replayed++;

@@ -1,3 +1,4 @@
+import { resolveClubTz } from "@/lib/time/club-tz";
 /**
  * Superadmin — Rattrapage d'envoi email pour convocations existantes.
  *
@@ -33,7 +34,7 @@ function resolveLocale(...candidates: Array<string | null | undefined>): string 
   }
   return "fr";
 }
-function fmtDate(iso: string, locale: string) {
+function fmtDate(iso: string, locale: string, tz?: string | null) {
   const bcp = locale === "en" ? "en-GB" : `${locale}-${locale.toUpperCase()}`;
   return new Date(iso).toLocaleDateString(bcp, {
     weekday: "long",
@@ -41,6 +42,7 @@ function fmtDate(iso: string, locale: string) {
     month: "long",
     hour: "2-digit",
     minute: "2-digit",
+    timeZone: resolveClubTz(tz),
   });
 }
 
@@ -106,6 +108,7 @@ export const backfillConvocationEmails = createServerFn({ method: "POST" })
         res.eventTitle = e.title ?? null;
         const clubId = (e.teams?.club_id as string | null) ?? null;
         const clubLang = e.teams?.clubs?.default_language as string | null | undefined;
+        const clubTz = resolveClubTz(e.teams?.clubs?.timezone as string | null | undefined);
 
         const { data: convs } = await supabaseAdmin
           .from("convocations")
@@ -233,7 +236,7 @@ export const backfillConvocationEmails = createServerFn({ method: "POST" })
 
             const recipientLang = r.userId ? langByUser.get(r.userId) : undefined;
             const locale = resolveLocale(recipientLang, clubLang);
-            const eventDateLabel = fmtDate(e.starts_at, locale);
+            const eventDateLabel = fmtDate(e.starts_at, locale, clubTz);
             try {
               await enqueueTransactionalEmailServer({
                 templateName: "convocation-invite",
@@ -252,7 +255,7 @@ export const backfillConvocationEmails = createServerFn({ method: "POST" })
                   eventDate: eventDateLabel,
                   eventDescription: e.description ?? undefined,
                   convocationTime: e.convocation_time
-                    ? fmtDate(e.convocation_time, locale)
+                    ? fmtDate(e.convocation_time, locale, clubTz)
                     : undefined,
                   eventLocation: e.location ?? undefined,
                   locationMapsUrl,
@@ -266,6 +269,7 @@ export const backfillConvocationEmails = createServerFn({ method: "POST" })
                   lineup: lineupEmail,
                   isReminder: false,
                   locale,
+                  tz: clubTz,
                 },
               });
               res.enqueued++;
