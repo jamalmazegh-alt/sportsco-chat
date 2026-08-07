@@ -1180,8 +1180,20 @@
     "confirmResponse": "Confirmer ma réponse",
     "responseRecorded": "Réponse enregistrée",
     "coachNotified": "Le coach a été prévenu.",
-    "reasonsAbsent": ["Travail", "Famille", "Blessure", "Maladie", "Études", "Autre engagement"],
-    "reasonsUncertain": ["À confirmer", "Travail", "Famille", "Léger souci de santé"],
+    "reasonsAbsent": [
+      "Travail",
+      "Famille",
+      "Blessure",
+      "Maladie",
+      "Études",
+      "Autre engagement"
+    ],
+    "reasonsUncertain": [
+      "À confirmer",
+      "Travail",
+      "Famille",
+      "Léger souci de santé"
+    ],
     "suggestedReasons": "Suggestions",
     "forceResponseTitle": "Forcer la réponse ?",
     "forceResponseDesc": "{{name}} a déjà répondu {{current}}. Voulez-vous vraiment forcer son statut à {{next}} ?",
@@ -1606,6 +1618,8 @@
     "hubCampsHint": "Créez, publiez et gérez les stages proposés par votre club",
     "emailLanguage": "Langue des emails de communication",
     "emailLanguageHint": "Langue utilisée pour les emails envoyés par le club aux destinataires qui n'ont pas défini de langue préférée.",
+    "clubTimezone": "Fuseau horaire du club",
+    "clubTimezoneHint": "Utilisé pour les horaires affichés dans les e-mails et notifications envoyés par le club.",
     "inviteCooldown": "Invitation déjà envoyée à {{email}}. Vous pourrez renvoyer dans {{seconds}} s.",
     "inviteSentTo": "Invitation envoyée à {{email}}. Renvoi possible dans 60 s."
   },

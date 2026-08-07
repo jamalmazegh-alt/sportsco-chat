@@ -1180,8 +1180,20 @@
     "confirmResponse": "Confirm response",
     "responseRecorded": "Response recorded",
     "coachNotified": "The coach has been notified.",
-    "reasonsAbsent": ["Work", "Family", "Injury", "Illness", "Studies", "Other commitment"],
-    "reasonsUncertain": ["To confirm", "Work", "Family", "Minor health issue"],
+    "reasonsAbsent": [
+      "Work",
+      "Family",
+      "Injury",
+      "Illness",
+      "Studies",
+      "Other commitment"
+    ],
+    "reasonsUncertain": [
+      "To confirm",
+      "Work",
+      "Family",
+      "Minor health issue"
+    ],
     "suggestedReasons": "Suggestions",
     "forceResponseTitle": "Force response?",
     "forceResponseDesc": "{{name}} already responded {{current}}. Do you really want to force their status to {{next}}?",
@@ -1606,6 +1618,8 @@
     "hubCampsHint": "Create, publish and manage camps offered by your club",
     "emailLanguage": "Communication email language",
     "emailLanguageHint": "Language used for emails sent by the club to recipients who have not set a preferred language.",
+    "clubTimezone": "Club time zone",
+    "clubTimezoneHint": "Used for the times shown in emails and notifications sent by the club.",
     "inviteCooldown": "Invitation already sent to {{email}}. You can resend in {{seconds}}s.",
     "inviteSentTo": "Invitation sent to {{email}}. You can resend in 60s."
   },
