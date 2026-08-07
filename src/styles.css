@@ -8,6 +8,13 @@
 @import "@fontsource/dm-sans/600.css";
 @import "@fontsource/dm-sans/700.css";
 @import "@fontsource/space-grotesk/500.css";
+/* Sora : utilisé par l'écran de connexion et la bannière marketing. Servi
+   jusqu'ici par une feuille Google Fonts distante, chargée AVANT le premier
+   rendu — donc un aller-retour réseau à chaque démarrage de l'application
+   native, alors que tout le reste est déjà sur l'appareil. */
+@import "@fontsource/sora/500.css";
+@import "@fontsource/sora/600.css";
+@import "@fontsource/sora/700.css";
 @import "@fontsource/space-grotesk/600.css";
 @import "@fontsource/space-grotesk/700.css";
 @import "@fontsource/inter/400.css";
