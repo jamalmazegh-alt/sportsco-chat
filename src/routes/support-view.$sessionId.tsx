@@ -36,7 +36,6 @@ export const Route = createFileRoute("/support-view/$sessionId")({
     queryClient: getSupportQueryClient(params.sessionId),
   }),
 
-
   loader: async ({ params }) => {
     try {
       const session = await getSupportViewSession({ data: { session_id: params.sessionId } });

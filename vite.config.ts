@@ -42,7 +42,6 @@ export default async function config(env: ConfigEnv) {
   // variable, et conservent donc le SSR à l'identique.
   const isMobileBuild = process.env.MOBILE_BUILD === "1";
 
-
   return defineLovableConfig({
     // Le build mobile n'a pas de serveur : c'est un shell statique embarqué dans
     // l'app, le Worker restant le backend distant. Nitro force la sortie vers
