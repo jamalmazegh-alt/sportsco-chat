@@ -1,4 +1,5 @@
 import { supabase } from "@/integrations/supabase/client";
+import { apiUrl } from "@/lib/native-platform";
 
 export interface SendTransactionalEmailParams {
   templateName: string;
@@ -18,7 +19,9 @@ export async function sendTransactionalEmail(params: SendTransactionalEmailParam
     data: { session },
   } = await supabase.auth.getSession();
   if (!session) throw new Error("Not authenticated");
-  const response = await fetch("/lovable/email/transactional/send", {
+  // `apiUrl` absolutise en natif : dans la WebView Capacitor, un chemin relatif
+  // viserait le bundle embarqué et l'envoi échouerait silencieusement.
+  const response = await fetch(apiUrl("/lovable/email/transactional/send"), {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
