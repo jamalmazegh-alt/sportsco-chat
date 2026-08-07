@@ -329,6 +329,128 @@ const T: Record<
   },
 };
 
+/** Libellés additionnels pour la mise en page « déroulé de la journée ». */
+const T2: Record<
+  Locale,
+  {
+    rdvLabel: string;
+    startLabel: string;
+    meetingKicker: string;
+    venueKicker: string;
+    venueKickerOnSite: string;
+    coachNote: string;
+    maps: string;
+    waze: string;
+  }
+> = {
+  fr: {
+    rdvLabel: "RDV",
+    startLabel: "DÉBUT",
+    meetingKicker: "🚌 POINT DE RENDEZ-VOUS",
+    venueKicker: "📍 LIEU DE L’ÉVÉNEMENT",
+    venueKickerOnSite: "📍 LIEU · RENDEZ-VOUS SUR PLACE",
+    coachNote: "Consigne du coach",
+    maps: "🗺️ Google Maps",
+    waze: "🚗 Waze",
+  },
+  en: {
+    rdvLabel: "MEET",
+    startLabel: "START",
+    meetingKicker: "🚌 MEETING POINT",
+    venueKicker: "📍 VENUE",
+    venueKickerOnSite: "📍 VENUE · MEET THERE",
+    coachNote: "Coach’s note",
+    maps: "🗺️ Google Maps",
+    waze: "🚗 Waze",
+  },
+  es: {
+    rdvLabel: "CITA",
+    startLabel: "INICIO",
+    meetingKicker: "🚌 PUNTO DE ENCUENTRO",
+    venueKicker: "📍 LUGAR",
+    venueKickerOnSite: "📍 LUGAR · QUEDADA ALLÍ",
+    coachNote: "Indicación del entrenador",
+    maps: "🗺️ Google Maps",
+    waze: "🚗 Waze",
+  },
+  de: {
+    rdvLabel: "TREFF",
+    startLabel: "START",
+    meetingKicker: "🚌 TREFFPUNKT",
+    venueKicker: "📍 ORT",
+    venueKickerOnSite: "📍 ORT · TREFFEN VOR ORT",
+    coachNote: "Hinweis des Trainers",
+    maps: "🗺️ Google Maps",
+    waze: "🚗 Waze",
+  },
+  it: {
+    rdvLabel: "RITROVO",
+    startLabel: "INIZIO",
+    meetingKicker: "🚌 PUNTO DI RITROVO",
+    venueKicker: "📍 LUOGO",
+    venueKickerOnSite: "📍 LUOGO · RITROVO SUL POSTO",
+    coachNote: "Indicazione dell’allenatore",
+    maps: "🗺️ Google Maps",
+    waze: "🚗 Waze",
+  },
+  nl: {
+    rdvLabel: "VERZAMELEN",
+    startLabel: "START",
+    meetingKicker: "🚌 VERZAMELPUNT",
+    venueKicker: "📍 LOCATIE",
+    venueKickerOnSite: "📍 LOCATIE · TER PLAATSE",
+    coachNote: "Bericht van de coach",
+    maps: "🗺️ Google Maps",
+    waze: "🚗 Waze",
+  },
+  pt: {
+    rdvLabel: "ENCONTRO",
+    startLabel: "INÍCIO",
+    meetingKicker: "🚌 PONTO DE ENCONTRO",
+    venueKicker: "📍 LOCAL",
+    venueKickerOnSite: "📍 LOCAL · ENCONTRO NO LOCAL",
+    coachNote: "Indicação do treinador",
+    maps: "🗺️ Google Maps",
+    waze: "🚗 Waze",
+  },
+};
+
+const isIso = (v?: string | null) => !!v && /^\d{4}-\d{2}-\d{2}T/.test(v);
+const bcpOf = (l: Locale) => (l === "en" ? "en-GB" : `${l}-${l.toUpperCase()}`);
+
+const fmtTimeOnly = (value?: string | null, l: Locale = "fr", tz?: string | null) => {
+  if (!isIso(value)) return undefined;
+  try {
+    return new Date(value as string).toLocaleTimeString(bcpOf(l), {
+      hour: "2-digit",
+      minute: "2-digit",
+      timeZone: tz ?? undefined,
+    });
+  } catch {
+    return undefined;
+  }
+};
+
+const fmtDateOnly = (value?: string | null, l: Locale = "fr", tz?: string | null) => {
+  if (!isIso(value)) return undefined;
+  try {
+    return new Date(value as string).toLocaleDateString(bcpOf(l), {
+      weekday: "long",
+      day: "numeric",
+      month: "long",
+      timeZone: tz ?? undefined,
+    });
+  } catch {
+    return undefined;
+  }
+};
+
+const mapsHref = (place: string, explicit?: string) =>
+  explicit ?? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(place)}`;
+const wazeHref = (place: string) =>
+  `https://www.waze.com/ul?q=${encodeURIComponent(place)}&navigate=yes`;
+
+
 const ConvocationInviteEmail = ({
   recipientFirstName,
   playerName,
