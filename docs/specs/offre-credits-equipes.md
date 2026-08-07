@@ -15,17 +15,23 @@
 
 ```text
 Essai Découverte — 30 jours, gratuit, sans carte bancaire
-  1 équipe · 25 joueurs max · pas de tournois
+  1 équipe · 25 joueurs max · ni tournois ni stages
   → à l'échéance sans paiement : club verrouillé (comportement actuel)
   → PAS d'offre gratuite permanente
 
 Offre à crédits — 9,99 €/mois ou 99,99 €/an PAR CRÉDIT
-  1 crédit = 1 place d'équipe · 25 joueurs max par équipe · pas de tournois
+  1 crédit = 1 place d'équipe · 25 joueurs max par équipe
+  ni tournois ni stages
   plafond dur à 4 crédits
 
 Offre Club — 49 €/mois ou 490 €/an (existante, inchangée)
-  équipes illimitées · joueurs illimités · fonctionnalités club · tournois
+  équipes illimitées · joueurs illimités · fonctionnalités club
+  tournois ET stages
 ```
+
+**Tournois et stages sont des fonctionnalités Club.** Ce sont les deux modules
+« événementiels » qui dépassent le cadre d'une équipe : ils s'adressent à une structure
+organisatrice, pas à un coach gérant son effectif.
 
 Grille tarifaire :
 
@@ -57,10 +63,10 @@ ALTER TABLE public.subscriptions
 
 Cette colonne encode **à la fois le palier et toutes ses limites** :
 
-| `team_credits` | Formule | Équipes | Joueurs / équipe | Tournois |
-|---|---|---|---|---|
-| `NULL` | **Club** | illimitées | illimités | autorisés |
-| `1` à `4` | **Crédits** | = `team_credits` | 25 | bloqués |
+| `team_credits` | Formule | Équipes | Joueurs / équipe | Tournois | Stages |
+|---|---|---|---|---|---|
+| `NULL` | **Club** | illimitées | illimités | autorisés | autorisés |
+| `1` à `4` | **Crédits** | = `team_credits` | 25 | bloqués | bloqués |
 
 **Tous les clubs existants prennent `NULL` par défaut** → formule Club → comportement
 strictement inchangé. C'est une migration additive sans backfill.
@@ -197,11 +203,69 @@ exclue.
 ### 5.4 Tournois
 
 Bloqués dès que `team_credits IS NOT NULL`. Une seule fonction SQL existante est
-concernée : `can_create_tournament`.
+concernée : `can_create_tournament`, qui contrôle déjà l'abonnement.
 
 L'équipe peut toujours **participer** à un tournoi tiers selon les flux existants ; seules
 la création et l'administration sont bloquées. Écran d'upsell vers les offres tournoi
 existantes, jamais une erreur ni une page vide.
+
+### 5.5 Stages — attention, garde différente des tournois
+
+Le module Stages est complet : tables `club_camps`, `club_camp_age_groups`,
+`club_camp_program_items`, `club_camp_registrations`, `club_camp_documents`,
+`club_camp_required_documents`, `club_camp_registration_documents`,
+`club_camp_document_purge_log` ; routes publiques `stages.$clubSlug.$campSlug.*` ;
+server functions dans `src/lib/camps.functions.ts` et `src/lib/camp-registrations.functions.ts`.
+
+**Différence structurelle avec les tournois, à ne pas manquer :**
+
+| | Tournois | Stages |
+|---|---|---|
+| Garde de création | `can_create_tournament(_user_id)` — **contrôle l'abonnement** | **aucune garde d'abonnement** |
+| Garde existante | — | `can_manage_club_camp(_camp_id, _user_id)` — **rôle seul**, et exige un camp déjà existant |
+| Création côté serveur | — | `camps.functions.ts:191` (création) et `:607` (duplication), gardées par `assertClubRole(MANAGER_ROLES)` uniquement, écriture via `supabaseAdmin` |
+| Policy RLS INSERT sur `club_camps` | — | rôle seul (`admin`/`dirigeant`/`coach`), contournée par `supabaseAdmin` |
+
+`can_manage_club_camp` **ne peut pas servir de garde de création** : elle prend un
+`_camp_id` qui n'existe pas encore. Il n'existe donc aujourd'hui **aucun contrôle
+d'abonnement sur les stages** — tout club dont le rôle convient peut en créer.
+
+Aujourd'hui cela ne se voit pas, parce qu'un club sans abonnement actif est verrouillé
+globalement et n'atteint jamais les écrans de stages. **Mais un club en formule à crédits
+a un abonnement actif** : le verrou global le laisse passer, et les stages lui seraient
+donc entièrement accessibles. Il faut ajouter la garde.
+
+**Travail requis, en trois couches :**
+
+1. **Server functions** — ajouter le contrôle `team_credits IS NULL` aux deux chemins de
+   création de `camps.functions.ts` (`:191` création, `:607` duplication), à côté de
+   l'`assertClubRole` existant. C'est la couche décisive, puisque les écritures passent par
+   `supabaseAdmin`.
+2. **Policy RLS INSERT sur `club_camps`** — même contrôle, en défense en profondeur.
+3. **Interface** — masquer l'entrée Stages en formule à crédits, avec écran d'upsell,
+   jamais une page vide ni une erreur.
+
+`can_manage_club_camp` **n'est pas modifiée** : si la création est bloquée, il n'y a pas de
+stage à gérer. La modifier risquerait au contraire de verrouiller un club en pleine saison
+lors d'un changement de formule.
+
+**Compatibilité ascendante** : les clubs existants ont `team_credits = NULL`, donc le
+nouveau contrôle les laisse passer. Aucun changement de comportement.
+
+### 5.6 Passage de la formule Club à la formule à crédits
+
+Refusé si le club possède des ressources qui n'existent pas dans la formule à crédits :
+
+```text
+plus de 4 équipes non archivées      → refus
+au moins un stage non archivé        → refus
+au moins un tournoi non archivé      → refus
+une équipe de plus de 25 joueurs     → refus
+```
+
+Message explicite indiquant ce qui bloque et ce qu'il faut archiver. Même logique que la
+réduction de crédits (§5.3) : **ne jamais laisser passer un downgrade qui créerait des
+ressources orphelines ou partiellement couvertes.**
 
 ### 5.5 Fin d'essai
 
@@ -234,8 +298,16 @@ rate limiter fail-closed, le helper existant étant fail-open
 2. Trigger `auto_create_trial_subscription` : `14 days` → `30 days`. **Release dédiée.**
 3. `can_create_tournament` : ajout du contrôle `team_credits IS NULL`. **Release dédiée,
    via `_v2` comparée avant substitution** (§9).
-4. RPC de création d'équipe avec contrôle de crédits.
-5. RPC d'ajout de joueur et d'import avec contrôle de la limite.
+4. Policy RLS INSERT sur `club_camps` : ajout du même contrôle, en défense en profondeur.
+   **Release dédiée.**
+5. RPC de création d'équipe avec contrôle de crédits.
+6. RPC d'ajout de joueur et d'import avec contrôle de la limite.
+
+### Server functions
+
+- `camps.functions.ts` : contrôle `team_credits IS NULL` sur les deux chemins de création
+  (`:191` et `:607`) — **couche décisive**, les écritures passant par `supabaseAdmin`.
+- Garde de downgrade (§5.6) sur le changement de formule.
 
 ### Stripe
 
@@ -251,8 +323,8 @@ rate limiter fail-closed, le helper existant étant fail-open
 
 - Choix du nombre de crédits au checkout, avec le tarif calculé.
 - Page de facturation : crédits utilisés / disponibles, ajout et retrait, upsell Club à 4.
-- Blocages : création d'équipe au-delà des crédits, ajout de joueur au-delà de 25, écran
-  d'upsell tournoi.
+- Blocages : création d'équipe au-delà des crédits, ajout de joueur au-delà de 25, écrans
+  d'upsell tournoi **et stages**, message de refus de downgrade (§5.6).
 - Page pricing à trois colonnes, i18n **7 locales**, `bun run check:i18n` vert.
 
 ### Tests
@@ -265,6 +337,10 @@ rate limiter fail-closed, le helper existant étant fail-open
 - Caractérisation : un club existant conserve exactement son comportement actuel.
 - Régression tournoi : club à crédits → création refusée ; club en formule Club avec
   abonnement actif → autorisée ; entitlement tournoi → comportement conservé.
+- Régression stage : club à crédits → création **et duplication** refusées, par la server
+  function **et** par la policy RLS testée séparément ; club en formule Club → autorisées.
+- Downgrade refusé si stages, tournois, plus de 4 équipes ou une équipe de plus de
+  25 joueurs.
 
 ---
 
@@ -274,9 +350,9 @@ rate limiter fail-closed, le helper existant étant fail-open
 `team_credits`, trigger d'essai à 30 jours (release dédiée), RPC de contrôle des crédits
 et de la limite de joueurs, tests de concurrence, tests de caractérisation.
 
-**Lot 2 — Stripe, tournois et interface**
-Prix, checkout avec quantité, gestion des crédits, garde de réduction, contrôle tournoi
-(release dédiée), écrans, pricing, i18n.
+**Lot 2 — Stripe, modules Club et interface**
+Prix, checkout avec quantité, gestion des crédits, garde de réduction et de downgrade,
+contrôle tournoi et contrôle stages (releases dédiées), écrans, pricing, i18n.
 
 Deux lots au lieu de huit.
 
@@ -336,6 +412,8 @@ Formule Club : aucune limite de joueurs ni d'équipes
 Crédits : 9,99 €/mois ou 99,99 €/an l'unité, plafond DUR à 4
 Réduction de crédits : uniquement si les équipes en excès sont archivées
 Tournois : bloqués en formule à crédits, participation conservée
+Stages : bloqués en formule à crédits — garde à CRÉER, elle n'existe pas
+Downgrade Club → crédits : refusé si stages, tournois, >4 équipes ou équipe >25 joueurs
 Clubs en double : aucun rapprochement, choix manuel de l'utilisateur
 team_members.status : non nécessaire en V1
 exempt_until : dette indépendante, plus un prérequis
