@@ -4,6 +4,10 @@ apply plugin: 'com.android.application'
 // gitignoré (modèle : keystore.properties.example). Absent — cas du poste d'un
 // contributeur ou d'une CI sans secrets — le build debug continue de fonctionner
 // et seul `assembleRelease` échouera, explicitement.
+// Numéro et nom de version injectés par la CI (vides en local — voir plus bas).
+def ciVersionCode = System.getenv("ANDROID_VERSION_CODE")?.trim()
+def ciVersionName = System.getenv("ANDROID_VERSION_NAME")?.trim()
+
 def keystorePropsFile = rootProject.file("keystore.properties")
 def keystoreProps = new Properties()
 if (keystorePropsFile.exists()) {
@@ -21,8 +25,13 @@ android {
         // Store, même pour un correctif — Google refuse un code déjà utilisé,
         // et il n'est jamais réutilisable, même après suppression d'un build.
         // versionName : chaîne affichée à l'utilisateur, libre.
-        versionCode 13
-        versionName "1.0"
+        //
+        // En CI, `ANDROID_VERSION_CODE` / `ANDROID_VERSION_NAME` prennent le pas
+        // (voir .github/workflows/mobile-release.yml) : c'est ce qui supprime le
+        // dernier geste manuel avant chaque envoi. Les valeurs littérales
+        // ci-dessous restent celles des builds locaux.
+        versionCode ciVersionCode ? ciVersionCode.toInteger() : 13
+        versionName ciVersionName ?: "1.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         aaptOptions {
              // Files and dirs to omit from the packaged assets dir, modified to accommodate modern web apps.

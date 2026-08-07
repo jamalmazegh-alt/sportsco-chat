@@ -162,7 +162,7 @@ Choix d'image système à conserver : variante **Google Play** obligatoire — s
 
 ### Lot 7 — CI/CD et tests
 
-- `bun run build:mobile && npx cap sync` dans la CI ; build iOS sur runner macOS, signature via fastlane match ou App Store Connect API key.
+- **Fait** : `.github/workflows/mobile-release.yml` — build du shell SPA, `cap sync`, signature et envoi sur la piste interne du Play Store et sur TestFlight, déclenché par un tag `v*`. Signature iOS par clé API App Store Connect (profil créé automatiquement) plutôt que fastlane match, qui aurait imposé un dépôt de certificats supplémentaire. Configuration et secrets : `docs/dev/mobile-release.md`.
 - Les tests Playwright existants restent sur le build web ; ajouter une passe de smoke tests sur simulateur/émulateur.
 
 ---

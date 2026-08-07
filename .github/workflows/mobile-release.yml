@@ -1,0 +1,401 @@
+name: Mobile release (iOS + Android)
+
+# Chaîne de publication mobile complète, sans geste manuel après le clic
+# initial : build du shell SPA, `cap sync`, signature, puis envoi sur TestFlight
+# (iOS) et sur la piste interne du Play Store (Android).
+#
+# La seule validation humaine est l'approbation de l'environnement GitHub
+# `mobile-release` au démarrage de l'exécution. Prérequis de configuration
+# (secrets, comptes, premier envoi manuel obligatoire côté Google) :
+# docs/dev/mobile-release.md.
+
+on:
+  # Publication nominale : un tag `v1.2.3` déclenche les deux plateformes.
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch:
+    inputs:
+      platforms:
+        description: "Plateformes à construire"
+        type: choice
+        options:
+          - both
+          - ios
+          - android
+        default: both
+      version_name:
+        description: "Version affichée (ex. 1.2.0). Vide = valeur du projet."
+        required: false
+        default: ""
+      upload:
+        description: "Envoyer sur TestFlight / Play Store (sinon artefacts seuls)"
+        type: boolean
+        default: true
+
+# Deux exécutions simultanées se disputeraient le même numéro de build côté
+# stores : on sérialise, sans annuler une publication en cours.
+concurrency:
+  group: mobile-release
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  prepare:
+    name: Paramètres de build
+    runs-on: ubuntu-latest
+    outputs:
+      build_number: ${{ steps.compute.outputs.build_number }}
+      version_name: ${{ steps.compute.outputs.version_name }}
+      build_id: ${{ steps.compute.outputs.build_id }}
+      android: ${{ steps.compute.outputs.android }}
+      ios: ${{ steps.compute.outputs.ios }}
+      upload: ${{ steps.compute.outputs.upload }}
+    steps:
+      - id: compute
+        env:
+          EVENT: ${{ github.event_name }}
+          PLATFORMS: ${{ inputs.platforms }}
+          INPUT_VERSION: ${{ inputs.version_name }}
+          INPUT_UPLOAD: ${{ inputs.upload }}
+          # Décalage garantissant un numéro supérieur aux builds déjà envoyés
+          # à la main (versionCode 13 côté Android, CFBundleVersion 6 côté iOS).
+          # Un numéro de build n'est JAMAIS réutilisable : il ne doit que croître.
+          OFFSET: ${{ vars.MOBILE_BUILD_NUMBER_OFFSET || 1000 }}
+        run: |
+          set -euo pipefail
+
+          build_number=$(( OFFSET + GITHUB_RUN_NUMBER ))
+          echo "build_number=$build_number" >> "$GITHUB_OUTPUT"
+          echo "build_id=${build_number}-${GITHUB_SHA:0:7}" >> "$GITHUB_OUTPUT"
+
+          # Version affichée : le tag fait foi quand il y en a un.
+          if [ "$EVENT" = "push" ]; then
+            version_name="${GITHUB_REF_NAME#v}"
+          else
+            version_name="$INPUT_VERSION"
+          fi
+          echo "version_name=$version_name" >> "$GITHUB_OUTPUT"
+
+          platforms="${PLATFORMS:-both}"
+          if [ "$EVENT" = "push" ]; then platforms=both; fi
+          case "$platforms" in
+            both) android=true;  ios=true ;;
+            ios)  android=false; ios=true ;;
+            android) android=true; ios=false ;;
+          esac
+          echo "android=$android" >> "$GITHUB_OUTPUT"
+          echo "ios=$ios" >> "$GITHUB_OUTPUT"
+
+          # Un tag publie toujours ; en manuel, la case le décide.
+          if [ "$EVENT" = "push" ]; then upload=true; else upload="${INPUT_UPLOAD:-true}"; fi
+          echo "upload=$upload" >> "$GITHUB_OUTPUT"
+
+          {
+            echo "### Build mobile #$build_number"
+            echo ""
+            echo "- Plateformes : \`$platforms\`"
+            echo "- Version affichée : \`${version_name:-(valeur du projet)}\`"
+            echo "- Envoi aux stores : \`$upload\`"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+  android:
+    name: Android (AAB → Play interne)
+    needs: prepare
+    if: needs.prepare.outputs.android == 'true'
+    runs-on: ubuntu-latest
+    # Porte de validation : protéger cet environnement par un « required
+    # reviewer » suffit à obtenir l'approbation unique au démarrage.
+    environment: mobile-release
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Vérifier les secrets de signature
+        env:
+          ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+          PLAY_SERVICE_ACCOUNT_JSON: ${{ secrets.PLAY_SERVICE_ACCOUNT_JSON }}
+          UPLOAD: ${{ needs.prepare.outputs.upload }}
+        run: |
+          set -uo pipefail
+          missing=""
+          for name in ANDROID_KEYSTORE_BASE64 ANDROID_KEYSTORE_PASSWORD ANDROID_KEY_ALIAS ANDROID_KEY_PASSWORD; do
+            [ -n "${!name}" ] || missing="$missing $name"
+          done
+          if [ "$UPLOAD" = "true" ] && [ -z "$PLAY_SERVICE_ACCOUNT_JSON" ]; then
+            missing="$missing PLAY_SERVICE_ACCOUNT_JSON"
+          fi
+          if [ -n "$missing" ]; then
+            echo "::error::Secrets manquants :$missing — voir docs/dev/mobile-release.md"
+            exit 1
+          fi
+
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+
+      - name: Neutraliser le JDK épinglé pour macOS
+        # `android/gradle.properties` fixe `org.gradle.java.home` sur un chemin
+        # Homebrew (poste de dev macOS) qui n'existe pas ici. Le
+        # `gradle.properties` de GRADLE_USER_HOME est prioritaire sur celui du
+        # projet : on y réécrit la valeur au lieu de modifier le dépôt.
+        run: |
+          set -euo pipefail
+          mkdir -p ~/.gradle
+          echo "org.gradle.java.home=$JAVA_HOME" >> ~/.gradle/gradle.properties
+
+      - name: Accepter les licences du SDK Android
+        # `compileSdk 36` : si la plateforme manque sur l'image du runner, AGP
+        # la télécharge — mais uniquement si les licences sont acceptées.
+        run: yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --licenses > /dev/null || true
+
+      - name: Installer les dépendances
+        run: bun install --frozen-lockfile
+
+      - name: Build du shell SPA mobile
+        env:
+          VITE_API_ORIGIN: ${{ vars.MOBILE_API_ORIGIN || 'https://clubero.app' }}
+          VITE_PUBLIC_ORIGIN: ${{ vars.MOBILE_PUBLIC_ORIGIN }}
+          # Busteur du cache TanStack Query persisté : sans valeur distincte à
+          # chaque build, une app mise à jour repartirait du cache de l'ancienne.
+          VITE_BUILD_ID: ${{ needs.prepare.outputs.build_id }}
+          VITE_SUPABASE_URL: ${{ vars.VITE_SUPABASE_URL }}
+          VITE_SUPABASE_PUBLISHABLE_KEY: ${{ vars.VITE_SUPABASE_PUBLISHABLE_KEY }}
+          VITE_POSTHOG_KEY: ${{ vars.VITE_POSTHOG_KEY }}
+          VITE_POSTHOG_HOST: ${{ vars.VITE_POSTHOG_HOST }}
+          VITE_SENTRY_DSN: ${{ vars.VITE_SENTRY_DSN }}
+        run: bun run build:mobile:prod
+
+      - name: Synchroniser le projet Android
+        run: bunx cap sync android
+
+      - name: Restaurer le keystore de release
+        env:
+          ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+        run: |
+          set -euo pipefail
+          keystore="$RUNNER_TEMP/release.keystore"
+          printf '%s' "$ANDROID_KEYSTORE_BASE64" | base64 -d > "$keystore"
+          # `android/app/build.gradle` lit ce fichier ; absent, il produirait un
+          # artefact non signé que le Play Store refuserait.
+          {
+            printf 'storeFile=%s\n' "$keystore"
+            printf 'storePassword=%s\n' "$ANDROID_KEYSTORE_PASSWORD"
+            printf 'keyAlias=%s\n' "$ANDROID_KEY_ALIAS"
+            printf 'keyPassword=%s\n' "$ANDROID_KEY_PASSWORD"
+          } > android/keystore.properties
+
+      - name: Construire l'AAB et l'APK signés
+        working-directory: android
+        env:
+          ANDROID_VERSION_CODE: ${{ needs.prepare.outputs.build_number }}
+          ANDROID_VERSION_NAME: ${{ needs.prepare.outputs.version_name }}
+        run: ./gradlew --no-daemon bundleRelease assembleRelease
+
+      - name: Vérifier que l'AAB est bien signé
+        run: |
+          set -euo pipefail
+          aab=android/app/build/outputs/bundle/release/app-release.aab
+          # jarsigner échoue si l'archive n'a pas de bloc de signature : c'est le
+          # seul contrôle qui distingue un artefact publiable d'un artefact que
+          # le Play Store rejettera après plusieurs minutes d'upload.
+          jarsigner -verify "$aab" | tee /dev/stderr | grep -q "jar verified"
+
+      - name: Effacer les identifiants de signature
+        if: always()
+        run: rm -f android/keystore.properties "$RUNNER_TEMP/release.keystore"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: android-${{ needs.prepare.outputs.build_number }}
+          retention-days: 30
+          path: |
+            android/app/build/outputs/bundle/release/app-release.aab
+            android/app/build/outputs/apk/release/app-release.apk
+
+      - name: Publier sur la piste interne du Play Store
+        if: needs.prepare.outputs.upload == 'true'
+        uses: r0adkll/upload-google-play@v1
+        with:
+          serviceAccountJsonPlainText: ${{ secrets.PLAY_SERVICE_ACCOUNT_JSON }}
+          packageName: app.clubero.mobile
+          releaseFiles: android/app/build/outputs/bundle/release/app-release.aab
+          track: internal
+          status: completed
+
+  ios:
+    name: iOS (IPA → TestFlight)
+    needs: prepare
+    if: needs.prepare.outputs.ios == 'true'
+    runs-on: macos-15
+    environment: mobile-release
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Vérifier les secrets de signature
+        env:
+          IOS_DIST_CERT_P12_BASE64: ${{ secrets.IOS_DIST_CERT_P12_BASE64 }}
+          IOS_DIST_CERT_PASSWORD: ${{ secrets.IOS_DIST_CERT_PASSWORD }}
+          ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
+          ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
+          ASC_KEY_P8_BASE64: ${{ secrets.ASC_KEY_P8_BASE64 }}
+        run: |
+          set -uo pipefail
+          missing=""
+          for name in IOS_DIST_CERT_P12_BASE64 IOS_DIST_CERT_PASSWORD ASC_KEY_ID ASC_ISSUER_ID ASC_KEY_P8_BASE64; do
+            [ -n "${!name}" ] || missing="$missing $name"
+          done
+          if [ -n "$missing" ]; then
+            echo "::error::Secrets manquants :$missing — voir docs/dev/mobile-release.md"
+            exit 1
+          fi
+
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Installer les dépendances
+        run: bun install --frozen-lockfile
+
+      - name: Build du shell SPA mobile
+        env:
+          VITE_API_ORIGIN: ${{ vars.MOBILE_API_ORIGIN || 'https://clubero.app' }}
+          VITE_PUBLIC_ORIGIN: ${{ vars.MOBILE_PUBLIC_ORIGIN }}
+          VITE_BUILD_ID: ${{ needs.prepare.outputs.build_id }}
+          VITE_SUPABASE_URL: ${{ vars.VITE_SUPABASE_URL }}
+          VITE_SUPABASE_PUBLISHABLE_KEY: ${{ vars.VITE_SUPABASE_PUBLISHABLE_KEY }}
+          VITE_POSTHOG_KEY: ${{ vars.VITE_POSTHOG_KEY }}
+          VITE_POSTHOG_HOST: ${{ vars.VITE_POSTHOG_HOST }}
+          VITE_SENTRY_DSN: ${{ vars.VITE_SENTRY_DSN }}
+        run: bun run build:mobile:prod
+
+      - name: Synchroniser le projet iOS
+        run: bunx cap sync ios
+
+      - name: Importer le certificat de distribution
+        env:
+          IOS_DIST_CERT_P12_BASE64: ${{ secrets.IOS_DIST_CERT_P12_BASE64 }}
+          IOS_DIST_CERT_PASSWORD: ${{ secrets.IOS_DIST_CERT_PASSWORD }}
+        run: |
+          set -euo pipefail
+          keychain="$RUNNER_TEMP/signing.keychain-db"
+          password=$(openssl rand -base64 24)
+          p12="$RUNNER_TEMP/dist.p12"
+          printf '%s' "$IOS_DIST_CERT_P12_BASE64" | base64 -d > "$p12"
+
+          security create-keychain -p "$password" "$keychain"
+          security set-keychain-settings -lut 21600 "$keychain"
+          security unlock-keychain -p "$password" "$keychain"
+          security import "$p12" -k "$keychain" -P "$IOS_DIST_CERT_PASSWORD" \
+            -T /usr/bin/codesign -T /usr/bin/security
+          # Sans cette ligne, codesign ouvre une boîte de dialogue « autoriser
+          # l'accès au trousseau » — donc un blocage silencieux sur un runner.
+          security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k "$password" "$keychain" > /dev/null
+          # Le trousseau doit rester dans la liste de recherche pour xcodebuild.
+          security list-keychains -d user -s "$keychain" $(security list-keychains -d user | tr -d '"')
+
+          rm -f "$p12"
+          echo "SIGNING_KEYCHAIN=$keychain" >> "$GITHUB_ENV"
+
+      - name: Installer la clé API App Store Connect
+        env:
+          ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
+          ASC_KEY_P8_BASE64: ${{ secrets.ASC_KEY_P8_BASE64 }}
+        run: |
+          set -euo pipefail
+          # Emplacement conventionnel : `xcrun altool` y cherche la clé tout seul.
+          dir="$HOME/.appstoreconnect/private_keys"
+          mkdir -p "$dir"
+          key="$dir/AuthKey_${ASC_KEY_ID}.p8"
+          printf '%s' "$ASC_KEY_P8_BASE64" | base64 -d > "$key"
+          chmod 600 "$key"
+          echo "ASC_KEY_PATH=$key" >> "$GITHUB_ENV"
+
+      - name: Archiver
+        env:
+          ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
+          ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
+          BUILD_NUMBER: ${{ needs.prepare.outputs.build_number }}
+          VERSION_NAME: ${{ needs.prepare.outputs.version_name }}
+        run: |
+          set -euo pipefail
+          xcodebuild -version
+
+          args=(
+            -project ios/App/App.xcodeproj
+            -scheme App
+            -configuration Release
+            -destination "generic/platform=iOS"
+            -archivePath "$RUNNER_TEMP/App.xcarchive"
+            # Laisse Xcode créer / rafraîchir le profil de provisioning via la
+            # clé API : c'est ce qui évite d'entretenir un .mobileprovision à la
+            # main à chaque expiration.
+            -allowProvisioningUpdates
+            -authenticationKeyPath "$ASC_KEY_PATH"
+            -authenticationKeyID "$ASC_KEY_ID"
+            -authenticationKeyIssuerID "$ASC_ISSUER_ID"
+            OTHER_CODE_SIGN_FLAGS="--keychain $SIGNING_KEYCHAIN"
+            "CURRENT_PROJECT_VERSION=$BUILD_NUMBER"
+          )
+          if [ -n "$VERSION_NAME" ]; then args+=("MARKETING_VERSION=$VERSION_NAME"); fi
+
+          xcodebuild "${args[@]}" archive
+
+      - name: Exporter l'IPA
+        env:
+          ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
+          ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
+        run: |
+          set -euo pipefail
+          xcodebuild -exportArchive \
+            -archivePath "$RUNNER_TEMP/App.xcarchive" \
+            -exportOptionsPlist ios/ExportOptions.plist \
+            -exportPath "$RUNNER_TEMP/ipa" \
+            -allowProvisioningUpdates \
+            -authenticationKeyPath "$ASC_KEY_PATH" \
+            -authenticationKeyID "$ASC_KEY_ID" \
+            -authenticationKeyIssuerID "$ASC_ISSUER_ID"
+
+      - name: Rassembler les dSYM
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/ipa/dSYMs"
+          cp -R "$RUNNER_TEMP/App.xcarchive/dSYMs/." "$RUNNER_TEMP/ipa/dSYMs/" || true
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ios-${{ needs.prepare.outputs.build_number }}
+          retention-days: 30
+          path: ${{ runner.temp }}/ipa
+
+      - name: Envoyer sur TestFlight
+        if: needs.prepare.outputs.upload == 'true'
+        env:
+          ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
+          ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
+        run: |
+          set -euo pipefail
+          ipa=$(find "$RUNNER_TEMP/ipa" -maxdepth 1 -name "*.ipa" | head -n 1)
+          [ -n "$ipa" ] || { echo "::error::Aucun .ipa exporté"; exit 1; }
+          xcrun altool --upload-app -f "$ipa" -t ios \
+            --apiKey "$ASC_KEY_ID" --apiIssuer "$ASC_ISSUER_ID"
+
+      - name: Supprimer le trousseau temporaire
+        if: always()
+        run: |
+          security delete-keychain "$RUNNER_TEMP/signing.keychain-db" 2> /dev/null || true
+          rm -rf "$HOME/.appstoreconnect/private_keys"
