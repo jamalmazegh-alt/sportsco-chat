@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
+import { apiUrl } from "@/lib/native-platform";
 import { useTranslation } from "react-i18next";
 import { useChat } from "@ai-sdk/react";
 import { DefaultChatTransport } from "ai";
@@ -35,7 +36,10 @@ export function MarketingChatWidget() {
   }, [i18n.language]);
   const transport = useRef(
     new DefaultChatTransport({
-      api: "/api/public/marketing-chat",
+      // Même piège que l'assistant du dashboard : le transport de l'AI SDK
+      // échappe à `serverFns.fetch`, un chemin relatif viserait donc le bundle
+      // embarqué en natif au lieu du serveur.
+      api: apiUrl("/api/public/marketing-chat"),
       prepareSendMessagesRequest: ({ messages, id, body }) => ({
         body: { messages, id, language: langRef.current, ...body },
       }),
