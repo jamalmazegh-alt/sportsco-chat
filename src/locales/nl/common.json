@@ -1261,7 +1261,7 @@
     "matchesWithResult": "Wedstrijden",
     "diff": "Verschil",
     "winRate": "% Overwinningen",
-    "currentSeason": "Huidig ​​seizoen",
+    "currentSeason": "Huidig seizoen",
     "wins": "wint",
     "noPlayersInTeam": "Geen spelers in dit team.",
     "col": {
@@ -2644,7 +2644,7 @@
     ],
     "successTitle": "Betaling bevestigd",
     "metaTitle": "Toernooifacturering — Clubero",
-    "metaDesc": "Kies je plan om een ​​toernooi te organiseren met Clubero — €39 per evenement of €149/jaar onbeperkt."
+    "metaDesc": "Kies je plan om een toernooi te organiseren met Clubero — €39 per evenement of €149/jaar onbeperkt."
   },
   "eventCreateChooser": {
     "title": "Nieuw evenement",
@@ -2820,7 +2820,7 @@
       "label": "Interne clubvergadering (geen team)",
       "subtitle": "Bestuur, commissie, docenten… zichtbaar voor beheerders en genodigden"
     },
-    "namePlaceholder": "Bijvoorbeeld Winterkamp, ​​recreatief toernooi…",
+    "namePlaceholder": "Bijvoorbeeld Winterkamp, recreatief toernooi…",
     "range": {
       "dates": "Data van het kamp",
       "pickEnd": "einddatum",
@@ -3786,7 +3786,7 @@
     "flightsReady": "Groepsfasen zijn afgerond. Maak Flights aan om de 3 schema’s te genereren (Champions / Europa / Conference)."
   },
   "draw": {
-    "relaunchFromFooterHint": "Trekking voltooid. Gebruik ‘Opnieuw starten’ onderaan het dialoogvenster om een ​​nieuwe te genereren (huidige resultaten gaan verloren)."
+    "relaunchFromFooterHint": "Trekking voltooid. Gebruik ‘Opnieuw starten’ onderaan het dialoogvenster om een nieuwe te genereren (huidige resultaten gaan verloren)."
   },
   "fields": {
     "streamUrlPlaceholder": "Streaming-URL (YouTube, Twitch…)"

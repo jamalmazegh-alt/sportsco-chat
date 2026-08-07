@@ -3323,7 +3323,7 @@
       "noDocs": "Keine Dokumente hochgeladen.",
       "sensitive": "Sensibel",
       "reasonLabel": "Grund",
-      "notAllowed": "Sensibles Dokument – ​​Zugang nur für Clubleiter.",
+      "notAllowed": "Sensibles Dokument – Zugang nur für Clubleiter.",
       "openDoc": "Öffnen",
       "approve": "Genehmigen",
       "reject": "Ablehnen",
@@ -3482,7 +3482,7 @@
       "included": "Im Club-Abonnement enthalten",
       "includedDesc": "Unbegrenzte Turniere, keine Gebühren pro Veranstaltung",
       "includedBody": "Wenn du ein Clubero-Abo hast, organisierst du ohne Aufpreis so viele Turniere, wie du möchtest.",
-      "standalone": "Ohne Abonnement – ​​pro Veranstaltung",
+      "standalone": "Ohne Abonnement – pro Veranstaltung",
       "standaloneDesc": "Zahl 40 € pro Turnier, das war’s",
       "standaloneBody": "Ein einmaliges Turnier ohne Club veranstalten? Nutze Clubero nach Bedarf, ohne Bindung."
     },
@@ -3608,7 +3608,7 @@
       },
       "capacity": {
         "title": "Spots und Preis",
-        "hint": "Wie viele Teilnehmer, zu welchem ​​Preis"
+        "hint": "Wie viele Teilnehmer, zu welchem Preis"
       },
       "venue": {
         "title": "Wo ist das Lager?",
