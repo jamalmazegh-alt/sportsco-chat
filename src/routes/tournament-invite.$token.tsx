@@ -105,7 +105,9 @@ function AcceptInvitePage() {
             {t("invite.alreadyAccepted")}
           </div>
           <Button asChild className="w-full">
-            <Link to="/tournament/$slug" params={{ slug: invite.tournament_slug as string }}>{t("invite.viewTournament")}</Link>
+            <Link to="/tournament/$slug" params={{ slug: invite.tournament_slug as string }}>
+              {t("invite.viewTournament")}
+            </Link>
           </Button>
         </div>
       ) : !user ? (
