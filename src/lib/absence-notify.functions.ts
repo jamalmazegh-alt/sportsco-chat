@@ -1,3 +1,4 @@
+import { formatDateOnly } from "@/lib/time/club-tz";
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
@@ -197,20 +198,7 @@ export const notifyCoachesOfAbsence = createServerFn({ method: "POST" })
     const localeFor = (p: any) => resolveLocale(p?.preferred_language, clubDefaultLang);
     const fmtFor = (locale: string) => {
       const bcp = locale === "en" ? "en-GB" : `${locale}-${locale.toUpperCase()}`;
-      return (d: string) => {
-        try {
-          // Date seule : on la parse en UTC et on l'affiche en UTC pour que le
-          // jour calendaire reste identique quel que soit le fuseau du club.
-          return new Date(`${d}T00:00:00Z`).toLocaleDateString(bcp, {
-            weekday: "long",
-            day: "numeric",
-            month: "long",
-            timeZone: "UTC",
-          });
-        } catch {
-          return d;
-        }
-      };
+      return (d: string) => formatDateOnly(d, bcp);
     };
 
     // Push fan-out — independent of email preference / auth email presence.

@@ -17,6 +17,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { CLUB_TIMEZONES, resolveClubTz } from "@/lib/time/club-tz";
+import { invalidateClubTzCache } from "@/lib/time/club-tz.functions";
 
 export const Route = createFileRoute("/_authenticated/admin/settings/communications")({
   component: CommunicationsSettings,
@@ -101,6 +102,8 @@ function CommunicationsSettings() {
       .eq("id", form.id);
     setSaving(false);
     if (error) return toast.error(error.message);
+    // Le fuseau est mis en cache côté serveur pour les e-mails/push : on le purge.
+    await invalidateClubTzCache({ data: { clubId: form.id } }).catch(() => undefined);
     toast.success(t("admin.saved"));
     refetch();
   }

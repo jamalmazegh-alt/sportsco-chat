@@ -30,12 +30,13 @@ async function getTeamClubId(teamId: string | null | undefined): Promise<string 
 }
 
 const SUPPORTED = new Set(["fr", "en", "es", "de", "it", "nl", "pt"]);
-function fmtDate(iso: string): string {
+function fmtDate(iso: string, tz: string): string {
   const dt = new Date(iso);
   return dt.toLocaleDateString("fr-FR", {
     weekday: "short",
     day: "numeric",
     month: "short",
+    timeZone: tz,
   });
 }
 
@@ -72,7 +73,7 @@ export async function fanoutConvocationResponse(
   const opponent = (ev.opponent as string | null) || null;
   const typeLabel =
     ev.type === "match" ? (opponent ? `Match vs ${opponent}` : "Match") : ev.title || "Événement";
-  const dateStr = ev.starts_at ? fmtDate(ev.starts_at) : "";
+  const dateStr = ev.starts_at ? fmtDate(ev.starts_at, await getClubTz(clubId)) : "";
 
   const emoji = status === "present" ? "✅" : status === "absent" ? "❌" : "❓";
   const statusLabel =
@@ -156,7 +157,9 @@ export async function fanoutConvocationComplete(
         ? `Match vs ${opponent}`
         : "Match"
       : (ev as any).title || "Événement";
-  const dateStr = (ev as any).starts_at ? fmtDate((ev as any).starts_at) : "";
+  const dateStr = (ev as any).starts_at
+    ? fmtDate((ev as any).starts_at, await getClubTz(clubId))
+    : "";
 
   const body =
     `${present} présent${present > 1 ? "s" : ""} · ${absent} absent${absent > 1 ? "s" : ""} · ${uncertain} incertain${uncertain > 1 ? "s" : ""} — ${typeLabel} ${dateStr}`.trim();
