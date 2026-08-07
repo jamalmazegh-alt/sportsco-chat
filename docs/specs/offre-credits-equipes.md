@@ -319,13 +319,99 @@ rate limiter fail-closed, le helper existant étant fail-open
 - Webhook : lecture de `sub.items.data[0].quantity` → miroir dans `team_credits`. **Aucune
   nouvelle branche** : le flux Club existant traite déjà ces événements.
 
+### Page pricing — comparatif explicite
+
+**Exigence : l'utilisateur doit voir ce qui est inclus ET ce qui ne l'est pas**, sans avoir
+à déduire une exclusion de son absence dans une liste. Une fonctionnalité absente d'une
+colonne doit apparaître barrée ou marquée ❌, pas simplement omise.
+
+État actuel (`src/routes/pricing.tsx`, 249 lignes) : trois cartes — Club 49 €/490 €,
+Tournois, et Fédération sur contact — avec les fonctionnalités en tableaux i18n
+(`pricing.clubFeatures`, `pricing.enterpriseFeatures` via `returnObjects`).
+
+Structure cible : **quatre colonnes de plan** (Découverte, Crédits, Club, Fédération) plus
+les modules à part, et surtout un **tableau comparatif** sous les cartes. Le motif
+« liste de features par carte » ne permet pas de montrer une exclusion — il faut un
+tableau à lignes communes.
+
+#### Matrice à afficher
+
+| | Découverte | Crédits | Club | Fédération |
+|---|---|---|---|---|
+| **Prix** | Gratuit, 30 jours | 9,99 €/mois par équipe | 49 €/mois | Sur devis |
+| | sans carte bancaire | 99,99 €/an par équipe | 490 €/an | |
+| **Équipes** | 1 | 1 à 4 | Illimitées | Illimitées |
+| **Joueurs par équipe** | 25 | 25 | ❌ Illimités | Illimités |
+| **Coaches et staff** | Illimités | Illimités | Illimités | Illimités |
+| **Gestion d'équipe** | ✅ | ✅ | ✅ | ✅ |
+| Événements, entraînements, matchs | ✅ | ✅ | ✅ | ✅ |
+| Convocations et réponses | ✅ | ✅ | ✅ | ✅ |
+| Présences et compositions | ✅ | ✅ | ✅ | ✅ |
+| Disponibilités joueurs et staff | ✅ | ✅ | ✅ | ✅ |
+| Mur d'équipe et mur staff | ✅ | ✅ | ✅ | ✅ |
+| Sondages, documents, calendrier | ✅ | ✅ | ✅ | ✅ |
+| Parents et responsables légaux | ✅ | ✅ | ✅ | ✅ |
+| Import de joueurs | ✅ | ✅ | ✅ | ✅ |
+| Statistiques d'équipe | ✅ | ✅ | ✅ | ✅ |
+| Notifications et emails | ✅ | ✅ | ✅ | ✅ |
+| **Fonctionnalités club** | ❌ | ❌ | ✅ | ✅ |
+| Mur général du club | ❌ | ❌ | ✅ | ✅ |
+| Statistiques consolidées | ❌ | ❌ | ✅ | ✅ |
+| Groupes transverses | ❌ | ❌ | ✅ | ✅ |
+| Communication à tout le club | ❌ | ❌ | ✅ | ✅ |
+| Gestion centralisée des membres | ❌ | ❌ | ✅ | ✅ |
+| Documents communs | ❌ | ❌ | ✅ | ✅ |
+| **Tournois** | ❌ | ❌ | ✅ | ✅ |
+| **Stages** | ❌ | ❌ | ✅ | ✅ |
+| Identité du club (nom, logo) | ✅ | ✅ | ✅ | ✅ |
+
+> La ligne « Joueurs par équipe » est la seule où l'offre Club se distingue par une
+> **absence** de limite : la formuler « Illimités » plutôt que par un nombre rend le
+> bénéfice lisible.
+
+#### Points à corriger sur la page existante
+
+1. **Incohérence à résoudre** — la FAQ (`marketing.json:1079`) promet déjà « 30 jours sans
+   carte bancaire, pour une équipe jusqu'à 25 membres », alors que le code donne 14 jours
+   et aucune limite. La page et le code doivent converger sur 30 jours et 25 joueurs.
+2. **Sélecteur de crédits** — afficher le prix calculé pour 1 à 4 équipes, et basculer
+   visiblement vers la formule Club au-delà (« À partir de 5 équipes, la formule Club à
+   49 €/mois est plus avantageuse »).
+3. **Les cartes Tournois et Fédération restent** — la carte Tournois vend un module
+   indépendant, la carte Fédération est un contact commercial. Ni l'une ni l'autre ne
+   change.
+
+#### Conséquence i18n
+
+Le motif actuel `returnObjects` (un tableau de chaînes par carte) ne convient pas à un
+tableau comparatif : il produirait des listes désynchronisées entre colonnes.
+
+Structure recommandée — **une clé par ligne**, et les valeurs par plan portées par le code
+et non par les traductions :
+
+```text
+pricing.compare.rows.teams.label       → "Équipes"
+pricing.compare.rows.maxPlayers.label  → "Joueurs par équipe"
+pricing.compare.values.unlimited       → "Illimité"
+pricing.compare.values.included        → "Inclus"
+pricing.compare.values.excluded        → "Non inclus"
+```
+
+Les ✅/❌ et les nombres viennent d'une structure TypeScript unique ; seules les
+**étiquettes** sont traduites. Cela divise le volume de clés par quatre et garantit qu'une
+ligne ne puisse pas diverger d'une langue à l'autre.
+
+**7 locales** (`fr, en, de, es, it, nl, pt`), `bun run check:i18n` vert avant merge. La
+couverture de `nl` étant inégale, la vérifier avant d'ajouter des clés.
+
 ### Interface
 
 - Choix du nombre de crédits au checkout, avec le tarif calculé.
 - Page de facturation : crédits utilisés / disponibles, ajout et retrait, upsell Club à 4.
 - Blocages : création d'équipe au-delà des crédits, ajout de joueur au-delà de 25, écrans
   d'upsell tournoi **et stages**, message de refus de downgrade (§5.6).
-- Page pricing à trois colonnes, i18n **7 locales**, `bun run check:i18n` vert.
+- Page pricing refondue avec le tableau comparatif ci-dessus, montrant explicitement les
+  exclusions, i18n **7 locales**, `bun run check:i18n` vert.
 
 ### Tests
 
@@ -397,8 +483,11 @@ concernés et régularisation, dans une release dédiée.
 **Dette CI.** Corriger les contrôles bloquants (dont `check:i18n`) avant de s'en servir
 comme critères de sortie ; baseline chiffrée pour la dette réellement indépendante.
 
-**Incohérence marketing.** Le site promet 30 jours d'essai, le code en donne 14
-(`20260604212414_…sql:12`). La migration du Lot 1 résout cette incohérence.
+**Incohérence marketing.** Le site promet 30 jours d'essai et une équipe jusqu'à
+25 membres (`marketing.json:1079`), le code donne 14 jours sans aucune limite
+(`20260604212414_…sql:12`). Le Lot 1 résout les deux volets de cette incohérence, et la
+refonte de la page pricing la rend visible plutôt que de la laisser dans une réponse de
+FAQ.
 
 ---
 
