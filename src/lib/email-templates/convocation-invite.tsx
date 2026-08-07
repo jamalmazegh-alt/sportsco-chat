@@ -450,7 +450,6 @@ const mapsHref = (place: string, explicit?: string) =>
 const wazeHref = (place: string) =>
   `https://www.waze.com/ul?q=${encodeURIComponent(place)}&navigate=yes`;
 
-
 const ConvocationInviteEmail = ({
   recipientFirstName,
   playerName,
@@ -679,7 +678,6 @@ const ConvocationInviteEmail = ({
           </Row>
         </Section>
       ) : null}
-
 
       {lineup && ((lineup.starting?.length ?? 0) > 0 || (lineup.bench?.length ?? 0) > 0) ? (
         <Section style={lineupCard}>
@@ -979,3 +977,74 @@ const pitchPenaltyBottom = {
   borderRight: "1px solid rgba(255,255,255,0.7)",
   borderTop: "1px solid rgba(255,255,255,0.7)",
 };
+
+/* --- Mise en page « déroulé de la journée » --- */
+const headerBlock = { margin: "0 0 18px" };
+const kicker = {
+  fontSize: "12px",
+  fontWeight: "bold" as const,
+  color: "#0ea5e9",
+  letterSpacing: "1.4px",
+  margin: "0 0 8px",
+};
+const bigTitle = {
+  fontSize: "23px",
+  lineHeight: "30px",
+  fontWeight: "bold" as const,
+  color: "#0f172a",
+  margin: "0 0 6px",
+};
+const dateLine = { fontSize: "15px", color: "#64748b", margin: 0 };
+const railCol = { width: "72px", verticalAlign: "top" as const, paddingRight: "12px" };
+const railTime = {
+  fontSize: "25px",
+  fontWeight: "bold" as const,
+  color: "#0f172a",
+  lineHeight: "1",
+  margin: "0 0 4px",
+};
+const railLabel = {
+  fontSize: "11px",
+  fontWeight: "bold" as const,
+  color: "#64748b",
+  letterSpacing: "0.8px",
+  margin: 0,
+};
+const railLabelAccent = { ...railLabel, color: "#0ea5e9" };
+const meetingCard = {
+  backgroundColor: "#eff6ff",
+  border: "1px solid #cfe3ff",
+  borderRadius: "12px",
+  padding: "14px 16px",
+};
+const venueCard = {
+  backgroundColor: "#f5f7fa",
+  border: "1px solid #e8edf3",
+  borderRadius: "12px",
+  padding: "14px 16px",
+};
+const meetingKicker = {
+  fontSize: "12px",
+  fontWeight: "bold" as const,
+  color: "#0ea5e9",
+  letterSpacing: "1px",
+  margin: "0 0 6px",
+};
+const venueKicker = { ...meetingKicker, color: "#64748b" };
+const placeName = {
+  fontSize: "16px",
+  fontWeight: 600,
+  color: "#0f172a",
+  lineHeight: "22px",
+  margin: "0 0 2px",
+};
+const placeSub = { fontSize: "14px", color: "#64748b", margin: "6px 0 0" };
+const linksLine = { fontSize: "14px", margin: "10px 0 0" };
+const noteCard = {
+  backgroundColor: "#fff8e7",
+  border: "1px solid #fbe3b0",
+  borderRadius: "10px",
+  padding: "12px 14px",
+  margin: "0 0 18px",
+};
+const noteText = { fontSize: "14px", lineHeight: "20px", color: "#7a5a12", margin: 0 };
