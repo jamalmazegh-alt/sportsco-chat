@@ -51,3 +51,23 @@ export const withClubTz = <T extends Intl.DateTimeFormatOptions>(
   options: T,
   tz?: string | null,
 ): T & { timeZone: string } => ({ ...options, timeZone: resolveClubTz(tz) });
+
+/**
+ * Formate une date SEULE (`YYYY-MM-DD`, sans heure) sans jamais décaler le jour.
+ * On parse en UTC et on rend en UTC : le jour calendaire saisi est celui affiché,
+ * quel que soit le fuseau du serveur ou du club.
+ */
+export const formatDateOnly = (
+  date: string,
+  locale: string,
+  options: Intl.DateTimeFormatOptions = { weekday: "long", day: "numeric", month: "long" },
+): string => {
+  try {
+    return new Date(`${date}T00:00:00Z`).toLocaleDateString(locale, {
+      ...options,
+      timeZone: "UTC",
+    });
+  } catch {
+    return date;
+  }
+};
