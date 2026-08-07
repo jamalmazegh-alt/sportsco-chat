@@ -32,6 +32,11 @@ const config: CapacitorConfig = {
   ios: {
     contentInset: "always",
   },
+  // Journaux JS conservés en build de release : par défaut Capacitor les
+  // supprime hors debug, rendant une build TestFlight totalement muette.
+  // Constaté en cherchant la cause d'un échec d'activation des
+  // notifications sur iPhone — aucune console ne montrait rien.
+  loggingBehavior: "production",
   android: {
     // `false` depuis que l'API de production est en HTTPS (https://clubero.app) :
     // la WebView, servie en https://localhost, n'a plus de contenu mixte à

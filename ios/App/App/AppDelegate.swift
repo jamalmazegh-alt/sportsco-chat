@@ -1,5 +1,6 @@
 import UIKit
 import Capacitor
+import UserNotifications
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -9,6 +10,32 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         // Override point for customization after application launch.
         return true
+    }
+
+    // APNs répond au système, pas au plugin. Sans ces deux relais, le jeton
+    // arrive bien à l'application mais n'est transmis à personne : le plugin
+    // Capacitor attend un événement qui ne vient jamais, et `register()` finit
+    // en délai dépassé. C'est ce qui bloquait l'activation des notifications
+    // sur iPhone — ni la clé APNs, ni le profil, ni l'entitlement n'étaient en
+    // cause. Ces méthodes font partie du modèle Capacitor mais manquaient ici.
+    func application(
+        _ application: UIApplication,
+        didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data
+    ) {
+        NotificationCenter.default.post(
+            name: .capacitorDidRegisterForRemoteNotifications,
+            object: deviceToken
+        )
+    }
+
+    func application(
+        _ application: UIApplication,
+        didFailToRegisterForRemoteNotificationsWithError error: Error
+    ) {
+        NotificationCenter.default.post(
+            name: .capacitorDidFailToRegisterForRemoteNotifications,
+            object: error
+        )
     }
 
     func applicationWillResignActive(_ application: UIApplication) {
@@ -26,6 +53,14 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }
 
     func applicationDidBecomeActive(_ application: UIApplication) {
+        // La pastille rouge est imposée par le serveur à chaque notification :
+        // iOS ne la décrémente jamais seul. Sans cette remise à zéro, elle
+        // resterait affichée même après que l'utilisateur ait tout lu.
+        if #available(iOS 16.0, *) {
+            UNUserNotificationCenter.current().setBadgeCount(0)
+        } else {
+            application.applicationIconBadgeNumber = 0
+        }
         // Restart any tasks that were paused (or not yet started) while the application was inactive. If the application was previously in the background, optionally refresh the user interface.
     }
 

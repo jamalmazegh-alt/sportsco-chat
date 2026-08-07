@@ -27,6 +27,12 @@ export interface ApnsPayload {
   body: string;
   url?: string;
   tag?: string;
+  /**
+   * Pastille rouge sur l'icône. iOS ne la déduit PAS des notifications reçues :
+   * c'est le serveur qui impose le nombre à chaque envoi. Sans ce champ, aucune
+   * pastille n'apparaît jamais — quel que soit le nombre de notifications.
+   */
+  badge?: number;
 }
 
 /** Résultat d'un envoi : le statut HTTP pilote l'élagage des tokens morts. */
@@ -162,6 +168,9 @@ export async function sendApnsToToken(
     aps: {
       alert: { title: payload.title, body: payload.body },
       sound: "default",
+      // `0` est une valeur significative — elle efface la pastille — d'où le
+      // test sur `undefined` plutôt que sur la véracité.
+      ...(payload.badge !== undefined ? { badge: payload.badge } : {}),
       // Regroupe les notifications d'un même sujet plutôt que de les empiler,
       // équivalent du `tag` Web Push et Android.
       ...(payload.tag ? { "thread-id": payload.tag } : {}),

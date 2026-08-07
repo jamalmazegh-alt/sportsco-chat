@@ -3998,7 +3998,8 @@
     "bannerDesc": "Recevez vos convocations et rappels en temps réel",
     "bannerEnable": "Activer",
     "bannerLater": "Plus tard",
-    "close": "Fermer"
+    "close": "Fermer",
+    "openSettings": "Ouvrir les réglages"
   },
   "offline": {
     "metaTitle": "Hors ligne — Clubero",

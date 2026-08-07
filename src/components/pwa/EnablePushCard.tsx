@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
+import { openInSystemApp } from "@/lib/open-url";
 import { useTranslation } from "react-i18next";
-import { Bell, BellOff, CheckCircle2, Loader2, Smartphone } from "lucide-react";
+import { Bell, BellOff, CheckCircle2, Loader2, Settings, Smartphone } from "lucide-react";
 import { toast } from "sonner";
 import { isIOS, isInStandaloneMode, isPushSupported } from "@/lib/pwa";
-import { isNativePlatform } from "@/lib/native-platform";
+import { isNativePlatform, getPlatform } from "@/lib/native-platform";
 import { enableNativePush, getNativePushStatus, type NativePushStatus } from "@/lib/native-push";
 import { subscribeToPush } from "@/lib/push-subscribe";
 
@@ -49,7 +50,11 @@ function EnablePushCardNative() {
         setStatus("denied");
         toast.error(t("push.toastDenied"));
       } else {
-        toast.error(t("push.toastImpossible"));
+        // La raison est affichée à l'écran, pas seulement journalisée :
+        // Capacitor supprime les journaux JS en build de release, une
+        // TestFlight est donc muette et l'utilisateur — comme moi — n'avait
+        // aucun moyen de savoir ce qui avait échoué.
+        toast.error(`${t("push.toastImpossible")} (${res.reason ?? "inconnu"})`);
         console.warn("[native-push] enable KO:", res.reason);
       }
     } finally {
@@ -112,11 +117,30 @@ function EnablePushCardNative() {
             <div className="h-10 w-10 shrink-0 rounded-xl bg-amber-50 flex items-center justify-center text-amber-600">
               <BellOff className="h-5 w-5" />
             </div>
-            <div className="min-w-0">
+            <div className="min-w-0 flex-1">
               <p className="text-sm font-medium">{t("push.disabledTitle")}</p>
               <p className="text-xs text-muted-foreground mt-0.5 leading-relaxed">
                 {t("push.disabledDesc")}
               </p>
+              {/* Une permission refusée ne peut plus être redemandée : iOS
+                  interdit de rouvrir la boîte de dialogue système. Les Réglages
+                  sont le seul chemin, autant y emmener plutôt que de décrire
+                  l'itinéraire.
+
+                  iOS UNIQUEMENT : `app-settings:` est un schéma propre à Apple.
+                  Sur Android, Capacitor tenterait un ACTION_VIEW dessus, aucune
+                  application ne le gérerait, et le bouton serait mort. Ouvrir
+                  les réglages de notification Android demande un Intent
+                  explicite, hors de portée d'une simple URL. */}
+              {getPlatform() === "ios" && (
+                <button
+                  type="button"
+                  onClick={() => openInSystemApp("app-settings:")}
+                  className="mt-3 inline-flex items-center gap-2 px-3.5 py-2 rounded-lg border border-border text-xs font-semibold hover:bg-accent transition"
+                >
+                  <Settings className="h-3.5 w-3.5" /> {t("push.openSettings")}
+                </button>
+              )}
             </div>
           </div>
         )}
