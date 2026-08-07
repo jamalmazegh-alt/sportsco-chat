@@ -214,7 +214,9 @@ export const sendManualConvocationReminder = createServerFn({ method: "POST" })
             eventType: ev.type,
             eventDate: eventDateLabel,
             eventDescription: ev.description ?? undefined,
-            convocationTime: ev.convocation_time ? fmtDate(ev.convocation_time, locale, clubTz) : undefined,
+            convocationTime: ev.convocation_time
+              ? fmtDate(ev.convocation_time, locale, clubTz)
+              : undefined,
             eventLocation: ev.location ?? undefined,
             locationMapsUrl,
             meetingPoint: ev.meeting_point ?? undefined,

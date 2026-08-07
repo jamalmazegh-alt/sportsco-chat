@@ -54,10 +54,10 @@ export async function dispatchEventNeedPublication(params: DispatchPublicationPa
       : "";
     const timeStr = startsAt
       ? new Date(startsAt).toLocaleTimeString("fr-FR", {
-        hour: "2-digit",
-        minute: "2-digit",
-        timeZone: clubTz,
-      })
+          hour: "2-digit",
+          minute: "2-digit",
+          timeZone: clubTz,
+        })
       : "";
     const body = startsAt
       ? `Nouveau coup de main demandé pour ${eventTitle} — ${dateStr} à ${timeStr}`
@@ -188,7 +188,6 @@ export async function notifyStaffOfSignup(params: NotifyStaffOfSignupParams) {
   const teamName = (ev?.teams?.name as string | null) ?? null;
   const isHome = ev?.is_home as boolean | null | undefined;
   const clubTz = resolveClubTz((ev?.teams?.clubs?.timezone as string | null) ?? null);
-
 
   let matchLine = eventTitle;
   if (isMatch && teamName) {
