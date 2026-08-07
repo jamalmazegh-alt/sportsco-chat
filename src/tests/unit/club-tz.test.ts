@@ -65,7 +65,6 @@ describe("formatDateOnly (code réel utilisé par les notifications d'absence)",
     });
   });
 
-
   it("retourne la valeur brute si la locale est invalide", () => {
     expect(formatDateOnly("2026-08-07", "!!invalid!!")).toBe("2026-08-07");
   });
