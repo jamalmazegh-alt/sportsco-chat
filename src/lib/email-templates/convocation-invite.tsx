@@ -481,8 +481,12 @@ const ConvocationInviteEmail = ({
 }: Props) => {
   const l: Locale = pickLocale(locale);
   const t = T[l];
+  const t2 = T2[l];
   const eventDateFmt = formatEmailDateTime(eventDate, l, tz);
   const convocationTimeFmt = formatEmailDateTime(convocationTime, l, tz);
+  const dateOnly = fmtDateOnly(eventDate, l, tz);
+  const startTime = fmtTimeOnly(eventDate, l, tz);
+  const rdvTime = fmtTimeOnly(convocationTime, l, tz);
   return (
     <EmailShell
       preview={`${isUpdate ? t.update : isReminder ? t.reminder : ""}${t.convocation}: ${eventTitle}${eventDateFmt ? ` — ${eventDateFmt}` : ""}`}
