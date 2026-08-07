@@ -1,5 +1,11 @@
 import { describe, expect, it } from "vitest";
-import { CLUB_TIMEZONES, DEFAULT_CLUB_TZ, resolveClubTz, withClubTz } from "@/lib/time/club-tz";
+import {
+  CLUB_TIMEZONES,
+  DEFAULT_CLUB_TZ,
+  formatDateOnly,
+  resolveClubTz,
+  withClubTz,
+} from "@/lib/time/club-tz";
 
 describe("resolveClubTz", () => {
   it("falls back to Europe/Paris for empty or invalid input", () => {
@@ -24,15 +30,22 @@ describe("withClubTz", () => {
   });
 });
 
-describe("date-only rendering", () => {
-  const render = (d: string) =>
-    new Date(`${d}T00:00:00Z`).toLocaleDateString("fr-FR", {
-      day: "numeric",
-      month: "long",
-      timeZone: "UTC",
-    });
+describe("formatDateOnly (code réel utilisé par les notifications d'absence)", () => {
+  it("garde le jour saisi quel que soit le fuseau du process", () => {
+    expect(formatDateOnly("2026-08-07", "fr-FR")).toBe("vendredi 7 août");
+    expect(formatDateOnly("2026-01-01", "en-GB", { day: "numeric", month: "long" })).toBe(
+      "1 January",
+    );
+  });
 
-  it("keeps the calendar day stable regardless of the club timezone", () => {
-    expect(render("2026-08-07")).toContain("7");
+  it("ne recule pas d'un jour en fuseau occidental", () => {
+    const tz = process.env.TZ;
+    process.env.TZ = "America/Los_Angeles";
+    expect(formatDateOnly("2026-08-07", "fr-FR", { day: "numeric", month: "numeric" })).toBe("7/8");
+    process.env.TZ = tz;
+  });
+
+  it("retourne la valeur brute si la locale est invalide", () => {
+    expect(formatDateOnly("2026-08-07", "!!invalid!!")).toBe("2026-08-07");
   });
 });
