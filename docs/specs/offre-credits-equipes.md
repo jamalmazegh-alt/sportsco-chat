@@ -1,4 +1,4 @@
-# Offre Clubero à crédits d'équipes — spécification
+# Offre Clubero par équipe — spécification
 
 > **Statut : spécification de référence.** Remplace le chantier « Offre Équipe » précédent
 > (sept documents, huit lots), abandonné au profit de ce modèle radicalement plus simple.
@@ -15,14 +15,14 @@
 
 ```text
 Essai Découverte — 30 jours, gratuit, sans carte bancaire
-  1 équipe · 25 joueurs max · ni tournois ni stages
+  1 équipe · 30 joueurs max · ni tournois ni stages
   → à l'échéance sans paiement : club verrouillé (comportement actuel)
   → PAS d'offre gratuite permanente
 
-Offre à crédits — 9,99 €/mois ou 99,99 €/an PAR CRÉDIT
-  1 crédit = 1 place d'équipe · 25 joueurs max par équipe
+Offre par équipe — 9,99 €/mois ou 99,99 €/an PAR ÉQUIPE
+  1 équipe = 9,99 €/mois · 30 joueurs max par équipe
   ni tournois ni stages
-  plafond dur à 4 crédits
+  plafond dur à 4 équipes
 
 Offre Club — 49 €/mois ou 490 €/an (existante, inchangée)
   équipes illimitées · joueurs illimités · fonctionnalités club
@@ -33,9 +33,34 @@ Offre Club — 49 €/mois ou 490 €/an (existante, inchangée)
 « événementiels » qui dépassent le cadre d'une équipe : ils s'adressent à une structure
 organisatrice, pas à un coach gérant son effectif.
 
+### ⚠️ Terminologie — « crédit » est un terme INTERNE
+
+Le mot **crédit** ne doit jamais apparaître dans l'interface, la page pricing, les emails
+ni les factures. L'utilisateur raisonne en **nombre d'équipes**.
+
+```text
+INTERFACE                          INTERNE (code, base, logs)
+« Combien d'équipes ? »            team_credits
+« 3 équipes — 29,97 €/mois »       quantity = 3
+« Ajouter une équipe »             quantity 2 → 3
+```
+
+Deux raisons. D'abord la lisibilité : un coach qui découvre Clubero comprend « une équipe
+à 9,99 € », pas « acheter 3 crédits ». Ensuite la non-confusion : les crédits tournoi
+existent déjà et sont des **achats consommables à usage unique** (§4). Employer le même
+mot pour des places récurrentes créerait une ambiguïté durable, y compris dans le support.
+
+**Conséquence souvent oubliée : le libellé Stripe est visible du client.** Le nom du
+produit et le *nickname* du prix apparaissent sur les factures et dans le portail de
+facturation. Le produit Stripe doit donc s'appeler « Équipe Clubero » ou équivalent —
+**jamais « Crédit »**. Une facture indiquant « 3 × Crédit » serait incompréhensible.
+
+Les clés i18n suivent la même règle : `pricing.teams.*`, pas `pricing.credits.*`.
+Seuls la colonne `subscriptions.team_credits`, le code et les journaux gardent le terme.
+
 Grille tarifaire :
 
-| Crédits | Mensuel | Annuel |
+| Équipes | Mensuel | Annuel |
 |---|---|---|
 | 1 | 9,99 € | 99,99 € |
 | 2 | 19,98 € | 199,98 € |
@@ -43,14 +68,39 @@ Grille tarifaire :
 | 4 | 39,96 € | 399,96 € |
 | **Club** | **49,00 €** | **490,00 €** |
 
-Le plafond à 4 est **dur**, pas un simple conseil : à 5 crédits l'utilisateur paierait
+Le plafond à 4 est **dur**, pas un simple conseil : à 5 équipes l'utilisateur paierait
 49,95 €/mois (499,95 €/an) contre 49 €/mois (490 €/an) pour la formule Club — plus cher
 pour moins de fonctionnalités. Le seuil tombe au même endroit en mensuel et en annuel.
 
-**Cohérence avec la promesse publique.** `src/locales/fr/marketing.json:1079` annonce déjà
-« une période d'essai gratuit de 30 jours sans carte bancaire, pour une équipe jusqu'à
-25 membres ». Le code donne aujourd'hui **14 jours** et aucune limite de joueurs : la
-présente spécification aligne le produit sur ce qui est déjà promis.
+### Limite de joueurs : 30, et pourquoi pas 25
+
+`src/locales/fr/marketing.json:1079` annonce aujourd'hui « une période d'essai gratuit de
+30 jours sans carte bancaire, pour une équipe jusqu'à **25 membres** », alors que le code
+donne **14 jours** et **aucune limite**. La copie et le code divergent déjà : il faut de
+toute façon en corriger un des deux.
+
+**Valeur retenue : 30 joueurs**, pour l'essai comme pour la formule par équipe.
+
+Clubero est multisport, et 25 exclut des effectifs parfaitement normaux :
+
+```text
+Rugby à XV     15 titulaires + remplaçants → effectif courant 30 à 35   ← 25 est bloquant
+Football senior                              20 à 25                    ← 25 est juste
+Football jeune                               16 à 20                    ← confortable
+Handball, basket, volley                     12 à 16                    ← confortable
+```
+
+À 25, un club de rugby ne peut pas utiliser l'offre du tout, et un club de football senior
+se retrouve bloqué à son 26ᵉ licencié après avoir payé — frustration disproportionnée pour
+9,99 €. Or l'unité vendue est **l'équipe**, pas le joueur : la limite n'est là que pour
+empêcher qu'un club entier tienne dans une seule équipe, et 30 remplit cet office aussi
+bien que 25.
+
+La valeur est portée par la constante `TEAM_PLAN_MAX_PLAYERS`, modifiable **sans
+migration**. Elle reste donc révisable après lancement — ce n'est pas un choix structurel.
+
+**La copie FAQ doit passer de 25 à 30** en même temps que le code passe de 14 à 30 jours,
+dans les 7 locales.
 
 ---
 
@@ -66,7 +116,7 @@ Cette colonne encode **à la fois le palier et toutes ses limites** :
 | `team_credits` | Formule | Équipes | Joueurs / équipe | Tournois | Stages |
 |---|---|---|---|---|---|
 | `NULL` | **Club** | illimitées | illimités | autorisés | autorisés |
-| `1` à `4` | **Crédits** | = `team_credits` | 25 | bloqués | bloqués |
+| `1` à `4` | **Par équipe** | = `team_credits` | 30 | bloqués | bloqués |
 
 **Tous les clubs existants prennent `NULL` par défaut** → formule Club → comportement
 strictement inchangé. C'est une migration additive sans backfill.
@@ -75,7 +125,7 @@ Constantes serveur, configurables sans migration :
 
 ```text
 TEAM_CREDIT_MAX          = 4
-TEAM_PLAN_MAX_PLAYERS    = 25
+TEAM_PLAN_MAX_PLAYERS    = 30
 TRIAL_DURATION_DAYS      = 30
 ```
 
@@ -117,7 +167,7 @@ opération native, pas une saga.
 
 ---
 
-## 4. Les crédits Stripe
+## 4. Le nombre d'équipes côté Stripe
 
 La source de vérité est la **`quantity` de l'item Stripe** sur la souscription du club.
 `subscriptions.team_credits` en est le miroir, alimenté par le webhook, qui lit déjà
@@ -157,12 +207,12 @@ même transaction. **Le quota est résolu avant le verrou** : si `team_credits I
 
 Message :
 
-> Vous utilisez vos 3 crédits d'équipe. Ajoutez un crédit à 9,99 €/mois, ou passez à la
+> Vous gérez déjà vos 3 équipes. Ajoutez une équipe pour 9,99 €/mois, ou passez à la
 > formule Club pour un nombre d'équipes illimité.
 
 ### 5.2 Limite de joueurs
 
-25 joueurs actifs par équipe en formule à crédits ; aucune limite en formule Club.
+30 joueurs actifs par équipe en formule par équipe ; aucune limite en formule Club.
 
 Même stratégie atomique, même règle : quota résolu avant le verrou, donc **coût nul pour
 les clubs en formule Club**.
@@ -188,12 +238,12 @@ L'import CSV est traité comme un **lot atomique** : refus intégral si le lot d
 la limite, en ne comptant comme consommatrices que les créations réelles (ni les doublons,
 ni les mises à jour).
 
-### 5.3 Réduction de crédits — décision structurante
+### 5.3 Réduction du nombre d'équipes — décision structurante
 
 **Une réduction n'est possible que si le nombre d'équipes non archivées est déjà inférieur
-ou égal au nouveau nombre de crédits.**
+ou égal au nouveau nombre d'équipes souscrites.**
 
-> Vous avez 3 équipes actives et souhaitez passer à 2 crédits. Archivez d'abord une équipe.
+> Vous avez 3 équipes actives et souhaitez n'en conserver que 2. Archivez d'abord une équipe.
 
 C'est le seul endroit où ce modèle pourrait basculer du côté compliqué. L'alternative —
 laisser passer et verrouiller les équipes en excédent — **ressusciterait la couverture
@@ -260,7 +310,7 @@ Refusé si le club possède des ressources qui n'existent pas dans la formule à
 plus de 4 équipes non archivées      → refus
 au moins un stage non archivé        → refus
 au moins un tournoi non archivé      → refus
-une équipe de plus de 25 joueurs     → refus
+une équipe de plus de 30 joueurs     → refus
 ```
 
 Message explicite indiquant ce qui bloque et ce qu'il faut archiver. Même logique que la
@@ -341,7 +391,7 @@ tableau à lignes communes.
 | **Prix** | Gratuit, 30 jours | 9,99 €/mois par équipe | 49 €/mois | Sur devis |
 | | sans carte bancaire | 99,99 €/an par équipe | 490 €/an | |
 | **Équipes** | 1 | 1 à 4 | Illimitées | Illimitées |
-| **Joueurs par équipe** | 25 | 25 | ❌ Illimités | Illimités |
+| **Joueurs par équipe** | 30 | 30 | Illimités | Illimités |
 | **Coaches et staff** | Illimités | Illimités | Illimités | Illimités |
 | **Gestion d'équipe** | ✅ | ✅ | ✅ | ✅ |
 | Événements, entraînements, matchs | ✅ | ✅ | ✅ | ✅ |
@@ -366,15 +416,18 @@ tableau à lignes communes.
 | Identité du club (nom, logo) | ✅ | ✅ | ✅ | ✅ |
 
 > La ligne « Joueurs par équipe » est la seule où l'offre Club se distingue par une
-> **absence** de limite : la formuler « Illimités » plutôt que par un nombre rend le
-> bénéfice lisible.
+> **absence** de limite. L'écrire simplement « Illimités » — surtout **pas** précédé d'un
+> ❌, qui donnerait l'impression que la fonctionnalité est absente alors que c'est
+> l'inverse. Le ❌ est réservé aux lignes réellement exclues.
 
 #### Points à corriger sur la page existante
 
-1. **Incohérence à résoudre** — la FAQ (`marketing.json:1079`) promet déjà « 30 jours sans
-   carte bancaire, pour une équipe jusqu'à 25 membres », alors que le code donne 14 jours
-   et aucune limite. La page et le code doivent converger sur 30 jours et 25 joueurs.
-2. **Sélecteur de crédits** — afficher le prix calculé pour 1 à 4 équipes, et basculer
+1. **Incohérence à résoudre** — la FAQ (`marketing.json:1079`) promet « 30 jours sans carte
+   bancaire, pour une équipe jusqu'à 25 membres », alors que le code donne 14 jours et
+   aucune limite. Cible retenue : **30 jours et 30 joueurs** — la copie FAQ doit donc être
+   mise à jour de 25 à 30 en même temps (voir §1, choix de la limite).
+2. **Sélecteur du nombre d'équipes** — afficher le prix calculé pour 1 à 4 équipes, et
+   basculer
    visiblement vers la formule Club au-delà (« À partir de 5 équipes, la formule Club à
    49 €/mois est plus avantageuse »).
 3. **Les cartes Tournois et Fédération restent** — la carte Tournois vend un module
@@ -406,9 +459,9 @@ couverture de `nl` étant inégale, la vérifier avant d'ajouter des clés.
 
 ### Interface
 
-- Choix du nombre de crédits au checkout, avec le tarif calculé.
-- Page de facturation : crédits utilisés / disponibles, ajout et retrait, upsell Club à 4.
-- Blocages : création d'équipe au-delà des crédits, ajout de joueur au-delà de 25, écrans
+- Choix du nombre d'équipes au checkout, avec le tarif calculé (« Combien d'équipes souhaitez-vous gérer ? »).
+- Page de facturation : équipes utilisées / disponibles, ajout et retrait, upsell Club à 4.
+- Blocages : création d'équipe au-delà du nombre souscrit, ajout de joueur au-delà de 30, écrans
   d'upsell tournoi **et stages**, message de refus de downgrade (§5.6).
 - Page pricing refondue avec le tableau comparatif ci-dessus, montrant explicitement les
   exclusions, i18n **7 locales**, `bun run check:i18n` vert.
@@ -426,7 +479,7 @@ couverture de `nl` étant inégale, la vérifier avant d'ajouter des clés.
 - Régression stage : club à crédits → création **et duplication** refusées, par la server
   function **et** par la policy RLS testée séparément ; club en formule Club → autorisées.
 - Downgrade refusé si stages, tournois, plus de 4 équipes ou une équipe de plus de
-  25 joueurs.
+  30 joueurs.
 
 ---
 
@@ -494,15 +547,16 @@ FAQ.
 ## 11. Décisions actées
 
 ```text
-Essai : 30 jours, sans carte bancaire, aligné sur la promesse publique existante
+Essai : 30 jours, sans carte bancaire (le code donne 14 aujourd'hui)
 Aucune offre gratuite permanente
-Limite : 25 joueurs actifs par équipe en formule à crédits
+Terminologie : « crédit » est INTERNE — l'interface parle de nombre d'équipes
+Limite : 30 joueurs actifs par équipe (essai et formule par équipe)
 Formule Club : aucune limite de joueurs ni d'équipes
-Crédits : 9,99 €/mois ou 99,99 €/an l'unité, plafond DUR à 4
-Réduction de crédits : uniquement si les équipes en excès sont archivées
-Tournois : bloqués en formule à crédits, participation conservée
-Stages : bloqués en formule à crédits — garde à CRÉER, elle n'existe pas
-Downgrade Club → crédits : refusé si stages, tournois, >4 équipes ou équipe >25 joueurs
+Prix : 9,99 €/mois ou 99,99 €/an par équipe, plafond DUR à 4 équipes
+Réduction du nombre d'équipes : uniquement si les équipes en excès sont archivées
+Tournois : bloqués en formule par équipe, participation conservée
+Stages : bloqués en formule par équipe — garde à CRÉER, elle n'existe pas
+Downgrade Club → formule par équipe : refusé si stages, tournois, >4 équipes ou équipe >30 joueurs
 Clubs en double : aucun rapprochement, choix manuel de l'utilisateur
 team_members.status : non nécessaire en V1
 exempt_until : dette indépendante, plus un prérequis
