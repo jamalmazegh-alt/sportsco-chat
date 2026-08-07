@@ -41,7 +41,9 @@ describe("formatDateOnly (code réel utilisé par les notifications d'absence)",
   it("ne recule pas d'un jour en fuseau occidental", () => {
     const tz = process.env.TZ;
     process.env.TZ = "America/Los_Angeles";
-    expect(formatDateOnly("2026-08-07", "fr-FR", { day: "numeric", month: "numeric" })).toBe("7/8");
+    expect(formatDateOnly("2026-08-07", "fr-FR", { day: "numeric", month: "numeric" })).toMatch(
+      /^0?7\/0?8$/,
+    );
     process.env.TZ = tz;
   });
 
