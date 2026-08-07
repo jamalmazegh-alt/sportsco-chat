@@ -49,7 +49,11 @@ function EnablePushCardNative() {
         setStatus("denied");
         toast.error(t("push.toastDenied"));
       } else {
-        toast.error(t("push.toastImpossible"));
+        // La raison est affichée à l'écran, pas seulement journalisée :
+        // Capacitor supprime les journaux JS en build de release, une
+        // TestFlight est donc muette et l'utilisateur — comme moi — n'avait
+        // aucun moyen de savoir ce qui avait échoué.
+        toast.error(`${t("push.toastImpossible")} (${res.reason ?? "inconnu"})`);
         console.warn("[native-push] enable KO:", res.reason);
       }
     } finally {

@@ -11,6 +11,32 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         return true
     }
 
+    // APNs répond au système, pas au plugin. Sans ces deux relais, le jeton
+    // arrive bien à l'application mais n'est transmis à personne : le plugin
+    // Capacitor attend un événement qui ne vient jamais, et `register()` finit
+    // en délai dépassé. C'est ce qui bloquait l'activation des notifications
+    // sur iPhone — ni la clé APNs, ni le profil, ni l'entitlement n'étaient en
+    // cause. Ces méthodes font partie du modèle Capacitor mais manquaient ici.
+    func application(
+        _ application: UIApplication,
+        didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data
+    ) {
+        NotificationCenter.default.post(
+            name: .capacitorDidRegisterForRemoteNotifications,
+            object: deviceToken
+        )
+    }
+
+    func application(
+        _ application: UIApplication,
+        didFailToRegisterForRemoteNotificationsWithError error: Error
+    ) {
+        NotificationCenter.default.post(
+            name: .capacitorDidFailToRegisterForRemoteNotifications,
+            object: error
+        )
+    }
+
     func applicationWillResignActive(_ application: UIApplication) {
         // Sent when the application is about to move from active to inactive state. This can occur for certain types of temporary interruptions (such as an incoming phone call or SMS message) or when the user quits the application and it begins the transition to the background state.
         // Use this method to pause ongoing tasks, disable timers, and invalidate graphics rendering callbacks. Games should use this method to pause the game.

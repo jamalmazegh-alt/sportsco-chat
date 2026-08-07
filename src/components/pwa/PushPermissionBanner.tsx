@@ -85,7 +85,7 @@ function PushPermissionBannerNative() {
         // Refus explicite : ne pas reproposer avant le délai de report.
         dismiss();
       } else {
-        toast.error(t("push.toastImpossible"));
+        toast.error(`${t("push.toastImpossible")} (${res.reason ?? "inconnu"})`);
         console.warn("[native-push] banner enable KO:", res.reason);
       }
     } finally {
