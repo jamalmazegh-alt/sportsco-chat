@@ -538,7 +538,8 @@ const ConvocationInviteEmail = ({
         <Text style={kicker}>
           {[
             eventType?.toUpperCase() ?? t.cardKickerDefault,
-            competitionName && competitionName.trim().toLowerCase() !== teamName?.trim().toLowerCase()
+            competitionName &&
+            competitionName.trim().toLowerCase() !== teamName?.trim().toLowerCase()
               ? competitionName
               : null,
           ]
@@ -671,7 +672,6 @@ const ConvocationInviteEmail = ({
               {name}
             </Text>
           ))}
-
         </Section>
       ) : null}
 
