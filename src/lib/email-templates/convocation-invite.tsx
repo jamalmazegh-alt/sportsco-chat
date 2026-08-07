@@ -536,11 +536,17 @@ const ConvocationInviteEmail = ({
       {/* En-tête événement */}
       <Section style={headerBlock}>
         <Text style={kicker}>
-          {eventType?.toUpperCase() ?? t.cardKickerDefault}
-          {teamName ? ` · ${teamName}` : ""}
-          {competitionName ? ` · ${competitionName}` : ""}
+          {[
+            eventType?.toUpperCase() ?? t.cardKickerDefault,
+            competitionName && competitionName.trim().toLowerCase() !== teamName?.trim().toLowerCase()
+              ? competitionName
+              : null,
+          ]
+            .filter(Boolean)
+            .join(" · ")}
         </Text>
         <Text style={bigTitle}>{eventTitle}</Text>
+
         {dateOnly ? (
           <Text style={dateLine}>🗓️ {dateOnly}</Text>
         ) : eventDateFmt ? (
