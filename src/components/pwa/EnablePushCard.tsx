@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
-import { openInSystemApp } from "@/lib/open-url";
+import { canOpenNotificationSettings, openNotificationSettings } from "@/lib/native-settings";
 import { useTranslation } from "react-i18next";
 import { Bell, BellOff, CheckCircle2, Loader2, Settings, Smartphone } from "lucide-react";
 import { toast } from "sonner";
 import { isIOS, isInStandaloneMode, isPushSupported } from "@/lib/pwa";
-import { isNativePlatform, getPlatform } from "@/lib/native-platform";
+import { isNativePlatform } from "@/lib/native-platform";
 import { enableNativePush, getNativePushStatus, type NativePushStatus } from "@/lib/native-push";
 import { subscribeToPush } from "@/lib/push-subscribe";
 
@@ -132,10 +132,10 @@ function EnablePushCardNative() {
                   application ne le gérerait, et le bouton serait mort. Ouvrir
                   les réglages de notification Android demande un Intent
                   explicite, hors de portée d'une simple URL. */}
-              {getPlatform() === "ios" && (
+              {canOpenNotificationSettings() && (
                 <button
                   type="button"
-                  onClick={() => openInSystemApp("app-settings:")}
+                  onClick={() => void openNotificationSettings()}
                   className="mt-3 inline-flex items-center gap-2 px-3.5 py-2 rounded-lg border border-border text-xs font-semibold hover:bg-accent transition"
                 >
                   <Settings className="h-3.5 w-3.5" /> {t("push.openSettings")}
