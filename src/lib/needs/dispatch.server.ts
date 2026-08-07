@@ -266,6 +266,7 @@ export async function notifyStaffOfSignup(params: NotifyStaffOfSignupParams) {
       templateData: {
         recipientFirstName: profile?.first_name ?? null,
         locale,
+        tz: clubTz,
         status: params.status,
         needLabel: need.label,
         eventTitle,
@@ -365,6 +366,7 @@ export async function notifyApplicantOfDecision(params: NotifyApplicantOfDecisio
       templateData: {
         recipientFirstName: profile?.first_name ?? null,
         locale,
+        tz: clubTz,
         decision: params.decision,
         needLabel: need.label,
         eventTitle,
