@@ -1606,6 +1606,8 @@
     "hubCampsHint": "Crea, publica y gestiona los campamentos que ofrece tu club",
     "emailLanguage": "Idioma del correo electrónico de comunicación",
     "emailLanguageHint": "Idioma utilizado para los correos electrónicos enviados por el club a destinatarios que no han establecido un idioma preferido.",
+    "clubTimezone": "Zona horaria del club",
+    "clubTimezoneHint": "Se usa para las horas mostradas en los correos y notificaciones enviados por el club.",
     "inviteCooldown": "Invitación ya enviada a {{email}}. Podrás reenviarla en {{seconds}} s.",
     "inviteSentTo": "Invitación enviada a {{email}}. Podrás reenviarla en 60 s."
   },

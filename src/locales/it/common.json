@@ -1606,6 +1606,8 @@
     "hubCampsHint": "Crea, pubblica e gestisci i campi offerti dal tuo club",
     "emailLanguage": "Linguaggio della posta elettronica di comunicazione",
     "emailLanguageHint": "Lingua utilizzata per le email inviate dal club ai destinatari che non hanno impostato una lingua preferita.",
+    "clubTimezone": "Fuso orario del club",
+    "clubTimezoneHint": "Usato per gli orari mostrati nelle email e notifiche inviate dal club.",
     "inviteCooldown": "Invito già inviato a {{email}}. Potrai rinviarlo tra {{seconds}} s.",
     "inviteSentTo": "Invito inviato a {{email}}. Potrai rinviarlo tra 60 s."
   },

@@ -9,6 +9,14 @@ import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { SettingsSubHeader, SettingsRow } from "@/components/admin/settings-shared";
 import i18nInstance from "@/lib/i18n";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { CLUB_TIMEZONES, resolveClubTz } from "@/lib/time/club-tz";
 
 export const Route = createFileRoute("/_authenticated/admin/settings/communications")({
   component: CommunicationsSettings,
@@ -27,6 +35,7 @@ type Form = {
   event_chat_players_enabled: boolean;
   event_chat_parents_enabled: boolean;
   default_language: string;
+  timezone: string | null;
 };
 
 const LANGS = [
@@ -51,7 +60,7 @@ function CommunicationsSettings() {
       const { data, error } = await supabase
         .from("clubs")
         .select(
-          "id, wall_comments_enabled, event_chat_enabled, event_chat_players_enabled, event_chat_parents_enabled, default_language",
+          "id, wall_comments_enabled, event_chat_enabled, event_chat_players_enabled, event_chat_parents_enabled, default_language, timezone",
         )
         .eq("id", activeClubId!)
         .single();
@@ -87,6 +96,7 @@ function CommunicationsSettings() {
         event_chat_players_enabled: form.event_chat_players_enabled,
         event_chat_parents_enabled: form.event_chat_parents_enabled,
         default_language: form.default_language,
+        timezone: resolveClubTz(form.timezone),
       })
       .eq("id", form.id);
     setSaving(false);
@@ -162,6 +172,28 @@ function CommunicationsSettings() {
             );
           })}
         </div>
+      </section>
+
+      <section className="rounded-2xl border border-border bg-card p-5 space-y-3">
+        <div>
+          <p className="text-sm font-medium">{t("admin.clubTimezone")}</p>
+          <p className="text-xs text-muted-foreground mt-0.5">{t("admin.clubTimezoneHint")}</p>
+        </div>
+        <Select
+          value={resolveClubTz(form.timezone)}
+          onValueChange={(v) => setForm({ ...form, timezone: v })}
+        >
+          <SelectTrigger className="h-11">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            {CLUB_TIMEZONES.map((tz) => (
+              <SelectItem key={tz} value={tz}>
+                {tz.replace(/_/g, " ")}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
       </section>
 
       <Button className="w-full h-11" onClick={save} disabled={saving}>

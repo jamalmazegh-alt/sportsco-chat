@@ -1611,6 +1611,8 @@
     "hubCampsHint": "Erstelle, veröffentliche und verwalte die Camps deines Clubs",
     "emailLanguage": "Kommunikations-E-Mail-Sprache",
     "emailLanguageHint": "Sprache, die für E-Mails verwendet wird, die der Club an Empfänger sendet, die keine bevorzugte Sprache festgelegt haben.",
+    "clubTimezone": "Zeitzone des Clubs",
+    "clubTimezoneHint": "Wird für die Uhrzeiten in E-Mails und Benachrichtigungen des Clubs verwendet.",
     "inviteCooldown": "Einladung wurde bereits an {{email}} gesendet. Erneut senden in {{seconds}} s möglich.",
     "inviteSentTo": "Einladung an {{email}} gesendet. Erneut senden in 60 s möglich."
   },

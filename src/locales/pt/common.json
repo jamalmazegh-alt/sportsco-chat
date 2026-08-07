@@ -1606,6 +1606,8 @@
     "hubCampsHint": "Cria, publica e gere estágios oferecidos pelo teu clube",
     "emailLanguage": "Idioma do e-mail de comunicação",
     "emailLanguageHint": "Idioma usado nos e-mails enviados pelo clube para destinatários que não definiram um idioma preferencial.",
+    "clubTimezone": "Fuso horário do clube",
+    "clubTimezoneHint": "Usado para os horários exibidos nos e-mails e notificações enviados pelo clube.",
     "inviteCooldown": "Convite já enviado para {{email}}. Poderá reenviar dentro de {{seconds}} s.",
     "inviteSentTo": "Convite enviado para {{email}}. Poderá reenviar dentro de 60 s."
   },

@@ -1606,6 +1606,8 @@
     "hubCampsHint": "Maak, publiceer en beheer kampen die je club aanbiedt",
     "emailLanguage": "Communicatie e-mailtaal",
     "emailLanguageHint": "Taal die wordt gebruikt voor e-mails die door de club worden verzonden naar ontvangers die geen voorkeurstaal hebben ingesteld.",
+    "clubTimezone": "Tijdzone van de club",
+    "clubTimezoneHint": "Gebruikt voor de tijden in e-mails en meldingen die de club verstuurt.",
     "inviteCooldown": "Uitnodiging al verzonden naar {{email}}. Je kunt over {{seconds}} s opnieuw verzenden.",
     "inviteSentTo": "Uitnodiging verzonden naar {{email}}. Je kunt over 60 s opnieuw verzenden."
   },

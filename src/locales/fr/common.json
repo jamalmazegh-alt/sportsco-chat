@@ -1606,6 +1606,8 @@
     "hubCampsHint": "Créez, publiez et gérez les stages proposés par votre club",
     "emailLanguage": "Langue des emails de communication",
     "emailLanguageHint": "Langue utilisée pour les emails envoyés par le club aux destinataires qui n'ont pas défini de langue préférée.",
+    "clubTimezone": "Fuseau horaire du club",
+    "clubTimezoneHint": "Utilisé pour les horaires affichés dans les e-mails et notifications envoyés par le club.",
     "inviteCooldown": "Invitation déjà envoyée à {{email}}. Vous pourrez renvoyer dans {{seconds}} s.",
     "inviteSentTo": "Invitation envoyée à {{email}}. Renvoi possible dans 60 s."
   },
