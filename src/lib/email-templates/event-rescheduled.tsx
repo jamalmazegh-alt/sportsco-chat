@@ -6,6 +6,7 @@ import type { TemplateEntry } from "./registry";
 type Locale = "fr" | "en";
 
 interface Props {
+  tz?: string;
   recipientFirstName?: string;
   playerName?: string;
   eventTitle: string;
@@ -92,11 +93,12 @@ const EventRescheduledEmail = ({
   clubName,
   clubLogoUrl,
   locale,
+  tz,
 }: Props) => {
   const l: Locale = locale === "fr" ? "fr" : "en";
   const t = T[l];
-  const previousDateFmt = formatEmailDateTime(previousDate, l);
-  const newDateFmt = formatEmailDateTime(newDate, l) ?? newDate;
+  const previousDateFmt = formatEmailDateTime(previousDate, l, tz);
+  const newDateFmt = formatEmailDateTime(newDate, l, tz) ?? newDate;
   return (
     <EmailShell
       preview={`${t.preview(eventTitle, newDateFmt)}`}
@@ -141,7 +143,7 @@ export const template = {
   component: EventRescheduledEmail,
   subject: (d) => {
     const l: Locale = (d as any).locale === "fr" ? "fr" : "en";
-    const newDateFmt = formatEmailDateTime(d.newDate as string, l) ?? (d.newDate as string);
+    const newDateFmt = formatEmailDateTime(d.newDate as string, l, (d as any).tz) ?? (d.newDate as string);
     return T[l].subject(d.eventTitle as string, newDateFmt);
   },
   displayName: "Event rescheduled",

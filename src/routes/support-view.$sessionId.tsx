@@ -32,9 +32,12 @@ export const Route = createFileRoute("/support-view/$sessionId")({
   // both child loaders (ensureQueryData) AND the React provider share the
   // exact same instance. Without this, loaders would hit the superadmin's
   // global cache and leak simulated data.
-  beforeLoad: ({ params }) => ({
+  // Cast: the QueryClient is intentionally non-serializable router context.
+  beforeLoad: (({ params }: { params: { sessionId: string } }) => ({
     queryClient: getSupportQueryClient(params.sessionId),
-  }),
+  })) as unknown as undefined,
+
+
 
   loader: async ({ params }) => {
     try {

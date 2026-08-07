@@ -1,3 +1,4 @@
+import { resolveClubTz } from "@/lib/time/club-tz";
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
@@ -26,7 +27,7 @@ export const notifyCoachesEmail = createServerFn({ method: "POST" })
     const { data: conv } = await supabaseAdmin
       .from("convocations")
       .select(
-        "id, status, comment, player_id, event_id, players:player_id(first_name,last_name), events:event_id(id,title,type,opponent,starts_at,team_id,teams:team_id(name,clubs:club_id(name,default_language)))",
+        "id, status, comment, player_id, event_id, players:player_id(first_name,last_name), events:event_id(id,title,type,opponent,starts_at,team_id,teams:team_id(name,clubs:club_id(name,default_language, timezone)))",
       )
       .eq("id", convocationId)
       .single();
@@ -37,6 +38,7 @@ export const notifyCoachesEmail = createServerFn({ method: "POST" })
 
     const ev: any = conv.events;
     const clubDefaultLang = ev?.teams?.clubs?.default_language as string | null | undefined;
+    const clubTz = resolveClubTz((ev?.teams?.clubs as any)?.timezone as string | null | undefined);
     const player: any = conv.players ?? {};
     const playerName = `${player.first_name ?? ""} ${player.last_name ?? ""}`.trim() || "Un joueur";
 
@@ -120,6 +122,7 @@ export const notifyCoachesEmail = createServerFn({ method: "POST" })
             month: "long",
             hour: "2-digit",
             minute: "2-digit",
+            timeZone: clubTz,
           })
         : undefined;
 
@@ -142,6 +145,7 @@ export const notifyCoachesEmail = createServerFn({ method: "POST" })
             declaredByName,
             eventUrl: `${baseUrl}/events/${ev.id}`,
             locale,
+            tz: clubTz,
           },
         });
         sent += 1;

@@ -92,7 +92,7 @@ export const backfillConvocationEmails = createServerFn({ method: "POST" })
         const { data: ev } = await supabaseAdmin
           .from("events")
           .select(
-            "id, title, type, starts_at, location, location_url, meeting_point, convocation_time, description, team_id, opponent, is_home, competition_name, competition_type, teams:team_id(name, club_id, clubs:club_id(name, logo_url, default_language))",
+            "id, title, type, starts_at, location, location_url, meeting_point, convocation_time, description, team_id, opponent, is_home, competition_name, competition_type, teams:team_id(name, club_id, clubs:club_id(name, logo_url, default_language, timezone))",
           )
           .eq("id", eventId)
           .maybeSingle();

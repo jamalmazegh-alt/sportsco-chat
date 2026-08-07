@@ -11,6 +11,7 @@
  * Records a row in `reminders` (channel = "email") so the 30-min cooldown
  * applied in the UI stays consistent across triggers.
  */
+import { resolveClubTz } from "@/lib/time/club-tz";
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
@@ -27,7 +28,7 @@ function resolveLocale(...candidates: Array<string | null | undefined>): string 
   }
   return "fr";
 }
-function fmtDate(iso: string, locale: string) {
+function fmtDate(iso: string, locale: string, tz?: string | null) {
   const bcp = locale === "en" ? "en-GB" : `${locale}-${locale.toUpperCase()}`;
   return new Date(iso).toLocaleDateString(bcp, {
     weekday: "long",
@@ -35,6 +36,7 @@ function fmtDate(iso: string, locale: string) {
     month: "long",
     hour: "2-digit",
     minute: "2-digit",
+    timeZone: resolveClubTz(tz),
   });
 }
 
@@ -54,7 +56,7 @@ export const sendManualConvocationReminder = createServerFn({ method: "POST" })
     const { data: conv } = await supabaseAdmin
       .from("convocations")
       .select(
-        "id, event_id, player_id, response_token, status, events:event_id(id, title, type, starts_at, location, location_url, meeting_point, convocation_time, description, team_id, opponent, is_home, competition_name, competition_type, teams:team_id(name, club_id, clubs:club_id(name, logo_url, default_language)), event_staff_assignments(user_id, profiles:user_id(first_name, last_name, full_name)))",
+        "id, event_id, player_id, response_token, status, events:event_id(id, title, type, starts_at, location, location_url, meeting_point, convocation_time, description, team_id, opponent, is_home, competition_name, competition_type, teams:team_id(name, club_id, clubs:club_id(name, logo_url, default_language, timezone)), event_staff_assignments(user_id, profiles:user_id(first_name, last_name, full_name)))",
       )
       .eq("id", data.convocationId)
       .maybeSingle();
@@ -143,6 +145,7 @@ export const sendManualConvocationReminder = createServerFn({ method: "POST" })
       }
     }
     const clubLang = ev.teams?.clubs?.default_language as string | null | undefined;
+    const clubTz = resolveClubTz(ev.teams?.clubs?.timezone as string | null | undefined);
 
     const baseUrl = process.env.SITE_URL || "https://www.clubero.app";
     const respondUrl = `${baseUrl}/r/${(conv as any).response_token}`;
@@ -197,7 +200,7 @@ export const sendManualConvocationReminder = createServerFn({ method: "POST" })
     for (const r of recipients) {
       const recipientLang = r.userId ? langByUser.get(r.userId) : undefined;
       const locale = resolveLocale(recipientLang, clubLang);
-      const eventDateLabel = fmtDate(ev.starts_at, locale);
+      const eventDateLabel = fmtDate(ev.starts_at, locale, clubTz);
       try {
         await enqueueTransactionalEmailServer({
           templateName: "convocation-invite",
@@ -211,7 +214,7 @@ export const sendManualConvocationReminder = createServerFn({ method: "POST" })
             eventType: ev.type,
             eventDate: eventDateLabel,
             eventDescription: ev.description ?? undefined,
-            convocationTime: ev.convocation_time ? fmtDate(ev.convocation_time, locale) : undefined,
+            convocationTime: ev.convocation_time ? fmtDate(ev.convocation_time, locale, clubTz) : undefined,
             eventLocation: ev.location ?? undefined,
             locationMapsUrl,
             meetingPoint: ev.meeting_point ?? undefined,
@@ -224,6 +227,7 @@ export const sendManualConvocationReminder = createServerFn({ method: "POST" })
             respondUrl,
             isReminder: true,
             locale,
+            tz: clubTz,
           },
         });
         emailsSent++;
@@ -246,7 +250,11 @@ export const sendManualConvocationReminder = createServerFn({ method: "POST" })
       const opponent = (ev.opponent as string | null) ?? null;
       const isHome = ev.is_home as boolean | null | undefined;
       const startDt = new Date(ev.starts_at);
-      const timeStr = startDt.toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" });
+      const timeStr = startDt.toLocaleTimeString("fr-FR", {
+        hour: "2-digit",
+        minute: "2-digit",
+        timeZone: clubTz,
+      });
       let headline: string;
       if (isMatch && opponent) {
         headline = teamName ? `${teamName} vs ${opponent}` : `vs ${opponent}`;
