@@ -329,6 +329,127 @@ const T: Record<
   },
 };
 
+/** Libellés additionnels pour la mise en page « déroulé de la journée ». */
+const T2: Record<
+  Locale,
+  {
+    rdvLabel: string;
+    startLabel: string;
+    meetingKicker: string;
+    venueKicker: string;
+    venueKickerOnSite: string;
+    coachNote: string;
+    maps: string;
+    waze: string;
+  }
+> = {
+  fr: {
+    rdvLabel: "RDV",
+    startLabel: "DÉBUT",
+    meetingKicker: "🚌 POINT DE RENDEZ-VOUS",
+    venueKicker: "📍 LIEU DE L’ÉVÉNEMENT",
+    venueKickerOnSite: "📍 LIEU · RENDEZ-VOUS SUR PLACE",
+    coachNote: "Consigne du coach",
+    maps: "🗺️ Google Maps",
+    waze: "🚗 Waze",
+  },
+  en: {
+    rdvLabel: "MEET",
+    startLabel: "START",
+    meetingKicker: "🚌 MEETING POINT",
+    venueKicker: "📍 VENUE",
+    venueKickerOnSite: "📍 VENUE · MEET THERE",
+    coachNote: "Coach’s note",
+    maps: "🗺️ Google Maps",
+    waze: "🚗 Waze",
+  },
+  es: {
+    rdvLabel: "CITA",
+    startLabel: "INICIO",
+    meetingKicker: "🚌 PUNTO DE ENCUENTRO",
+    venueKicker: "📍 LUGAR",
+    venueKickerOnSite: "📍 LUGAR · QUEDADA ALLÍ",
+    coachNote: "Indicación del entrenador",
+    maps: "🗺️ Google Maps",
+    waze: "🚗 Waze",
+  },
+  de: {
+    rdvLabel: "TREFF",
+    startLabel: "START",
+    meetingKicker: "🚌 TREFFPUNKT",
+    venueKicker: "📍 ORT",
+    venueKickerOnSite: "📍 ORT · TREFFEN VOR ORT",
+    coachNote: "Hinweis des Trainers",
+    maps: "🗺️ Google Maps",
+    waze: "🚗 Waze",
+  },
+  it: {
+    rdvLabel: "RITROVO",
+    startLabel: "INIZIO",
+    meetingKicker: "🚌 PUNTO DI RITROVO",
+    venueKicker: "📍 LUOGO",
+    venueKickerOnSite: "📍 LUOGO · RITROVO SUL POSTO",
+    coachNote: "Indicazione dell’allenatore",
+    maps: "🗺️ Google Maps",
+    waze: "🚗 Waze",
+  },
+  nl: {
+    rdvLabel: "VERZAMELEN",
+    startLabel: "START",
+    meetingKicker: "🚌 VERZAMELPUNT",
+    venueKicker: "📍 LOCATIE",
+    venueKickerOnSite: "📍 LOCATIE · TER PLAATSE",
+    coachNote: "Bericht van de coach",
+    maps: "🗺️ Google Maps",
+    waze: "🚗 Waze",
+  },
+  pt: {
+    rdvLabel: "ENCONTRO",
+    startLabel: "INÍCIO",
+    meetingKicker: "🚌 PONTO DE ENCONTRO",
+    venueKicker: "📍 LOCAL",
+    venueKickerOnSite: "📍 LOCAL · ENCONTRO NO LOCAL",
+    coachNote: "Indicação do treinador",
+    maps: "🗺️ Google Maps",
+    waze: "🚗 Waze",
+  },
+};
+
+const isIso = (v?: string | null) => !!v && /^\d{4}-\d{2}-\d{2}T/.test(v);
+const bcpOf = (l: Locale) => (l === "en" ? "en-GB" : `${l}-${l.toUpperCase()}`);
+
+const fmtTimeOnly = (value?: string | null, l: Locale = "fr", tz?: string | null) => {
+  if (!isIso(value)) return undefined;
+  try {
+    return new Date(value as string).toLocaleTimeString(bcpOf(l), {
+      hour: "2-digit",
+      minute: "2-digit",
+      timeZone: tz ?? undefined,
+    });
+  } catch {
+    return undefined;
+  }
+};
+
+const fmtDateOnly = (value?: string | null, l: Locale = "fr", tz?: string | null) => {
+  if (!isIso(value)) return undefined;
+  try {
+    return new Date(value as string).toLocaleDateString(bcpOf(l), {
+      weekday: "long",
+      day: "numeric",
+      month: "long",
+      timeZone: tz ?? undefined,
+    });
+  } catch {
+    return undefined;
+  }
+};
+
+const mapsHref = (place: string, explicit?: string) =>
+  explicit ?? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(place)}`;
+const wazeHref = (place: string) =>
+  `https://www.waze.com/ul?q=${encodeURIComponent(place)}&navigate=yes`;
+
 const ConvocationInviteEmail = ({
   recipientFirstName,
   playerName,
@@ -359,8 +480,12 @@ const ConvocationInviteEmail = ({
 }: Props) => {
   const l: Locale = pickLocale(locale);
   const t = T[l];
+  const t2 = T2[l];
   const eventDateFmt = formatEmailDateTime(eventDate, l, tz);
   const convocationTimeFmt = formatEmailDateTime(convocationTime, l, tz);
+  const dateOnly = fmtDateOnly(eventDate, l, tz);
+  const startTime = fmtTimeOnly(eventDate, l, tz);
+  const rdvTime = fmtTimeOnly(convocationTime, l, tz);
   return (
     <EmailShell
       preview={`${isUpdate ? t.update : isReminder ? t.reminder : ""}${t.convocation}: ${eventTitle}${eventDateFmt ? ` — ${eventDateFmt}` : ""}`}
@@ -408,85 +533,105 @@ const ConvocationInviteEmail = ({
         {clubName ? <> ({clubName})</> : null}.
       </Text>
 
-      <Section style={card}>
-        <Text style={cardKicker}>
+      {/* En-tête événement */}
+      <Section style={headerBlock}>
+        <Text style={kicker}>
           {eventType?.toUpperCase() ?? t.cardKickerDefault}
+          {teamName ? ` · ${teamName}` : ""}
           {competitionName ? ` · ${competitionName}` : ""}
         </Text>
-        <Text style={cardTitle}>{eventTitle}</Text>
-        {eventDateFmt ? <Text style={cardMeta}>📅 {eventDateFmt}</Text> : null}
-        {convocationTimeFmt ? (
-          <Text style={cardMeta}>
-            ⏰ {t.meetingTime}: <strong>{convocationTimeFmt}</strong>
-          </Text>
-        ) : null}
-        {eventLocation ? (
-          <Text style={cardMeta}>
-            📍 {eventLocation}
-            <br />
-            <a
-              href={
-                locationMapsUrl ??
-                `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(eventLocation)}`
-              }
-              style={mapsLink}
-            >
-              🗺️ Google Maps
-            </a>
-            {" · "}
-            <a
-              href={`https://www.waze.com/ul?q=${encodeURIComponent(eventLocation)}&navigate=yes`}
-              style={mapsLink}
-            >
-              🚗 Waze
-            </a>
-          </Text>
-        ) : null}
-        {meetingPoint ? (
-          <Text style={cardMeta}>
-            🚌 {t.meetingPointLabel}: {meetingPoint}
-            <br />
-            <a
-              href={
-                meetingPointMapsUrl ??
-                `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(meetingPoint)}`
-              }
-              style={mapsLink}
-            >
-              🗺️ Google Maps
-            </a>
-            {" · "}
-            <a
-              href={`https://www.waze.com/ul?q=${encodeURIComponent(meetingPoint)}&navigate=yes`}
-              style={mapsLink}
-            >
-              🚗 Waze
-            </a>
-          </Text>
-        ) : null}
-        {coachNames && coachNames.length > 0 ? (
-          <Text style={cardMeta}>
-            👤 {t.coachLabel}
-            {coachNames.length > 1 ? "s" : ""}: {coachNames.join(", ")}
-          </Text>
-        ) : coachName ? (
-          <Text style={cardMeta}>
-            👤 {t.coachLabel}: {coachName}
-          </Text>
-        ) : null}
-        {eventDescription ? (
-          <Text
-            style={{
-              ...cardMeta,
-              marginTop: 10,
-              whiteSpace: "pre-wrap" as const,
-              color: "#0f172a",
-            }}
-          >
-            📝 {eventDescription}
-          </Text>
+        <Text style={bigTitle}>{eventTitle}</Text>
+        {dateOnly ? (
+          <Text style={dateLine}>🗓️ {dateOnly}</Text>
+        ) : eventDateFmt ? (
+          <Text style={dateLine}>🗓️ {eventDateFmt}</Text>
         ) : null}
       </Section>
+
+      {/* Déroulé : point de RDV puis lieu de l'événement */}
+      {meetingPoint || convocationTimeFmt ? (
+        <Section style={{ margin: "0 0 10px" }}>
+          <Row>
+            <Column style={railCol}>
+              {rdvTime ? <Text style={railTime}>{rdvTime}</Text> : null}
+              <Text style={railLabelAccent}>{t2.rdvLabel}</Text>
+            </Column>
+            <Column>
+              <Section style={meetingCard}>
+                <Text style={meetingKicker}>{t2.meetingKicker}</Text>
+                <Text style={placeName}>{meetingPoint ?? convocationTimeFmt}</Text>
+                {!rdvTime && meetingPoint && convocationTimeFmt ? (
+                  <Text style={placeSub}>
+                    ⏰ {t.meetingTime}: {convocationTimeFmt}
+                  </Text>
+                ) : null}
+                {meetingPoint ? (
+                  <Text style={linksLine}>
+                    <a href={mapsHref(meetingPoint, meetingPointMapsUrl)} style={mapsLink}>
+                      {t2.maps}
+                    </a>
+                    {" · "}
+                    <a href={wazeHref(meetingPoint)} style={mapsLink}>
+                      {t2.waze}
+                    </a>
+                  </Text>
+                ) : null}
+              </Section>
+            </Column>
+          </Row>
+        </Section>
+      ) : null}
+
+      {eventLocation || startTime ? (
+        <Section style={{ margin: "0 0 16px" }}>
+          <Row>
+            <Column style={railCol}>
+              {startTime ? <Text style={railTime}>{startTime}</Text> : null}
+              <Text style={railLabel}>
+                {(eventType?.toUpperCase() || t2.startLabel).slice(0, 12)}
+              </Text>
+            </Column>
+            <Column>
+              <Section style={venueCard}>
+                <Text style={venueKicker}>
+                  {meetingPoint ? t2.venueKicker : t2.venueKickerOnSite}
+                </Text>
+                <Text style={placeName}>{eventLocation ?? eventTitle}</Text>
+                {eventLocation ? (
+                  <Text style={linksLine}>
+                    <a href={mapsHref(eventLocation, locationMapsUrl)} style={mapsLink}>
+                      {t2.maps}
+                    </a>
+                    {" · "}
+                    <a href={wazeHref(eventLocation)} style={mapsLink}>
+                      {t2.waze}
+                    </a>
+                  </Text>
+                ) : null}
+                {coachNames && coachNames.length > 0 ? (
+                  <Text style={placeSub}>
+                    👤 {t.coachLabel}
+                    {coachNames.length > 1 ? "s" : ""}: {coachNames.join(", ")}
+                  </Text>
+                ) : coachName ? (
+                  <Text style={placeSub}>
+                    👤 {t.coachLabel}: {coachName}
+                  </Text>
+                ) : null}
+              </Section>
+            </Column>
+          </Row>
+        </Section>
+      ) : null}
+
+      {eventDescription ? (
+        <Section style={noteCard}>
+          <Text style={noteText}>
+            💬 <strong>{t2.coachNote} — </strong>
+            <span style={{ whiteSpace: "pre-wrap" as const }}>{eventDescription}</span>
+          </Text>
+        </Section>
+      ) : null}
 
       <Text style={text}>{t.respondPrompt}</Text>
 
@@ -510,14 +655,27 @@ const ConvocationInviteEmail = ({
         </Row>
       </Section>
 
+      <Text style={smallText}>{t.foot}</Text>
+
       {squadList && squadList.length > 0 ? (
         <Section style={squadCard}>
           <Text style={squadTitle}>{t.squadTitle(squadList.length)}</Text>
-          {squadList.map((name, i) => (
-            <Text key={i} style={squadLine}>
-              • {name}
-            </Text>
-          ))}
+          <Row>
+            <Column style={{ width: "50%", verticalAlign: "top" }}>
+              {squadList.slice(0, Math.ceil(squadList.length / 2)).map((name, i) => (
+                <Text key={`sq-a-${i}`} style={squadLine}>
+                  {name}
+                </Text>
+              ))}
+            </Column>
+            <Column style={{ width: "50%", verticalAlign: "top" }}>
+              {squadList.slice(Math.ceil(squadList.length / 2)).map((name, i) => (
+                <Text key={`sq-b-${i}`} style={squadLine}>
+                  {name}
+                </Text>
+              ))}
+            </Column>
+          </Row>
         </Section>
       ) : null}
 
@@ -638,10 +796,11 @@ export const template = {
     playerName: "Leo Dupont",
     eventTitle: "vs FC Example",
     eventType: "Match",
-    eventDate: "Saturday, May 24 at 3:00 PM",
+    eventDate: "2026-05-24T15:00:00.000Z",
     eventLocation: "Municipal Stadium, Paris",
     locationMapsUrl: "https://www.google.com/maps/search/?api=1&query=Stade+Municipal+Paris",
-    meetingPoint: "Club car park at 2:00 PM",
+    meetingPoint: "Club car park",
+    convocationTime: "2026-05-24T14:00:00.000Z",
     meetingPointMapsUrl: "https://www.google.com/maps/search/?api=1&query=Parking+du+club",
     competitionName: "U13 League",
     coachName: "Marc Lefèvre",
@@ -819,3 +978,74 @@ const pitchPenaltyBottom = {
   borderRight: "1px solid rgba(255,255,255,0.7)",
   borderTop: "1px solid rgba(255,255,255,0.7)",
 };
+
+/* --- Mise en page « déroulé de la journée » --- */
+const headerBlock = { margin: "0 0 18px" };
+const kicker = {
+  fontSize: "12px",
+  fontWeight: "bold" as const,
+  color: "#0ea5e9",
+  letterSpacing: "1.4px",
+  margin: "0 0 8px",
+};
+const bigTitle = {
+  fontSize: "23px",
+  lineHeight: "30px",
+  fontWeight: "bold" as const,
+  color: "#0f172a",
+  margin: "0 0 6px",
+};
+const dateLine = { fontSize: "15px", color: "#64748b", margin: 0 };
+const railCol = { width: "72px", verticalAlign: "top" as const, paddingRight: "12px" };
+const railTime = {
+  fontSize: "25px",
+  fontWeight: "bold" as const,
+  color: "#0f172a",
+  lineHeight: "1",
+  margin: "0 0 4px",
+};
+const railLabel = {
+  fontSize: "11px",
+  fontWeight: "bold" as const,
+  color: "#64748b",
+  letterSpacing: "0.8px",
+  margin: 0,
+};
+const railLabelAccent = { ...railLabel, color: "#0ea5e9" };
+const meetingCard = {
+  backgroundColor: "#eff6ff",
+  border: "1px solid #cfe3ff",
+  borderRadius: "12px",
+  padding: "14px 16px",
+};
+const venueCard = {
+  backgroundColor: "#f5f7fa",
+  border: "1px solid #e8edf3",
+  borderRadius: "12px",
+  padding: "14px 16px",
+};
+const meetingKicker = {
+  fontSize: "12px",
+  fontWeight: "bold" as const,
+  color: "#0ea5e9",
+  letterSpacing: "1px",
+  margin: "0 0 6px",
+};
+const venueKicker = { ...meetingKicker, color: "#64748b" };
+const placeName = {
+  fontSize: "16px",
+  fontWeight: 600,
+  color: "#0f172a",
+  lineHeight: "22px",
+  margin: "0 0 2px",
+};
+const placeSub = { fontSize: "14px", color: "#64748b", margin: "6px 0 0" };
+const linksLine = { fontSize: "14px", margin: "10px 0 0" };
+const noteCard = {
+  backgroundColor: "#fff8e7",
+  border: "1px solid #fbe3b0",
+  borderRadius: "10px",
+  padding: "12px 14px",
+  margin: "0 0 18px",
+};
+const noteText = { fontSize: "14px", lineHeight: "20px", color: "#7a5a12", margin: 0 };
