@@ -1,3 +1,4 @@
+import { resolveClubTz } from "@/lib/time/club-tz";
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import * as React from "react";
@@ -79,14 +80,32 @@ export const dispatchStaffAssignmentEmail = createServerFn({ method: "POST" })
       .maybeSingle();
     if (suppressed) return { sent: false, reason: "suppressed" as const };
 
+    let clubTzRaw: string | null = null;
+    if (clubId) {
+      const { data: clubRow } = await supabaseAdmin
+        .from("clubs")
+        .select("timezone")
+        .eq("id", clubId)
+        .maybeSingle();
+      clubTzRaw = ((clubRow as { timezone?: string | null } | null)?.timezone ?? null) as
+        | string
+        | null;
+    }
+    const clubTz = resolveClubTz(clubTzRaw);
+
     const dt = new Date((ev as any).starts_at);
     const locale = (profile?.preferred_language ?? "fr").slice(0, 2).toLowerCase();
     const dateStr = dt.toLocaleDateString(locale, {
       weekday: "short",
       day: "numeric",
       month: "short",
+      timeZone: clubTz,
     });
-    const timeStr = dt.toLocaleTimeString(locale, { hour: "2-digit", minute: "2-digit" });
+    const timeStr = dt.toLocaleTimeString(locale, {
+      hour: "2-digit",
+      minute: "2-digit",
+      timeZone: clubTz,
+    });
 
     const isMatch = (ev as any).type === "match";
     const teamName = ((ev as any).teams?.name as string | null) ?? undefined;

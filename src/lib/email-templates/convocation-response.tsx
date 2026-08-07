@@ -6,6 +6,7 @@ import type { TemplateEntry } from "./registry";
 type Locale = "fr" | "en";
 
 interface Props {
+  tz?: string;
   coachFirstName?: string;
   playerName: string;
   eventTitle: string;
@@ -64,11 +65,12 @@ const ConvocationResponseEmail = ({
   declaredByName,
   eventUrl,
   locale,
+  tz,
 }: Props) => {
   const l: Locale = locale === "fr" ? "fr" : "en";
   const t = T[l];
   const statusLabel = t.labels[status];
-  const eventDateFmt = formatEmailDateTime(eventDate, l);
+  const eventDateFmt = formatEmailDateTime(eventDate, l, tz);
   return (
     <EmailShell
       preview={

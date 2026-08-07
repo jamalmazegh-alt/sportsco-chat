@@ -15,6 +15,7 @@ interface LineupPlayer {
 }
 
 interface Props {
+  tz?: string;
   recipientFirstName?: string;
   playerName: string;
   eventTitle: string;
@@ -354,11 +355,12 @@ const ConvocationInviteEmail = ({
   changes,
   lineup,
   locale,
+  tz,
 }: Props) => {
   const l: Locale = pickLocale(locale);
   const t = T[l];
-  const eventDateFmt = formatEmailDateTime(eventDate, l);
-  const convocationTimeFmt = formatEmailDateTime(convocationTime, l);
+  const eventDateFmt = formatEmailDateTime(eventDate, l, tz);
+  const convocationTimeFmt = formatEmailDateTime(convocationTime, l, tz);
   return (
     <EmailShell
       preview={`${isUpdate ? t.update : isReminder ? t.reminder : ""}${t.convocation}: ${eventTitle}${eventDateFmt ? ` — ${eventDateFmt}` : ""}`}
@@ -627,7 +629,7 @@ export const template = {
     const l: Locale = pickLocale((d as any).locale);
     const t = T[l];
     const prefix = d.isUpdate ? t.subjUpdate : d.isReminder ? t.subjReminder : t.subjDefault;
-    const dateFmt = formatEmailDateTime(d.eventDate, l);
+    const dateFmt = formatEmailDateTime(d.eventDate, l, (d as any).tz);
     return `${prefix}${t.convocation}: ${d.eventTitle}${dateFmt ? ` — ${dateFmt}` : ""}`;
   },
   displayName: "Convocation invite",

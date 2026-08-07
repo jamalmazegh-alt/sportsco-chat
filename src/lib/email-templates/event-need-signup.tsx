@@ -11,8 +11,10 @@ import {
   Text,
 } from "@react-email/components";
 import type { TemplateEntry } from "./registry";
+import { resolveClubTz } from "@/lib/time/club-tz";
 
 interface Props {
+  tz?: string;
   recipientFirstName?: string | null;
   locale?: "fr" | "en";
   status: "applied" | "confirmed";
@@ -56,7 +58,7 @@ const T = {
   },
 } as const;
 
-function fmtDate(iso: string | null | undefined, locale: "fr" | "en") {
+function fmtDate(iso: string | null | undefined, locale: "fr" | "en", tz?: string | null) {
   if (!iso) return null;
   try {
     return new Date(iso).toLocaleString(locale === "en" ? "en-GB" : "fr-FR", {
@@ -65,6 +67,7 @@ function fmtDate(iso: string | null | undefined, locale: "fr" | "en") {
       month: "long",
       hour: "2-digit",
       minute: "2-digit",
+      timeZone: resolveClubTz(tz),
     });
   } catch {
     return null;
@@ -82,6 +85,7 @@ const Email = ({
   applicantFirstName,
   applicantLastName,
   eventUrl,
+  tz,
 }: Props) => {
   const t = T[locale] ?? T.fr;
   const isConfirmed = status === "confirmed";
@@ -92,7 +96,7 @@ const Email = ({
   const intro = isConfirmed
     ? t.introConfirmed(whoName, needLabel, eventTitle)
     : t.introApplied(whoName, needLabel, eventTitle);
-  const whenStr = fmtDate(eventStartsAt, locale);
+  const whenStr = fmtDate(eventStartsAt, locale, tz);
   return (
     <Html lang={locale} dir="ltr">
       <Head />

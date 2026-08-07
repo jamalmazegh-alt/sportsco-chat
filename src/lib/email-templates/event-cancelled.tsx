@@ -6,6 +6,7 @@ import type { TemplateEntry } from "./registry";
 type Locale = "fr" | "en";
 
 interface Props {
+  tz?: string;
   recipientFirstName?: string;
   playerName?: string;
   eventTitle: string;
@@ -92,10 +93,11 @@ const EventCancelledEmail = ({
   clubName,
   clubLogoUrl,
   locale,
+  tz,
 }: Props) => {
   const l: Locale = locale === "fr" ? "fr" : "en";
   const t = T[l];
-  const eventDateFmt = formatEmailDateTime(eventDate, l);
+  const eventDateFmt = formatEmailDateTime(eventDate, l, tz);
   return (
     <EmailShell
       preview={`${t.preview(eventTitle, eventDateFmt)}`}
@@ -135,7 +137,7 @@ export const template = {
     const l: Locale = (d as any).locale === "fr" ? "fr" : "en";
     return T[l].subject(
       d.eventTitle as string,
-      formatEmailDateTime(d.eventDate as string | undefined, l),
+      formatEmailDateTime(d.eventDate as string | undefined, l, (d as any).tz),
     );
   },
   displayName: "Event cancelled",

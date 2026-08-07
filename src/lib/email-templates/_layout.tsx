@@ -13,6 +13,7 @@ import {
   Text,
 } from "@react-email/components";
 import { COMPANY_LEGAL, formatCompanyFooterLine } from "@/config/company";
+import { resolveClubTz } from "@/lib/time/club-tz";
 
 export type Locale = "fr" | "en" | "es" | "de" | "it" | "nl" | "pt";
 
@@ -34,6 +35,7 @@ export const pickLocale = (input?: string | null): Locale => {
 export const formatEmailDateTime = (
   value: string | undefined | null,
   locale?: Locale | string | null,
+  tz?: string | null,
 ): string | undefined => {
   if (!value) return value ?? undefined;
   if (!/^\d{4}-\d{2}-\d{2}T/.test(value)) return value;
@@ -46,6 +48,7 @@ export const formatEmailDateTime = (
       month: "long",
       hour: "2-digit",
       minute: "2-digit",
+      timeZone: resolveClubTz(tz),
     });
   } catch {
     return value;

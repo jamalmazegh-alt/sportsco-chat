@@ -2145,6 +2145,7 @@ export type Database = {
           stripe_charges_enabled: boolean
           stripe_payouts_enabled: boolean
           theme_color: string
+          timezone: string
           wall_comments_enabled: boolean
         }
         Insert: {
@@ -2173,6 +2174,7 @@ export type Database = {
           stripe_charges_enabled?: boolean
           stripe_payouts_enabled?: boolean
           theme_color?: string
+          timezone?: string
           wall_comments_enabled?: boolean
         }
         Update: {
@@ -2201,6 +2203,7 @@ export type Database = {
           stripe_charges_enabled?: boolean
           stripe_payouts_enabled?: boolean
           theme_color?: string
+          timezone?: string
           wall_comments_enabled?: boolean
         }
         Relationships: []

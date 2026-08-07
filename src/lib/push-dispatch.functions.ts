@@ -1,3 +1,4 @@
+import { getClubTz } from "@/lib/time/club-tz.server";
 /**
  * Client-callable server functions that fan out Web Push notifications.
  * All run fire-and-forget on the server, so callers should not await them
@@ -61,12 +62,18 @@ export const dispatchConvocationPush = createServerFn({ method: "POST" })
       if ((p as any).parent_user_id) targets.add((p as any).parent_user_id);
 
     const dt = new Date((ev as any).starts_at);
+    const clubTz = await getClubTz(((ev as any).teams?.club_id as string | null) ?? null);
     const dateStr = dt.toLocaleDateString("fr-FR", {
       weekday: "short",
       day: "numeric",
       month: "short",
+      timeZone: clubTz,
     });
-    const timeStr = dt.toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" });
+    const timeStr = dt.toLocaleTimeString("fr-FR", {
+      hour: "2-digit",
+      minute: "2-digit",
+      timeZone: clubTz,
+    });
     const isMatch = (ev as any).type === "match";
     const teamName = ((ev as any).teams?.name as string | null) ?? null;
     const opponent = ((ev as any).opponent as string | null) ?? null;
@@ -175,12 +182,18 @@ export const dispatchConvocationResendPush = createServerFn({ method: "POST" })
       if ((p as any).parent_user_id) targets.add((p as any).parent_user_id);
 
     const dt = new Date((ev as any).starts_at);
+    const clubTz = await getClubTz(((ev as any).teams?.club_id as string | null) ?? null);
     const dateStr = dt.toLocaleDateString("fr-FR", {
       weekday: "short",
       day: "numeric",
       month: "short",
+      timeZone: clubTz,
     });
-    const timeStr = dt.toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" });
+    const timeStr = dt.toLocaleTimeString("fr-FR", {
+      hour: "2-digit",
+      minute: "2-digit",
+      timeZone: clubTz,
+    });
     const isMatch = (ev as any).type === "match";
     const teamName = ((ev as any).teams?.name as string | null) ?? null;
     const opponent = ((ev as any).opponent as string | null) ?? null;
@@ -519,12 +532,18 @@ export const dispatchEventReschedulePush = createServerFn({ method: "POST" })
     }
 
     const dt = new Date((ev as any).starts_at);
+    const clubTz = await getClubTz(((ev as any).teams?.club_id as string | null) ?? null);
     const dateStr = dt.toLocaleDateString("fr-FR", {
       weekday: "short",
       day: "numeric",
       month: "short",
+      timeZone: clubTz,
     });
-    const timeStr = dt.toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" });
+    const timeStr = dt.toLocaleTimeString("fr-FR", {
+      hour: "2-digit",
+      minute: "2-digit",
+      timeZone: clubTz,
+    });
     const isMatch = (ev as any).type === "match";
     const teamName = ((ev as any).teams?.name as string | null) ?? null;
     const opponent = ((ev as any).opponent as string | null) ?? null;
@@ -605,12 +624,18 @@ export const dispatchEventCancelPush = createServerFn({ method: "POST" })
 
     const startIso = data.previousStartsAt || ((ev as any).starts_at as string);
     const dt = new Date(startIso);
+    const clubTz = await getClubTz(((ev as any).teams?.club_id as string | null) ?? null);
     const dateStr = dt.toLocaleDateString("fr-FR", {
       weekday: "short",
       day: "numeric",
       month: "short",
+      timeZone: clubTz,
     });
-    const timeStr = dt.toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" });
+    const timeStr = dt.toLocaleTimeString("fr-FR", {
+      hour: "2-digit",
+      minute: "2-digit",
+      timeZone: clubTz,
+    });
     const isMatch = (ev as any).type === "match";
     const teamName = ((ev as any).teams?.name as string | null) ?? null;
     const opponent = ((ev as any).opponent as string | null) ?? null;
@@ -667,12 +692,18 @@ export const dispatchStaffAssignmentPush = createServerFn({ method: "POST" })
     if (!ev) return { sent: 0 };
 
     const dt = new Date((ev as any).starts_at);
+    const clubTz = await getClubTz(((ev as any).teams?.club_id as string | null) ?? null);
     const dateStr = dt.toLocaleDateString("fr-FR", {
       weekday: "short",
       day: "numeric",
       month: "short",
+      timeZone: clubTz,
     });
-    const timeStr = dt.toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" });
+    const timeStr = dt.toLocaleTimeString("fr-FR", {
+      hour: "2-digit",
+      minute: "2-digit",
+      timeZone: clubTz,
+    });
     const isMatch = (ev as any).type === "match";
     const teamName = ((ev as any).teams?.name as string | null) ?? null;
     const opponent = ((ev as any).opponent as string | null) ?? null;

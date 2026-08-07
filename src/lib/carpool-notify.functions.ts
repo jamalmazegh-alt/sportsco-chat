@@ -1,3 +1,4 @@
+import { resolveClubTz } from "@/lib/time/club-tz";
 import { createServerFn } from "@tanstack/react-start";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { z } from "zod";
@@ -91,7 +92,7 @@ export const notifyCoachesOfCarpoolNeed = createServerFn({ method: "POST" })
     const { data: club } = ev.teams
       ? await supabaseAdmin
           .from("clubs")
-          .select("name, default_language")
+          .select("name, default_language, timezone")
           .eq("id", (ev.teams as any).club_id)
           .maybeSingle()
       : { data: null as any };
@@ -129,6 +130,7 @@ export const notifyCoachesOfCarpoolNeed = createServerFn({ method: "POST" })
               month: "long",
               hour: "2-digit",
               minute: "2-digit",
+              timeZone: resolveClubTz((club as any)?.timezone ?? null),
             })
           : undefined;
       } catch {
@@ -153,6 +155,7 @@ export const notifyCoachesOfCarpoolNeed = createServerFn({ method: "POST" })
             note: need.note ?? undefined,
             eventUrl: `${baseUrl}/events/${need.event_id}`,
             locale,
+            tz: resolveClubTz((club as any)?.timezone ?? null),
           },
         });
         sent += 1;

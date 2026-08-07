@@ -1,3 +1,4 @@
+import { resolveClubTz } from "@/lib/time/club-tz";
 /**
  * Dispatcher pour les convocations de réunion (interne).
  * Envoie in-app + push + e-mail aux nouveaux convoqués uniquement.
@@ -26,7 +27,9 @@ export async function dispatchMeetingConvocation(
   // Contexte réunion + club (pour brand fromName).
   const { data: ev } = await supabaseAdmin
     .from("events")
-    .select("id, title, starts_at, location, team_id, teams:team_id(club_id, clubs:club_id(name))")
+    .select(
+      "id, title, starts_at, location, team_id, teams:team_id(club_id, clubs:club_id(name, timezone))",
+    )
     .eq("id", params.eventId)
     .maybeSingle();
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -35,6 +38,7 @@ export async function dispatchMeetingConvocation(
   const startsAt = (evRow?.starts_at as string | null) ?? null;
   const location = (evRow?.location as string | null) ?? null;
   const clubName = (evRow?.teams?.clubs?.name as string | null) ?? null;
+  const clubTz = resolveClubTz((evRow?.teams?.clubs?.timezone as string | null) ?? null);
 
   const link = `/events/${params.eventId}`;
   const bodyText = "Vous êtes convoqué(e) à cette réunion.";
@@ -128,6 +132,7 @@ export async function dispatchMeetingConvocation(
           meetingStartsAt: startsAt,
           location,
           clubName,
+          tz: clubTz,
           eventUrl: link,
           respondUrl,
         },
@@ -162,13 +167,14 @@ export async function dispatchMeetingRemoval(
 
   const { data: ev } = await supabaseAdmin
     .from("events")
-    .select("id, title, teams:team_id(club_id, clubs:club_id(name))")
+    .select("id, title, teams:team_id(club_id, clubs:club_id(name, timezone))")
     .eq("id", params.eventId)
     .maybeSingle();
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const evRow = ev as any;
   const meetingTitle = (evRow?.title as string | null) ?? "Réunion";
   const clubName = (evRow?.teams?.clubs?.name as string | null) ?? null;
+  const clubTz = resolveClubTz((evRow?.teams?.clubs?.timezone as string | null) ?? null);
 
   const link = `/events/${params.eventId}`;
   const bodyText = "Vous n'êtes plus convoqué(e) à cette réunion.";
@@ -242,6 +248,7 @@ export async function dispatchMeetingRemoval(
           locale,
           meetingTitle,
           clubName,
+          tz: clubTz,
           eventUrl: link,
         },
       });

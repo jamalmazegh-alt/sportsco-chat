@@ -1,3 +1,4 @@
+import { resolveClubTz } from "@/lib/time/club-tz";
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
@@ -165,13 +166,16 @@ export const notifyCoachesOfAbsence = createServerFn({ method: "POST" })
     // Find teams of the player
     const { data: tm } = await supabaseAdmin
       .from("team_members")
-      .select("team_id, teams:team_id(clubs:club_id(default_language))")
+      .select("team_id, teams:team_id(clubs:club_id(default_language, timezone))")
       .eq("player_id", avail.player_id)
       .eq("role", "player");
     const teamIds = Array.from(new Set((tm ?? []).map((r: any) => r.team_id))).filter(Boolean);
     if (teamIds.length === 0) return { sent: 0 };
     const clubDefaultLang =
       (tm ?? []).map((r: any) => r?.teams?.clubs?.default_language).find(Boolean) ?? null;
+    const clubTz =
+      (tm ?? []).map((r: any) => r?.teams?.clubs?.timezone).find(Boolean) ?? null;
+
 
     // Coaches/admins
     const { data: coaches } = await supabaseAdmin
@@ -203,6 +207,7 @@ export const notifyCoachesOfAbsence = createServerFn({ method: "POST" })
             weekday: "long",
             day: "numeric",
             month: "long",
+            timeZone: resolveClubTz(clubTz),
           });
         } catch {
           return d;

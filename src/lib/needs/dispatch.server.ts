@@ -1,3 +1,4 @@
+import { resolveClubTz } from "@/lib/time/club-tz";
 /**
  * LOT 1 / Phase A — Dispatch push + email pour les besoins événementiels.
  *
@@ -25,7 +26,7 @@ export async function dispatchEventNeedPublication(params: DispatchPublicationPa
   const { data: need } = await supabaseAdmin
     .from("event_needs")
     .select(
-      "id, label, capacity, validation_mode, event_id, events:event_id(id, title, starts_at, team_id, teams:team_id(name, club_id, clubs:club_id(name)))",
+      "id, label, capacity, validation_mode, event_id, events:event_id(id, title, starts_at, team_id, teams:team_id(name, club_id, clubs:club_id(name, timezone)))",
     )
     .eq("id", params.needId)
     .maybeSingle();
@@ -37,6 +38,7 @@ export async function dispatchEventNeedPublication(params: DispatchPublicationPa
   const startsAt = ev?.starts_at as string | null;
   const teamName = (ev?.teams?.name as string | null) ?? null;
   const clubName = (ev?.teams?.clubs?.name as string | null) ?? null;
+  const clubTz = resolveClubTz((ev?.teams?.clubs?.timezone as string | null) ?? null);
 
   // Push fanout
   try {
@@ -47,10 +49,15 @@ export async function dispatchEventNeedPublication(params: DispatchPublicationPa
           weekday: "short",
           day: "numeric",
           month: "short",
+          timeZone: clubTz,
         })
       : "";
     const timeStr = startsAt
-      ? new Date(startsAt).toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" })
+      ? new Date(startsAt).toLocaleTimeString("fr-FR", {
+          hour: "2-digit",
+          minute: "2-digit",
+          timeZone: clubTz,
+        })
       : "";
     const body = startsAt
       ? `Nouveau coup de main demandé pour ${eventTitle} — ${dateStr} à ${timeStr}`
@@ -136,7 +143,7 @@ export async function notifyStaffOfSignup(params: NotifyStaffOfSignupParams) {
   const { data: need } = await supabaseAdmin
     .from("event_needs")
     .select(
-      "id, label, club_id, event_id, created_by, events:event_id(id, title, starts_at, type, opponent, is_home, team_id, teams:team_id(name, clubs:club_id(name)))",
+      "id, label, club_id, event_id, created_by, events:event_id(id, title, starts_at, type, opponent, is_home, team_id, teams:team_id(name, clubs:club_id(name, timezone)))",
     )
     .eq("id", params.needId)
     .maybeSingle();
@@ -180,6 +187,7 @@ export async function notifyStaffOfSignup(params: NotifyStaffOfSignupParams) {
   const opponent = (ev?.opponent as string | null) ?? null;
   const teamName = (ev?.teams?.name as string | null) ?? null;
   const isHome = ev?.is_home as boolean | null | undefined;
+  const clubTz = resolveClubTz((ev?.teams?.clubs?.timezone as string | null) ?? null);
 
   let matchLine = eventTitle;
   if (isMatch && teamName) {
@@ -204,10 +212,15 @@ export async function notifyStaffOfSignup(params: NotifyStaffOfSignupParams) {
         weekday: "short",
         day: "numeric",
         month: "short",
+        timeZone: clubTz,
       })
     : "";
   const timeStr = startsAt
-    ? new Date(startsAt).toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" })
+    ? new Date(startsAt).toLocaleTimeString("fr-FR", {
+        hour: "2-digit",
+        minute: "2-digit",
+        timeZone: clubTz,
+      })
     : "";
   const body = startsAt
     ? `${matchLine} — ${dateStr} à ${timeStr} — ${applicantFirstName}`
@@ -239,6 +252,7 @@ export async function notifyStaffOfSignup(params: NotifyStaffOfSignupParams) {
       .maybeSingle();
     const locale = (profile?.preferred_language ?? "fr").startsWith("en") ? "en" : "fr";
     const clubName = (ev?.teams?.clubs?.name as string | null) ?? null;
+    const clubTz = resolveClubTz((ev?.teams?.clubs?.timezone as string | null) ?? null);
     await enqueueTransactionalEmailServer({
       templateName: "event-need-signup",
       recipientEmail: email,
@@ -251,6 +265,7 @@ export async function notifyStaffOfSignup(params: NotifyStaffOfSignupParams) {
       templateData: {
         recipientFirstName: profile?.first_name ?? null,
         locale,
+        tz: clubTz,
         status: params.status,
         needLabel: need.label,
         eventTitle,
@@ -281,7 +296,7 @@ export async function notifyApplicantOfDecision(params: NotifyApplicantOfDecisio
   const { data: need } = await supabaseAdmin
     .from("event_needs")
     .select(
-      "id, label, event_id, events:event_id(id, title, starts_at, team_id, teams:team_id(name, club_id, clubs:club_id(name)))",
+      "id, label, event_id, events:event_id(id, title, starts_at, team_id, teams:team_id(name, club_id, clubs:club_id(name, timezone)))",
     )
     .eq("id", params.needId)
     .maybeSingle();
@@ -292,6 +307,7 @@ export async function notifyApplicantOfDecision(params: NotifyApplicantOfDecisio
   const eventTitle = (ev?.title as string) ?? "Événement";
   const eventStartsAt = (ev?.starts_at as string | null) ?? null;
   const clubName = (ev?.teams?.clubs?.name as string | null) ?? null;
+  const clubTz = resolveClubTz((ev?.teams?.clubs?.timezone as string | null) ?? null);
   const isConfirm = params.decision === "confirm";
   const isUnassign = params.decision === "unassign";
 
@@ -310,6 +326,7 @@ export async function notifyApplicantOfDecision(params: NotifyApplicantOfDecisio
           month: "short",
           hour: "2-digit",
           minute: "2-digit",
+          timeZone: clubTz,
         })
       : null;
     const body = isUnassign
@@ -348,6 +365,7 @@ export async function notifyApplicantOfDecision(params: NotifyApplicantOfDecisio
       templateData: {
         recipientFirstName: profile?.first_name ?? null,
         locale,
+        tz: clubTz,
         decision: params.decision,
         needLabel: need.label,
         eventTitle,
@@ -369,7 +387,7 @@ export async function notifyNeedCancelled(params: { needId: string }) {
   const { data: need } = await supabaseAdmin
     .from("event_needs")
     .select(
-      "id, label, event_id, events:event_id(id, title, starts_at, team_id, teams:team_id(name, club_id, clubs:club_id(name)))",
+      "id, label, event_id, events:event_id(id, title, starts_at, team_id, teams:team_id(name, club_id, clubs:club_id(name, timezone)))",
     )
     .eq("id", params.needId)
     .maybeSingle();
@@ -393,6 +411,7 @@ export async function notifyNeedCancelled(params: { needId: string }) {
   const ev = (need as any).events;
   const eventTitle = (ev?.title as string) ?? "Événement";
   const clubName = (ev?.teams?.clubs?.name as string | null) ?? null;
+  const clubTz = resolveClubTz((ev?.teams?.clubs?.timezone as string | null) ?? null);
 
   // Push
   try {

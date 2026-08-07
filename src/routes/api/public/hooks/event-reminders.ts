@@ -1,3 +1,4 @@
+import { resolveClubTz } from "@/lib/time/club-tz";
 import { createFileRoute } from "@tanstack/react-router";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
 import { enqueueTransactionalEmailServer } from "@/lib/email/send.server";
@@ -15,7 +16,7 @@ function resolveLocale(...candidates: Array<string | null | undefined>): string 
   }
   return "fr";
 }
-function fmtDate(iso: string, locale: string) {
+function fmtDate(iso: string, locale: string, tz?: string | null) {
   const bcp = locale === "en" ? "en-GB" : `${locale}-${locale.toUpperCase()}`;
   return new Date(iso).toLocaleDateString(bcp, {
     weekday: "long",
@@ -23,6 +24,7 @@ function fmtDate(iso: string, locale: string) {
     month: "long",
     hour: "2-digit",
     minute: "2-digit",
+    timeZone: resolveClubTz(tz),
   });
 }
 
@@ -47,7 +49,7 @@ export const Route = createFileRoute("/api/public/hooks/event-reminders")({
         const { data: events, error } = await supabaseAdmin
           .from("events")
           .select(
-            "id, title, type, starts_at, location, location_url, meeting_point, convocation_time, description, team_id, opponent, is_home, cancelled_at, deleted_at, competition_name, competition_type, teams:team_id(name, club_id, clubs:club_id(name, logo_url, auto_reminders_enabled, auto_reminder_hours_before, default_language))",
+            "id, title, type, starts_at, location, location_url, meeting_point, convocation_time, description, team_id, opponent, is_home, cancelled_at, deleted_at, competition_name, competition_type, teams:team_id(name, club_id, clubs:club_id(name, logo_url, auto_reminders_enabled, auto_reminder_hours_before, default_language, timezone))",
           )
           .is("cancelled_at", null)
           .is("deleted_at", null)
@@ -135,6 +137,8 @@ export const Route = createFileRoute("/api/public/hooks/event-reminders")({
           }
 
           const clubLang = (club as any).default_language as string | null | undefined;
+
+          const clubTz = resolveClubTz((club as any).timezone as string | null | undefined);
           const baseUrl = process.env.SITE_URL || "https://www.clubero.app";
 
           const locationMapsUrl = ev.location
@@ -182,7 +186,7 @@ export const Route = createFileRoute("/api/public/hooks/event-reminders")({
             for (const r of recipients) {
               const recipientLang = r.userId ? langByUser.get(r.userId) : undefined;
               const locale = resolveLocale(recipientLang, clubLang);
-              const eventDateLabel = fmtDate(ev.starts_at, locale);
+              const eventDateLabel = fmtDate(ev.starts_at, locale, clubTz);
               try {
                 await enqueueTransactionalEmailServer({
                   templateName: "convocation-invite",
@@ -197,7 +201,7 @@ export const Route = createFileRoute("/api/public/hooks/event-reminders")({
                     eventDate: eventDateLabel,
                     eventDescription: ev.description ?? undefined,
                     convocationTime: ev.convocation_time
-                      ? fmtDate(ev.convocation_time, locale)
+                      ? fmtDate(ev.convocation_time, locale, clubTz)
                       : undefined,
                     eventLocation: ev.location ?? undefined,
                     locationMapsUrl,
@@ -212,6 +216,7 @@ export const Route = createFileRoute("/api/public/hooks/event-reminders")({
                     reminderHoursBefore: milestone,
                     lineup: lineupEmail,
                     locale,
+                    tz: clubTz,
                   },
                 });
                 sent++;
@@ -240,6 +245,7 @@ export const Route = createFileRoute("/api/public/hooks/event-reminders")({
               const timeStr = startDt.toLocaleTimeString("fr-FR", {
                 hour: "2-digit",
                 minute: "2-digit",
+                timeZone: clubTz,
               });
               let headline: string;
               if (isMatch && opponent) {

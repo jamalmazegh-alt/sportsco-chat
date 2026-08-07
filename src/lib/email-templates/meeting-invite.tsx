@@ -2,10 +2,12 @@ import * as React from "react";
 import { Button, Column, Heading, Row, Section, Text } from "@react-email/components";
 import { EmailShell } from "./_layout";
 import type { TemplateEntry } from "./registry";
+import { resolveClubTz } from "@/lib/time/club-tz";
 
 type Locale = "fr" | "en" | "de" | "es" | "it" | "nl" | "pt";
 
 interface Props {
+  tz?: string;
   displayName?: string | null;
   meetingTitle: string;
   meetingStartsAt?: string | null;
@@ -241,7 +243,11 @@ function pickLocale(l?: string): Locale {
     : "fr";
 }
 
-function formatWhen(iso: string | null | undefined, dateLocale: string): string | null {
+function formatWhen(
+  iso: string | null | undefined,
+  dateLocale: string,
+  tz?: string | null,
+): string | null {
   if (!iso) return null;
   try {
     return new Date(iso).toLocaleString(dateLocale, {
@@ -250,6 +256,7 @@ function formatWhen(iso: string | null | undefined, dateLocale: string): string 
       month: "long",
       hour: "2-digit",
       minute: "2-digit",
+      timeZone: resolveClubTz(tz),
     });
   } catch {
     return null;
@@ -265,10 +272,11 @@ const MeetingInviteEmail = ({
   eventUrl,
   respondUrl,
   locale,
+  tz,
 }: Props) => {
   const l = pickLocale(locale);
   const c = COPY[l];
-  const when = formatWhen(meetingStartsAt, c.dateLocale);
+  const when = formatWhen(meetingStartsAt, c.dateLocale, tz);
   return (
     <EmailShell preview={c.preview(meetingTitle)} locale={l}>
       <Heading style={h1}>{c.hello(displayName)}</Heading>
