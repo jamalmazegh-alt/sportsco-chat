@@ -357,7 +357,9 @@ function RosterPage() {
                     setUploadingLogo(true);
                     try {
                       const res = await fetch(
-                        `/api/public/tournament-roster-logo?token=${encodeURIComponent(token)}`,
+                        apiUrl(
+                          `/api/public/tournament-roster-logo?token=${encodeURIComponent(token)}`,
+                        ),
                         { method: "DELETE" },
                       );
                       const data = await res.json();

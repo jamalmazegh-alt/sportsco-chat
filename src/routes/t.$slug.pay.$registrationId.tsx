@@ -44,7 +44,7 @@ function PayPage() {
     queryKey: ["public-tournament-payment", registrationId],
     queryFn: async () => {
       const res = await fetch(
-        `/api/public/tournament-payment-link?id=${encodeURIComponent(registrationId)}`,
+        apiUrl(`/api/public/tournament-payment-link?id=${encodeURIComponent(registrationId)}`),
       );
       if (!res.ok) throw new Error(String(res.status));
       return res.json() as Promise<{

@@ -73,5 +73,61 @@ export default tseslint.config(
       ],
     },
   },
+  // Garde-fou natif : aucun appel réseau vers un chemin relatif dans le code
+  // qui tourne dans la WebView.
+  //
+  // Dans l'application Capacitor, l'origine est celle du bundle embarqué
+  // (`https://localhost` / `capacitor://localhost`) : un `fetch("/api/x")` y
+  // vise l'application elle-même, pas le serveur, et échoue SANS ERREUR
+  // VISIBLE. Symptôme typique : l'interface annonce « envoyé », rien ne part.
+  //
+  // Cette règle existe parce que le défaut est revenu quatre fois malgré trois
+  // audits : une route sous `/lovable` qu'une recherche limitée à `/api` avait
+  // manquée, deux appels répartis sur plusieurs lignes, et un transport d'IA
+  // configuré sur `api: "/..."`. Un audit ne tient pas dans le temps, une règle
+  // si.
+  //
+  // Le code serveur est exclu : `src/routes/api/**` et les `*.server.ts`
+  // s'exécutent sur le Worker, où un chemin relatif est légitime.
+  {
+    files: ["src/**/*.{ts,tsx}"],
+    ignores: [
+      "src/routes/api/**",
+      "src/**/*.server.ts",
+      "src/**/*.test.ts",
+      "src/**/*.test.tsx",
+      "src/tests/**",
+    ],
+    rules: {
+      "no-restricted-syntax": [
+        "error",
+        {
+          selector: "CallExpression[callee.name='fetch'] > Literal[value=/^\\//]",
+          message:
+            "Chemin relatif : en natif la WebView viserait le bundle embarqué. Utiliser apiUrl() de @/lib/native-platform.",
+        },
+        {
+          selector:
+            "CallExpression[callee.name='fetch'] > TemplateLiteral[quasis.0.value.raw=/^\\//]",
+          message:
+            "Chemin relatif : en natif la WebView viserait le bundle embarqué. Utiliser apiUrl() de @/lib/native-platform.",
+        },
+        {
+          selector: "Property[key.name='api'] > Literal[value=/^\\//]",
+          message:
+            "Transport sur chemin relatif : il échappe à serverFns.fetch et casse en natif. Utiliser apiUrl().",
+        },
+        {
+          selector:
+            "NewExpression[callee.name=/^(EventSource|WebSocket)$/] > Literal[value=/^\\//]",
+          message: "Chemin relatif : utiliser apiUrl() de @/lib/native-platform.",
+        },
+        {
+          selector: "CallExpression[callee.property.name='sendBeacon'] > Literal[value=/^\\//]",
+          message: "Chemin relatif : utiliser apiUrl() de @/lib/native-platform.",
+        },
+      ],
+    },
+  },
   eslintPluginPrettier,
 );
