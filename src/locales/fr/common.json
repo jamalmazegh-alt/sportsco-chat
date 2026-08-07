@@ -3786,7 +3786,7 @@
     "flightsReady": "Les poules sont terminées. Crée les Flights pour générer les 3 tableaux (Champions / Europa / Conference)."
   },
   "draw": {
-    "relaunchFromFooterHint": "Tirage effectué. Utilisez « Relancer » en bas du dialog pour en générer un nouveau (les résultats actuels seront perdus)."
+    "relaunchFromFooterHint": "Tirage effectué. Utilisez « Relancer » en bas de la boîte de dialogue pour en générer un nouveau (les résultats actuels seront perdus)."
   },
   "fields": {
     "streamUrlPlaceholder": "URL de streaming (YouTube, Twitch…)"

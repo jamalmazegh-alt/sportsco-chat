@@ -79,8 +79,52 @@ for (const ns of namespaces) {
   }
 }
 
-if (missing > 0) {
-  console.error(`\n${missing} missing translation key(s).`);
+/**
+ * A key present everywhere but empty in only some locales renders as nothing
+ * on those screens, while the others show text. Parity alone cannot see it —
+ * the key exists in every file. An empty string is only legitimate when every
+ * locale agrees it is empty (a deliberately blank column header, say).
+ */
+function collectEntries(obj, prefix = "", out = new Map()) {
+  if (obj && typeof obj === "object" && !Array.isArray(obj)) {
+    for (const [k, v] of Object.entries(obj)) {
+      const next = prefix ? `${prefix}.${k}` : k;
+      if (v && typeof v === "object" && !Array.isArray(v)) collectEntries(v, next, out);
+      else out.set(next, v);
+    }
+  }
+  return out;
+}
+
+let blank = 0;
+for (const ns of namespaces) {
+  const perLocale = new Map();
+  for (const lang of locales) {
+    const p = path.join(LOCALES_DIR, lang, `${ns}.json`);
+    if (fs.existsSync(p)) perLocale.set(lang, collectEntries(readJson(p)));
+  }
+  for (const key of collectEntries(
+    readJson(path.join(LOCALES_DIR, REFERENCE, `${ns}.json`)),
+  ).keys()) {
+    const empty = [];
+    const filled = [];
+    for (const [lang, entries] of perLocale) {
+      const v = entries.get(key);
+      if (v === "") empty.push(lang);
+      else if (typeof v === "string" && v.trim()) filled.push(lang);
+    }
+    if (empty.length && filled.length) {
+      console.error(
+        `✗ [${ns}] ${key} is empty in ${empty.join(", ")} but translated in ${filled.join(", ")}`,
+      );
+      blank++;
+    }
+  }
+}
+
+if (missing > 0 || blank > 0) {
+  if (missing > 0) console.error(`\n${missing} missing translation key(s).`);
+  if (blank > 0) console.error(`${blank} key(s) blank in some locales but not others.`);
   process.exit(1);
 }
 console.log(

@@ -746,7 +746,7 @@
     "overwriteDesc": "Cette action va supprimer la composition actuelle (poules/tableau final) et les matchs associés. Les équipes inscrites sont conservées.",
     "cancel": "Annuler",
     "confirmRelaunch": "Confirmer et relancer",
-    "relaunchFromFooterHint": ""
+    "relaunchFromFooterHint": "Tirage effectué. Utilisez « Relancer » en bas de la boîte de dialogue pour en générer un nouveau (les résultats actuels seront perdus)."
   },
   "rules": {
     "savedToast": "Règles enregistrées",

@@ -746,7 +746,7 @@
     "overwriteDesc": "This will remove the current composition (groups/bracket) and related matches. Registered teams are kept.",
     "cancel": "Cancel",
     "confirmRelaunch": "Confirm and relaunch",
-    "relaunchFromFooterHint": ""
+    "relaunchFromFooterHint": "Draw completed. Use “Relaunch” at the bottom of the dialog to generate a new one (current results will be lost)."
   },
   "rules": {
     "savedToast": "Rules saved",

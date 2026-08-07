@@ -746,7 +746,7 @@
     "overwriteDesc": "Deze actie verwijdert de huidige samenstelling (groepen/schema) en de bijbehorende wedstrijden. Aangemelde Teams blijven behouden.",
     "cancel": "Annuleren",
     "confirmRelaunch": "Bevestigen en opnieuw starten",
-    "relaunchFromFooterHint": "Trekking voltooid. Gebruik ‘Opnieuw starten’ onderaan het dialoogvenster om een ​​nieuwe te genereren (huidige resultaten gaan verloren)."
+    "relaunchFromFooterHint": "Trekking voltooid. Gebruik ‘Opnieuw starten’ onderaan het dialoogvenster om een nieuwe te genereren (huidige resultaten gaan verloren)."
   },
   "rules": {
     "savedToast": "Regels opgeslagen",
