@@ -1180,20 +1180,8 @@
     "confirmResponse": "Confirmer ma réponse",
     "responseRecorded": "Réponse enregistrée",
     "coachNotified": "Le coach a été prévenu.",
-    "reasonsAbsent": [
-      "Travail",
-      "Famille",
-      "Blessure",
-      "Maladie",
-      "Études",
-      "Autre engagement"
-    ],
-    "reasonsUncertain": [
-      "À confirmer",
-      "Travail",
-      "Famille",
-      "Léger souci de santé"
-    ],
+    "reasonsAbsent": ["Travail", "Famille", "Blessure", "Maladie", "Études", "Autre engagement"],
+    "reasonsUncertain": ["À confirmer", "Travail", "Famille", "Léger souci de santé"],
     "suggestedReasons": "Suggestions",
     "forceResponseTitle": "Forcer la réponse ?",
     "forceResponseDesc": "{{name}} a déjà répondu {{current}}. Voulez-vous vraiment forcer son statut à {{next}} ?",

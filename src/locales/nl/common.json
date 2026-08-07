@@ -1180,20 +1180,8 @@
     "confirmResponse": "Antwoord bevestigen",
     "responseRecorded": "Antwoord opgeslagen",
     "coachNotified": "De Coach is geïnformeerd.",
-    "reasonsAbsent": [
-      "Werk",
-      "Familie",
-      "Blessure",
-      "Ziekte",
-      "Studie",
-      "Andere verplichting"
-    ],
-    "reasonsUncertain": [
-      "Nog te bevestigen",
-      "Werk",
-      "Familie",
-      "Lichte gezondheidsklachten"
-    ],
+    "reasonsAbsent": ["Werk", "Familie", "Blessure", "Ziekte", "Studie", "Andere verplichting"],
+    "reasonsUncertain": ["Nog te bevestigen", "Werk", "Familie", "Lichte gezondheidsklachten"],
     "suggestedReasons": "Suggesties",
     "forceResponseTitle": "Antwoord forceren?",
     "forceResponseDesc": "{{name}} heeft al geantwoord met {{current}}. Wil je de status echt wijzigen naar {{next}}?",
