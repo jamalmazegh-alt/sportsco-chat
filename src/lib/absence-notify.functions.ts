@@ -1,4 +1,3 @@
-import { resolveClubTz } from "@/lib/time/club-tz";
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
@@ -201,11 +200,13 @@ export const notifyCoachesOfAbsence = createServerFn({ method: "POST" })
       const bcp = locale === "en" ? "en-GB" : `${locale}-${locale.toUpperCase()}`;
       return (d: string) => {
         try {
-          return new Date(`${d}T00:00:00`).toLocaleDateString(bcp, {
+          // Date seule : on la parse en UTC et on l'affiche en UTC pour que le
+          // jour calendaire reste identique quel que soit le fuseau du club.
+          return new Date(`${d}T00:00:00Z`).toLocaleDateString(bcp, {
             weekday: "long",
             day: "numeric",
             month: "long",
-            timeZone: resolveClubTz(clubTz),
+            timeZone: "UTC",
           });
         } catch {
           return d;

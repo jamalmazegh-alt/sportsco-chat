@@ -17,6 +17,7 @@
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
 import { sendPushToUser } from "./push-send.server";
 import { getClubNotifSettings } from "./club-notif-settings.server";
+import { getClubTz } from "./time/club-tz.server";
 
 async function getTeamClubId(teamId: string | null | undefined): Promise<string | null> {
   if (!teamId) return null;
@@ -267,10 +268,12 @@ export async function fanoutTournamentMatchReminder(
   for (const t of tteams ?? []) nameById.set((t as any).id, (t as any).name);
 
   const slug = ((m as any).tournaments?.slug as string) || ((m as any).tournament_id as string);
+  const tz = await getClubTz(clubId);
   const time = (m as any).scheduled_at
     ? new Date((m as any).scheduled_at).toLocaleTimeString("fr-FR", {
         hour: "2-digit",
         minute: "2-digit",
+        timeZone: tz,
       })
     : "";
   const field = ((m as any).field as string) || "—";
