@@ -3998,7 +3998,8 @@
     "bannerDesc": "Recebe convocatórias e lembretes em tempo real",
     "bannerEnable": "Ativar",
     "bannerLater": "Mais tarde",
-    "close": "Fechar"
+    "close": "Fechar",
+    "openSettings": "Abrir definições"
   },
   "offline": {
     "metaTitle": "Offline — Clubero",

@@ -4003,7 +4003,8 @@
     "bannerDesc": "Erhalte Einberufungen und Erinnerungen in Echtzeit",
     "bannerEnable": "Aktivieren",
     "bannerLater": "Später",
-    "close": "Schließen"
+    "close": "Schließen",
+    "openSettings": "Einstellungen öffnen"
   },
   "offline": {
     "metaTitle": "Offline — Clubero",

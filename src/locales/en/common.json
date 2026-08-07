@@ -3998,7 +3998,8 @@
     "bannerDesc": "Get your call-ups and reminders in real time",
     "bannerEnable": "Enable",
     "bannerLater": "Later",
-    "close": "Close"
+    "close": "Close",
+    "openSettings": "Open settings"
   },
   "offline": {
     "metaTitle": "Offline — Clubero",

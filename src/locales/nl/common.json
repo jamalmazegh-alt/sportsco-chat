@@ -3998,7 +3998,8 @@
     "bannerDesc": "Ontvang oproepen en herinneringen in realtime",
     "bannerEnable": "Inschakelen",
     "bannerLater": "Later",
-    "close": "Sluiten"
+    "close": "Sluiten",
+    "openSettings": "Instellingen openen"
   },
   "offline": {
     "metaTitle": "Offline - Clubero",

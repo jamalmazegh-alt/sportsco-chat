@@ -375,10 +375,46 @@ async function sendOne(sub: RawSubscription, payload: PushPayload): Promise<numb
  * Send a push notification to every active subscription of one user.
  * Cleans up endpoints that respond 404/410 (gone).
  */
+/**
+ * Nombre de notifications non lues, pour la pastille iOS.
+ *
+ * iOS n'incrémente pas la pastille tout seul : sa valeur est celle que le
+ * serveur envoie, à chaque notification. Une erreur ici ne doit jamais empêcher
+ * l'envoi — mieux vaut une notification sans pastille que pas de notification.
+ *
+ * Le compte est mis en cache le temps d'un fanout : un même utilisateur peut
+ * avoir plusieurs appareils, et ils doivent tous afficher le même nombre.
+ */
+const badgeCache = new Map<string, number>();
+
+async function unreadBadgeCount(userId: string): Promise<number | undefined> {
+  const cached = badgeCache.get(userId);
+  if (cached !== undefined) return cached;
+  try {
+    const { count, error } = await supabaseAdmin
+      .from("notifications")
+      .select("id", { count: "exact", head: true })
+      .eq("user_id", userId)
+      .is("read_at", null);
+    if (error) throw error;
+    // +1 : la notification en cours d'envoi n'est pas encore en base au moment
+    // où on compte, selon l'ordre des appels côté appelant.
+    const value = (count ?? 0) + 1;
+    badgeCache.set(userId, value);
+    return value;
+  } catch (e) {
+    console.warn("[push] badge count failed", (e as Error).message);
+    return undefined;
+  }
+}
+
 export async function sendPushToUser(
   userId: string,
   payload: PushPayload,
 ): Promise<{ sent: number; pruned: number }> {
+  // Le cache de pastille ne vaut que pour CE fanout : un Worker vit longtemps,
+  // un compteur figé y resterait périmé indéfiniment.
+  badgeCache.delete(userId);
   // La colonne `channel` peut ne pas encore exister : si le code est déployé
   // avant sa migration, PostgREST rejette le SELECT entier (42703) et TOUT le
   // push tomberait, y compris le canal web qui n'a rien à voir. On retente donc
@@ -418,7 +454,10 @@ export async function sendPushToUser(
         continue;
       }
       try {
-        const result = await sendApnsToToken(s.endpoint, payload);
+        const result = await sendApnsToToken(s.endpoint, {
+          ...payload,
+          badge: await unreadBadgeCount(userId),
+        });
         if (result.status >= 200 && result.status < 300) sent++;
         else if (result.unregistered) toPrune.push(s.endpoint);
       } catch (e) {
