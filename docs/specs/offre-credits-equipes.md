@@ -1,11 +1,7 @@
-# Offre Clubero par équipe — spécification
+# Offre Clubero par équipe — spécification V3
 
-> **Statut : spécification de référence.** Remplace le chantier « Offre Équipe » précédent
-> (sept documents, huit lots), abandonné au profit de ce modèle radicalement plus simple.
->
-> Les documents précédents sont conservés en archive dans `docs/specs/archive-offre-equipe/`
-> — ils gardent une valeur documentaire sur le code existant, mais ne décrivent plus le
-> chantier à mener.
+> **Statut : spécification de référence, consolidée.** Remplace la V2 et le chantier
+> « Offre Équipe » initial (archivé dans `docs/specs/archive-offre-equipe/`).
 >
 > **Aucun code n'a été écrit. Ce document décrit ce qu'il faudra faire.**
 
@@ -13,50 +9,30 @@
 
 ## 1. Modèle commercial
 
-```text
-Essai Découverte — 30 jours, gratuit, sans carte bancaire
-  1 équipe · 30 joueurs max · ni tournois ni stages
-  → à l'échéance sans paiement : club verrouillé (comportement actuel)
-  → PAS d'offre gratuite permanente
-
-Offre par équipe — 9,99 €/mois ou 99,99 €/an PAR ÉQUIPE
-  1 équipe = 9,99 €/mois · 30 joueurs max par équipe
-  ni tournois ni stages
-  plafond dur à 4 équipes
-
-Offre Club — 49 €/mois ou 490 €/an (existante, inchangée)
-  équipes illimitées · joueurs illimités · fonctionnalités club
-  tournois ET stages
-```
-
-**Tournois et stages sont des fonctionnalités Club.** Ce sont les deux modules
-« événementiels » qui dépassent le cadre d'une équipe : ils s'adressent à une structure
-organisatrice, pas à un coach gérant son effectif.
-
-### ⚠️ Terminologie — « crédit » est un terme INTERNE
-
-Le mot **crédit** ne doit jamais apparaître dans l'interface, la page pricing, les emails
-ni les factures. L'utilisateur raisonne en **nombre d'équipes**.
+Deux parcours d'essai distincts, puis deux offres payantes.
 
 ```text
-INTERFACE                          INTERNE (code, base, logs)
-« Combien d'équipes ? »            team_credits
-« 3 équipes — 29,97 €/mois »       quantity = 3
-« Ajouter une équipe »             quantity 2 → 3
+ESSAI ÉQUIPE — 30 jours, sans carte bancaire
+  1 équipe · 30 joueurs actifs max · coaches et staff illimités
+  tournois et stages : création/administration NON
+  → teste exactement le périmètre de l'offre à 9,99 €
+
+ESSAI CLUB — 30 jours, sans carte bancaire
+  équipes illimitées · joueurs illimités · TOUTES les fonctionnalités
+  tournois et stages : OUI
+  → teste exactement le périmètre de l'offre Club
+
+OFFRE PAR ÉQUIPE — 9,99 €/mois ou 99,99 €/an par équipe
+  1 à 4 équipes · 30 joueurs actifs max par équipe · staff illimité
+  tournois et stages : NON
+
+OFFRE CLUB — 49 €/mois ou 490 €/an  (existante, inchangée)
+  équipes illimitées · joueurs illimités · tournois · stages
 ```
 
-Deux raisons. D'abord la lisibilité : un coach qui découvre Clubero comprend « une équipe
-à 9,99 € », pas « acheter 3 crédits ». Ensuite la non-confusion : les crédits tournoi
-existent déjà et sont des **achats consommables à usage unique** (§4). Employer le même
-mot pour des places récurrentes créerait une ambiguïté durable, y compris dans le support.
-
-**Conséquence souvent oubliée : le libellé Stripe est visible du client.** Le nom du
-produit et le *nickname* du prix apparaissent sur les factures et dans le portail de
-facturation. Le produit Stripe doit donc s'appeler « Équipe Clubero » ou équivalent —
-**jamais « Crédit »**. Une facture indiquant « 3 × Crédit » serait incompréhensible.
-
-Les clés i18n suivent la même règle : `pricing.teams.*`, pas `pricing.credits.*`.
-Seuls la colonne `subscriptions.team_credits`, le code et les journaux gardent le terme.
+**L'essai Club est un vrai essai de l'offre Club.** Un utilisateur qui teste Clubero comme
+club doit pouvoir configurer et utiliser son espace exactement comme avec l'abonnement
+payant : aucune limitation artificielle à une équipe, aucune fonctionnalité privée.
 
 Grille tarifaire :
 
@@ -68,58 +44,91 @@ Grille tarifaire :
 | 4 | 39,96 € | 399,96 € |
 | **Club** | **49,00 €** | **490,00 €** |
 
-Le plafond à 4 est **dur**, pas un simple conseil : à 5 équipes l'utilisateur paierait
-49,95 €/mois (499,95 €/an) contre 49 €/mois (490 €/an) pour la formule Club — plus cher
-pour moins de fonctionnalités. Le seuil tombe au même endroit en mensuel et en annuel.
+Plafond **dur** à 4 équipes : à 5 équipes l'utilisateur paierait 49,95 €/mois
+(499,95 €/an) contre 49 €/mois (490 €/an) pour la formule Club — plus cher pour moins de
+fonctionnalités. Le seuil tombe au même endroit en mensuel et en annuel.
 
-### Limite de joueurs : 30, et pourquoi pas 25
+### 1.1 Terminologie — « crédit » est strictement interne
 
-`src/locales/fr/marketing.json:1079` annonce aujourd'hui « une période d'essai gratuit de
-30 jours sans carte bancaire, pour une équipe jusqu'à **25 membres** », alors que le code
-donne **14 jours** et **aucune limite**. La copie et le code divergent déjà : il faut de
-toute façon en corriger un des deux.
-
-**Valeur retenue : 30 joueurs**, pour l'essai comme pour la formule par équipe.
-
-Clubero est multisport, et 25 exclut des effectifs parfaitement normaux :
+Le mot **crédit** ne doit jamais apparaître dans l'interface, la page pricing, les emails,
+les factures ni le portail Stripe. L'utilisateur raisonne en **nombre d'équipes**.
 
 ```text
-Rugby à XV     15 titulaires + remplaçants → effectif courant 30 à 35   ← 25 est bloquant
-Football senior                              20 à 25                    ← 25 est juste
-Football jeune                               16 à 20                    ← confortable
-Handball, basket, volley                     12 à 16                    ← confortable
+FAÇADE                             INTERNE (code, base, journaux)
+« Combien d'équipes ? »            team_credits
+« 3 équipes — 29,97 €/mois »       quantity = 3
+« Ajouter une équipe »             quantity 2 → 3
 ```
 
-À 25, un club de rugby ne peut pas utiliser l'offre du tout, et un club de football senior
-se retrouve bloqué à son 26ᵉ licencié après avoir payé — frustration disproportionnée pour
-9,99 €. Or l'unité vendue est **l'équipe**, pas le joueur : la limite n'est là que pour
-empêcher qu'un club entier tienne dans une seule équipe, et 30 remplit cet office aussi
-bien que 25.
+Deux raisons : la lisibilité, et la non-confusion avec les **crédits tournoi**, qui
+existent déjà et sont des achats consommables à usage unique (§9).
 
-La valeur est portée par la constante `TEAM_PLAN_MAX_PLAYERS`, modifiable **sans
-migration**. Elle reste donc révisable après lancement — ce n'est pas un choix structurel.
+**Le libellé Stripe est visible du client** — nom du produit et *nickname* du prix
+apparaissent sur les factures et dans le portail. Le produit doit s'appeler
+« Équipe Clubero », jamais « Crédit ». Une facture « 3 × Crédit » serait incompréhensible.
 
-**La copie FAQ doit passer de 25 à 30** en même temps que le code passe de 14 à 30 jours,
-dans les 7 locales.
+Clés i18n : `pricing.teams.*`, jamais `pricing.credits.*`.
+
+### 1.2 Staff et coaches — illimités dans toutes les offres
+
+**Une équipe souscrite est une place d'équipe, jamais un utilisateur.** Une équipe peut
+avoir 1, 3 ou 12 coaches sans aucune incidence sur la facturation.
+
+Le staff n'entre **jamais** dans le quota de 30 joueurs : les lignes `team_members` du
+staff ont `player_id IS NULL`, seules les lignes joueur sont comptées (§6.2).
+
+### 1.3 Limite de joueurs : 30
+
+Clubero est multisport, et 25 exclurait des effectifs normaux :
+
+```text
+Rugby à XV      effectif courant 30 à 35   ← 25 rendrait l'offre inutilisable
+Football senior            20 à 25
+Football jeune             16 à 20
+Handball, basket, volley   12 à 16
+```
+
+L'unité vendue est l'équipe, pas le joueur : la limite n'existe que pour empêcher qu'un
+club entier tienne dans une seule équipe. Valeur portée par `TEAM_PLAN_MAX_PLAYERS`,
+modifiable **sans migration**.
+
+⚠️ `src/locales/fr/marketing.json:1079` annonce « 30 jours sans carte bancaire, pour une
+équipe jusqu'à **25 membres** », alors que le code donne **14 jours** et **aucune limite**.
+La copie et le code divergent déjà. **La FAQ doit passer à 30 joueurs dans les 7 locales**,
+en même temps que le code passe à 30 jours.
 
 ---
 
-## 2. Modèle technique — une seule colonne
+## 2. Modèle technique — une seule colonne, quatre états
 
 ```sql
 ALTER TABLE public.subscriptions
-  ADD COLUMN team_credits int NULL CHECK (team_credits IS NULL OR team_credits BETWEEN 1 AND 4);
+  ADD COLUMN team_credits int NULL
+  CHECK (team_credits IS NULL OR team_credits BETWEEN 1 AND 4);
 ```
 
-Cette colonne encode **à la fois le palier et toutes ses limites** :
+Les quatre situations s'expriment avec les concepts existants :
 
-| `team_credits` | Formule | Équipes | Joueurs / équipe | Tournois | Stages |
-|---|---|---|---|---|---|
-| `NULL` | **Club** | illimitées | illimités | autorisés | autorisés |
-| `1` à `4` | **Par équipe** | = `team_credits` | 30 | bloqués | bloqués |
+| Situation | `status` | `team_credits` |
+|---|---|---|
+| Essai Équipe | `trialing` | `1` |
+| Essai Club | `trialing` | `NULL` |
+| Payant Équipe | `active` | `1` à `4` |
+| Payant Club | `active` | `NULL` |
 
-**Tous les clubs existants prennent `NULL` par défaut** → formule Club → comportement
-strictement inchangé. C'est une migration additive sans backfill.
+**Séparation nette des rôles :**
+
+```text
+team_credits  → CAPACITÉS   (combien d'équipes, combien de joueurs, tournois, stages)
+status        → ACCÈS       (essai, actif, impayé, expiré)
+```
+
+`team_credits IS NOT NULL` → quota d'équipes, 30 joueurs max par équipe, ni tournois ni
+stages.
+`team_credits IS NULL` → équipes et joueurs illimités, tournois et stages.
+
+**Tous les clubs existants prennent `NULL`** → formule Club → comportement strictement
+inchangé. Migration additive, sans backfill.
 
 Constantes serveur, configurables sans migration :
 
@@ -131,93 +140,181 @@ TRIAL_DURATION_DAYS      = 30
 
 ### Ce qui n'est PAS créé
 
-Pas de `team_subscriptions`. Pas de `team_discovery_coverage`. Pas de
-`club_plan_migrations`. Pas de `billing_delegates`. Pas de `team_members.status`. Pas de
-fonctions de couverture par équipe. Pas de machine à états dérivés. Pas de saga.
+Pas de `team_subscriptions`. Pas de `billing_delegates`. Pas de couverture par équipe. Pas
+de moteur générique d'entitlements. Pas de saga de migration. Pas de `team_members.status`.
 
-La table `subscriptions` conserve sa contrainte **UNIQUE sur `club_id`**, et
-`club_has_active_subscription()` conserve **exactement** sa sémantique actuelle.
+`subscriptions` conserve sa contrainte **UNIQUE sur `club_id`**, et
+`club_has_active_subscription()` conserve **exactement** sa sémantique.
+
+**La simplicité de cette architecture est son principal avantage** — ne pas introduire de
+système générique pour résoudre un problème que deux colonnes suffisent à décrire.
 
 ---
 
 ## 3. Pourquoi ce modèle élimine le risque
 
 Le chantier précédent était risqué parce qu'un club pouvait avoir des équipes couvertes
-différemment. Cette **couverture partielle** imposait un contrôle d'accès à portée équipe,
-donc la réécriture des RLS.
+différemment. Cette **couverture partielle** imposait un contrôle d'accès par équipe, donc
+la réécriture des RLS.
 
-Ici, **un club a un abonnement ou n'en a pas**. Il n'existe aucune couverture partielle.
-Le verrouillage existant, au niveau club, suffit.
-
-Conséquences directes, toutes vérifiées dans le code :
+Ici, **un club a un abonnement ou n'en a pas**. Aucune couverture partielle. Le
+verrouillage existant, au niveau club, suffit.
 
 | Composant | Effet |
 |---|---|
 | `subscriptions` (UNIQUE `club_id`) | inchangé |
 | `club_has_active_subscription()` | **inchangée** |
-| Garde de `src/routes/_authenticated.tsx` | **inchangée** — le bloquant n°1 identifié à l'inventaire disparaît |
-| `useTournamentOnlyMode` | **inchangé** — le club a bien une souscription active, le bloquant n°2 disparaît |
-| Webhook `upsert(onConflict: "club_id")` | **inchangé** |
-| `billing.functions.ts` (verrouillé « club admin ») | **inchangé** — le coach est l'admin de son club |
-| `trial-banner.tsx`, `has-paid-access`, console superadmin | **inchangés** |
-| Policies RLS existantes | **aucune modification** |
+| Garde de `src/routes/_authenticated.tsx` | **inchangée** |
+| `useTournamentOnlyMode` | **inchangé** |
+| Webhook `upsert(onConflict: "club_id")` | conservé, **une branche ajoutée** (§10) |
+| `billing.functions.ts` (« club admin ») | inchangé — le coach est l'admin de son club |
+| `trial-banner.tsx`, `has-paid-access`, superadmin | inchangés |
+| Policies RLS existantes | **aucune refonte** — deux ajouts ciblés (§8, §9) |
 
-Le passage à la formule Club devient un **changement de prix sur l'item Stripe existant** —
-opération native, pas une saga.
+**Confirmation demandée au §15.8 : ces changements ne nécessitent ni couverture partielle
+ni refonte globale des RLS.** Les seuls ajouts RLS sont deux policies ciblées, sur
+`club_camps` (INSERT) et sur les chemins de quota — aucune policy existante n'est réécrite.
 
 ---
 
-## 4. Le nombre d'équipes côté Stripe
+## 4. Onboarding — deux parcours explicites
 
-La source de vérité est la **`quantity` de l'item Stripe** sur la souscription du club.
-`subscriptions.team_credits` en est le miroir, alimenté par le webhook, qui lit déjà
-`sub.items.data[0]`.
+Avant la création de l'espace, l'utilisateur choisit :
 
-```text
-checkout    → line_items: [{ price: PRIX_CREDIT, quantity: N }]
-mise à jour → modification de quantity sur l'item existant
-passage Club→ changement de price sur l'item existant, quantity 1, team_credits → NULL
+> **Comment souhaitez-vous utiliser Clubero ?**
+> [ Gérer une ou plusieurs équipes ] [ Gérer un club ]
+
+Ce choix détermine le type d'essai créé. **Ne jamais le déduire automatiquement** du
+nombre d'équipes créées ensuite.
+
+### 4.1 Comment le trigger apprend le choix
+
+Le trigger `auto_create_trial_subscription` est `AFTER INSERT ON public.clubs` : il ne
+connaît que la ligne `clubs` insérée. Il faut donc porter l'intention **sur cette ligne**.
+
+```sql
+ALTER TABLE public.clubs
+  ADD COLUMN plan_intent text NOT NULL DEFAULT 'club'
+  CHECK (plan_intent IN ('team', 'club'));
 ```
 
-Le prorata est calculé **par Stripe**, jamais en interne — ajouter un crédit en cours de
-mois est nativement géré.
+Le trigger devient :
 
-### ⚠️ Ne pas copier la mécanique des tournois
+```text
+IF NEW.is_personal THEN RETURN NEW              -- inchangé
+IF NEW.name LIKE '__rls_%' OR '__e2e_%' THEN RETURN NEW   -- inchangé
 
-Le modèle mental « crédits » vient des tournois, mais leur **implémentation** est d'une
-autre nature : `tournament_passes` et `consume_single_entitlement` gèrent des achats
-**consommables à usage unique**.
+INSERT INTO subscriptions (club_id, status, trial_end, team_credits)
+VALUES (NEW.id, 'trialing', now() + TRIAL_DURATION_DAYS,
+        CASE WHEN NEW.plan_intent = 'team' THEN 1 ELSE NULL END)
+ON CONFLICT (club_id) DO NOTHING
+```
 
-Les crédits d'équipe sont des **places récurrentes** : on ne les consomme pas, on les
-occupe, et elles se libèrent à l'archivage d'une équipe. Reprendre la machinerie de
-consommation introduirait un registre à réconcilier, sans bénéfice. La `quantity` Stripe
-suffit.
+**`DEFAULT 'club'` est le choix décisif de compatibilité ascendante.** Tous les chemins de
+création existants — onboarding club actuel (`_authenticated.tsx:248`), parcours
+organisateur de tournoi (`TournamentUpgradeCard.tsx:39`), superadmin, scripts,
+`get_or_create_personal_club` — n'écrivent pas cette colonne et obtiennent donc un essai
+Club, c'est-à-dire **exactement le comportement actuel**.
+
+Seul le nouveau parcours « gérer une ou plusieurs équipes » écrit `plan_intent = 'team'`.
+
+**Note de confiance.** `plan_intent` est écrit côté client (le club est créé par un insert
+direct). Ce n'est pas un problème de sécurité : les deux essais sont gratuits et de même
+durée, et un utilisateur qui voudrait l'essai Club n'a qu'à cliquer sur « Gérer un club ».
+Le seul enjeu réel est l'unicité de l'essai (§5), qui est traitée à part.
+
+**Alternative écartée** : laisser le trigger créer un essai Club puis corriger
+`team_credits` depuis la server function d'onboarding. Cela fonctionnerait, mais crée une
+fenêtre où le club dispose d'un essai Club complet, et deux écritures là où une suffit.
+
+### 4.2 Passage Essai Équipe → Club
+
+CTA « Passer à Clubero Club » disponible pendant tout l'essai Équipe. L'utilisateur
+souscrit l'offre Club ; à confirmation Stripe, `team_credits → NULL` et les limitations
+disparaissent. **Toutes les données sont conservées** — même club, même `club_id`, aucune
+migration. Le prorata éventuel est calculé par Stripe.
 
 ---
 
-## 5. Règles d'application
+## 5. Éligibilité aux essais — anti-abus
 
-### 5.1 Création d'équipe
+### 5.1 Trou existant, à documenter
+
+Aujourd'hui, le trigger crée un essai pour **chaque** club non-personnel créé, sans aucune
+mémoire par utilisateur. Un même compte peut donc créer autant de clubs que voulu, chacun
+avec son essai. **C'est un trou préexistant**, indépendant de ce chantier.
+
+Avec deux parcours d'essai, il devient exploitable de façon plus visible : essai Équipe de
+30 jours, puis nouveau club en essai Club de 30 jours.
+
+### 5.2 Mécanisme minimal proposé — aucune table nouvelle
+
+`clubs.created_by` existe déjà. L'éligibilité est donc **dérivable** :
+
+```text
+un utilisateur est éligible à un essai
+  s'il n'a jamais créé de club possédant une ligne subscriptions
+```
+
+Dans le trigger :
+
+```sql
+IF EXISTS (
+  SELECT 1 FROM public.clubs c
+  JOIN public.subscriptions s ON s.club_id = c.id
+  WHERE c.created_by = NEW.created_by AND c.id <> NEW.id
+) THEN
+  RETURN NEW;   -- pas d'essai : le club devra souscrire
+END IF;
+```
+
+Le club est alors créé sans souscription, donc verrouillé par la garde existante, avec
+redirection de l'admin vers la facturation — comportement déjà en place, aucun écran neuf.
+
+### 5.3 Décision requise avant activation
+
+Ce contrôle **change le comportement actuel** : un administrateur légitime créant un
+second club réel n'aurait plus d'essai. Trois options :
+
+| Option | Effet |
+|---|---|
+| **A** — activer le contrôle | Ferme le trou. Un admin multi-clubs légitime perd l'essai sur ses clubs suivants |
+| **B** — ne rien changer | Le trou reste ; les deux essais sont cumulables |
+| **C** — activer avec exception superadmin | Ferme le trou, permet une régularisation manuelle au cas par cas |
+
+**Recommandation : C.** Le cas « une personne administre réellement plusieurs clubs » est
+rare et se traite par le support, alors que le cumul des essais est trivial à exploiter.
+
+Ce changement part dans une **release dédiée**, séparée du reste du Lot 1, avec un
+inventaire préalable des comptes actuellement porteurs de plusieurs clubs.
+
+---
+
+## 6. Règles de capacité
+
+### 6.1 Création d'équipe
 
 Refusée si le club a déjà `team_credits` équipes non archivées.
 
-Contrôle **atomique** — verrou sur la ligne `clubs`, comptage, décision, insertion dans la
-même transaction. **Le quota est résolu avant le verrou** : si `team_credits IS NULL`
-(formule Club), aucun verrou n'est pris et aucun comptage n'est fait.
-
-Message :
+Contrôle **atomique** : verrou sur la ligne `clubs`, comptage, décision, insertion dans la
+même transaction. **Le quota est résolu avant le verrou** — si `team_credits IS NULL`
+(Club, essai Club inclus), aucun verrou n'est pris et aucun comptage n'est fait.
 
 > Vous gérez déjà vos 3 équipes. Ajoutez une équipe pour 9,99 €/mois, ou passez à la
 > formule Club pour un nombre d'équipes illimité.
 
-### 5.2 Limite de joueurs
+Pendant l'essai Équipe (`team_credits = 1`), le message oriente vers la souscription :
 
-30 joueurs actifs par équipe en formule par équipe ; aucune limite en formule Club.
+> L'essai vous permet de gérer une équipe. Souscrivez pour en ajouter d'autres.
 
-Même stratégie atomique, même règle : quota résolu avant le verrou, donc **coût nul pour
-les clubs en formule Club**.
+### 6.2 Limite de joueurs
 
-Définition du joueur comptabilisé, **sans nouvelle colonne** — le modèle actuel suffit :
+30 joueurs actifs par équipe quand `team_credits IS NOT NULL` ; aucune limite sinon.
+
+Même stratégie atomique, même règle d'ordre : quota résolu avant le verrou, donc **coût
+nul pour les clubs en formule Club**.
+
+Prédicat de comptage — **sans nouvelle colonne**, le schéma actuel suffit :
 
 ```sql
 team_members.team_id = :team_id
@@ -227,341 +324,397 @@ AND players.deleted_at IS NULL
 
 Retirer un joueur de l'effectif supprime sa ligne `team_members` ; l'historique des
 convocations, présences et compositions référence `player_id` et `event_id` directement,
-il n'est donc pas affecté. **`team_members.status` n'est pas nécessaire en V1.**
-
-Le staff n'est jamais compté : les lignes `team_members` du staff ont `player_id IS NULL`.
+il n'est donc pas affecté.
 
 Chemins à protéger, tous via la même RPC : création manuelle, import CSV, rattachement
 d'un joueur existant, acceptation d'une invitation joueur, transfert entre équipes.
 
-L'import CSV est traité comme un **lot atomique** : refus intégral si le lot dépasserait
-la limite, en ne comptant comme consommatrices que les créations réelles (ni les doublons,
-ni les mises à jour).
+L'import CSV est un **lot atomique** : refus intégral si le lot dépasserait la limite, en
+ne comptant comme consommatrices que les créations et réactivations réelles (ni les
+doublons, ni les mises à jour).
 
-### 5.3 Réduction du nombre d'équipes — décision structurante
+### 6.3 Réduction du nombre d'équipes
 
-**Une réduction n'est possible que si le nombre d'équipes non archivées est déjà inférieur
-ou égal au nouveau nombre d'équipes souscrites.**
+**Possible uniquement si le nombre d'équipes non archivées est déjà inférieur ou égal au
+nouveau nombre souscrit.**
 
-> Vous avez 3 équipes actives et souhaitez n'en conserver que 2. Archivez d'abord une équipe.
+> Vous avez 3 équipes actives et souhaitez n'en conserver que 2. Archivez d'abord une
+> équipe.
 
-C'est le seul endroit où ce modèle pourrait basculer du côté compliqué. L'alternative —
-laisser passer et verrouiller les équipes en excédent — **ressusciterait la couverture
-partielle**, donc le contrôle d'accès par équipe et la réécriture des RLS. Elle est
-exclue.
+L'alternative — laisser passer et verrouiller les équipes en excédent — **ressusciterait
+la couverture partielle**, donc toute la complexité éliminée. Elle est exclue.
 
-### 5.4 Tournois
+### 6.4 Downgrade Club → formule par équipe
 
-Bloqués dès que `team_credits IS NOT NULL`. Une seule fonction SQL existante est
-concernée : `can_create_tournament`, qui contrôle déjà l'abonnement.
+Recevable, y compris à l'issue d'un essai Club. Refusé si les données ne sont pas
+compatibles avec l'offre visée :
 
-L'équipe peut toujours **participer** à un tournoi tiers selon les flux existants ; seules
-la création et l'administration sont bloquées. Écran d'upsell vers les offres tournoi
-existantes, jamais une erreur ni une page vide.
+```text
+plus de N équipes non archivées (N = équipes souscrites)  → refus
+une équipe de plus de 30 joueurs actifs                   → refus
+au moins un stage non archivé                             → refus
+au moins un tournoi non archivé                           → refus
+```
 
-### 5.5 Stages — attention, garde différente des tournois
+Message précisant **exactement** ce qui bloque et ce qu'il faut archiver ou régulariser.
 
-Le module Stages est complet : tables `club_camps`, `club_camp_age_groups`,
-`club_camp_program_items`, `club_camp_registrations`, `club_camp_documents`,
-`club_camp_required_documents`, `club_camp_registration_documents`,
-`club_camp_document_purge_log` ; routes publiques `stages.$clubSlug.$campSlug.*` ;
-server functions dans `src/lib/camps.functions.ts` et `src/lib/camp-registrations.functions.ts`.
+**Ne jamais sélectionner arbitrairement les équipes à conserver. Ne jamais créer de
+couverture partielle.**
 
-**Différence structurelle avec les tournois, à ne pas manquer :**
+---
+
+## 7. Audit des fonctionnalités « Club » — résultat
+
+> Demandé au §15.5 : vérifier que la matrice pricing corresponde aux blocages réellement
+> appliqués. **Une fonctionnalité ne doit jamais apparaître ❌ dans le pricing tout en
+> restant utilisable dans le produit.**
+
+### 7.1 Constat de départ
+
+**Aucune route club ne possède aujourd'hui de garde d'abonnement.** Les écrans
+`/admin/*` sont gardés par **rôle uniquement**. La seule garde de plan existante est
+`can_create_tournament`. Et `/admin` figure dans `CLUB_LOCKED_ALLOWED`, donc reste
+accessible même quand le club est verrouillé.
+
+Bloquer une fonctionnalité « Club » signifie donc **construire une garde qui n'existe
+pas**, à chaque fois.
+
+### 7.2 Fonctionnalité par fonctionnalité
+
+| Annoncée ❌ en V2 | Réalité constatée | Verdict |
+|---|---|---|
+| **Statistiques consolidées du club** | **N'existe pas.** `/admin/index.tsx` est un hub de navigation ; le seul tableau de bord est `payments/dashboard`, qui relève de Stripe Connect (paiements des membres), une autre fonctionnalité | **Retirer de la matrice** — on ne peut pas exclure ce qui n'existe pas |
+| **Documents communs du club** | **N'existe pas.** Aucune table de documents au niveau club : seulement `club_camp_documents`, `tournament_documents`, `club_publication_documents` (pièces jointes de publications) | **Retirer de la matrice** |
+| **Mur général du club** | Pas un écran distinct : le mur est un flux unique avec un `AudiencePicker` partagé, ciblant équipes et groupes. Le bloquer signifie retirer une option d'audience **à l'intérieur d'un composant partagé** | **Ne pas bloquer** — coût élevé, fragile, gain nul pour 1 à 4 équipes |
+| **Communication globale** | Même mécanisme d'audience, plus `settings.communications` qui écrit sur `clubs` | **Ne pas bloquer** |
+| **Gestion centralisée des membres** | `/admin/users.index.tsx`. Pour un club de 1 à 4 équipes, c'est **la** page de gestion des membres | **Ne pas bloquer** — un client payant doit pouvoir gérer ses membres |
+| **Groupes transverses** | Existe réellement : `/admin/groups.tsx`, tables `club_groups` / `club_group_members`, `src/modules/groups/` | **Ne pas bloquer** — c'est la seule candidate crédible, mais des groupes transverses sur 1 à 4 équipes ont une valeur marginale, et la garde coûterait plus que le gain |
+| **Tournois** | `can_create_tournament` existe et contrôle déjà l'abonnement | **Bloquer** (§8) |
+| **Stages** | Module complet, **aucune garde de plan** | **Bloquer** (§9) |
+
+### 7.3 Décision
+
+**Seuls les tournois et les stages sont bloqués en formule par équipe.**
+
+Les différenciateurs commerciaux de l'offre Club deviennent, et ce sont de vrais
+différenciateurs vérifiables :
+
+```text
+Nombre d'équipes    1 à 4        vs  illimité
+Joueurs par équipe  30           vs  illimité
+Tournois            non          vs  oui
+Stages              non          vs  oui
+```
+
+C'est honnête, applicable, et cela évite six gardes à construire pour un gain commercial
+nul. **La matrice pricing du §11 est corrigée en conséquence.**
+
+---
+
+## 8. Tournois
+
+```text
+team_credits IS NOT NULL  → création et administration INTERDITES
+team_credits IS NULL      → autorisées (essai Club inclus)
+```
+
+⚠️ **Ne jamais écrire une règle du type `status = 'trialing'` → tournoi interdit.** Ce
+serait faux : l'essai Club donne accès aux tournois. Le critère est `team_credits`, jamais
+le statut.
+
+La **participation** d'une équipe à un tournoi tiers reste possible selon les flux
+existants ; seules la création et l'administration sont bloquées.
+
+Une seule fonction SQL existante concernée : `can_create_tournament`, qui contrôle déjà
+l'abonnement. Écran d'upsell vers les offres tournoi existantes — jamais d'erreur ni de
+page vide.
+
+---
+
+## 9. Stages — garde à créer
+
+```text
+team_credits IS NOT NULL  → création et duplication INTERDITES
+team_credits IS NULL      → autorisées (essai Club inclus)
+```
+
+### 9.1 Différence structurelle avec les tournois
 
 | | Tournois | Stages |
 |---|---|---|
 | Garde de création | `can_create_tournament(_user_id)` — **contrôle l'abonnement** | **aucune garde d'abonnement** |
-| Garde existante | — | `can_manage_club_camp(_camp_id, _user_id)` — **rôle seul**, et exige un camp déjà existant |
-| Création côté serveur | — | `camps.functions.ts:191` (création) et `:607` (duplication), gardées par `assertClubRole(MANAGER_ROLES)` uniquement, écriture via `supabaseAdmin` |
-| Policy RLS INSERT sur `club_camps` | — | rôle seul (`admin`/`dirigeant`/`coach`), contournée par `supabaseAdmin` |
+| Garde existante | — | `can_manage_club_camp(_camp_id, _user_id)` — **rôle seul**, exige un camp existant |
+| Création | — | `camps.functions.ts:191` (création) et `:607` (duplication), gardées par `assertClubRole(MANAGER_ROLES)` uniquement, écriture via `supabaseAdmin` |
+| Policy RLS INSERT `club_camps` | — | rôle seul, contournée par `supabaseAdmin` |
 
 `can_manage_club_camp` **ne peut pas servir de garde de création** : elle prend un
-`_camp_id` qui n'existe pas encore. Il n'existe donc aujourd'hui **aucun contrôle
-d'abonnement sur les stages** — tout club dont le rôle convient peut en créer.
+`_camp_id` qui n'existe pas encore.
 
-Aujourd'hui cela ne se voit pas, parce qu'un club sans abonnement actif est verrouillé
-globalement et n'atteint jamais les écrans de stages. **Mais un club en formule à crédits
-a un abonnement actif** : le verrou global le laisse passer, et les stages lui seraient
-donc entièrement accessibles. Il faut ajouter la garde.
+Aujourd'hui cela ne se voit pas : un club sans abonnement est verrouillé globalement.
+**Mais un club en formule par équipe a un abonnement actif** — le verrou le laisse passer,
+et les stages lui seraient entièrement accessibles.
 
-**Travail requis, en trois couches :**
+### 9.2 Trois couches
 
-1. **Server functions** — ajouter le contrôle `team_credits IS NULL` aux deux chemins de
-   création de `camps.functions.ts` (`:191` création, `:607` duplication), à côté de
-   l'`assertClubRole` existant. C'est la couche décisive, puisque les écritures passent par
-   `supabaseAdmin`.
-2. **Policy RLS INSERT sur `club_camps`** — même contrôle, en défense en profondeur.
-3. **Interface** — masquer l'entrée Stages en formule à crédits, avec écran d'upsell,
-   jamais une page vide ni une erreur.
+1. **Server functions** — contrôle `team_credits IS NULL` sur les deux chemins de
+   `camps.functions.ts` (`:191`, `:607`), à côté de l'`assertClubRole` existant. **Couche
+   décisive**, les écritures passant par `supabaseAdmin`.
+2. **Policy RLS INSERT sur `club_camps`** — même contrôle, défense en profondeur.
+3. **Interface** — masquer l'entrée Stages, écran d'upsell, jamais de page vide.
 
-`can_manage_club_camp` **n'est pas modifiée** : si la création est bloquée, il n'y a pas de
-stage à gérer. La modifier risquerait au contraire de verrouiller un club en pleine saison
-lors d'un changement de formule.
+`can_manage_club_camp` **reste inchangée** : si la création est bloquée, il n'y a pas de
+stage à gérer, et la modifier risquerait de verrouiller un club en pleine saison lors d'un
+changement de formule.
 
-**Compatibilité ascendante** : les clubs existants ont `team_credits = NULL`, donc le
-nouveau contrôle les laisse passer. Aucun changement de comportement.
+Compatibilité ascendante : les clubs existants ont `team_credits = NULL`, le contrôle les
+laisse passer.
 
-### 5.6 Passage de la formule Club à la formule à crédits
+---
 
-Refusé si le club possède des ressources qui n'existent pas dans la formule à crédits :
+## 10. Stripe — la branche du webhook
+
+La source de vérité est Stripe. `subscriptions.team_credits` en est le miroir.
+
+### 10.1 Le routage se fait sur le prix, jamais sur la quantité
+
+⚠️ **Correction d'une formulation trop optimiste de la V2**, qui laissait entendre
+qu'aucune branche n'était nécessaire. Une branche existe, petite mais réelle :
 
 ```text
-plus de 4 équipes non archivées      → refus
-au moins un stage non archivé        → refus
-au moins un tournoi non archivé      → refus
-une équipe de plus de 30 joueurs     → refus
+price_id ∈ { TEAM_MONTHLY, TEAM_YEARLY }  → team_credits = subscription_item.quantity
+price_id ∈ { CLUB_MONTHLY, CLUB_YEARLY }  → team_credits = NULL
+price_id inconnu                          → ne pas toucher team_credits, journaliser
 ```
 
-Message explicite indiquant ce qui bloque et ce qu'il faut archiver. Même logique que la
-réduction de crédits (§5.3) : **ne jamais laisser passer un downgrade qui créerait des
-ressources orphelines ou partiellement couvertes.**
+**Ne jamais déduire la formule de `quantity` seule.** Une souscription Club a typiquement
+`quantity = 1`, ce qui ne signifie évidemment pas `team_credits = 1`. Confondre les deux
+transformerait un client Club en client mono-équipe.
 
-### 5.5 Fin d'essai
+Le dépôt possède déjà `planFromStripePriceId` / `planFromPriceId` : la nouvelle fonction
+suit le même motif, par exemple `teamCreditsFromPrice(priceId, quantity)`.
 
-À l'échéance des 30 jours sans paiement : **comportement actuel inchangé** — le club passe
-en lecture seule via `ClubSubscriptionExpiredScreen`, les données sont conservées, l'admin
-est redirigé vers la facturation.
+Cette branche doit être **documentée et testée**, pas seulement écrite.
 
-Aucune bascule vers une offre gratuite : **il n'y a pas d'offre gratuite permanente**.
+### 10.2 Opérations
+
+```text
+checkout Équipe → line_items: [{ price: PRIX_ÉQUIPE, quantity: N }]
+ajout d'équipe  → modification de quantity sur l'item existant
+passage Club    → changement de price sur l'item existant, quantity 1, team_credits → NULL
+```
+
+Le prorata est calculé **par Stripe**, jamais en interne.
+
+### 10.3 Ne pas copier la mécanique des tournois
+
+Le modèle mental vient des tournois, mais leur implémentation est d'une autre nature :
+`tournament_passes` et `consume_single_entitlement` gèrent des achats **consommables à
+usage unique**.
+
+Les équipes souscrites sont des **places récurrentes** : on ne les consomme pas, on les
+occupe, et elles se libèrent à l'archivage. La `quantity` Stripe suffit — pas de registre
+à réconcilier.
 
 ---
 
-## 6. Clubs en double — hors périmètre
+## 11. Page pricing — matrice corrigée
 
-Si deux coaches de la même structure créent deux clubs, aucun rapprochement n'est proposé.
-Ils choisissent lequel conserver et recréent l'équipe dans l'autre.
+**Exigence : l'utilisateur voit ce qui est inclus ET ce qui ne l'est pas.** Une
+fonctionnalité absente doit être marquée ❌, pas simplement omise. Le motif actuel
+(`pricing.clubFeatures` via `returnObjects`, une liste par carte) ne permet pas de montrer
+une exclusion : il faut un **tableau à lignes communes**.
 
-Pas de détection, pas de suggestion, pas d'endpoint de recherche publique, pas de parcours
-de rattachement, pas de fusion. À faible volume, un traitement manuel par le support coûte
-moins cher que ce dispositif — et l'endpoint de recherche publique aurait exigé son propre
-rate limiter fail-closed, le helper existant étant fail-open
-(`src/lib/rate-limit.server.ts:46-52`).
-
----
-
-## 7. Travaux
-
-### Migrations
-
-1. `subscriptions.team_credits int NULL` avec `CHECK` — additive, sans backfill.
-2. Trigger `auto_create_trial_subscription` : `14 days` → `30 days`. **Release dédiée.**
-3. `can_create_tournament` : ajout du contrôle `team_credits IS NULL`. **Release dédiée,
-   via `_v2` comparée avant substitution** (§9).
-4. Policy RLS INSERT sur `club_camps` : ajout du même contrôle, en défense en profondeur.
-   **Release dédiée.**
-5. RPC de création d'équipe avec contrôle de crédits.
-6. RPC d'ajout de joueur et d'import avec contrôle de la limite.
-
-### Server functions
-
-- `camps.functions.ts` : contrôle `team_credits IS NULL` sur les deux chemins de création
-  (`:191` et `:607`) — **couche décisive**, les écritures passant par `supabaseAdmin`.
-- Garde de downgrade (§5.6) sur le changement de formule.
-
-### Stripe
-
-- Deux prix : `STRIPE_PRICE_TEAM_CREDIT_MONTHLY` (9,99 €),
-  `STRIPE_PRICE_TEAM_CREDIT_YEARLY` (99,99 €), motif env + défaut comme l'existant.
-- Checkout avec `quantity`.
-- Mise à jour de `quantity` (ajout/retrait de crédit) avec garde §5.3.
-- Passage à la formule Club : changement de `price`, `quantity: 1`, `team_credits → NULL`.
-- Webhook : lecture de `sub.items.data[0].quantity` → miroir dans `team_credits`. **Aucune
-  nouvelle branche** : le flux Club existant traite déjà ces événements.
-
-### Page pricing — comparatif explicite
-
-**Exigence : l'utilisateur doit voir ce qui est inclus ET ce qui ne l'est pas**, sans avoir
-à déduire une exclusion de son absence dans une liste. Une fonctionnalité absente d'une
-colonne doit apparaître barrée ou marquée ❌, pas simplement omise.
-
-État actuel (`src/routes/pricing.tsx`, 249 lignes) : trois cartes — Club 49 €/490 €,
-Tournois, et Fédération sur contact — avec les fonctionnalités en tableaux i18n
-(`pricing.clubFeatures`, `pricing.enterpriseFeatures` via `returnObjects`).
-
-Structure cible : **quatre colonnes de plan** (Découverte, Crédits, Club, Fédération) plus
-les modules à part, et surtout un **tableau comparatif** sous les cartes. Le motif
-« liste de features par carte » ne permet pas de montrer une exclusion — il faut un
-tableau à lignes communes.
-
-#### Matrice à afficher
-
-| | Découverte | Crédits | Club | Fédération |
+| | Essai Équipe | Par équipe | Essai Club | Club |
 |---|---|---|---|---|
-| **Prix** | Gratuit, 30 jours | 9,99 €/mois par équipe | 49 €/mois | Sur devis |
-| | sans carte bancaire | 99,99 €/an par équipe | 490 €/an | |
+| **Prix** | Gratuit 30 j | 9,99 €/mois par équipe | Gratuit 30 j | 49 €/mois |
+| | sans carte | 99,99 €/an par équipe | sans carte | 490 €/an |
 | **Équipes** | 1 | 1 à 4 | Illimitées | Illimitées |
 | **Joueurs par équipe** | 30 | 30 | Illimités | Illimités |
 | **Coaches et staff** | Illimités | Illimités | Illimités | Illimités |
-| **Gestion d'équipe** | ✅ | ✅ | ✅ | ✅ |
+| Gestion d'équipe | ✅ | ✅ | ✅ | ✅ |
 | Événements, entraînements, matchs | ✅ | ✅ | ✅ | ✅ |
 | Convocations et réponses | ✅ | ✅ | ✅ | ✅ |
 | Présences et compositions | ✅ | ✅ | ✅ | ✅ |
 | Disponibilités joueurs et staff | ✅ | ✅ | ✅ | ✅ |
-| Mur d'équipe et mur staff | ✅ | ✅ | ✅ | ✅ |
-| Sondages, documents, calendrier | ✅ | ✅ | ✅ | ✅ |
+| Mur, sondages, documents, calendrier | ✅ | ✅ | ✅ | ✅ |
 | Parents et responsables légaux | ✅ | ✅ | ✅ | ✅ |
 | Import de joueurs | ✅ | ✅ | ✅ | ✅ |
-| Statistiques d'équipe | ✅ | ✅ | ✅ | ✅ |
-| Notifications et emails | ✅ | ✅ | ✅ | ✅ |
-| **Fonctionnalités club** | ❌ | ❌ | ✅ | ✅ |
-| Mur général du club | ❌ | ❌ | ✅ | ✅ |
-| Statistiques consolidées | ❌ | ❌ | ✅ | ✅ |
-| Groupes transverses | ❌ | ❌ | ✅ | ✅ |
-| Communication à tout le club | ❌ | ❌ | ✅ | ✅ |
-| Gestion centralisée des membres | ❌ | ❌ | ✅ | ✅ |
-| Documents communs | ❌ | ❌ | ✅ | ✅ |
+| Groupes et communication du club | ✅ | ✅ | ✅ | ✅ |
+| Gestion des membres | ✅ | ✅ | ✅ | ✅ |
 | **Tournois** | ❌ | ❌ | ✅ | ✅ |
 | **Stages** | ❌ | ❌ | ✅ | ✅ |
-| Identité du club (nom, logo) | ✅ | ✅ | ✅ | ✅ |
 
-> La ligne « Joueurs par équipe » est la seule où l'offre Club se distingue par une
-> **absence** de limite. L'écrire simplement « Illimités » — surtout **pas** précédé d'un
-> ❌, qui donnerait l'impression que la fonctionnalité est absente alors que c'est
-> l'inverse. Le ❌ est réservé aux lignes réellement exclues.
+> Aucune ligne ❌ qui ne corresponde à un blocage réellement appliqué (§7). L'absence de
+> limite en formule Club s'écrit « Illimités », **jamais précédé d'un ❌** — ce serait
+> suggérer une fonctionnalité manquante alors que c'est l'avantage.
 
-#### Points à corriger sur la page existante
+Au-delà de 4 équipes :
 
-1. **Incohérence à résoudre** — la FAQ (`marketing.json:1079`) promet « 30 jours sans carte
-   bancaire, pour une équipe jusqu'à 25 membres », alors que le code donne 14 jours et
-   aucune limite. Cible retenue : **30 jours et 30 joueurs** — la copie FAQ doit donc être
-   mise à jour de 25 à 30 en même temps (voir §1, choix de la limite).
-2. **Sélecteur du nombre d'équipes** — afficher le prix calculé pour 1 à 4 équipes, et
-   basculer
-   visiblement vers la formule Club au-delà (« À partir de 5 équipes, la formule Club à
-   49 €/mois est plus avantageuse »).
-3. **Les cartes Tournois et Fédération restent** — la carte Tournois vend un module
-   indépendant, la carte Fédération est un contact commercial. Ni l'une ni l'autre ne
-   change.
+> À partir de 5 équipes, l'offre Club à 49 €/mois est plus avantageuse et vous donne accès
+> à l'ensemble des fonctionnalités Clubero.
 
-#### Conséquence i18n
+### 11.1 Conséquence i18n
 
-Le motif actuel `returnObjects` (un tableau de chaînes par carte) ne convient pas à un
-tableau comparatif : il produirait des listes désynchronisées entre colonnes.
+Une clé **par ligne**, les valeurs (✅/❌/nombres) portées par une structure TypeScript
+unique. Seules les étiquettes sont traduites : le volume de clés est divisé par quatre, et
+une colonne ne peut pas diverger d'une langue à l'autre.
 
-Structure recommandée — **une clé par ligne**, et les valeurs par plan portées par le code
-et non par les traductions :
+**7 locales**, `bun run check:i18n` vert avant merge. Couverture de `nl` à vérifier.
 
-```text
-pricing.compare.rows.teams.label       → "Équipes"
-pricing.compare.rows.maxPlayers.label  → "Joueurs par équipe"
-pricing.compare.values.unlimited       → "Illimité"
-pricing.compare.values.included        → "Inclus"
-pricing.compare.values.excluded        → "Non inclus"
-```
+---
 
-Les ✅/❌ et les nombres viennent d'une structure TypeScript unique ; seules les
-**étiquettes** sont traduites. Cela divise le volume de clés par quatre et garantit qu'une
-ligne ne puisse pas diverger d'une langue à l'autre.
+## 12. Travaux
 
-**7 locales** (`fr, en, de, es, it, nl, pt`), `bun run check:i18n` vert avant merge. La
-couverture de `nl` étant inégale, la vérifier avant d'ajouter des clés.
+### Migrations — une à la fois, release isolée
+
+1. `subscriptions.team_credits` + `CHECK` — additive.
+2. `clubs.plan_intent` + `CHECK`, `DEFAULT 'club'` — additive.
+3. Trigger `auto_create_trial_subscription` : 14 → 30 jours **et** lecture de
+   `plan_intent`. **Release dédiée.**
+4. Trigger : contrôle d'éligibilité à l'essai (§5.3, option retenue). **Release dédiée
+   distincte de la 3.**
+5. `can_create_tournament` + contrôle `team_credits IS NULL`. **Release dédiée, via `_v2`
+   comparée avant substitution.**
+6. Policy RLS INSERT sur `club_camps`. **Release dédiée.**
+7. RPC de création d'équipe (quota).
+8. RPC d'ajout de joueur et d'import (limite).
+
+### Server functions
+
+- `camps.functions.ts` : contrôle sur les deux chemins de création — **couche décisive**.
+- Checkout Équipe avec `quantity`, ajout/retrait d'équipe, garde de réduction (§6.3).
+- Garde de downgrade (§6.4).
+- Webhook : `teamCreditsFromPrice(priceId, quantity)` (§10.1).
 
 ### Interface
 
-- Choix du nombre d'équipes au checkout, avec le tarif calculé (« Combien d'équipes souhaitez-vous gérer ? »).
-- Page de facturation : équipes utilisées / disponibles, ajout et retrait, upsell Club à 4.
-- Blocages : création d'équipe au-delà du nombre souscrit, ajout de joueur au-delà de 30, écrans
-  d'upsell tournoi **et stages**, message de refus de downgrade (§5.6).
-- Page pricing refondue avec le tableau comparatif ci-dessus, montrant explicitement les
-  exclusions, i18n **7 locales**, `bun run check:i18n` vert.
-
-### Tests
-
-- Concurrence : deux créations d'équipe simultanées sur la dernière place disponible
-  (2/3 équipes, `team_credits = 3`) → une seule réussit, jamais 4.
-- Concurrence : deux ajouts de joueur simultanés à 29/30 → une seule opération réussit,
-  effectif final 30, jamais 31.
-- Formule Club (`team_credits IS NULL`) : aucun verrou pris, aucune limite.
-- Import CSV dépassant la limite → lot entièrement refusé.
-- Réduction de crédits avec équipes en excès → refusée.
-- Caractérisation : un club existant conserve exactement son comportement actuel.
-- Régression tournoi : club à crédits → création refusée ; club en formule Club avec
-  abonnement actif → autorisée ; entitlement tournoi → comportement conservé.
-- Régression stage : club à crédits → création **et duplication** refusées, par la server
-  function **et** par la policy RLS testée séparément ; club en formule Club → autorisées.
-- Downgrade refusé si stages, tournois, plus de 4 équipes ou une équipe de plus de
-  30 joueurs.
+- Choix du parcours à l'onboarding (§4).
+- Sélecteur « Combien d'équipes souhaitez-vous gérer ? » au checkout, tarif calculé.
+- Page de facturation : équipes utilisées / disponibles, ajout, retrait, upsell Club à 4.
+- Blocages : création d'équipe au-delà du nombre souscrit, ajout de joueur au-delà de 30,
+  upsell tournoi, upsell stages, refus de réduction et de downgrade.
+- Page pricing refondue (§11), i18n 7 locales.
 
 ---
 
-## 8. Découpage
+## 13. Tests
 
-**Lot 1 — Fondations et essai**
-`team_credits`, trigger d'essai à 30 jours (release dédiée), RPC de contrôle des crédits
-et de la limite de joueurs, tests de concurrence, tests de caractérisation.
+**Parcours d'essai**
 
-**Lot 2 — Stripe, modules Club et interface**
-Prix, checkout avec quantité, gestion des crédits, garde de réduction et de downgrade,
-contrôle tournoi et contrôle stages (releases dédiées), écrans, pricing, i18n.
+- Onboarding « équipes » → `plan_intent='team'` → `trialing`, `team_credits=1`.
+- Onboarding « club » → `plan_intent='club'` → `trialing`, `team_credits=NULL`.
+- Chemins de création existants sans `plan_intent` → essai Club, **comportement actuel**.
+- Essai Club : création de tournoi **autorisée**, création de stage **autorisée**.
+- Essai Équipe : tournoi et stage **refusés**, 2ᵉ équipe **refusée**.
+- Éligibilité : second club du même créateur → pas de nouvel essai (option retenue §5.3).
 
-Deux lots au lieu de huit.
+**Concurrence** (deux transactions réelles simultanées)
+
+- Deux créations d'équipe sur la dernière place (2/3 équipes, `team_credits = 3`) → une
+  seule réussit, jamais 4.
+- Deux ajouts de joueur simultanés à 29/30 → une seule opération réussit, effectif final
+  30, jamais 31.
+- Club (`team_credits IS NULL`) : deux ajouts simultanés → les deux réussissent, **aucun
+  verrou pris**.
+- Import de 10 lignes sur une équipe à 25/30 → lot entièrement rejeté, effectif inchangé.
+
+**Stripe**
+
+- Prix Équipe, `quantity = 3` → `team_credits = 3`.
+- Prix Club, `quantity = 1` → `team_credits = NULL` — **jamais 1**.
+- Prix inconnu → `team_credits` inchangé, événement journalisé.
+- Changement de quantité, passage Club, rejeu de webhook (idempotence).
+
+**Régression**
+
+- Club existant (`team_credits NULL`) : comportement strictement inchangé, aucun verrou.
+- Tournoi : formule par équipe refusée ; Club actif autorisé ; entitlement tournoi
+  conservé.
+- Stage : formule par équipe → création **et duplication** refusées, par la server function
+  **et** par la policy RLS testée séparément.
+- Downgrade refusé si stages, tournois, trop d'équipes ou équipe de plus de 30 joueurs.
 
 ---
 
-## 9. Discipline de déploiement
+## 14. Lots et discipline de déploiement
 
-Le modèle est simple, mais **trois objets existants sont modifiés**. Ils gardent la
-discipline établie :
+**Lot 1 — Modèle, essais, quotas**
+`team_credits`, `plan_intent`, trigger (durée puis intention, releases séparées), RPC de
+quota équipes et joueurs, tests de concurrence et de caractérisation.
+→ **Arrêt et revue humaine.**
 
-- **R1 — une migration sensible à la fois**, déploiement isolé, 24 à 48 h d'observation.
-  Le trigger d'essai et `can_create_tournament` partent chacun dans leur propre release,
-  jamais ensemble.
-- **Ajouter avant de remplacer** — `can_create_tournament_v2` créée puis comparée à
-  l'existante sur des cas réels (clubs abonnés, exemptés, organisateurs, superadmins,
-  clubs personnels, comptes sans abonnement) avant substitution. L'ancienne définition est
-  conservée pour la migration de retour.
-- **Contrat de rollback** pour chaque changement sensible : migration aller, migration de
-  retour écrite et testée, vérification avant, vérification après, condition d'arrêt,
-  métrique d'alerte, procédure de restauration.
-- **Feature flag** `team_credits_v1` masquant checkout, pricing et gestion des crédits —
-  sans jamais désactiver webhooks, synchronisation Stripe ni lecture des souscriptions
-  existantes.
-- **Arrêt et revue humaine** après le Lot 1, avant le Lot 2.
+**Lot 2 — Stripe, modules Club, interface**
+Prix et checkout avec quantité, branche webhook, gestion du nombre d'équipes, gardes de
+réduction et de downgrade, contrôle tournoi et contrôle stages (releases dédiées),
+onboarding à deux parcours, page pricing, i18n.
+
+**Discipline conservée :**
+
+- **R1** — une migration sensible à la fois, déploiement isolé, 24 à 48 h d'observation.
+- **Ajouter avant remplacer** — `can_create_tournament_v2` comparée sur cas réels avant
+  substitution ; ancienne définition conservée pour la migration de retour.
+- **Contrat de rollback** par changement sensible : migration aller, migration de retour
+  écrite et testée, vérification avant, vérification après, condition d'arrêt, métrique,
+  procédure de restauration.
+- **Feature flag** `team_credits_v1` masquant onboarding, pricing, checkout et gestion des
+  équipes — sans jamais désactiver webhooks, synchronisation Stripe ni lecture des
+  souscriptions existantes.
+- **Arrêt et revue humaine** entre les lots.
 
 ---
 
-## 10. Dette préexistante, indépendante de ce chantier
-
-Deux points relevés lors de l'audit, à traiter **séparément** :
+## 15. Dette préexistante, indépendante
 
 **Bug `exempt_until`.** `club_has_active_subscription`
-(`20260622120000_subscription_billing_exemption.sql:36`) teste `exempt_from_billing = true`
-sans regarder `exempt_until`, alors que `isBillingExempt`
-(`src/lib/has-paid-access.ts:22-25`) l'honore. Une exemption expirée donne encore accès.
-
-Ce n'est **plus un prérequis** de ce chantier — il l'était parce que de nouvelles fonctions
-de couverture devaient reposer sur une sémantique saine, et ces fonctions n'existent plus.
-Il reste un bug réel, à corriger sur son propre calendrier, après inventaire des clubs
-concernés et régularisation, dans une release dédiée.
+(`20260622120000_…sql:36`) teste `exempt_from_billing = true` sans regarder `exempt_until`,
+alors que `isBillingExempt` (`src/lib/has-paid-access.ts:22-25`) l'honore. Une exemption
+expirée donne encore accès. **Plus un prérequis** de ce chantier — à corriger sur son
+propre calendrier, après inventaire et régularisation, dans une release dédiée.
 
 **Dette CI.** Corriger les contrôles bloquants (dont `check:i18n`) avant de s'en servir
 comme critères de sortie ; baseline chiffrée pour la dette réellement indépendante.
 
-**Incohérence marketing.** Le site promet 30 jours d'essai et une équipe jusqu'à
-25 membres (`marketing.json:1079`), le code donne 14 jours sans aucune limite
-(`20260604212414_…sql:12`). Le Lot 1 résout les deux volets de cette incohérence, et la
-refonte de la page pricing la rend visible plutôt que de la laisser dans une réponse de
-FAQ.
+**Incohérence marketing.** 30 jours et 30 joueurs annoncés vs 14 jours et aucune limite en
+code — résolue par le Lot 1 et la refonte pricing.
+
+**Cumul d'essais.** Trou préexistant (§5.1), traité en release dédiée.
 
 ---
 
-## 11. Décisions actées
+## 16. Décisions actées
 
 ```text
-Essai : 30 jours, sans carte bancaire (le code donne 14 aujourd'hui)
-Aucune offre gratuite permanente
-Terminologie : « crédit » est INTERNE — l'interface parle de nombre d'équipes
-Limite : 30 joueurs actifs par équipe (essai et formule par équipe)
-Formule Club : aucune limite de joueurs ni d'équipes
-Prix : 9,99 €/mois ou 99,99 €/an par équipe, plafond DUR à 4 équipes
-Réduction du nombre d'équipes : uniquement si les équipes en excès sont archivées
-Tournois : bloqués en formule par équipe, participation conservée
-Stages : bloqués en formule par équipe — garde à CRÉER, elle n'existe pas
-Downgrade Club → formule par équipe : refusé si stages, tournois, >4 équipes ou équipe >30 joueurs
-Clubs en double : aucun rapprochement, choix manuel de l'utilisateur
-team_members.status : non nécessaire en V1
-exempt_until : dette indépendante, plus un prérequis
+ONBOARDING       deux parcours explicites : Équipe ou Club, choisis avant création
+
+ESSAI ÉQUIPE     30 j · sans CB · 1 équipe · 30 joueurs · staff illimité
+                 tournois NON · stages NON
+
+ESSAI CLUB       30 j · sans CB · illimité · TOUTES fonctionnalités
+                 tournois OUI · stages OUI · aucune restriction de plan
+
+OFFRE ÉQUIPE     9,99 €/mois ou 99,99 €/an par équipe · 1 à 4 équipes
+                 30 joueurs par équipe · staff illimité · tournois NON · stages NON
+
+OFFRE CLUB       49 €/mois ou 490 €/an · illimité · tournois OUI · stages OUI
+
+ARCHITECTURE     team_credits 1..4 → mode Équipe ; NULL → mode Club
+                 status → accès ; team_credits → capacités
+                 clubs.plan_intent porte le choix jusqu'au trigger (DEFAULT 'club')
+
+PLAFOND          4 équipes maximum ; à partir de 5 → offre Club
+
+DOWNGRADE        jamais de couverture partielle
+                 mise en conformité obligatoire avant réduction ou downgrade
+
+BLOCAGES         seuls les tournois et les stages sont bloqués (§7)
+                 critère = team_credits, JAMAIS status = 'trialing'
+
+STRIPE           price_id détermine la formule ; quantity ne vaut que pour le prix Équipe
+                 Club → team_credits NULL même avec quantity = 1
+
+TERMINOLOGIE     « crédit » strictement interne
+                 interface, marketing, Stripe, factures = « équipe »
 ```
 
-**Aucune décision produit ne reste ouverte.**
+**Aucune décision produit ne reste ouverte**, hormis le choix d'option au §5.3
+(éligibilité aux essais — recommandation : option C).
