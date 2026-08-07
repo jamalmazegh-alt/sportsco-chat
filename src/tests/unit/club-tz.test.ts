@@ -38,14 +38,33 @@ describe("formatDateOnly (code réel utilisé par les notifications d'absence)",
     );
   });
 
-  it("ne recule pas d'un jour en fuseau occidental", () => {
-    const tz = process.env.TZ;
-    process.env.TZ = "America/Los_Angeles";
-    expect(formatDateOnly("2026-08-07", "fr-FR", { day: "numeric", month: "numeric" })).toMatch(
-      /^0?7\/0?8$/,
-    );
-    process.env.TZ = tz;
+  const withProcessTz = (zone: string, fn: () => void) => {
+    const previous = process.env.TZ;
+    process.env.TZ = zone;
+    try {
+      fn();
+    } finally {
+      if (previous === undefined) delete process.env.TZ;
+      else process.env.TZ = previous;
+    }
+  };
+
+  it("ne recule pas d'un jour en fuseau occidental (protège timeZone: UTC)", () => {
+    withProcessTz("America/Los_Angeles", () => {
+      expect(formatDateOnly("2026-08-07", "fr-FR", { day: "numeric", month: "numeric" })).toMatch(
+        /^0?7\/0?8$/,
+      );
+    });
   });
+
+  it("ne recule pas d'un jour en fuseau oriental (protège le suffixe Z du parsing)", () => {
+    withProcessTz("Asia/Tokyo", () => {
+      expect(formatDateOnly("2026-08-07", "fr-FR", { day: "numeric", month: "numeric" })).toMatch(
+        /^0?7\/0?8$/,
+      );
+    });
+  });
+
 
   it("retourne la valeur brute si la locale est invalide", () => {
     expect(formatDateOnly("2026-08-07", "!!invalid!!")).toBe("2026-08-07");
