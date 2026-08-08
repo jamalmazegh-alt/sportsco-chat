@@ -291,8 +291,8 @@ export function MatchResultCard({
       {/* Header */}
       <header className="flex items-center justify-between gap-3 px-5 py-3.5 border-b border-border">
         <div className="flex items-center gap-2.5 min-w-0">
-          <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-gradient-to-br from-emerald-50 to-emerald-100 ring-1 ring-emerald-200/60">
-            <Trophy className="h-4 w-4 text-[#1d7a45]" />
+          <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-primary/12 ring-1 ring-primary/22">
+            <Trophy className="h-4 w-4 text-primary" />
           </div>
           <h2 className="text-sm font-extrabold tracking-tight text-foreground truncate">
             {t("match.result")}
@@ -304,7 +304,7 @@ export function MatchResultCard({
             <button
               type="button"
               onClick={() => setEditing(true)}
-              className="inline-flex items-center gap-1 text-xs font-semibold text-[#1d7a45] hover:text-[#0f4a26] transition-colors"
+              className="inline-flex items-center gap-1 text-xs font-semibold text-primary transition-colors hover:opacity-80"
             >
               <Pencil className="h-3.5 w-3.5" />
               {t("common.edit")}
@@ -324,29 +324,19 @@ export function MatchResultCard({
       <div className="px-5 py-4 space-y-4">
         {!editing && result && (
           <div className="space-y-3">
-            <div className="flex items-center justify-center gap-3">
-              <div className="text-center flex-1 min-w-0">
-                <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold truncate">
-                  {teamName ?? (ourSide === "home" ? t("events.home") : t("events.away"))}
-                </p>
-                <p className="text-[28px] leading-none font-black tabular-nums text-foreground mt-1">
-                  {ourScore}
-                </p>
-              </div>
-              <span
-                className="text-[28px] font-black tabular-nums bg-gradient-to-br from-[#1d7a45] to-[#2d9d5f] bg-clip-text text-transparent select-none"
-                aria-hidden="true"
-              >
-                —
+            <div className="flex items-center gap-3">
+              <Side
+                name={teamName ?? (ourSide === "home" ? t("events.home") : t("events.away"))}
+                ours
+              />
+              <span className="font-display text-[34px] font-bold leading-none tracking-[-0.02em] tabular-nums">
+                {ourScore}
+                <span className="mx-1.5 align-[3px] text-xl text-muted-foreground" aria-hidden>
+                  —
+                </span>
+                {theirScore}
               </span>
-              <div className="text-center flex-1 min-w-0">
-                <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold truncate">
-                  {opponent ?? t("events.opponent")}
-                </p>
-                <p className="text-[28px] leading-none font-black tabular-nums text-foreground mt-1">
-                  {theirScore}
-                </p>
-              </div>
+              <Side name={opponent ?? t("events.opponent")} />
             </div>
             <div className="flex justify-center">
               <span
@@ -373,7 +363,7 @@ export function MatchResultCard({
         )}
 
         {!editing && !result && isPast && isCoach && (
-          <div className="flex items-center justify-between gap-3 rounded-xl bg-gradient-to-r from-emerald-50 to-transparent dark:from-emerald-950/30 px-4 py-3 border border-emerald-200/60 dark:border-emerald-900/50">
+          <div className="flex items-center justify-between gap-3 rounded-xl border border-primary/22 bg-primary/8 px-4 py-3">
             <div className="min-w-0">
               <p className="text-sm font-bold text-foreground">{t("match.finishedTitle")}</p>
               <p className="text-xs text-muted-foreground">{t("match.finishedHint")}</p>
@@ -381,7 +371,7 @@ export function MatchResultCard({
             <Button
               size="sm"
               onClick={() => setEditing(true)}
-              className="rounded-xl bg-gradient-to-br from-[#1d7a45] to-[#2d9d5f] hover:from-[#185c34] hover:to-[#22834d] text-white shadow-[0_8px_20px_-10px_rgba(29,122,69,0.6)] active:scale-[0.98] transition shrink-0"
+              className="shrink-0 rounded-xl transition active:scale-[0.98]"
             >
               <Plus className="h-4 w-4" />
               {t("match.enterResult")}
@@ -490,7 +480,7 @@ export function MatchResultCard({
               <button
                 type="button"
                 onClick={() => setShowGoalForm(true)}
-                className="inline-flex items-center gap-1 text-xs font-semibold text-[#1d7a45] hover:text-[#0f4a26] transition-colors"
+                className="inline-flex items-center gap-1 text-xs font-semibold text-primary transition-colors hover:opacity-80"
               >
                 <Plus className="h-3.5 w-3.5" />
                 {t("match.addEvent")}
@@ -763,5 +753,39 @@ function SetScoresEditor({
         <Plus className="h-3.5 w-3.5" /> {t("match.addSet")}
       </Button>
     </div>
+  );
+}
+
+/**
+ * Un camp du tableau de score : écusson d'initiales et nom.
+ *
+ * L'écusson distingue les deux équipes sans avoir besoin de lire — émeraude
+ * pour nous, violet pour l'adversaire, comme la pastille domicile/extérieur
+ * de la carte de liste.
+ */
+function Side({ name, ours = false }: { name: string; ours?: boolean }) {
+  const initials =
+    name
+      .split(/\s+/)
+      .filter(Boolean)
+      .slice(0, 2)
+      .map((w) => w[0])
+      .join("")
+      .toUpperCase() || "?";
+  return (
+    <span className="flex min-w-0 flex-1 flex-col items-center gap-1.5 text-center">
+      <span
+        className={cn(
+          "flex h-9 w-9 items-center justify-center rounded-[10px] font-display text-xs font-bold",
+          ours
+            ? "bg-primary/13 text-primary"
+            : "bg-violet-500/13 text-violet-700 dark:text-violet-300",
+        )}
+        aria-hidden
+      >
+        {initials}
+      </span>
+      <span className="w-full truncate text-[11.5px] font-semibold leading-tight">{name}</span>
+    </span>
   );
 }

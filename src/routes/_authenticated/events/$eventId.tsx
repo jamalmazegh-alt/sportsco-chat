@@ -2803,53 +2803,34 @@ function EventDetail() {
           const convocCount = (convocations ?? []).length;
           return (
             <div className="relative overflow-hidden rounded-2xl border border-border bg-card shadow-sm">
-              {/* Header — green gradient */}
-              <div className="relative overflow-hidden bg-gradient-to-br from-[#0f4a26] via-[#1d7a45] to-[#2d9d5f] px-4 py-3 text-white">
-                <svg
-                  className="pointer-events-none absolute inset-0 h-full w-full opacity-[0.10]"
-                  aria-hidden="true"
-                >
-                  <defs>
-                    <pattern
-                      id="comm-diag"
-                      width="14"
-                      height="14"
-                      patternUnits="userSpaceOnUse"
-                      patternTransform="rotate(45)"
-                    >
-                      <line x1="0" y1="0" x2="0" y2="14" stroke="white" strokeWidth="1" />
-                    </pattern>
-                  </defs>
-                  <rect width="100%" height="100%" fill="url(#comm-diag)" />
-                </svg>
-                <div className="pointer-events-none absolute -top-14 -right-14 h-36 w-36 rounded-full bg-white/20 blur-3xl" />
-                <div className="relative flex items-center justify-between gap-3">
-                  <div className="flex items-center gap-3 min-w-0">
-                    <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-white/15 backdrop-blur-sm ring-1 ring-white/25 shrink-0">
-                      <Send className="h-5 w-5 text-white" />
-                    </div>
-                    <div className="min-w-0 leading-tight">
-                      <div className="text-base font-extrabold tracking-tight">
-                        {t("events.whatsappShare.shareViaWhatsApp")}
-                      </div>
-                      <div className="text-[11px] text-white/75 font-medium mt-0.5">
-                        {t("events.commCard.subtitle", {
-                          count: convocCount,
-                        })}
-                      </div>
-                    </div>
+              {/* En-tête — la carte WhatsApp portait son propre dégradé, motif
+                  diagonal et halo compris : un troisième héros sur une page qui
+                  n'en supporte déjà pas deux. Elle devient une carte comme les
+                  autres ; c'est le bouton qui garde le vert de la marque. */}
+              <div className="flex items-center justify-between gap-3 border-b border-border/60 px-4 py-3">
+                <div className="flex min-w-0 items-center gap-2.5">
+                  <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-primary/12 ring-1 ring-primary/22">
+                    <Send className="h-4 w-4 text-primary" />
+                  </span>
+                  <div className="min-w-0 leading-tight">
+                    <p className="truncate text-sm font-extrabold tracking-tight">
+                      {t("events.whatsappShare.shareViaWhatsApp")}
+                    </p>
+                    <p className="mt-0.5 text-[11px] font-medium text-muted-foreground">
+                      {t("events.commCard.subtitle", { count: convocCount })}
+                    </p>
                   </div>
-                  {groupUrl && (
-                    <a
-                      href={groupUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-[11px] font-semibold text-white/90 hover:text-white inline-flex items-center gap-1 rounded-full bg-white/10 hover:bg-white/15 px-2.5 py-1 ring-1 ring-white/20 shrink-0"
-                    >
-                      {t("events.whatsappShare.openGroup")} <ExternalLink className="h-3 w-3" />
-                    </a>
-                  )}
                 </div>
+                {groupUrl && (
+                  <a
+                    href={groupUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex shrink-0 items-center gap-1 rounded-full border border-border px-2.5 py-1 text-[11px] font-semibold text-muted-foreground transition-colors hover:border-primary/45 hover:text-foreground"
+                  >
+                    {t("events.whatsappShare.openGroup")} <ExternalLink className="h-3 w-3" />
+                  </a>
+                )}
               </div>
 
               {/* Actions */}
@@ -2859,9 +2840,8 @@ function EventDetail() {
                     href={`https://wa.me/?text=${encodeURIComponent(convocMsg)}`}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="group relative overflow-hidden flex items-center gap-3 w-full rounded-2xl bg-gradient-to-br from-[#1d7a45] to-[#25D366] px-4 py-3 text-white shadow-[0_8px_20px_-10px_rgba(29,122,69,0.55)] active:scale-[0.99] transition"
+                    className="flex w-full items-center gap-3 rounded-2xl bg-[#25D366] px-4 py-3 text-white transition active:scale-[0.99] hover:brightness-95"
                   >
-                    <span className="pointer-events-none absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/30 to-transparent group-hover:translate-x-full transition-transform duration-1000" />
                     <span className="relative flex h-9 w-9 items-center justify-center rounded-xl bg-white/15 ring-1 ring-white/25 shrink-0">
                       <svg
                         viewBox="0 0 32 32"
@@ -2890,9 +2870,8 @@ function EventDetail() {
                         href={`https://wa.me/?text=${encodeURIComponent(convocMsg)}`}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="group relative overflow-hidden flex items-center gap-3 w-full rounded-2xl bg-gradient-to-br from-[#1d7a45] to-[#25D366] px-4 py-3 text-white shadow-[0_8px_20px_-10px_rgba(29,122,69,0.55)] active:scale-[0.99] transition"
+                        className="flex w-full items-center gap-3 rounded-2xl bg-[#25D366] px-4 py-3 text-white transition active:scale-[0.99] hover:brightness-95"
                       >
-                        <span className="pointer-events-none absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/30 to-transparent group-hover:translate-x-full transition-transform duration-1000" />
                         <span className="relative flex h-9 w-9 items-center justify-center rounded-xl bg-white/15 ring-1 ring-white/25 shrink-0">
                           <svg
                             viewBox="0 0 32 32"
@@ -2915,9 +2894,8 @@ function EventDetail() {
                         onClick={() => {
                           sendConvocations();
                         }}
-                        className="group relative overflow-hidden flex items-center gap-3 w-full rounded-2xl bg-gradient-to-br from-[#1d7a45] to-[#25D366] px-4 py-3 text-white shadow-[0_8px_20px_-10px_rgba(29,122,69,0.55)] active:scale-[0.99] transition text-left"
+                        className="flex w-full items-center gap-3 rounded-2xl bg-[#25D366] px-4 py-3 text-left text-white transition active:scale-[0.99] hover:brightness-95"
                       >
-                        <span className="pointer-events-none absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/30 to-transparent group-hover:translate-x-full transition-transform duration-1000" />
                         <span className="relative flex h-9 w-9 items-center justify-center rounded-xl bg-white/15 ring-1 ring-white/25 shrink-0">
                           <UserPlus className="h-4 w-4" />
                         </span>
@@ -2939,7 +2917,7 @@ function EventDetail() {
                       >
                         <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-emerald-50 to-emerald-100 ring-1 ring-emerald-200/60 shrink-0">
                           {sharingLineup ? (
-                            <Loader2 className="h-4 w-4 animate-spin text-[#1d7a45]" />
+                            <Loader2 className="h-4 w-4 animate-spin text-primary" />
                           ) : (
                             <svg
                               viewBox="0 0 32 32"
@@ -3667,9 +3645,7 @@ function EventDetail() {
                 variant={convocChanges.length > 0 ? "default" : "outline"}
                 className={cn(
                   "w-full h-11 rounded-2xl",
-                  convocChanges.length > 0
-                    ? "bg-gradient-to-br from-[#1d7a45] to-[#2d9d5f] hover:from-[#185c34] hover:to-[#22834d] text-white shadow-[0_8px_20px_-10px_rgba(29,122,69,0.55)]"
-                    : "border-[1.5px]",
+                  convocChanges.length > 0 ? "" : "border-[1.5px]",
                 )}
               >
                 <Send className="h-4 w-4" />
@@ -3690,10 +3666,7 @@ function EventDetail() {
           {/* Coach: first-time send */}
           {isCoach && event.status !== "cancelled" && !event.convocations_sent && (
             <div className="p-4">
-              <Button
-                onClick={() => openPicker()}
-                className="w-full h-11 rounded-2xl bg-gradient-to-br from-[#1d7a45] to-[#2d9d5f] hover:from-[#185c34] hover:to-[#22834d] text-white shadow-[0_8px_20px_-10px_rgba(29,122,69,0.55)]"
-              >
+              <Button onClick={() => openPicker()} className="h-11 w-full rounded-2xl">
                 <Send className="h-4 w-4" />
                 {t("events.sendConvocations")}
               </Button>
@@ -3847,9 +3820,8 @@ function EventDetail() {
               <button
                 type="button"
                 onClick={remindAllPending}
-                className="group relative overflow-hidden inline-flex items-center gap-1.5 h-9 px-4 rounded-full bg-gradient-to-br from-[#1d7a45] to-[#2d9d5f] text-white text-xs font-bold shadow-[0_6px_16px_-6px_rgba(29,122,69,0.55)] active:scale-[0.98] transition shrink-0"
+                className="inline-flex h-9 shrink-0 items-center gap-1.5 rounded-full bg-primary px-4 text-xs font-bold text-primary-foreground transition active:scale-[0.98] hover:opacity-90"
               >
-                <span className="pointer-events-none absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/30 to-transparent group-hover:translate-x-full transition-transform duration-1000" />
                 <Bell className="h-3.5 w-3.5" /> {t("attendance.remindAll")}
               </button>
             </div>
@@ -4021,7 +3993,7 @@ function EventDetail() {
                         <button
                           type="button"
                           onClick={() => setPresencesExpanded((v) => !v)}
-                          className="w-full px-4 py-3 border-t border-border/70 text-xs font-semibold text-[#1d7a45] hover:bg-emerald-50/40 transition-colors flex items-center justify-center gap-1"
+                          className="flex w-full items-center justify-center gap-1 border-t border-border/70 px-4 py-3 text-xs font-semibold text-primary transition-colors hover:bg-primary/8"
                         >
                           {presencesExpanded
                             ? t("attendance.showLess")
