@@ -1075,6 +1075,8 @@
       "lineup": "Aufstellung"
     },
     "pastBadge": "Vergangen",
+    "todayShort": "heute",
+    "live": "Läuft",
     "calendarHint": "Tippe auf einen Tag mit Punkt, um die Events zu sehen.",
     "noEventsThisDay": "Kein Event an diesem Tag.",
     "duplicateExists": "Für dieses Team existiert bereits ein Event zu diesem Datum/dieser Uhrzeit.",

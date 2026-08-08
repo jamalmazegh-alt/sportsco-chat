@@ -1075,6 +1075,8 @@
       "lineup": "Alinhamento"
     },
     "pastBadge": "Passado",
+    "todayShort": "hoje",
+    "live": "A decorrer",
     "calendarHint": "Toca num dia com um ponto para ver os Eventos.",
     "noEventsThisDay": "Nenhum Evento neste dia.",
     "duplicateExists": "Já existe um Evento para esta Equipa nesta data/hora.",

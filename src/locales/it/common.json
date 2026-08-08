@@ -1075,6 +1075,8 @@
       "lineup": "Formazione"
     },
     "pastBadge": "Passato",
+    "todayShort": "oggi",
+    "live": "In corso",
     "calendarHint": "Tocca un giorno con un punto per vedere gli eventi.",
     "noEventsThisDay": "Nessun evento in questo giorno.",
     "duplicateExists": "Esiste già un evento per questa Squadra in questa data/ora.",

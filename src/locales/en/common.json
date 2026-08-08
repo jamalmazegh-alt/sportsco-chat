@@ -1075,6 +1075,8 @@
       "lineup": "Lineup"
     },
     "pastBadge": "Past",
+    "todayShort": "today",
+    "live": "Live",
     "calendarHint": "Tap a day with a dot to see events.",
     "noEventsThisDay": "No events that day.",
     "duplicateExists": "An event already exists for this team at that date/time.",

@@ -1075,6 +1075,8 @@
       "lineup": "Opstelling"
     },
     "pastBadge": "Verleden",
+    "todayShort": "vandaag",
+    "live": "Bezig",
     "calendarHint": "Tik op een dag met een stip om de evenementen te zien.",
     "noEventsThisDay": "Geen evenement op deze dag.",
     "duplicateExists": "Voor dit Team bestaat al een evenement op deze datum/tijd.",

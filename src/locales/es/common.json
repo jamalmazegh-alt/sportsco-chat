@@ -1075,6 +1075,8 @@
       "lineup": "Alineación"
     },
     "pastBadge": "Pasado",
+    "todayShort": "hoy",
+    "live": "En curso",
     "calendarHint": "Toca un día con un punto para ver los eventos.",
     "noEventsThisDay": "No hay eventos este día.",
     "duplicateExists": "Ya existe un evento para este equipo en esta fecha/hora.",

@@ -1075,6 +1075,8 @@
       "lineup": "Compo"
     },
     "pastBadge": "Passé",
+    "todayShort": "auj.",
+    "live": "En cours",
     "calendarHint": "Touche un jour avec une pastille pour voir les événements.",
     "noEventsThisDay": "Aucun événement ce jour.",
     "duplicateExists": "Un événement existe déjà pour cette équipe à cette date/heure.",
