@@ -1144,7 +1144,13 @@
       "seatsMissing_one": "{{count}} place à pourvoir",
       "seatsMissing_other": "{{count}} places à pourvoir",
       "messageCount_one": "{{count}} message",
-      "messageCount_other": "{{count}} messages"
+      "messageCount_other": "{{count}} messages",
+      "noCoach": "Aucun coach",
+      "transportCovered": "Tous couverts",
+      "carpoolOff": "Désactivé",
+      "seatsFilled": "Complet",
+      "noNeed": "Aucun besoin",
+      "noMessage": "Aucun message"
     }
   },
   "followUps": {

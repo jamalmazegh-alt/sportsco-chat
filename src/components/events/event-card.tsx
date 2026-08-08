@@ -130,9 +130,10 @@ export function EventCard({
   const showCounts = footer.counts;
   const showSent = footer.sent;
   const showResponse = footer.response;
-  // Une prévision — ou son absence motivée — n'a plus d'objet sur un match
-  // joué ou annulé : le serveur n'en renvoie d'ailleurs pas.
-  const showWeather = !!weather && !isCancelled && !past;
+  // La pastille ne s'affiche que s'il y a vraiment une prévision : sur une
+  // liste, expliquer son absence coûterait plus que ça ne rapporte. Le
+  // pourquoi est dit sur le détail.
+  const showWeather = !!weather?.ok && !isCancelled && !past;
   const hasFooter =
     isCancelled ||
     !!outcome ||
@@ -260,7 +261,7 @@ export function EventCard({
           {hasFooter && (
             <div className="mt-1 flex items-center justify-between gap-2">
               <div className="flex min-w-0 items-center gap-1.5">
-                {showWeather && <EventWeatherBadge result={weather} dateLocale={dateLocale} />}
+                {showWeather && <EventWeatherBadge result={weather} />}
                 {isCancelled ? (
                   <span className="inline-flex shrink-0 items-center gap-1 rounded-full border border-destructive/30 bg-destructive/12 px-2 py-0.5 text-[10.5px] font-bold text-destructive">
                     <Ban className="h-3 w-3" />

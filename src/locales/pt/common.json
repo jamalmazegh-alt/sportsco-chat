@@ -1144,7 +1144,13 @@
       "seatsMissing_one": "{{count}} vaga por preencher",
       "seatsMissing_other": "{{count}} vagas por preencher",
       "messageCount_one": "{{count}} mensagem",
-      "messageCount_other": "{{count}} mensagens"
+      "messageCount_other": "{{count}} mensagens",
+      "noCoach": "Sem treinador",
+      "transportCovered": "Todos cobertos",
+      "carpoolOff": "Desativado",
+      "seatsFilled": "Completo",
+      "noNeed": "Sem pedidos",
+      "noMessage": "Sem mensagens"
     }
   },
   "followUps": {

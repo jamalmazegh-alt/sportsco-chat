@@ -1144,7 +1144,13 @@
       "seatsMissing_one": "{{count}} posto da coprire",
       "seatsMissing_other": "{{count}} posti da coprire",
       "messageCount_one": "{{count}} messaggio",
-      "messageCount_other": "{{count}} messaggi"
+      "messageCount_other": "{{count}} messaggi",
+      "noCoach": "Nessun allenatore",
+      "transportCovered": "Tutti coperti",
+      "carpoolOff": "Disattivato",
+      "seatsFilled": "Completo",
+      "noNeed": "Nessuna richiesta",
+      "noMessage": "Nessun messaggio"
     }
   },
   "followUps": {

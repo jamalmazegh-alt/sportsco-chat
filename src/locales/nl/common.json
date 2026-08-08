@@ -1144,7 +1144,13 @@
       "seatsMissing_one": "{{count}} plek te vullen",
       "seatsMissing_other": "{{count}} plekken te vullen",
       "messageCount_one": "{{count}} bericht",
-      "messageCount_other": "{{count}} berichten"
+      "messageCount_other": "{{count}} berichten",
+      "noCoach": "Geen coach",
+      "transportCovered": "Allen gedekt",
+      "carpoolOff": "Uit",
+      "seatsFilled": "Compleet",
+      "noNeed": "Geen verzoek",
+      "noMessage": "Geen bericht"
     }
   },
   "followUps": {

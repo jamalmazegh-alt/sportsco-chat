@@ -26,7 +26,18 @@ type Msg = {
 
 const PAGE_SIZE = 30;
 
-export function EventChat({ eventId }: { eventId: string }) {
+export function EventChat({
+  eventId,
+  embedded = false,
+}: {
+  eventId: string;
+  /**
+   * Rendu dans une section repliable, qui porte déjà carte, titre et repli :
+   * on retire la coquille et le repli interne, sinon la page imbrique deux
+   * accordéons pour une seule conversation.
+   */
+  embedded?: boolean;
+}) {
   const { t } = useTranslation();
   const { user } = useAuth();
   const roles = useMyRoles();
@@ -48,7 +59,8 @@ export function EventChat({ eventId }: { eventId: string }) {
   const [canPost, setCanPost] = useState<boolean | null>(null);
   const [sendError, setSendError] = useState<string | null>(null);
   const [sending, setSending] = useState(false);
-  const [open, setOpen] = useState(false);
+  const [ownOpen, setOwnOpen] = useState(false);
+  const open = embedded || ownOpen;
   const [hasMore, setHasMore] = useState(false);
   const [loadingMore, setLoadingMore] = useState(false);
   const endRef = useRef<HTMLDivElement>(null);
@@ -239,27 +251,39 @@ export function EventChat({ eventId }: { eventId: string }) {
   }
 
   return (
-    <section className="rounded-2xl border border-border bg-card overflow-hidden">
-      <button
-        type="button"
-        onClick={() => setOpen((v) => !v)}
-        className="w-full flex items-center justify-between gap-2 px-4 py-3 hover:bg-muted/40 transition-colors"
-      >
-        <div className="flex items-center gap-2">
-          <MessageCircle className="h-4 w-4 text-primary" />
-          <h3 className="text-sm font-semibold">{t("chat.title")}</h3>
-          {visibleMessages.length > 0 && (
-            <span className="text-[11px] text-muted-foreground">· {visibleMessages.length}</span>
-          )}
-        </div>
-        <ChevronDown
-          className={cn("h-4 w-4 text-muted-foreground transition-transform", open && "rotate-180")}
-        />
-      </button>
+    <section
+      className={cn("overflow-hidden", !embedded && "rounded-2xl border border-border bg-card")}
+    >
+      {!embedded && (
+        <button
+          type="button"
+          onClick={() => setOwnOpen((v) => !v)}
+          className="w-full flex items-center justify-between gap-2 px-4 py-3 hover:bg-muted/40 transition-colors"
+        >
+          <div className="flex items-center gap-2">
+            <MessageCircle className="h-4 w-4 text-primary" />
+            <h3 className="text-sm font-semibold">{t("chat.title")}</h3>
+            {visibleMessages.length > 0 && (
+              <span className="text-[11px] text-muted-foreground">· {visibleMessages.length}</span>
+            )}
+          </div>
+          <ChevronDown
+            className={cn(
+              "h-4 w-4 text-muted-foreground transition-transform",
+              open && "rotate-180",
+            )}
+          />
+        </button>
+      )}
 
       {open && (
         <>
-          <div className="max-h-80 overflow-y-auto px-3 py-3 space-y-2 border-t border-border">
+          <div
+            className={cn(
+              "max-h-80 space-y-2 overflow-y-auto py-3",
+              embedded ? "px-0" : "border-t border-border px-3",
+            )}
+          >
             {hasMore && (
               <div className="flex justify-center pb-1">
                 <button

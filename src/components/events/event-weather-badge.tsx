@@ -6,14 +6,10 @@ import {
   CloudRain,
   CloudSnow,
   CloudSun,
-  CloudOff,
-  CalendarClock,
   Sun,
   Wind,
   type LucideIcon,
 } from "lucide-react";
-import { format } from "date-fns";
-import type { Locale } from "date-fns";
 import type { EventWeatherResult, WeatherKind } from "@/lib/weather/types";
 import { cn } from "@/lib/utils";
 
@@ -40,43 +36,19 @@ const KIND_ICON: Record<WeatherKind, LucideIcon> = {
 
 export function EventWeatherBadge({
   result,
-  dateLocale,
   className,
 }: {
   result: EventWeatherResult | null | undefined;
-  dateLocale?: Locale;
   className?: string;
 }) {
   const { t } = useTranslation();
   if (!result) return null;
 
-  // Pas de prévision : on dit pourquoi. « Météo dès le 4 mars » et « météo
-  // indisponible » n'appellent pas la même réaction, les confondre serait
-  // laisser croire à une panne à chaque événement un peu lointain.
-  if (!result.ok) {
-    const label =
-      result.reason === "beyond_horizon" && result.availableFrom
-        ? t("weather.availableFrom", {
-            date: format(new Date(result.availableFrom), "d MMM", { locale: dateLocale }),
-          })
-        : result.reason === "beyond_horizon"
-          ? t("weather.tooFar")
-          : result.reason === "no_location"
-            ? t("weather.noLocation")
-            : t("weather.unavailable");
-    const Glyph = result.reason === "beyond_horizon" ? CalendarClock : CloudOff;
-    return (
-      <span
-        className={cn(
-          "inline-flex shrink-0 items-center gap-1 rounded-full border border-border bg-muted/60 px-2 py-0.5 text-[10.5px] font-semibold text-muted-foreground",
-          className,
-        )}
-      >
-        <Glyph className="h-3 w-3 shrink-0" aria-hidden />
-        {label}
-      </span>
-    );
-  }
+  // Sur une carte de liste, une prévision absente ne vaut pas la place d'un
+  // message : la plupart des événements sont hors horizon, et une ligne « météo
+  // indisponible » sur chaque carte deviendrait le bruit dominant. Le détail,
+  // lui, a la place de dire pourquoi — c'est là que le message vit.
+  if (!result.ok) return null;
 
   const { at, alert } = result.weather;
   // Sur une alerte de vent, l'icône bascule sur le facteur dominant plutôt que

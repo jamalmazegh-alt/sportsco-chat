@@ -1144,7 +1144,13 @@
       "seatsMissing_one": "{{count}} slot to fill",
       "seatsMissing_other": "{{count}} slots to fill",
       "messageCount_one": "{{count}} message",
-      "messageCount_other": "{{count}} messages"
+      "messageCount_other": "{{count}} messages",
+      "noCoach": "No coach",
+      "transportCovered": "All covered",
+      "carpoolOff": "Off",
+      "seatsFilled": "All filled",
+      "noNeed": "No request",
+      "noMessage": "No message"
     }
   },
   "followUps": {

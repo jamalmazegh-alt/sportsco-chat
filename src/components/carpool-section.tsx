@@ -52,6 +52,8 @@ type Need = {
 };
 
 interface Props {
+  /** Rendu dans une section repliable qui fournit déjà carte, titre et résumé. */
+  embedded?: boolean;
   eventId: string;
   teamId: string;
   isCoach: boolean;
@@ -68,6 +70,7 @@ export function CarpoolSection({
   childrenLinks,
   carpoolEnabled,
   onToggleEnabled,
+  embedded = false,
 }: Props) {
   const { t } = useTranslation();
   const { user } = useAuth();
@@ -209,21 +212,40 @@ export function CarpoolSection({
 
   return (
     <>
-      <div className="rounded-2xl border border-border bg-card overflow-hidden">
-        <div className="px-4 py-3 border-b border-border flex items-center justify-between gap-3">
-          <div className="flex items-center gap-2 min-w-0">
-            <Car className="h-4 w-4 text-primary shrink-0" />
-            <div className="min-w-0">
-              <h3 className="font-semibold text-sm leading-tight">{t("carpool.tab")}</h3>
-              {isCoach && (
-                <p className="text-[11px] text-muted-foreground leading-tight">
-                  {carpoolEnabled
-                    ? t("carpool.toggleOn" as any) || "Activé pour cet événement"
-                    : t("carpool.toggleOff" as any) || "Désactivé pour cet événement"}
-                </p>
-              )}
+      <div
+        className={cn("overflow-hidden", !embedded && "rounded-2xl border border-border bg-card")}
+      >
+        {/* En mode intégré, la section repliable porte déjà le titre : on ne
+            garde que l'interrupteur d'activation, qui est une action. */}
+        <div
+          className={cn(
+            "flex items-center justify-between gap-3",
+            embedded ? "pb-2" : "border-b border-border px-4 py-3",
+          )}
+        >
+          {embedded ? (
+            <p className="min-w-0 text-[11px] leading-tight text-muted-foreground">
+              {isCoach
+                ? carpoolEnabled
+                  ? t("carpool.toggleOn" as any) || "Activé pour cet événement"
+                  : t("carpool.toggleOff" as any) || "Désactivé pour cet événement"
+                : null}
+            </p>
+          ) : (
+            <div className="flex items-center gap-2 min-w-0">
+              <Car className="h-4 w-4 text-primary shrink-0" />
+              <div className="min-w-0">
+                <h3 className="font-semibold text-sm leading-tight">{t("carpool.tab")}</h3>
+                {isCoach && (
+                  <p className="text-[11px] text-muted-foreground leading-tight">
+                    {carpoolEnabled
+                      ? t("carpool.toggleOn" as any) || "Activé pour cet événement"
+                      : t("carpool.toggleOff" as any) || "Désactivé pour cet événement"}
+                  </p>
+                )}
+              </div>
             </div>
-          </div>
+          )}
           {isCoach && onToggleEnabled && (
             <Button
               size="sm"
@@ -239,14 +261,14 @@ export function CarpoolSection({
         </div>
 
         {!carpoolEnabled ? (
-          <div className="p-4">
+          <div className={cn(!embedded && "p-4")}>
             <p className="text-xs text-muted-foreground italic">
               {t("carpool.disabledHint" as any) ||
                 "Activez le covoiturage pour permettre aux parents de proposer et réserver des places."}
             </p>
           </div>
         ) : (
-          <div className="p-4 space-y-3">
+          <div className={cn("space-y-3", !embedded && "p-4")}>
             <p className="text-[11px] text-muted-foreground bg-muted/50 rounded-lg p-2.5 leading-relaxed">
               {t("carpool.disclaimer")}
             </p>
