@@ -3019,7 +3019,13 @@
       "noFacilitiesHint": "Kein Platz konfiguriert.",
       "noFacilityOption": "Kein Gericht"
     },
-    "surfacePlaceholder": "Rasen, Kunstrasen, Parkett…"
+    "surfacePlaceholder": "Rasen, Kunstrasen, Parkett…",
+    "geocode": {
+      "action": "Verorten ({{count}})",
+      "done": "{{count}} Ort(e) verortet",
+      "partial": "{{count}} verortet, {{failed}} fehlgeschlagen",
+      "nothingToDo": "Alle Orte sind bereits verortet"
+    }
   },
   "callUpList": {
     "masked": "Liste verborgen",

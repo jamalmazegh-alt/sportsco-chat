@@ -3014,7 +3014,13 @@
       "noFacilitiesHint": "Aucun terrain configuré pour ce site.",
       "noFacilityOption": "Aucun terrain"
     },
-    "surfacePlaceholder": "Gazon, synthétique, parquet…"
+    "surfacePlaceholder": "Gazon, synthétique, parquet…",
+    "geocode": {
+      "action": "Géolocaliser ({{count}})",
+      "done": "{{count}} lieu(x) géolocalisé(s)",
+      "partial": "{{count}} géolocalisé(s), {{failed}} en échec",
+      "nothingToDo": "Tous les lieux sont déjà géolocalisés"
+    }
   },
   "callUpList": {
     "masked": "Liste masquée",

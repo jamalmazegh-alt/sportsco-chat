@@ -3014,7 +3014,13 @@
       "noFacilitiesHint": "Nessun campo configurato.",
       "noFacilityOption": "Nessun campo"
     },
-    "surfacePlaceholder": "Erba, sintetico, parquet…"
+    "surfacePlaceholder": "Erba, sintetico, parquet…",
+    "geocode": {
+      "action": "Geolocalizza ({{count}})",
+      "done": "{{count}} luogo/luoghi geolocalizzati",
+      "partial": "{{count}} geolocalizzati, {{failed}} falliti",
+      "nothingToDo": "Tutti i luoghi sono già geolocalizzati"
+    }
   },
   "callUpList": {
     "masked": "Elenco nascosto",

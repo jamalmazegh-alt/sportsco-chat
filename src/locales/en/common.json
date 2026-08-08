@@ -3014,7 +3014,13 @@
       "noFacilitiesHint": "No field configured for this site.",
       "noFacilityOption": "No court"
     },
-    "surfacePlaceholder": "Grass, synthetic, parquet…"
+    "surfacePlaceholder": "Grass, synthetic, parquet…",
+    "geocode": {
+      "action": "Locate ({{count}})",
+      "done": "{{count}} venue(s) located",
+      "partial": "{{count}} located, {{failed}} failed",
+      "nothingToDo": "All venues are already located"
+    }
   },
   "callUpList": {
     "masked": "List hidden",

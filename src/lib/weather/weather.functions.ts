@@ -9,6 +9,7 @@ import {
   buildEventWeather,
   forecastAvailableFrom,
   isCacheFresh,
+  resolveEventCoordinates,
   weatherAvailability,
   weatherCacheKey,
 } from "./rules";
@@ -42,6 +43,9 @@ interface EventRow {
   convocation_time: string | null;
   status: string;
   venue_id: string | null;
+  location: string | null;
+  is_home: boolean | null;
+  team_id: string | null;
 }
 
 export const getEventsWeather = createServerFn({ method: "GET" })
@@ -54,24 +58,48 @@ export const getEventsWeather = createServerFn({ method: "GET" })
 
     const { data: events, error } = await supabase
       .from("events")
-      .select("id, starts_at, ends_at, convocation_time, status, venue_id")
+      .select(
+        "id, starts_at, ends_at, convocation_time, status, venue_id, location, is_home, team_id",
+      )
       .in("id", data.eventIds)
       .is("deleted_at", null);
     if (error || !events) return out;
 
     const rows = events as EventRow[];
-    const venueIds = Array.from(
-      new Set(rows.map((e) => e.venue_id).filter((v): v is string => !!v)),
-    );
 
-    const coordsByVenue = new Map<string, { latitude: number | null; longitude: number | null }>();
-    if (venueIds.length > 0) {
-      const { data: venues } = await supabase
+    // Tous les lieux des clubs concernés, pas seulement ceux rattachés : un
+    // événement peut avoir perdu son venue_id — dans l'assistant de création,
+    // saisir une adresse libre l'efface — et rester malgré tout au stade du
+    // club. On rattrape alors par le nom, puis par le lieu par défaut.
+    const teamIds = Array.from(new Set(rows.map((e) => e.team_id).filter((v): v is string => !!v)));
+    const clubIds = new Set<string>();
+    if (teamIds.length > 0) {
+      const { data: teams } = await supabase.from("teams").select("id, club_id").in("id", teamIds);
+      for (const team of teams ?? []) if (team.club_id) clubIds.add(team.club_id);
+    }
+
+    const venues: Array<{
+      id: string;
+      name: string;
+      address: string | null;
+      latitude: number | null;
+      longitude: number | null;
+      isDefault: boolean;
+    }> = [];
+    if (clubIds.size > 0) {
+      const { data: rowsVenues } = await supabase
         .from("club_venues")
-        .select("id, latitude, longitude")
-        .in("id", venueIds);
-      for (const v of venues ?? []) {
-        coordsByVenue.set(v.id, { latitude: v.latitude, longitude: v.longitude });
+        .select("id, name, address, latitude, longitude, is_default")
+        .in("club_id", Array.from(clubIds));
+      for (const v of rowsVenues ?? []) {
+        venues.push({
+          id: v.id,
+          name: v.name,
+          address: v.address,
+          latitude: v.latitude,
+          longitude: v.longitude,
+          isDefault: !!v.is_default,
+        });
       }
     }
 
@@ -85,7 +113,10 @@ export const getEventsWeather = createServerFn({ method: "GET" })
     }
     const groups = new Map<string, Group>();
     for (const e of rows) {
-      const coords = e.venue_id ? coordsByVenue.get(e.venue_id) : undefined;
+      const coords = resolveEventCoordinates(
+        { venueId: e.venue_id, location: e.location, isHome: e.is_home },
+        venues,
+      );
       const startsAt = new Date(e.starts_at);
       const reason = weatherAvailability(
         {
@@ -104,7 +135,7 @@ export const getEventsWeather = createServerFn({ method: "GET" })
             : { ok: false, reason };
         continue;
       }
-      const key = weatherCacheKey(coords!.latitude!, coords!.longitude!, startsAt);
+      const key = weatherCacheKey(coords!.latitude, coords!.longitude, startsAt);
       // Tant que la prévision n'est pas résolue, l'événement est en erreur :
       // un groupe qui échoue laisse ainsi le bon message plutôt qu'un blanc.
       out[e.id] = { ok: false, reason: "provider_error" };
@@ -112,8 +143,8 @@ export const getEventsWeather = createServerFn({ method: "GET" })
       if (group) group.events.push(e);
       else
         groups.set(key, {
-          latitude: coords!.latitude!,
-          longitude: coords!.longitude!,
+          latitude: coords!.latitude,
+          longitude: coords!.longitude,
           day: startsAt,
           events: [e],
         });

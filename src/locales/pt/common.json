@@ -3014,7 +3014,13 @@
       "noFacilitiesHint": "Nenhum campo configurado.",
       "noFacilityOption": "Sem tribunal"
     },
-    "surfacePlaceholder": "Relvado, sintético, soalho…"
+    "surfacePlaceholder": "Relvado, sintético, soalho…",
+    "geocode": {
+      "action": "Localizar ({{count}})",
+      "done": "{{count}} local(is) localizado(s)",
+      "partial": "{{count}} localizado(s), {{failed}} falharam",
+      "nothingToDo": "Todos os locais já estão localizados"
+    }
   },
   "callUpList": {
     "masked": "Lista oculta",

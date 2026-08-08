@@ -3014,7 +3014,13 @@
       "noFacilitiesHint": "Geen veld geconfigureerd.",
       "noFacilityOption": "Geen veld"
     },
-    "surfacePlaceholder": "Gras, kunstgras, parket…"
+    "surfacePlaceholder": "Gras, kunstgras, parket…",
+    "geocode": {
+      "action": "Lokaliseren ({{count}})",
+      "done": "{{count}} locatie(s) gelokaliseerd",
+      "partial": "{{count}} gelokaliseerd, {{failed}} mislukt",
+      "nothingToDo": "Alle locaties zijn al gelokaliseerd"
+    }
   },
   "callUpList": {
     "masked": "Lijst verborgen",

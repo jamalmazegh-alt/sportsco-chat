@@ -3014,7 +3014,13 @@
       "noFacilitiesHint": "Sin campos configurados.",
       "noFacilityOption": "Sin corte"
     },
-    "surfacePlaceholder": "Césped, sintético, parquet…"
+    "surfacePlaceholder": "Césped, sintético, parquet…",
+    "geocode": {
+      "action": "Geolocalizar ({{count}})",
+      "done": "{{count}} lugar(es) geolocalizado(s)",
+      "partial": "{{count}} geolocalizado(s), {{failed}} con error",
+      "nothingToDo": "Todos los lugares ya están geolocalizados"
+    }
   },
   "callUpList": {
     "masked": "Lista oculta",
