@@ -591,6 +591,7 @@ function EventDetail() {
   // Météo — la page n'affiche qu'un événement, mais la fonction est par lot.
   const weatherEligible =
     !!event &&
+    event.type !== "meeting" &&
     weatherAvailability(
       {
         status: event.status,
@@ -2424,6 +2425,8 @@ function EventDetail() {
         endsAt={event.ends_at ? new Date(event.ends_at) : null}
         convocationAt={event.convocation_time ? new Date(event.convocation_time) : null}
         countdown={countdownLabel}
+        startLabel={event.type === "match" ? t("events.kickoff") : t("events.timeShort")}
+        startIcon={event.type === "match" ? undefined : <Clock className="h-3 w-3" aria-hidden />}
         locationName={event.location}
         meetingPoint={
           event.type === "match" && event.is_home === false ? event.meeting_point : null
@@ -3464,6 +3467,11 @@ function EventDetail() {
         )}
 
       {/* === Unified Convocation card === */}
+      {/* Pour une réunion, les convoqués sont le contenu principal : la section
+          prend la place qu'occupe la carte des présences sur un match, avant la
+          pile secondaire, et non en fin de page. */}
+      {isInternalMeeting && <MeetingAttendeesSection eventId={eventId} eventType={event.type} />}
+
       {showConvocationSection && (
         <section
           id="my-response"
@@ -4404,9 +4412,6 @@ function EventDetail() {
           <EventChat eventId={eventId} />
         </CollapsibleSection>
       </section>
-
-      {/* Convocations réunion — ne s'affiche que pour les événements de type "meeting". */}
-      {isInternalMeeting && <MeetingAttendeesSection eventId={eventId} eventType={event.type} />}
 
       {/* Sticky bottom "Répondre" CTA — mobile only, when at least one of the user's convocations is still pending */}
       {hasPendingForMe && (

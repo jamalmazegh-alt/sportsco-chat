@@ -24,6 +24,10 @@ export interface EventWhenWhereProps {
   convocationAt?: Date | null;
   /** Libellé relatif affiché en tête de carte : « dans 3 jours ». */
   countdown?: string | null;
+  /** « Coup d'envoi » pour un match, « Horaire » pour le reste. */
+  startLabel?: string;
+  /** Picto du créneau de début — un but n'a de sens que sur un match. */
+  startIcon?: ReactNode;
   locationName?: string | null;
   locationAddress?: string | null;
   meetingPoint?: string | null;
@@ -39,6 +43,8 @@ export function EventWhenWhere({
   endsAt,
   convocationAt,
   countdown,
+  startLabel,
+  startIcon,
   locationName,
   locationAddress,
   meetingPoint,
@@ -87,8 +93,8 @@ export function EventWhenWhere({
           )}
           <TimeRow
             emphasis
-            icon={<Goal className="h-3 w-3" aria-hidden />}
-            label={t("events.kickoff")}
+            icon={startIcon ?? <Goal className="h-3 w-3" aria-hidden />}
+            label={startLabel ?? t("events.kickoff")}
             value={format(startsAt, "HH:mm")}
           />
           {showEnd && (
