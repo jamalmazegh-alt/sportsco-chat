@@ -45,6 +45,12 @@ export interface EventCardProps {
   counts?: ConvocationCounts | null;
   /** Forecast for the kickoff hour. Absent beyond J+10, or without venue coordinates. */
   weather?: EventWeather | null;
+  /** Home screen: ribbon marking the very next event. */
+  highlight?: boolean;
+  /** Home screen: amber emphasis when the viewer still has to answer. */
+  actionRequired?: boolean;
+  /** Whose convocation this is — only worth showing to a parent of several children. */
+  showPlayerName?: boolean;
 }
 
 /** Accent colour of the type glyph — same mapping as `EventTypeBadge`. */
@@ -64,6 +70,9 @@ export function EventCard({
   myConvocation,
   counts,
   weather,
+  highlight = false,
+  actionRequired = false,
+  showPlayerName = false,
 }: EventCardProps) {
   const { t } = useTranslation();
 
@@ -134,11 +143,22 @@ export function EventCard({
           "transition-[border-color,transform] active:scale-[0.99]",
           isCancelled
             ? "border-destructive/35 opacity-70"
-            : called
-              ? "border-primary/35 hover:border-primary/60"
-              : "border-border hover:border-primary/40",
+            : actionRequired
+              ? "border-amber-500/60 hover:border-amber-500/80"
+              : highlight
+                ? "border-primary/70 shadow-md"
+                : called
+                  ? "border-primary/35 hover:border-primary/60"
+                  : "border-border hover:border-primary/40",
+          // Le ruban occupe toute la largeur : la grille passe alors sur deux rangées.
+          highlight && "grid-rows-[auto_1fr]",
         )}
       >
+        {highlight && (
+          <div className="col-span-2 bg-primary px-3 py-1 text-[9.5px] font-bold uppercase tracking-[0.15em] text-primary-foreground">
+            {t("dashboard.nextEvent")}
+          </div>
+        )}
         {/* Rail de date — porte l'état de l'événement */}
         <div
           className={cn(
@@ -252,6 +272,11 @@ export function EventCard({
               </div>
 
               <div className="flex shrink-0 items-center gap-1.5">
+                {actionRequired && !live && (
+                  <span className="inline-flex items-center gap-1 rounded-full border border-amber-500/40 bg-amber-500/20 px-2 py-0.5 text-[10.5px] font-bold text-amber-700 dark:text-amber-300">
+                    {t("dashboard.actionRequired")}
+                  </span>
+                )}
                 {live && (
                   <span className="inline-flex items-center gap-1.5 rounded-full border border-primary/30 bg-primary/15 px-2 py-0.5 text-[10.5px] font-bold text-primary">
                     <span className="h-1.5 w-1.5 rounded-full bg-current motion-safe:animate-pulse" />
@@ -264,7 +289,12 @@ export function EventCard({
                     {t("events.pastBadge")}
                   </span>
                 )}
-                {showResponse && <ResponsePill status={myConvocation!.status} />}
+                {showResponse && !actionRequired && (
+                  <ResponsePill
+                    status={myConvocation!.status}
+                    playerName={showPlayerName ? myConvocation!.playerName : null}
+                  />
+                )}
                 {showSent && (
                   <span
                     className="inline-flex items-center gap-1 rounded-full border border-primary/22 bg-primary/10 px-2 py-0.5 text-[10.5px] font-bold text-primary"
@@ -293,12 +323,14 @@ export function EventCard({
   );
 }
 
-function ResponsePill({ status }: { status: string }) {
+function ResponsePill({ status, playerName }: { status: string; playerName?: string | null }) {
   const { t } = useTranslation();
+  const who = playerName ? <span className="font-medium opacity-70">· {playerName}</span> : null;
   if (status === "present") {
     return (
       <span className="inline-flex items-center gap-1 rounded-full border border-present/28 bg-present/15 px-2 py-0.5 text-[10.5px] font-bold text-present">
         {t("attendance.present")}
+        {who}
       </span>
     );
   }
@@ -306,6 +338,7 @@ function ResponsePill({ status }: { status: string }) {
     return (
       <span className="inline-flex items-center gap-1 rounded-full border border-defeat/28 bg-defeat/13 px-2 py-0.5 text-[10.5px] font-bold text-defeat">
         {t("attendance.absent")}
+        {who}
       </span>
     );
   }
@@ -317,6 +350,7 @@ function ResponsePill({ status }: { status: string }) {
     <span className="inline-flex items-center gap-1 rounded-full border border-amber-500/30 bg-amber-500/16 px-2 py-0.5 text-[10.5px] font-bold text-amber-700 dark:text-amber-300">
       {uncertain ? <HelpCircle className="h-3 w-3" /> : <Clock className="h-3 w-3" />}
       {uncertain ? t("attendance.uncertain") : t("attendance.toConfirm")}
+      {who}
     </span>
   );
 }
