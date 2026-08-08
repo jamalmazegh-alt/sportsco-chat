@@ -20,6 +20,8 @@ import { Calendar, Plus, Dumbbell, BellRing, List, CalendarDays, Search } from "
 import { EventCreateChooser } from "@/components/events/EventCreateChooser";
 import { EmptyState } from "@/components/empty-state";
 import { EventCard } from "@/components/events/event-card";
+import { getEventsWeather } from "@/lib/weather/weather.functions";
+import { shouldFetchWeather } from "@/lib/weather/rules";
 import {
   buildConvocationCounts,
   type ConvocationCounts,
@@ -290,6 +292,37 @@ function EventsPage() {
   });
   const convocSentSet = convocStats?.sent;
 
+  // Météo — un seul appel pour toutes les cartes éligibles. Les événements hors
+  // horizon, passés, annulés ou sans lieu géolocalisé sont écartés côté client
+  // pour ne pas les envoyer au serveur pour rien.
+  const weatherEventIds = useMemo(() => {
+    const now = new Date();
+    return (baseVisibleEvents ?? [])
+      .filter((e) =>
+        shouldFetchWeather(
+          {
+            status: e.status,
+            startsAt: new Date(e.starts_at),
+            // Les coordonnées vivent sur le lieu, que la liste ne charge pas :
+            // le serveur les résout et écarte lui-même ce qui n'en a pas.
+            latitude: 1,
+            longitude: 1,
+          },
+          now,
+        ),
+      )
+      .map((e) => e.id)
+      .slice(0, 100);
+  }, [baseVisibleEvents]);
+
+  const { data: weatherByEvent } = useQuery({
+    queryKey: ["events-weather", weatherEventIds],
+    enabled: weatherEventIds.length > 0,
+    queryFn: () => getEventsWeather({ data: { eventIds: weatherEventIds } }),
+    // La prévision bouge lentement ; le cache serveur a lui-même un TTL de 3 h.
+    staleTime: 30 * 60_000,
+  });
+
   const visibleEvents = useMemo(() => {
     if (filters.convocationsSent === "all") return baseVisibleEvents;
     return baseVisibleEvents.filter((e) => {
@@ -375,6 +408,7 @@ function EventsPage() {
         convocationSent={!!e.convocations_sent || !!convocSentSet?.has(e.id)}
         myConvocation={myConvocsByEvent?.get(e.id) ?? null}
         counts={convocStats?.counts.get(e.id) ?? null}
+        weather={weatherByEvent?.[e.id] ?? null}
       />
     );
   }

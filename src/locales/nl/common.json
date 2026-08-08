@@ -4919,5 +4919,17 @@
     "it": "Italiaans",
     "nl": "Nederlands",
     "pt": "Portugees"
+  },
+  "weather": {
+    "label": "Weersverwachting",
+    "temperature": "{{value}}°",
+    "precipitationShort": "{{value}}%",
+    "windShort": "{{value}} km/u",
+    "alerts": {
+      "rain": "Regen verwacht bij aftrap",
+      "wind": "Harde wind verwacht",
+      "cold": "Kou verwacht",
+      "heat": "Grote hitte verwacht"
+    }
   }
 }

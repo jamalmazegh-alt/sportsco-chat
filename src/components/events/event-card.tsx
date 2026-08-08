@@ -13,6 +13,8 @@ import {
   ConvocationSummaryPill,
   type ConvocationCounts,
 } from "@/components/convocation-summary-pill";
+import { EventWeatherBadge } from "@/components/events/event-weather-badge";
+import type { EventWeather } from "@/lib/weather/types";
 import { cn } from "@/lib/utils";
 
 /**
@@ -41,6 +43,8 @@ export interface EventCardProps {
   myConvocation?: { status: string; playerName: string } | null;
   /** Per-status counts, staff only. */
   counts?: ConvocationCounts | null;
+  /** Forecast for the kickoff hour. Absent beyond J+10, or without venue coordinates. */
+  weather?: EventWeather | null;
 }
 
 /** Accent colour of the type glyph — same mapping as `EventTypeBadge`. */
@@ -59,6 +63,7 @@ export function EventCard({
   convocationSent,
   myConvocation,
   counts,
+  weather,
 }: EventCardProps) {
   const { t } = useTranslation();
 
@@ -107,8 +112,17 @@ export function EventCard({
   // pour ne jamais laisser un coach sans indication quand les compteurs manquent.
   const showSent = !isCancelled && !!convocationSent && !showCounts;
   const showResponse = !!myConvocation && !isCancelled;
+  // Une prévision sur un match joué ou annulé n'a plus d'objet.
+  const showWeather = !!weather && !isCancelled && !past;
   const hasFooter =
-    isCancelled || !!outcome || past || live || showResponse || showSent || showCounts;
+    isCancelled ||
+    !!outcome ||
+    past ||
+    live ||
+    showWeather ||
+    showResponse ||
+    showSent ||
+    showCounts;
 
   return (
     <li>
@@ -216,6 +230,7 @@ export function EventCard({
           {hasFooter && (
             <div className="mt-1 flex items-center justify-between gap-2">
               <div className="flex min-w-0 items-center gap-1.5">
+                {showWeather && <EventWeatherBadge weather={weather} />}
                 {isCancelled ? (
                   <span className="inline-flex shrink-0 items-center gap-1 rounded-full border border-destructive/30 bg-destructive/12 px-2 py-0.5 text-[10.5px] font-bold text-destructive">
                     <Ban className="h-3 w-3" />

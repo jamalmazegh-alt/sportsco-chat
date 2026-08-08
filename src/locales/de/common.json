@@ -4924,5 +4924,17 @@
     "it": "Italienisch",
     "nl": "Niederländisch",
     "pt": "Portugiesisch"
+  },
+  "weather": {
+    "label": "Wettervorhersage",
+    "temperature": "{{value}}°",
+    "precipitationShort": "{{value}} %",
+    "windShort": "{{value}} km/h",
+    "alerts": {
+      "rain": "Regen zum Anpfiff erwartet",
+      "wind": "Starker Wind erwartet",
+      "cold": "Kälte erwartet",
+      "heat": "Große Hitze erwartet"
+    }
   }
 }

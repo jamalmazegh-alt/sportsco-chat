@@ -55,6 +55,13 @@ const ALLOWLIST = new Set([
   // changes, not a user-facing server function. No cross-tenant risk: queries
   // are scoped to the affected coach and team.
   "src/lib/coach-notify.functions.ts",
+  // supabaseAdmin y touche uniquement `weather_cache`, qui ne contient aucune
+  // donnée de tenant : des coordonnées arrondies et une prévision publique,
+  // sans club_id ni event_id. Sa clé dérive des coordonnées, pas d'un
+  // identifiant fourni par le client, donc rien à croiser entre tenants. Toutes
+  // les lectures d'événements et de lieux passent, elles, par context.supabase
+  // et restent soumises à RLS.
+  "src/lib/weather/weather.functions.ts",
 ]);
 
 // Only server-fn ENTRY POINTS (.functions.ts) are checked. Leaf .server.ts

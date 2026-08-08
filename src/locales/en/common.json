@@ -4919,5 +4919,17 @@
     "it": "Italian",
     "nl": "Dutch",
     "pt": "Portuguese"
+  },
+  "weather": {
+    "label": "Forecast",
+    "temperature": "{{value}}°",
+    "precipitationShort": "{{value}}%",
+    "windShort": "{{value}} km/h",
+    "alerts": {
+      "rain": "Rain expected at kick-off",
+      "wind": "Strong wind expected",
+      "cold": "Cold expected",
+      "heat": "High heat expected"
+    }
   }
 }

@@ -13,6 +13,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { assertClubRole } from "@/lib/authz.server";
+import { geocodeAddress } from "@/lib/geocode/geocode.server";
 
 // ---------------------------------------------------------------------------
 // Types
@@ -108,6 +109,19 @@ export const createVenue = createServerFn({ method: "POST" })
       clubId: data.clubId,
       allowedRoles: ["admin"],
     });
+    // Coordonnées : celles saisies à la main priment, sinon on géocode
+    // l'adresse. Best-effort — un échec laisse le lieu sans coordonnées, ce qui
+    // le prive seulement de la météo.
+    const coords =
+      data.latitude != null && data.longitude != null
+        ? { latitude: data.latitude, longitude: data.longitude }
+        : ((await geocodeAddress({
+            address: data.address,
+            city: data.city,
+            postalCode: data.postalCode,
+            country: data.country,
+          })) ?? null);
+
     const { data: row, error } = await context.supabase
       .from("club_venues")
       .insert({
@@ -117,8 +131,8 @@ export const createVenue = createServerFn({ method: "POST" })
         city: data.city ?? null,
         postal_code: data.postalCode ?? null,
         country: data.country ?? null,
-        latitude: data.latitude ?? null,
-        longitude: data.longitude ?? null,
+        latitude: coords?.latitude ?? null,
+        longitude: coords?.longitude ?? null,
         notes: data.notes ?? null,
         is_default: data.isDefault ?? false,
       })
@@ -171,6 +185,31 @@ export const updateVenue = createServerFn({ method: "POST" })
     if (data.country !== undefined) patch.country = data.country;
     if (data.latitude !== undefined) patch.latitude = data.latitude;
     if (data.longitude !== undefined) patch.longitude = data.longitude;
+
+    // L'adresse a changé sans que des coordonnées soient fournies : les
+    // anciennes ne valent plus rien, on regéocode. Si ça échoue, on les efface
+    // plutôt que de laisser un lieu pointer sur son adresse précédente.
+    const addressTouched =
+      data.address !== undefined || data.city !== undefined || data.postalCode !== undefined;
+    if (addressTouched && data.latitude === undefined && data.longitude === undefined) {
+      const { data: current } = await context.supabase
+        .from("club_venues")
+        .select("address, city, postal_code, country")
+        .eq("id", data.venueId)
+        .eq("club_id", data.clubId)
+        .maybeSingle();
+      const address = data.address ?? current?.address ?? "";
+      if (address) {
+        const geo = await geocodeAddress({
+          address,
+          city: data.city !== undefined ? data.city : current?.city,
+          postalCode: data.postalCode !== undefined ? data.postalCode : current?.postal_code,
+          country: data.country !== undefined ? data.country : current?.country,
+        });
+        patch.latitude = geo?.latitude ?? null;
+        patch.longitude = geo?.longitude ?? null;
+      }
+    }
     if (data.notes !== undefined) patch.notes = data.notes;
     if (data.isDefault !== undefined) patch.is_default = data.isDefault;
     const { error } = await context.supabase
