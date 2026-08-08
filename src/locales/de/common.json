@@ -897,6 +897,9 @@
     "inviteWholeTeam": "Einladen ({{count}})"
   },
   "events": {
+    "gameFormatLabel": "{{players}}er-{{sport}}",
+    "halvesShort": "{{periods}}×{{minutes}} Min.",
+    "bestOfShort": "Best of {{sets}}",
     "isOfficial": "Pflichtspiel",
     "isOfficialTournament": "Offizielles Turnier",
     "isOfficialTournamentDescription": "Ergebnisse und Spielerstatistiken werden in die Clubbilanz eingerechnet.",

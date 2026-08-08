@@ -84,6 +84,13 @@ import { EventWhenWhere } from "@/components/events/event-when-where";
 import { EventWeatherPanel } from "@/components/events/event-weather-panel";
 import { getEventsWeather } from "@/lib/weather/weather.functions";
 import { weatherAvailability } from "@/lib/weather/rules";
+import {
+  gameFormatPlayerCount,
+  parseBestOf,
+  parseGameFormat,
+  parseHalves,
+  upperFirst,
+} from "@/lib/events/game-format";
 import { EventDetailSkeleton } from "@/components/skeletons";
 import { UnavailableBadge, type UnavailableReason } from "@/components/unavailable-badge";
 // StaffAvailabilityForEvent moved to team availability page (fused into StaffAssignmentSection here).
@@ -2298,10 +2305,16 @@ function EventDetail() {
     return <EventDetailSkeleton />;
   }
 
+  // Le format de jeu est écrit en tête de la description par l'assistant de
+  // création, faute de colonne dédiée. On l'en retire ici pour le remonter en
+  // sous-titre : sa place est sous le nom du match, pas dans le bloc de texte
+  // libre entre les consignes du coach et les pièces jointes.
+  const gameFormat = parseGameFormat(event.description as string | null);
+
   // Parse an optional "Horaires:\n..." block from description to detect multi-day
   // events and to render a dedicated schedule block below.
   const parsedSchedule = (() => {
-    const raw = (event.description as string | null) ?? "";
+    const raw = gameFormat.rest;
     const m = raw.match(/(^|\n)Horaires:\s*\n?([\s\S]*?)(?=\n\n|$)/);
     if (!m) return { items: [] as { date: string; start: string; end: string }[], rest: raw };
     const items = m[2]
@@ -2356,14 +2369,40 @@ function EventDetail() {
     return event.title;
   })();
 
+  // « Football à 11 » plutôt que « Football » : quand le format est connu, il
+  // remplace le sport au lieu de s'y ajouter — les deux disent la même chose,
+  // le format en dit juste plus. Un format libre non reconnu s'affiche tel quel
+  // plutôt que de disparaître.
+  const sportLabel = eventTeam?.sport
+    ? t(`teams.sports.${eventTeam.sport}`, { defaultValue: eventTeam.sport })
+    : null;
+  const playerCount = gameFormatPlayerCount(gameFormat.format);
+  // `players` et non `count` : i18next réserve `count` à la pluralisation et
+  // irait chercher des variantes de clé qui n'existent pas.
+  const formatLabel =
+    playerCount && sportLabel
+      ? t("events.gameFormatLabel", { sport: sportLabel, players: playerCount })
+      : (gameFormat.format ?? sportLabel);
+
+  const halvesParts = parseHalves(gameFormat.halves);
+  const bestOf = parseBestOf(gameFormat.halves);
+  const halvesLabel = halvesParts
+    ? t("events.halvesShort", { periods: halvesParts.periods, minutes: halvesParts.minutes })
+    : bestOf
+      ? t("events.bestOfShort", { sets: bestOf })
+      : gameFormat.halves;
+
   const heroSubtitle = event
     ? [
-        fmt(event.starts_at, "EEEE d MMMM yyyy"),
-        eventTeam?.sport ? t(`sports.${eventTeam.sport}`, { defaultValue: eventTeam.sport }) : null,
+        // date-fns rend « samedi » en minuscules ; on ne relève que l'initiale,
+        // là où `capitalize` capitalisait aussi le mois — et transformerait
+        // « Football à 11 » en « Football À 11 ».
+        upperFirst(fmt(event.starts_at, "EEEE d MMMM yyyy")),
+        formatLabel && halvesLabel ? `${formatLabel} (${halvesLabel})` : formatLabel,
       ]
         .filter(Boolean)
         .map((part, i) => (
-          <span key={i} className="capitalize">
+          <span key={i}>
             {i > 0 && <span className="mr-1.5 opacity-45">·</span>}
             {part}
           </span>
@@ -2484,8 +2523,10 @@ function EventDetail() {
         weather={<EventWeatherPanel result={eventWeather} dateLocale={detailLocale} />}
       />
 
-      {/* Programme multi-jours, description et pièces jointes */}
-      {(event.description || parsedSchedule.items.length > 0 || attachmentList.length > 0) && (
+      {/* Programme multi-jours, description et pièces jointes. La condition
+          porte sur le texte restant, pas sur la description brute : une
+          description réduite à sa ligne « Format: » n'ouvre plus une carte vide. */}
+      {(parsedSchedule.rest || parsedSchedule.items.length > 0 || attachmentList.length > 0) && (
         <section className="space-y-3 rounded-2xl border border-border bg-card px-3.5 py-3">
           {parsedSchedule.items.length > 0 && (
             <div className="overflow-hidden rounded-xl border border-border">
