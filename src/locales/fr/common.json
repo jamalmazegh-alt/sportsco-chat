@@ -1223,7 +1223,8 @@
     "toConfirm": "À confirmer",
     "calledUp": "Convoqué",
     "pendingShort": "{{count}} en attente",
-    "showAll": "Voir les {{count}} joueurs"
+    "showAll": "Voir les {{count}} joueurs",
+    "addPlayers": "Ajouter"
   },
   "stats": {
     "title": "Statistiques",

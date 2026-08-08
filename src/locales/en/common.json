@@ -1223,7 +1223,8 @@
     "toConfirm": "To confirm",
     "calledUp": "Called up",
     "pendingShort": "{{count}} pending",
-    "showAll": "Show all {{count}} players"
+    "showAll": "Show all {{count}} players",
+    "addPlayers": "Add"
   },
   "stats": {
     "title": "Stats",

@@ -3499,6 +3499,78 @@ function EventDetail() {
                           </span>
                         )}
                       </div>
+                      {isCoach && event.status !== "cancelled" && (
+                        <div className="flex items-center gap-1 shrink-0">
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="h-7 w-7 text-muted-foreground"
+                              >
+                                <MoreVertical className="h-4 w-4" />
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end" className="w-56">
+                              {counts.pending > 0 && (
+                                <DropdownMenuItem onClick={remindAllPending}>
+                                  <Bell className="h-4 w-4" /> {t("attendance.remindAll")}
+                                </DropdownMenuItem>
+                              )}
+                              {teamPlayers && teamPlayers.length > (convocations?.length ?? 0) && (
+                                <DropdownMenuItem onClick={() => openPicker()}>
+                                  <UserPlus className="h-4 w-4" /> {t("attendance.addMorePlayers")}
+                                </DropdownMenuItem>
+                              )}
+                              <DropdownMenuSeparator />
+                              <DropdownMenuItem onClick={toggleLock}>
+                                {event.responses_locked ? (
+                                  <>
+                                    <Unlock className="h-4 w-4" /> {t("attendance.unlockResponses")}
+                                  </>
+                                ) : (
+                                  <>
+                                    <Lock className="h-4 w-4" /> {t("attendance.lockResponses")}
+                                  </>
+                                )}
+                              </DropdownMenuItem>
+                              <DropdownMenuItem
+                                onClick={() => {
+                                  const rows = (convocations ?? []).map((c: any) => ({
+                                    last_name: c.players?.last_name ?? "",
+                                    first_name: c.players?.first_name ?? "",
+                                    jersey_number: c.players?.jersey_number ?? "",
+                                    status: c.status,
+                                    comment: c.comment ?? "",
+                                  }));
+                                  const csv = toCsv(rows, [
+                                    {
+                                      key: "last_name",
+                                      header: t("players.lastName"),
+                                    },
+                                    {
+                                      key: "first_name",
+                                      header: t("players.firstName"),
+                                    },
+                                    { key: "jersey_number", header: "#" },
+                                    {
+                                      key: "status",
+                                      header: t("attendance.status"),
+                                    },
+                                    {
+                                      key: "comment",
+                                      header: t("common.comment"),
+                                    },
+                                  ]);
+                                  downloadCsv(`${event.title}-attendance`, csv);
+                                }}
+                              >
+                                <Download className="h-4 w-4" /> {t("common.exportCsv")}
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
+                        </div>
+                      )}
                     </div>
 
                     {/* Taux de réponse */}
@@ -3844,15 +3916,29 @@ function EventDetail() {
                   const shown = truncate ? sortedConvocations.slice(0, 4) : sortedConvocations;
                   return (
                     <>
-                      <div className="px-4 pt-4 pb-2 flex items-center justify-between gap-2">
+                      <div className="flex items-center justify-between gap-2 px-4 pb-2 pt-4">
                         <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-muted-foreground">
                           {t("attendance.convokedPlayers")}
                         </p>
-                        {isCoach && (
-                          <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-muted-foreground/70 pr-11">
-                            {t("attendance.response")}
-                          </p>
-                        )}
+                        {/* Convoquer un joueur de plus n'existait que dans le
+                            menu « ⋮ » de l'en-tête, où personne ne le trouvait.
+                            L'action reste dans le menu, avec le verrouillage et
+                            l'export ; elle gagne ici un accès direct, au-dessus
+                            de la liste où l'on constate justement qu'il manque
+                            quelqu'un. */}
+                        {isCoach &&
+                          event.status !== "cancelled" &&
+                          teamPlayers &&
+                          teamPlayers.length > (convocations?.length ?? 0) && (
+                            <button
+                              type="button"
+                              onClick={() => openPicker()}
+                              className="inline-flex shrink-0 items-center gap-1 rounded-full border border-primary/30 bg-primary/10 px-2.5 py-1 text-[11px] font-bold text-primary transition-colors hover:bg-primary/16"
+                            >
+                              <UserPlus className="h-3.5 w-3.5" />
+                              {t("attendance.addPlayers")}
+                            </button>
+                          )}
                       </div>
 
                       <ul className="px-2 pb-2">

@@ -1223,7 +1223,8 @@
     "toConfirm": "Te bevestigen",
     "calledUp": "Opgeroepen",
     "pendingShort": "{{count}} in afwachting",
-    "showAll": "Alle {{count}} spelers tonen"
+    "showAll": "Alle {{count}} spelers tonen",
+    "addPlayers": "Toevoegen"
   },
   "stats": {
     "title": "Statistieken",

@@ -1228,7 +1228,8 @@
     "toConfirm": "Zu bestätigen",
     "calledUp": "Nominiert",
     "pendingShort": "{{count}} ausstehend",
-    "showAll": "Alle {{count}} Spieler anzeigen"
+    "showAll": "Alle {{count}} Spieler anzeigen",
+    "addPlayers": "Hinzufügen"
   },
   "stats": {
     "title": "Statistiken",
