@@ -3014,13 +3014,7 @@
       "noFacilitiesHint": "Aucun terrain configuré pour ce site.",
       "noFacilityOption": "Aucun terrain"
     },
-    "surfacePlaceholder": "Gazon, synthétique, parquet…",
-    "geocode": {
-      "action": "Géolocaliser ({{count}})",
-      "done": "{{count}} lieu(x) géolocalisé(s)",
-      "partial": "{{count}} géolocalisé(s), {{failed}} en échec",
-      "nothingToDo": "Tous les lieux sont déjà géolocalisés"
-    }
+    "surfacePlaceholder": "Gazon, synthétique, parquet…"
   },
   "callUpList": {
     "masked": "Liste masquée",
@@ -4173,6 +4167,21 @@
     "tournamentDrawHint": "Push aux équipes inscrites dès la publication des poules."
   },
   "superadmin": {
+    "venueGeocode": {
+      "title": "Géolocalisation des lieux",
+      "hint": "Résout les coordonnées des lieux de club qui n'en ont pas encore. Sans coordonnées, aucune météo ne s'affiche sur les événements qui s'y déroulent.",
+      "loading": "Analyse des lieux…",
+      "allResolved": "✓ Les {{count}} lieux enregistrés sont géolocalisés",
+      "missingCount": "{{count}} lieu(x) sans coordonnées sur {{total}}",
+      "action": "Géolocaliser les lieux manquants",
+      "running": "Géolocalisation…",
+      "done": "{{count}} lieu(x) géolocalisé(s)",
+      "partial": "{{count}} géolocalisé(s), {{failed}} en échec",
+      "nothingToDo": "Tous les lieux sont déjà géolocalisés",
+      "unresolvedTitle": "Adresses non résolues",
+      "unresolvedHint": "Le géocodeur n'a rien trouvé pour ces adresses — elles doivent être corrigées dans l'administration du club concerné.",
+      "noAddress": "aucune adresse renseignée"
+    },
     "brand": "Super Admin",
     "brandInternal": "Clubero • Interne",
     "signOut": "Déconnexion",

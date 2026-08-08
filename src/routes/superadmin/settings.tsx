@@ -5,6 +5,7 @@ import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { Bell, Loader2 } from "lucide-react";
 import { dispatchSuperadminTestPush } from "@/lib/superadmin-push-test.functions";
+import { VenueGeocodePanel } from "@/components/superadmin/VenueGeocodePanel";
 
 export const Route = createFileRoute("/superadmin/settings")({
   component: SettingsPage,
@@ -154,6 +155,8 @@ function SettingsPage() {
           </div>
         )}
       </section>
+
+      <VenueGeocodePanel />
     </div>
   );
 }

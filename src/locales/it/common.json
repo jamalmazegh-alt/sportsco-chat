@@ -3014,13 +3014,7 @@
       "noFacilitiesHint": "Nessun campo configurato.",
       "noFacilityOption": "Nessun campo"
     },
-    "surfacePlaceholder": "Erba, sintetico, parquet…",
-    "geocode": {
-      "action": "Geolocalizza ({{count}})",
-      "done": "{{count}} luogo/luoghi geolocalizzati",
-      "partial": "{{count}} geolocalizzati, {{failed}} falliti",
-      "nothingToDo": "Tutti i luoghi sono già geolocalizzati"
-    }
+    "surfacePlaceholder": "Erba, sintetico, parquet…"
   },
   "callUpList": {
     "masked": "Elenco nascosto",
@@ -4173,6 +4167,21 @@
     "tournamentDrawHint": "Push alle squadre iscritte alla pubblicazione dei gironi."
   },
   "superadmin": {
+    "venueGeocode": {
+      "title": "Geolocalizzazione dei luoghi",
+      "hint": "Risolve le coordinate dei luoghi del club che ancora non le hanno. Senza coordinate, il meteo non viene mostrato sugli eventi che vi si svolgono.",
+      "loading": "Analisi dei luoghi…",
+      "allResolved": "✓ Tutti i {{count}} luoghi sono geolocalizzati",
+      "missingCount": "{{count}} luogo/luoghi senza coordinate su {{total}}",
+      "action": "Geolocalizza i luoghi mancanti",
+      "running": "Geolocalizzazione…",
+      "done": "{{count}} luogo/luoghi geolocalizzati",
+      "partial": "{{count}} geolocalizzati, {{failed}} non riusciti",
+      "nothingToDo": "Tutti i luoghi sono già geolocalizzati",
+      "unresolvedTitle": "Indirizzi non risolti",
+      "unresolvedHint": "Il geocoder non ha trovato nulla per questi indirizzi: vanno corretti nell'amministrazione del club interessato.",
+      "noAddress": "nessun indirizzo indicato"
+    },
     "brand": "Super Admin",
     "brandInternal": "Clubero • Interno",
     "signOut": "Esci",

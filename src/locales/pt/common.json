@@ -3014,13 +3014,7 @@
       "noFacilitiesHint": "Nenhum campo configurado.",
       "noFacilityOption": "Sem tribunal"
     },
-    "surfacePlaceholder": "Relvado, sintético, soalho…",
-    "geocode": {
-      "action": "Localizar ({{count}})",
-      "done": "{{count}} local(is) localizado(s)",
-      "partial": "{{count}} localizado(s), {{failed}} falharam",
-      "nothingToDo": "Todos os locais já estão localizados"
-    }
+    "surfacePlaceholder": "Relvado, sintético, soalho…"
   },
   "callUpList": {
     "masked": "Lista oculta",
@@ -4173,6 +4167,21 @@
     "tournamentDrawHint": "Push às equipas inscritas quando os grupos são publicados."
   },
   "superadmin": {
+    "venueGeocode": {
+      "title": "Geolocalização dos locais",
+      "hint": "Resolve as coordenadas dos locais do clube que ainda não as têm. Sem coordenadas, não é apresentada meteorologia nos eventos realizados aí.",
+      "loading": "A analisar os locais…",
+      "allResolved": "✓ Os {{count}} locais registados estão geolocalizados",
+      "missingCount": "{{count}} local(is) sem coordenadas em {{total}}",
+      "action": "Geolocalizar os locais em falta",
+      "running": "A geolocalizar…",
+      "done": "{{count}} local(is) geolocalizado(s)",
+      "partial": "{{count}} geolocalizado(s), {{failed}} com erro",
+      "nothingToDo": "Todos os locais já estão geolocalizados",
+      "unresolvedTitle": "Endereços não resolvidos",
+      "unresolvedHint": "O geocodificador não encontrou nada para estes endereços — devem ser corrigidos na administração do clube em causa.",
+      "noAddress": "sem endereço"
+    },
     "brand": "Super Admin",
     "brandInternal": "Clubero • Interno",
     "signOut": "Terminar sessão",
