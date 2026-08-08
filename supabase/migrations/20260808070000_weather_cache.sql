@@ -9,8 +9,12 @@
 -- arrondies et une prévision publique. Elle n'est ni lue ni écrite par les
 -- clients — seule la server function y accède, via la clé service_role — donc
 -- RLS est activée sans aucune policy pour `authenticated`, ce qui refuse tout.
+--
+-- Tout est idempotent : la table peut être créée à la main dans l'éditeur SQL
+-- avant qu'un `supabase db push` ne rejoue ce fichier, sans que le second
+-- échoue sur un objet déjà présent.
 
-CREATE TABLE public.weather_cache (
+CREATE TABLE IF NOT EXISTS public.weather_cache (
   cache_key text PRIMARY KEY,
   latitude double precision NOT NULL,
   longitude double precision NOT NULL,
@@ -20,8 +24,8 @@ CREATE TABLE public.weather_cache (
 );
 
 -- Purge des entrées périmées : on balaie par date, jamais par clé.
-CREATE INDEX weather_cache_forecast_date_idx ON public.weather_cache (forecast_date);
-CREATE INDEX weather_cache_fetched_at_idx ON public.weather_cache (fetched_at);
+CREATE INDEX IF NOT EXISTS weather_cache_forecast_date_idx ON public.weather_cache (forecast_date);
+CREATE INDEX IF NOT EXISTS weather_cache_fetched_at_idx ON public.weather_cache (fetched_at);
 
 ALTER TABLE public.weather_cache ENABLE ROW LEVEL SECURITY;
 
