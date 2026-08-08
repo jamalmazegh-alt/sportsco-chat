@@ -3497,151 +3497,52 @@ function EventDetail() {
             // === A. HEADER ===
             if (event.convocations_sent) {
               return (
-                <div className="relative overflow-hidden bg-gradient-to-br from-[#0f4a26] via-[#1d7a45] to-[#2d9d5f] text-white">
-                  <svg
-                    className="pointer-events-none absolute inset-0 h-full w-full opacity-[0.10]"
-                    aria-hidden="true"
-                  >
-                    <defs>
-                      <pattern
-                        id="presences-diag"
-                        width="14"
-                        height="14"
-                        patternUnits="userSpaceOnUse"
-                        patternTransform="rotate(45)"
-                      >
-                        <line x1="0" y1="0" x2="0" y2="14" stroke="white" strokeWidth="1" />
-                      </pattern>
-                    </defs>
-                    <rect width="100%" height="100%" fill="url(#presences-diag)" />
-                  </svg>
-                  <div className="pointer-events-none absolute -top-16 -right-16 h-44 w-44 rounded-full bg-white/20 blur-3xl" />
-
-                  <div className="relative px-4 pt-3 pb-3.5">
-                    {/* Title row + team badge + actions */}
-                    <div className="flex items-start justify-between gap-3 mb-2.5">
-                      <div className="min-w-0">
-                        <div className="flex items-center gap-2 flex-wrap">
-                          <h2 className="text-sm font-extrabold tracking-tight">
-                            {t("attendance.title")}
-                          </h2>
-                          {teamName && (
-                            <span className="inline-flex items-center rounded-full bg-white/15 ring-1 ring-white/25 px-2 py-0.5 text-[10px] font-semibold tracking-wide backdrop-blur-sm">
-                              {teamName}
-                            </span>
-                          )}
-                          {event.responses_locked && (
-                            <span className="inline-flex items-center gap-1 rounded-full bg-amber-300/20 ring-1 ring-amber-200/40 px-2 py-0.5 text-[10px] font-semibold text-amber-100">
-                              <Lock className="h-3 w-3" /> {t("attendance.locked")}
-                            </span>
-                          )}
-                          {convocChanges.length > 0 && (
-                            <span className="inline-flex items-center rounded-full bg-amber-300/90 text-amber-950 px-2 py-0.5 text-[10px] font-bold">
-                              {t("events.resend.updatesBadge", {
-                                count: convocChanges.length,
-                              })}
-                            </span>
-                          )}
-                        </div>
+                <div className="border-b border-border/60">
+                  <div className="px-4 pb-3 pt-3">
+                    {/* Titre + équipe + badges */}
+                    <div className="mb-2.5 flex items-start justify-between gap-3">
+                      <div className="flex min-w-0 flex-wrap items-center gap-2">
+                        <h2 className="text-sm font-extrabold tracking-tight">
+                          {t("attendance.title")}
+                        </h2>
+                        {teamName && (
+                          <span className="inline-flex items-center rounded-full border border-border bg-muted px-2 py-0.5 text-[10px] font-semibold text-muted-foreground">
+                            {teamName}
+                          </span>
+                        )}
+                        {event.responses_locked && (
+                          <span className="inline-flex items-center gap-1 rounded-full border border-amber-500/30 bg-amber-500/15 px-2 py-0.5 text-[10px] font-semibold text-amber-700 dark:text-amber-300">
+                            <Lock className="h-3 w-3" /> {t("attendance.locked")}
+                          </span>
+                        )}
+                        {convocChanges.length > 0 && (
+                          <span className="inline-flex items-center rounded-full border border-amber-500/40 bg-amber-500/20 px-2 py-0.5 text-[10px] font-bold text-amber-700 dark:text-amber-300">
+                            {t("events.resend.updatesBadge", { count: convocChanges.length })}
+                          </span>
+                        )}
                       </div>
-                      {isCoach && event.status !== "cancelled" && (
-                        <div className="flex items-center gap-1 shrink-0">
-                          <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                              <Button
-                                variant="ghost"
-                                size="icon"
-                                className="h-7 w-7 text-white hover:bg-white/15 hover:text-white"
-                              >
-                                <MoreVertical className="h-4 w-4" />
-                              </Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end" className="w-56">
-                              {counts.pending > 0 && (
-                                <DropdownMenuItem onClick={remindAllPending}>
-                                  <Bell className="h-4 w-4" /> {t("attendance.remindAll")}
-                                </DropdownMenuItem>
-                              )}
-                              {teamPlayers && teamPlayers.length > (convocations?.length ?? 0) && (
-                                <DropdownMenuItem onClick={() => openPicker()}>
-                                  <UserPlus className="h-4 w-4" /> {t("attendance.addMorePlayers")}
-                                </DropdownMenuItem>
-                              )}
-                              <DropdownMenuSeparator />
-                              <DropdownMenuItem onClick={toggleLock}>
-                                {event.responses_locked ? (
-                                  <>
-                                    <Unlock className="h-4 w-4" /> {t("attendance.unlockResponses")}
-                                  </>
-                                ) : (
-                                  <>
-                                    <Lock className="h-4 w-4" /> {t("attendance.lockResponses")}
-                                  </>
-                                )}
-                              </DropdownMenuItem>
-                              <DropdownMenuItem
-                                onClick={() => {
-                                  const rows = (convocations ?? []).map((c: any) => ({
-                                    last_name: c.players?.last_name ?? "",
-                                    first_name: c.players?.first_name ?? "",
-                                    jersey_number: c.players?.jersey_number ?? "",
-                                    status: c.status,
-                                    comment: c.comment ?? "",
-                                  }));
-                                  const csv = toCsv(rows, [
-                                    {
-                                      key: "last_name",
-                                      header: t("players.lastName"),
-                                    },
-                                    {
-                                      key: "first_name",
-                                      header: t("players.firstName"),
-                                    },
-                                    { key: "jersey_number", header: "#" },
-                                    {
-                                      key: "status",
-                                      header: t("attendance.status"),
-                                    },
-                                    {
-                                      key: "comment",
-                                      header: t("common.comment"),
-                                    },
-                                  ]);
-                                  downloadCsv(`${event.title}-attendance`, csv);
-                                }}
-                              >
-                                <Download className="h-4 w-4" /> {t("common.exportCsv")}
-                              </DropdownMenuItem>
-                            </DropdownMenuContent>
-                          </DropdownMenu>
-                        </div>
-                      )}
                     </div>
 
-                    {/* Rate + responded */}
-                    <div className="flex items-end justify-between gap-3 mb-2">
+                    {/* Taux de réponse */}
+                    <div className="mb-2 flex items-end justify-between gap-3">
                       <div className="leading-none">
                         <div className="flex items-baseline gap-1">
-                          <span className="text-[32px] font-black tabular-nums tracking-[-0.04em] leading-none">
+                          <span className="font-display text-[34px] font-bold leading-none tracking-[-0.03em] tabular-nums">
                             {rate}
                           </span>
-                          <span className="text-lg font-bold text-white/80">%</span>
+                          <span className="text-base font-bold text-muted-foreground">%</span>
                         </div>
-                        <p className="text-[9px] uppercase tracking-[0.16em] text-white/70 font-bold mt-1">
+                        <p className="mt-1.5 text-[9.5px] font-bold uppercase tracking-[0.13em] text-muted-foreground">
                           {t("attendance.responseRate")}
                         </p>
                       </div>
-                      <div className="text-right leading-tight">
-                        <p className="text-xs font-bold tabular-nums">
-                          {respondedP}
-                          <span className="text-white/65 font-medium">/{totalP}</span>{" "}
-                          <span className="text-white/85 font-semibold">
-                            {t("attendance.responded")}
-                          </span>
+                      <div className="text-right text-xs leading-tight text-muted-foreground">
+                        <p className="tabular-nums">
+                          <span className="font-bold text-foreground">{respondedP}</span>/{totalP}{" "}
+                          {t("attendance.responded")}
                         </p>
                         {counts.pending > 0 && (
-                          <p className="text-[10px] text-white/70 mt-0.5">
-                            ·{" "}
+                          <p className="mt-0.5 text-[11px]">
                             {t("attendance.pendingShort", {
                               defaultValue: "{{count}} en attente",
                               count: counts.pending,
@@ -3651,67 +3552,80 @@ function EventDetail() {
                       </div>
                     </div>
 
-                    {/* Progress bar */}
-                    <div className="relative h-[3px] w-full overflow-hidden rounded-full bg-white/15 flex">
+                    {/* Barre empilée — 2 px de fond entre les segments, sans quoi
+                        deux parts voisines se lisent comme un seul bloc. La piste
+                        porte les non-répondants : ils ne sont pas une quatrième
+                        valeur, ils sont ce qui reste. */}
+                    <div
+                      className="flex h-[7px] gap-0.5 overflow-hidden rounded-full bg-muted"
+                      role="img"
+                      aria-label={[
+                        `${counts.present} ${t("attendance.present")}`,
+                        `${counts.uncertain} ${t("attendance.uncertain")}`,
+                        `${counts.absent} ${t("attendance.absent")}`,
+                        `${counts.pending} ${t("attendance.pending")}`,
+                      ].join(" · ")}
+                    >
                       {counts.present > 0 && (
                         <div
                           style={{ width: `${pct(counts.present)}%` }}
-                          className="bg-gradient-to-r from-emerald-300 to-emerald-200 transition-all"
+                          className="rounded-full bg-present"
                         />
                       )}
                       {counts.uncertain > 0 && (
                         <div
                           style={{ width: `${pct(counts.uncertain)}%` }}
-                          className="bg-gradient-to-r from-amber-300 to-amber-200 transition-all"
+                          className="rounded-full bg-uncertain"
                         />
                       )}
                       {counts.absent > 0 && (
                         <div
                           style={{ width: `${pct(counts.absent)}%` }}
-                          className="bg-gradient-to-r from-rose-300 to-rose-200 transition-all"
+                          className="rounded-full bg-absent"
                         />
                       )}
                     </div>
 
-                    {/* 4 stat blocks */}
-                    <div className="grid grid-cols-4 gap-1.5 mt-2.5">
+                    {/* Quatre compteurs — la pastille de couleur ne porte jamais
+                        l'information seule, le chiffre est écrit à côté. */}
+                    <div className="mt-2.5 grid grid-cols-4 gap-1.5">
                       {[
                         {
                           key: "present",
                           val: counts.present,
                           label: t("attendance.present"),
-                          tone: "bg-emerald-300",
+                          tone: "bg-present",
                         },
                         {
                           key: "uncertain",
                           val: counts.uncertain,
                           label: t("attendance.uncertain"),
-                          tone: "bg-amber-300",
+                          tone: "bg-uncertain",
                         },
                         {
                           key: "absent",
                           val: counts.absent,
                           label: t("attendance.absent"),
-                          tone: "bg-rose-300",
+                          tone: "bg-absent",
                         },
                         {
                           key: "pending",
                           val: counts.pending,
                           label: t("attendance.pending"),
-                          tone: "bg-white/60",
+                          tone: "bg-muted-foreground/40",
                         },
                       ].map((b) => (
                         <div
                           key={b.key}
-                          className="rounded-xl bg-white/10 backdrop-blur-sm ring-1 ring-white/15 px-1.5 py-1.5 text-center"
+                          className="rounded-xl border border-border px-1.5 py-1.5 text-center"
                         >
-                          <div className="flex items-center justify-center gap-1">
+                          <div className="flex items-center justify-center gap-1.5">
                             <span className={cn("h-1.5 w-1.5 rounded-full", b.tone)} />
-                            <span className="text-sm font-extrabold tabular-nums leading-none">
+                            <span className="font-display text-[15px] font-bold leading-none tabular-nums">
                               {b.val}
                             </span>
                           </div>
-                          <p className="text-[9px] uppercase tracking-wider text-white/75 font-semibold mt-0.5 truncate">
+                          <p className="mt-1 truncate text-[9px] font-bold uppercase tracking-wider text-muted-foreground">
                             {b.label}
                           </p>
                         </div>
