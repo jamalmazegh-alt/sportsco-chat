@@ -3019,13 +3019,7 @@
       "noFacilitiesHint": "Kein Platz konfiguriert.",
       "noFacilityOption": "Kein Gericht"
     },
-    "surfacePlaceholder": "Rasen, Kunstrasen, Parkett…",
-    "geocode": {
-      "action": "Verorten ({{count}})",
-      "done": "{{count}} Ort(e) verortet",
-      "partial": "{{count}} verortet, {{failed}} fehlgeschlagen",
-      "nothingToDo": "Alle Orte sind bereits verortet"
-    }
+    "surfacePlaceholder": "Rasen, Kunstrasen, Parkett…"
   },
   "callUpList": {
     "masked": "Liste verborgen",
@@ -4178,6 +4172,21 @@
     "tournamentDrawHint": "Push an gemeldete Teams bei Veröffentlichung der Gruppen."
   },
   "superadmin": {
+    "venueGeocode": {
+      "title": "Standort-Geolokalisierung",
+      "hint": "Ermittelt die Koordinaten der Vereinsstandorte, die noch keine haben. Ohne Koordinaten wird bei den dortigen Terminen kein Wetter angezeigt.",
+      "loading": "Standorte werden geprüft…",
+      "allResolved": "✓ Alle {{count}} Standorte sind geolokalisiert",
+      "missingCount": "{{count}} Standort(e) ohne Koordinaten von {{total}}",
+      "action": "Fehlende Standorte geolokalisieren",
+      "running": "Geolokalisierung…",
+      "done": "{{count}} Standort(e) geolokalisiert",
+      "partial": "{{count}} geolokalisiert, {{failed}} fehlgeschlagen",
+      "nothingToDo": "Alle Standorte sind bereits geolokalisiert",
+      "unresolvedTitle": "Nicht aufgelöste Adressen",
+      "unresolvedHint": "Der Geocoder hat zu diesen Adressen nichts gefunden — sie müssen in der Verwaltung des betroffenen Vereins korrigiert werden.",
+      "noAddress": "keine Adresse hinterlegt"
+    },
     "brand": "Super Admin",
     "brandInternal": "Clubero • Intern",
     "signOut": "Abmelden",

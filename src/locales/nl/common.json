@@ -3014,13 +3014,7 @@
       "noFacilitiesHint": "Geen veld geconfigureerd.",
       "noFacilityOption": "Geen veld"
     },
-    "surfacePlaceholder": "Gras, kunstgras, parket…",
-    "geocode": {
-      "action": "Lokaliseren ({{count}})",
-      "done": "{{count}} locatie(s) gelokaliseerd",
-      "partial": "{{count}} gelokaliseerd, {{failed}} mislukt",
-      "nothingToDo": "Alle locaties zijn al gelokaliseerd"
-    }
+    "surfacePlaceholder": "Gras, kunstgras, parket…"
   },
   "callUpList": {
     "masked": "Lijst verborgen",
@@ -4173,6 +4167,21 @@
     "tournamentDrawHint": "Push naar ingeschreven teams bij publicatie van de poules."
   },
   "superadmin": {
+    "venueGeocode": {
+      "title": "Geolocatie van locaties",
+      "hint": "Bepaalt de coördinaten van clublocaties die er nog geen hebben. Zonder coördinaten wordt er geen weer getoond bij evenementen die daar plaatsvinden.",
+      "loading": "Locaties analyseren…",
+      "allResolved": "✓ Alle {{count}} locaties zijn gelokaliseerd",
+      "missingCount": "{{count}} locatie(s) zonder coördinaten van {{total}}",
+      "action": "Ontbrekende locaties lokaliseren",
+      "running": "Lokaliseren…",
+      "done": "{{count}} locatie(s) gelokaliseerd",
+      "partial": "{{count}} gelokaliseerd, {{failed}} mislukt",
+      "nothingToDo": "Alle locaties zijn al gelokaliseerd",
+      "unresolvedTitle": "Niet-herkende adressen",
+      "unresolvedHint": "De geocoder vond niets voor deze adressen — corrigeer ze in het beheer van de betreffende club.",
+      "noAddress": "geen adres ingevuld"
+    },
     "brand": "Super Admin",
     "brandInternal": "Clubero • Intern",
     "signOut": "Uitloggen",

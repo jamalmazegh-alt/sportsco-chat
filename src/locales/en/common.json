@@ -3014,13 +3014,7 @@
       "noFacilitiesHint": "No field configured for this site.",
       "noFacilityOption": "No court"
     },
-    "surfacePlaceholder": "Grass, synthetic, parquet…",
-    "geocode": {
-      "action": "Locate ({{count}})",
-      "done": "{{count}} venue(s) located",
-      "partial": "{{count}} located, {{failed}} failed",
-      "nothingToDo": "All venues are already located"
-    }
+    "surfacePlaceholder": "Grass, synthetic, parquet…"
   },
   "callUpList": {
     "masked": "List hidden",
@@ -4173,6 +4167,21 @@
     "tournamentDrawHint": "Push to registered teams when pools are published."
   },
   "superadmin": {
+    "venueGeocode": {
+      "title": "Venue geolocation",
+      "hint": "Resolves coordinates for club venues that don't have any yet. Without coordinates, no weather is shown on events held there.",
+      "loading": "Scanning venues…",
+      "allResolved": "✓ All {{count}} venues are geolocated",
+      "missingCount": "{{count}} venue(s) without coordinates out of {{total}}",
+      "action": "Geolocate missing venues",
+      "running": "Geolocating…",
+      "done": "{{count}} venue(s) geolocated",
+      "partial": "{{count}} geolocated, {{failed}} failed",
+      "nothingToDo": "All venues are already geolocated",
+      "unresolvedTitle": "Unresolved addresses",
+      "unresolvedHint": "The geocoder found nothing for these addresses — they need to be corrected in the club's own admin settings.",
+      "noAddress": "no address set"
+    },
     "brand": "Super Admin",
     "brandInternal": "Clubero • Internal",
     "signOut": "Sign out",
