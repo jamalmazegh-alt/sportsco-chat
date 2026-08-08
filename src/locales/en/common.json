@@ -897,6 +897,9 @@
     "inviteWholeTeam": "Invite ({{count}})"
   },
   "events": {
+    "gameFormatLabel": "{{players}}-a-side {{sport}}",
+    "halvesShort": "{{periods}}×{{minutes}} min",
+    "bestOfShort": "Best of {{sets}}",
     "isOfficial": "Official match",
     "isOfficialTournament": "Official tournament",
     "isOfficialTournamentDescription": "Results and player statistics will be counted in the club's records.",

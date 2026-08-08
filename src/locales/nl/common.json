@@ -897,6 +897,9 @@
     "inviteWholeTeam": "Uitnodigen ({{count}})"
   },
   "events": {
+    "gameFormatLabel": "{{players}}-tal {{sport}}",
+    "halvesShort": "{{periods}}×{{minutes}} min",
+    "bestOfShort": "Best of {{sets}}",
     "isOfficial": "Officiële wedstrijd",
     "isOfficialTournament": "Officieel toernooi",
     "isOfficialTournamentDescription": "Resultaten en spelersstatistieken worden meegeteld in de clubhistorie.",
