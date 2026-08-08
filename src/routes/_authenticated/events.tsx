@@ -16,31 +16,13 @@ import {
   type EventsFilters,
 } from "@/components/events/EventsFilterSheet";
 
-import {
-  Calendar,
-  Plus,
-  Users,
-  Trophy,
-  Dumbbell,
-  BellRing,
-  Home,
-  Plane,
-  List,
-  CalendarDays,
-  Ban,
-  Clock,
-  Search,
-  Send,
-} from "lucide-react";
+import { Calendar, Plus, Dumbbell, BellRing, List, CalendarDays, Search } from "lucide-react";
 import { EventCreateChooser } from "@/components/events/EventCreateChooser";
 import { EmptyState } from "@/components/empty-state";
-import { ConvocationBand } from "@/components/convocation-band";
+import { EventCard } from "@/components/events/event-card";
+import { getEventsWeather } from "@/lib/weather/weather.functions";
+import { weatherAvailability } from "@/lib/weather/rules";
 import {
-  ConvocationResponseBadge,
-  type ConvocationResponse,
-} from "@/components/convocation-response-badge";
-import {
-  ConvocationSummaryPill,
   buildConvocationCounts,
   type ConvocationCounts,
 } from "@/components/convocation-summary-pill";
@@ -62,14 +44,6 @@ function EventsRoute() {
   if (pathname !== "/events") return <Outlet />;
   return <EventsPage />;
 }
-
-const TYPE_ICONS: Record<string, typeof Calendar> = {
-  training: Dumbbell,
-  match: Trophy,
-  tournament: Trophy,
-  meeting: Users,
-  other: Calendar,
-};
 
 function EventsPage() {
   const { t, i18n } = useTranslation();
@@ -131,7 +105,7 @@ function EventsPage() {
       let q = supabase
         .from("events")
         .select(
-          "id, title, starts_at, location, type, status, team_id, opponent, competition_type, competition_name, is_home, convocations_sent",
+          "id, title, starts_at, ends_at, location, type, status, team_id, opponent, competition_type, competition_name, is_home, convocations_sent",
         )
         .in("team_id", teamIds)
         .is("deleted_at", null)
@@ -318,6 +292,34 @@ function EventsPage() {
   });
   const convocSentSet = convocStats?.sent;
 
+  // Météo — un seul appel pour toutes les cartes éligibles. Les événements hors
+  // horizon, passés, annulés ou sans lieu géolocalisé sont écartés côté client
+  // pour ne pas les envoyer au serveur pour rien.
+  const weatherEventIds = useMemo(() => {
+    const now = new Date();
+    return (baseVisibleEvents ?? [])
+      .filter(
+        (e) =>
+          // On envoie tout ce qui n'est ni passé ni annulé, y compris au-delà de
+          // l'horizon : c'est le serveur qui décide du message, et lui seul
+          // connaît les coordonnées du lieu.
+          weatherAvailability(
+            { status: e.status, startsAt: new Date(e.starts_at), latitude: 1, longitude: 1 },
+            now,
+          ) !== "silent",
+      )
+      .map((e) => e.id)
+      .slice(0, 100);
+  }, [baseVisibleEvents]);
+
+  const { data: weatherByEvent } = useQuery({
+    queryKey: ["events-weather", weatherEventIds],
+    enabled: weatherEventIds.length > 0,
+    queryFn: () => getEventsWeather({ data: { eventIds: weatherEventIds } }),
+    // La prévision bouge lentement ; le cache serveur a lui-même un TTL de 3 h.
+    staleTime: 30 * 60_000,
+  });
+
   const visibleEvents = useMemo(() => {
     if (filters.convocationsSent === "all") return baseVisibleEvents;
     return baseVisibleEvents.filter((e) => {
@@ -394,207 +396,17 @@ function EventsPage() {
   }, [events, selectedDay]);
 
   function renderEventItem(e: NonNullable<typeof events>[number]) {
-    const Icon = TYPE_ICONS[e.type] ?? Calendar;
-    const d = new Date(e.starts_at);
-    const past = isPast(d) && !isToday(d);
-    const isCancelled = e.status === "cancelled";
-    let outcome: "win" | "loss" | "draw" | null = null;
-    if (e.type === "match" && e.result) {
-      const ourSide = e.is_home === false ? "away" : "home";
-      const ours = ourSide === "home" ? e.result.home_score : e.result.away_score;
-      const theirs = ourSide === "home" ? e.result.away_score : e.result.home_score;
-      outcome = ours > theirs ? "win" : ours < theirs ? "loss" : "draw";
-    }
-    const isLoss = outcome === "loss";
     return (
-      <li key={e.id}>
-        <Link
-          to="/events/$eventId"
-          params={{ eventId: e.id }}
-          className={cn(
-            "flex items-stretch gap-3 rounded-2xl border bg-card overflow-hidden active:scale-[0.99] transition-transform",
-            isCancelled
-              ? "border-red-300/60 bg-red-50/30 opacity-60 hover:border-red-400/70"
-              : isLoss
-                ? "border-defeat/50 bg-defeat/5 hover:border-defeat/70"
-                : past
-                  ? "border-amber-200/60 bg-amber-50/20 hover:border-amber-300/80 dark:border-amber-900/40 dark:bg-amber-950/10"
-                  : "border-border hover:border-primary/40",
-          )}
-        >
-          <div
-            className={cn(
-              "flex flex-col items-center justify-center w-16 shrink-0 py-3",
-              isCancelled
-                ? "bg-red-100/40"
-                : isLoss
-                  ? "bg-defeat/15"
-                  : past
-                    ? "bg-amber-100/40 dark:bg-amber-900/30"
-                    : "bg-primary/8",
-            )}
-          >
-            <span
-              className={cn(
-                "text-[10px] font-semibold uppercase tracking-wider",
-                isCancelled
-                  ? "text-red-600"
-                  : past
-                    ? "text-amber-700 dark:text-amber-400"
-                    : "text-primary",
-              )}
-            >
-              {format(d, "EEE", { locale: dateLocale })}
-            </span>
-            <span
-              className={cn(
-                "text-2xl font-bold leading-none mt-0.5",
-                past && "text-amber-800 dark:text-amber-300",
-              )}
-            >
-              {format(d, "d")}
-            </span>
-            <span className="text-[10px] text-muted-foreground mt-1">{format(d, "HH:mm")}</span>
-          </div>
-          <div className="flex-1 min-w-0 py-3 pr-3 flex flex-col justify-center gap-1">
-            <div className="flex items-center gap-1.5 flex-wrap">
-              <Icon
-                className={cn(
-                  "h-3.5 w-3.5 shrink-0",
-                  past ? "text-amber-600 dark:text-amber-400" : "text-muted-foreground",
-                )}
-              />
-              <span
-                className={cn(
-                  "text-[10px] uppercase tracking-wider font-semibold",
-                  past ? "text-amber-700 dark:text-amber-400" : "text-muted-foreground",
-                )}
-              >
-                {t(`events.types.${e.type}`)}
-              </span>
-              {past && (
-                <span className="text-[10px] uppercase tracking-wider font-bold px-1.5 py-0.5 rounded-md border bg-amber-500/15 text-amber-700 border-amber-500/30 dark:text-amber-300 inline-flex items-center gap-1">
-                  <Clock className="h-3 w-3" />
-                  {t("events.pastBadge")}
-                </span>
-              )}
-              {isCancelled && (
-                <span className="text-[10px] uppercase tracking-wider font-bold px-1.5 py-0.5 rounded-md border bg-red-500/15 text-red-700 border-red-500/30 dark:text-red-300 inline-flex items-center gap-1">
-                  <Ban className="h-3 w-3" />
-                  {t("events.status.cancelled")}
-                </span>
-              )}
-
-              {e.type === "match" && e.competition_type && (
-                <span
-                  className={cn(
-                    "text-[10px] uppercase tracking-wider font-bold px-1.5 py-0.5 rounded-md border inline-flex items-center gap-1 max-w-full",
-                    e.competition_type === "friendly" &&
-                      "bg-sky-500/15 text-sky-700 border-sky-500/30 dark:text-sky-300",
-                    e.competition_type === "championship" &&
-                      "bg-red-500/15 text-red-700 border-red-500/30 dark:text-red-300",
-                    e.competition_type === "cup" &&
-                      "bg-amber-500/15 text-amber-700 border-amber-500/30 dark:text-amber-300",
-                  )}
-                >
-                  <span>{t(`events.competitionTypes.${e.competition_type}`)}</span>
-                  {e.competition_name && (
-                    <>
-                      <span className="opacity-50">·</span>
-                      <span className="font-semibold normal-case tracking-normal truncate">
-                        {e.competition_name}
-                      </span>
-                    </>
-                  )}
-                </span>
-              )}
-              {e.type === "match" && e.is_home !== null && e.is_home !== undefined && (
-                <span
-                  className={cn(
-                    "text-[10px] uppercase tracking-wider font-bold px-1.5 py-0.5 rounded-md border inline-flex items-center gap-1",
-                    e.is_home
-                      ? "bg-emerald-500/15 text-emerald-700 border-emerald-500/30 dark:text-emerald-300"
-                      : "bg-violet-500/15 text-violet-700 border-violet-500/30 dark:text-violet-300",
-                  )}
-                >
-                  {e.is_home ? <Home className="h-3 w-3" /> : <Plane className="h-3 w-3" />}
-                  {e.is_home ? t("events.home") : t("events.away")}
-                </span>
-              )}
-
-              {(() => {
-                if (e.type !== "match") return null;
-                const myC = myConvocsByEvent?.get(e.id);
-                if (!myC) return null;
-                const s = myC.status;
-                const resp: ConvocationResponse | null =
-                  s === "pending" || s === "present" || s === "absent" ? s : null;
-                if (!resp) return null;
-                return <ConvocationResponseBadge response={resp} />;
-              })()}
-              {((e as any).convocations_sent || convocSentSet?.has(e.id)) && !isCancelled && (
-                <span
-                  className="inline-flex items-center gap-1 rounded-full border border-emerald-500/20 bg-emerald-500/10 px-2 py-0.5 text-[10px] font-semibold text-emerald-700 dark:text-emerald-300"
-                  title={t("events.convocsSentTitle")}
-                >
-                  <Send className="h-3 w-3" />
-                  {t("events.convocationsSentShort")}
-                </span>
-              )}
-              {isCoach && !isCancelled && convocStats?.counts.get(e.id) && (
-                <ConvocationSummaryPill counts={convocStats.counts.get(e.id)!} />
-              )}
-            </div>
-            <p
-              className={cn(
-                "font-medium truncate leading-tight",
-                isCancelled && "line-through text-muted-foreground",
-              )}
-            >
-              {(() => {
-                if (e.type === "match" && e.opponent && e.team_name)
-                  return `${e.team_name} vs ${e.opponent}`;
-                if (e.type === "match" && e.opponent && e.title?.toLowerCase().startsWith("vs "))
-                  return e.title;
-                return (
-                  <>
-                    {e.title}
-                    {e.opponent && (
-                      <span className="text-muted-foreground font-normal"> · {e.opponent}</span>
-                    )}
-                  </>
-                );
-              })()}
-            </p>
-            {e.type === "match" &&
-              e.result &&
-              (() => {
-                const ourSide = e.is_home === false ? "away" : "home";
-                const ours = ourSide === "home" ? e.result.home_score : e.result.away_score;
-                const theirs = ourSide === "home" ? e.result.away_score : e.result.home_score;
-                const oc = ours > theirs ? "win" : ours < theirs ? "loss" : "draw";
-                return (
-                  <p
-                    className={cn(
-                      "text-xs font-bold tabular-nums inline-flex items-center gap-1.5 mt-0.5 w-fit px-1.5 py-0.5 rounded",
-                      oc === "win" && "bg-present/15 text-present",
-                      oc === "loss" && "bg-defeat/15 text-defeat",
-                      oc === "draw" && "bg-draw/15 text-draw",
-                    )}
-                  >
-                    <Trophy className="h-3 w-3" />
-                    {t(`match.${oc}`)} {ours} — {theirs}
-                  </p>
-                );
-              })()}
-          </div>
-          {(() => {
-            const myC = myConvocsByEvent?.get(e.id);
-            if (!myC) return null;
-            return <ConvocationBand title={`Convoqué · ${myC.playerName}`} />;
-          })()}
-        </Link>
-      </li>
+      <EventCard
+        key={e.id}
+        event={e}
+        dateLocale={dateLocale}
+        isCoach={isCoach}
+        convocationSent={!!e.convocations_sent || !!convocSentSet?.has(e.id)}
+        myConvocation={myConvocsByEvent?.get(e.id) ?? null}
+        counts={convocStats?.counts.get(e.id) ?? null}
+        weather={weatherByEvent?.[e.id] ?? null}
+      />
     );
   }
 

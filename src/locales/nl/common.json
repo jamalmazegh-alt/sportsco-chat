@@ -1075,6 +1075,8 @@
       "lineup": "Opstelling"
     },
     "pastBadge": "Verleden",
+    "todayShort": "vandaag",
+    "live": "Bezig",
     "calendarHint": "Tik op een dag met een stip om de evenementen te zien.",
     "noEventsThisDay": "Geen evenement op deze dag.",
     "duplicateExists": "Voor dit Team bestaat al een evenement op deze datum/tijd.",
@@ -1130,7 +1132,20 @@
       "invitePlayersFirstTitle": "Nodig spelers uit",
       "subtitle": "{{count}} spelers opgeroepen"
     },
-    "scoreDisabledCancelled": "Evenement geannuleerd: bewerken van scores en wedstrijdgegevens uitgeschakeld."
+    "scoreDisabledCancelled": "Evenement geannuleerd: bewerken van scores en wedstrijdgegevens uitgeschakeld.",
+    "whenWhere": "Wanneer & waar",
+    "kickoff": "Aftrap",
+    "estimatedEnd": "Verwacht einde",
+    "stack": {
+      "coachCount_one": "{{count}} coach",
+      "coachCount_other": "{{count}} coaches",
+      "transportMissing_one": "{{count}} zonder vervoer",
+      "transportMissing_other": "{{count}} zonder vervoer",
+      "seatsMissing_one": "{{count}} plek te vullen",
+      "seatsMissing_other": "{{count}} plekken te vullen",
+      "messageCount_one": "{{count}} bericht",
+      "messageCount_other": "{{count}} berichten"
+    }
   },
   "followUps": {
     "title": "Te herinneren",
@@ -1208,7 +1223,8 @@
     "toConfirm": "Te bevestigen",
     "calledUp": "Opgeroepen",
     "pendingShort": "{{count}} in afwachting",
-    "showAll": "Alle {{count}} spelers tonen"
+    "showAll": "Alle {{count}} spelers tonen",
+    "addPlayers": "Toevoegen"
   },
   "stats": {
     "title": "Statistieken",
@@ -4917,5 +4933,40 @@
     "it": "Italiaans",
     "nl": "Nederlands",
     "pt": "Portugees"
+  },
+  "weather": {
+    "label": "Weersverwachting",
+    "temperature": "{{value}}°",
+    "precipitationShort": "{{value}}%",
+    "windShort": "{{value}} km/u",
+    "alerts": {
+      "rain": "Regen verwacht bij aftrap",
+      "wind": "Harde wind verwacht",
+      "cold": "Kou verwacht",
+      "heat": "Grote hitte verwacht"
+    },
+    "availableFrom": "Verwachting vanaf {{date}}",
+    "tooFar": "Te ver vooruit",
+    "unavailable": "Verwachting niet beschikbaar",
+    "noLocation": "Locatie niet gelokaliseerd",
+    "feelsLike": "Gevoel {{value}}°",
+    "windValue": "wind {{value}} km/u",
+    "stripCaption": "van verzamelen tot einde",
+    "updated": "Verwachting {{ago}} geleden bijgewerkt",
+    "conditions": {
+      "clear": "Onbewolkt",
+      "partly": "Licht bewolkt",
+      "cloudy": "Bewolkt",
+      "fog": "Mist",
+      "rain": "Buien",
+      "snow": "Sneeuw",
+      "storm": "Onweer"
+    },
+    "alertText": {
+      "rain": "Buien verwacht bij de aftrap — {{value}}% om {{time}}.",
+      "wind": "Harde wind verwacht bij de aftrap — {{value}} km/u om {{time}}.",
+      "cold": "Kou verwacht bij de aftrap — gevoel {{value}}° om {{time}}.",
+      "heat": "Grote hitte verwacht bij de aftrap — gevoel {{value}}° om {{time}}."
+    }
   }
 }

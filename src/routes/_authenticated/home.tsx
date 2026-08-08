@@ -5,21 +5,9 @@ import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useAuth, useMyRoles } from "@/lib/auth-context";
 import { supabase } from "@/integrations/supabase/client";
-import {
-  Calendar,
-  MapPin,
-  ChevronRight,
-  Plus,
-  Users,
-  BarChart3,
-  CreditCard,
-  Send,
-} from "lucide-react";
-import { isToday, isTomorrow } from "date-fns";
-import { fmt } from "@/lib/date-locale";
+import { Calendar, ChevronRight, Plus, Users, BarChart3, CreditCard } from "lucide-react";
 import i18n from "@/lib/i18n";
 import { Button } from "@/components/ui/button";
-import { AttendancePill } from "@/components/attendance-pill";
 import { EventCreateChooser } from "@/components/events/EventCreateChooser";
 import { OnboardingChecklist } from "@/components/onboarding-checklist";
 import { AdminKpis } from "@/components/admin-kpis";
@@ -31,14 +19,16 @@ import { HomeQuickCards } from "@/components/home-quick-cards";
 import { HomeNeedsCard } from "@/components/home-needs-card";
 import { listMyObligations } from "@/lib/payment-checkout.functions";
 import { isV2 } from "@/config/features";
-import { EventTypeBadge } from "@/lib/event-type-icon";
+import { EventCard } from "@/components/events/event-card";
+import { getEventsWeather } from "@/lib/weather/weather.functions";
+import { weatherAvailability } from "@/lib/weather/rules";
+import { fr, enUS } from "date-fns/locale";
 
 import { DeclareAbsenceDrawer } from "@/components/declare-absence-drawer";
 import { UrgencyCenter } from "@/components/urgency-center";
 import { SponsorBanner } from "@/components/sponsors/sponsor-banner";
 import { getActiveSponsorsForHome } from "@/lib/sponsors.functions";
 import {
-  ConvocationSummaryPill,
   buildConvocationCounts,
   type ConvocationCounts,
 } from "@/components/convocation-summary-pill";
@@ -52,35 +42,6 @@ export const Route = createFileRoute("/_authenticated/home")({
     ],
   }),
 });
-
-function formatWhen(d: Date) {
-  const label = isToday(d)
-    ? i18n.t("common.today")
-    : isTomorrow(d)
-      ? i18n.t("common.tomorrow")
-      : fmt(d, "EEE d MMM");
-  return `${label} · ${fmt(d, "HH:mm")}`;
-}
-
-function formatHomeEventTitle(event: {
-  type?: string | null;
-  title: string;
-  team_name?: string | null;
-  opponent?: string | null;
-  is_home?: boolean | null;
-}) {
-  const teamName = event.team_name?.trim();
-  if (event.type !== "match" || !teamName) return event.title;
-  if (event.title.toLowerCase().includes(teamName.toLowerCase())) return event.title;
-
-  const opponent = event.opponent?.trim();
-  if (opponent)
-    return event.is_home === false ? `${opponent} vs ${teamName}` : `${teamName} vs ${opponent}`;
-
-  const title = event.title.trim();
-  if (/^(vs|contre)\b/i.test(title)) return `${teamName} ${title}`;
-  return `${teamName} · ${event.title}`;
-}
 
 function formatPaymentAmount(cents: number, currency: string | null | undefined, locale: string) {
   const code = (currency || "eur").toUpperCase();
@@ -137,7 +98,7 @@ function HomePage() {
       const { data, error } = await supabase
         .from("events")
         .select(
-          "id, title, starts_at, location, type, status, team_id, opponent, is_home, convocations_sent",
+          "id, title, starts_at, ends_at, location, type, status, team_id, opponent, competition_type, competition_name, is_home, convocations_sent",
         )
         .in("team_id", teamIds)
         .eq("status", "published")
@@ -156,6 +117,8 @@ function HomePage() {
       });
     },
   });
+
+  const dateLocale = i18n.language?.startsWith("fr") ? fr : enUS;
 
   // Coach view: which of the "next events" already have convocations dispatched.
   const { data: convocStats } = useQuery({
@@ -214,7 +177,7 @@ function HomePage() {
       const { data } = await supabase
         .from("convocations")
         .select(
-          "id, status, player_id, event:event_id(id, title, starts_at, location, type, status, team_id, opponent, is_home)",
+          "id, status, player_id, event:event_id(id, title, starts_at, ends_at, location, type, status, team_id, opponent, competition_type, competition_name, is_home)",
         )
         .in("player_id", playerIds)
         .order("created_at", { ascending: false });
@@ -231,6 +194,42 @@ function HomePage() {
         .sort((a: any, b: any) => new Date(a.starts_at).getTime() - new Date(b.starts_at).getTime())
         .slice(0, 3);
     },
+  });
+
+  // Météo — un seul appel pour les deux listes de l'accueil (prochains
+  // événements côté staff, convocations côté joueur/parent).
+  const weatherEventIds = useMemo(() => {
+    const now = new Date();
+    const ids = [
+      ...(upcoming ?? []).map((e) => ({ id: e.id, status: e.status, starts_at: e.starts_at })),
+      ...((myConvocs as any[]) ?? []).map((e: any) => ({
+        id: e.id,
+        status: e.status,
+        starts_at: e.starts_at,
+      })),
+    ];
+    const seen = new Set<string>();
+    return ids
+      .filter((e) => {
+        if (seen.has(e.id)) return false;
+        seen.add(e.id);
+        // On envoie tout ce qui n'est ni passé ni annulé : le serveur connaît
+        // les coordonnées et décide s'il y a une prévision ou un message.
+        return (
+          weatherAvailability(
+            { status: e.status, startsAt: new Date(e.starts_at), latitude: 1, longitude: 1 },
+            now,
+          ) !== "silent"
+        );
+      })
+      .map((e) => e.id);
+  }, [upcoming, myConvocs]);
+
+  const { data: weatherByEvent } = useQuery({
+    queryKey: ["home-events-weather", weatherEventIds],
+    enabled: weatherEventIds.length > 0,
+    queryFn: () => getEventsWeather({ data: { eventIds: weatherEventIds } }),
+    staleTime: 30 * 60_000,
   });
 
   // Teams the user (or their children) belong to — for player/parent quick access
@@ -432,88 +431,18 @@ function HomePage() {
             </div>
           ) : (
             <ul className="space-y-2">
-              {upcoming.map((e, idx) => {
-                const isFirst = idx === 0;
-                return (
-                  <li key={e.id}>
-                    <Link
-                      to="/events/$eventId"
-                      params={{ eventId: e.id }}
-                      className={cn(
-                        "relative block overflow-hidden rounded-[14px] border-[1.5px] active:scale-[0.99] transition-all",
-                        isFirst
-                          ? "border-primary bg-card shadow-[0_4px_14px_color-mix(in oklab, var(--primary) 22%, transparent)]"
-                          : "border-border bg-card hover:border-border",
-                      )}
-                    >
-                      {isFirst && (
-                        <div
-                          className="px-4 py-2 text-[10px] font-black uppercase tracking-[0.15em] text-white"
-                          style={{
-                            background:
-                              "linear-gradient(135deg, var(--primary) 0%, color-mix(in oklab, var(--primary) 72%, white) 100%)",
-                          }}
-                        >
-                          ★ {t("dashboard.nextEvent")}
-                        </div>
-                      )}
-                      <div
-                        className={cn(
-                          "flex items-center justify-between gap-3",
-                          isFirst ? "p-4" : "p-3.5",
-                        )}
-                      >
-                        <div className="min-w-0 flex-1">
-                          <div className="flex items-center gap-2 min-w-0 flex-wrap">
-                            <EventTypeBadge type={(e as any).type} size={isFirst ? "md" : "sm"} />
-                            <p
-                              className={cn(
-                                "font-bold truncate text-foreground",
-                                isFirst ? "text-[15px]" : "text-sm",
-                              )}
-                            >
-                              {formatHomeEventTitle(e as any)}
-                            </p>
-                            {((e as any).convocations_sent || convocSentSet?.has(e.id)) && (
-                              <span
-                                className="inline-flex items-center gap-1 rounded-full border border-primary/20 bg-primary/10 px-2 py-0.5 text-[10px] font-semibold text-primary"
-                                title={t("events.convocsSentTitle")}
-                              >
-                                <Send className="h-3 w-3" />
-                                {t("events.convocationsSentShort")}
-                              </span>
-                            )}
-                            {isCoach && convocStats?.counts.get(e.id) && (
-                              <ConvocationSummaryPill counts={convocStats.counts.get(e.id)!} />
-                            )}
-                          </div>
-                          <p className="text-[11px] text-muted-foreground font-medium mt-1 flex items-center gap-1.5 flex-wrap">
-                            <Calendar className="h-3 w-3" strokeWidth={2.4} />
-                            <span>{formatWhen(new Date(e.starts_at))}</span>
-                            {(e as any).team_name && <span>· {(e as any).team_name}</span>}
-                            {e.location && (
-                              <>
-                                <span>·</span>
-                                <MapPin className="h-3 w-3" strokeWidth={2.4} />
-                                <span className="truncate">{e.location}</span>
-                              </>
-                            )}
-                          </p>
-                        </div>
-                        <ChevronRight
-                          className={cn(
-                            "shrink-0",
-                            isFirst
-                              ? "h-5 w-5 text-foreground"
-                              : "h-4 w-4 text-muted-foreground/70",
-                          )}
-                          strokeWidth={2.4}
-                        />
-                      </div>
-                    </Link>
-                  </li>
-                );
-              })}
+              {upcoming.map((e, idx) => (
+                <EventCard
+                  key={e.id}
+                  event={e as any}
+                  dateLocale={dateLocale}
+                  isCoach={isCoach}
+                  highlight={idx === 0}
+                  convocationSent={!!(e as any).convocations_sent || !!convocSentSet?.has(e.id)}
+                  counts={convocStats?.counts.get(e.id) ?? null}
+                  weather={weatherByEvent?.[e.id] ?? null}
+                />
+              ))}
             </ul>
           )}
         </section>
@@ -719,94 +648,27 @@ function HomePage() {
                   {(myConvocs as any[]).map((e: any, idx: number) => {
                     const isCancelled = e.status === "cancelled";
                     const actionRequired = !isCancelled && e.convocation?.status === "pending";
-                    const isFirst = idx === 0 && !actionRequired && !isCancelled;
                     return (
-                      <li key={`${e.id}-${e.player?.id ?? ""}`}>
-                        <Link
-                          to="/events/$eventId"
-                          params={{ eventId: e.id }}
-                          className={cn(
-                            "relative block overflow-hidden rounded-[14px] border-[1.5px] active:scale-[0.99] transition-all",
-                            isCancelled
-                              ? "border-red-400/70 bg-red-50/40 dark:bg-red-950/20"
-                              : actionRequired
-                                ? "border-[#fcd34d] bg-[#fffbeb] shadow-[0_2px_8px_rgba(245,158,11,0.15)]"
-                                : isFirst
-                                  ? "border-primary bg-card shadow-[0_4px_14px_color-mix(in oklab, var(--primary) 22%, transparent)]"
-                                  : "border-border bg-card hover:border-border",
-                          )}
-                        >
-                          {isFirst && (
-                            <div
-                              className="px-4 py-2 text-[10px] font-black uppercase tracking-[0.15em] text-white"
-                              style={{
-                                background:
-                                  "linear-gradient(135deg, var(--primary) 0%, color-mix(in oklab, var(--primary) 72%, white) 100%)",
-                              }}
-                            >
-                              ★ {t("dashboard.nextEvent")}
-                            </div>
-                          )}
-                          <div
-                            className={cn(
-                              "flex items-center justify-between gap-3",
-                              isFirst ? "p-4" : "p-3.5",
-                            )}
-                          >
-                            <div className="min-w-0 flex-1">
-                              <div className="flex items-center gap-2 flex-wrap">
-                                <EventTypeBadge
-                                  type={(e as any).type}
-                                  size={isFirst ? "md" : "sm"}
-                                />
-                                <p
-                                  className={cn(
-                                    "font-bold truncate text-foreground",
-                                    isFirst ? "text-[15px]" : "text-sm",
-                                    isCancelled && "line-through text-red-700 dark:text-red-300",
-                                  )}
-                                >
-                                  {formatHomeEventTitle(e as any)}
-                                </p>
-                                {isCancelled ? (
-                                  <span className="text-[9px] font-black uppercase tracking-[0.1em] px-1.5 py-0.5 rounded-[4px] bg-red-600 text-white shrink-0">
-                                    {t("events.status.cancelled")}
-                                  </span>
-                                ) : (
-                                  actionRequired && (
-                                    <span className="text-[9px] font-black uppercase tracking-[0.1em] px-1.5 py-0.5 rounded-[4px] bg-[#f59e0b] text-white shrink-0">
-                                      {t("dashboard.actionRequired")}
-                                    </span>
-                                  )
-                                )}
-                              </div>
-                              <p className="text-[11px] text-muted-foreground font-medium mt-1 flex items-center gap-1.5 flex-wrap">
-                                <Calendar className="h-3 w-3" strokeWidth={2.4} />
-                                <span>{formatWhen(new Date(e.starts_at))}</span>
-                                {e.player && <span>· {e.player.first_name}</span>}
-                                {e.team_name && <span>· {e.team_name}</span>}
-                                {e.location && (
-                                  <>
-                                    <MapPin className="h-3 w-3" strokeWidth={2.4} />
-                                    <span className="truncate">{e.location}</span>
-                                  </>
-                                )}
-                              </p>
-                            </div>
-                            <div className="flex items-center gap-2 shrink-0">
-                              {e.convocation && <AttendancePill status={e.convocation.status} />}
-                              <ChevronRight
-                                className={cn(
-                                  isFirst
-                                    ? "h-5 w-5 text-foreground"
-                                    : "h-4 w-4 text-muted-foreground/70",
-                                )}
-                                strokeWidth={2.4}
-                              />
-                            </div>
-                          </div>
-                        </Link>
-                      </li>
+                      <EventCard
+                        key={`${e.id}-${e.player?.id ?? ""}`}
+                        event={e}
+                        dateLocale={dateLocale}
+                        isCoach={false}
+                        highlight={idx === 0 && !actionRequired && !isCancelled}
+                        actionRequired={actionRequired}
+                        // Un parent de plusieurs enfants doit voir de qui il s'agit ;
+                        // pour un joueur seul, le prénom n'apprend rien.
+                        showPlayerName={childOnly || list.length > 1}
+                        myConvocation={
+                          e.convocation
+                            ? {
+                                status: e.convocation.status,
+                                playerName: e.player?.first_name ?? "",
+                              }
+                            : null
+                        }
+                        weather={weatherByEvent?.[e.id] ?? null}
+                      />
                     );
                   })}
                 </ul>

@@ -17,7 +17,8 @@ const pickEmailLocale = (...candidates: Array<string | null | undefined>): strin
   }
   return "fr";
 };
-import { fmt } from "@/lib/date-locale";
+import { fmt, dateLocale } from "@/lib/date-locale";
+import { formatDistanceToNowStrict } from "date-fns";
 import {
   MapPin,
   Bell,
@@ -45,8 +46,7 @@ import {
   UserPlus,
   AlertTriangle,
   Trophy,
-  Timer,
-  LayoutGrid,
+  Navigation,
 } from "lucide-react";
 import { BackLink } from "@/components/back-link";
 import { AddToCalendarButton } from "@/components/events/add-to-calendar-button";
@@ -71,10 +71,19 @@ import { CallUpVisibilityBadge } from "@/components/call-up-visibility-badge";
 import { useCallUpVisibilityGate } from "@/hooks/use-call-up-visibility";
 import { EventChat } from "@/components/event-chat";
 import { EventNeedsSection } from "@/components/needs/event-needs-section";
+import { listEventNeeds } from "@/lib/needs/needs.functions";
+import { CollapsibleSection } from "@/components/events/collapsible-section";
+import { Car, HandHelping, MessageSquare, UserCog } from "lucide-react";
 import { MeetingAttendeesSection } from "@/components/meetings/meeting-attendees-section";
 import { CarpoolSection } from "@/components/carpool-section";
 import { AttachmentList, type Attachment } from "@/components/attachments";
 import { PublishedLineupCard } from "@/components/lineup/published-lineup-card";
+import { EventDetailHeader } from "@/components/events/event-detail-header";
+import { isEventDayReached } from "@/components/events/event-card-state";
+import { EventWhenWhere } from "@/components/events/event-when-where";
+import { EventWeatherPanel } from "@/components/events/event-weather-panel";
+import { getEventsWeather } from "@/lib/weather/weather.functions";
+import { weatherAvailability } from "@/lib/weather/rules";
 import { EventDetailSkeleton } from "@/components/skeletons";
 import { UnavailableBadge, type UnavailableReason } from "@/components/unavailable-badge";
 // StaffAvailabilityForEvent moved to team availability page (fused into StaffAssignmentSection here).
@@ -578,6 +587,66 @@ function EventDetail() {
     const day = String(d.getDate()).padStart(2, "0");
     return `${y}-${m}-${day}`;
   }, [event?.starts_at]);
+
+  // Météo — la page n'affiche qu'un événement, mais la fonction est par lot.
+  const weatherEligible =
+    !!event &&
+    event.type !== "meeting" &&
+    weatherAvailability(
+      {
+        status: event.status,
+        startsAt: new Date(event.starts_at),
+        latitude: 1,
+        longitude: 1,
+      },
+      new Date(),
+    ) !== "silent";
+
+  const { data: weatherMap } = useQuery({
+    queryKey: ["event-weather", eventId, weatherEligible],
+    enabled: weatherEligible,
+    queryFn: () => getEventsWeather({ data: { eventIds: [eventId] } }),
+    staleTime: 30 * 60_000,
+  });
+
+  // Résumés de la pile secondaire. Les clés de requête sont celles des sections
+  // elles-mêmes : React Query déduplique, donc ces lectures ne coûtent aucun
+  // aller-retour supplémentaire. Sans résumé, replier reviendrait à cacher.
+  const { data: carpoolNeeds } = useQuery({
+    queryKey: ["carpool-needs", eventId],
+    enabled: !!event && eventSupportsCarpool(event.type),
+    queryFn: async () => {
+      const { data } = await supabase.from("carpool_needs").select("id").eq("event_id", eventId);
+      return data ?? [];
+    },
+    staleTime: 60_000,
+  });
+
+  const listNeedsFn = useServerFn(listEventNeeds);
+  const { data: needsData } = useQuery({
+    queryKey: ["event-needs", eventId],
+    queryFn: () => listNeedsFn({ data: { event_id: eventId } }),
+  });
+
+  const { data: chatCount } = useQuery({
+    queryKey: ["event-messages-count", eventId],
+    queryFn: async () => {
+      const { count } = await supabase
+        .from("event_messages")
+        .select("id", { count: "exact", head: true })
+        .eq("event_id", eventId);
+      return count ?? 0;
+    },
+    staleTime: 60_000,
+  });
+
+  const staffCount = ((event as any)?.event_staff_assignments?.length ?? 0) as number;
+  const transportMissing = (carpoolNeeds ?? []).length;
+  const seatsMissing = (
+    (needsData?.needs ?? []) as Array<{ status: string; remaining_seats: number }>
+  )
+    .filter((n) => n.status === "open")
+    .reduce((acc, n) => acc + (n.remaining_seats ?? 0), 0);
 
   const { data: eventAbsences } = useQuery({
     queryKey: ["event-absences", event?.team_id, eventDateStr, (teamPlayers ?? []).length],
@@ -2254,8 +2323,62 @@ function EventDetail() {
     new Date((event.ends_at ?? event.starts_at) as string).getTime() <= Date.now();
   const hasPendingForMe =
     !responsesReadOnly && visibleMyConvocs.some((c: any) => c.status === "pending");
-  const isPastMatch = event.type === "match" && new Date(event.starts_at).getTime() <= Date.now();
+  // Score et retour d'après-match sont ouverts dès le jour du match, pas
+  // seulement après le coup d'envoi.
+  const isPastMatch =
+    event.type === "match" && isEventDayReached(new Date(event.starts_at), new Date());
   const showFeedbackButton = isPastMatch && isCoach;
+
+  const detailLocale = dateLocale();
+
+  const attachmentList = ((event?.attachments as unknown as Attachment[] | null) ??
+    []) as Attachment[];
+
+  // Titre du héros — même logique que la carte de liste, pour que les deux
+  // écrans nomment un match de la même façon.
+  const heroTitle = (() => {
+    if (!event) return "";
+    const teamName = eventTeam?.name?.trim();
+    if (event.type === "match" && event.opponent && teamName) {
+      return (
+        <>
+          {teamName} <span className="font-medium text-muted-foreground">vs</span> {event.opponent}
+        </>
+      );
+    }
+    return event.title;
+  })();
+
+  const heroSubtitle = event
+    ? [
+        fmt(event.starts_at, "EEEE d MMMM yyyy"),
+        eventTeam?.sport ? t(`sports.${eventTeam.sport}`, { defaultValue: eventTeam.sport }) : null,
+      ]
+        .filter(Boolean)
+        .map((part, i) => (
+          <span key={i} className="capitalize">
+            {i > 0 && <span className="mr-1.5 opacity-45">·</span>}
+            {part}
+          </span>
+        ))
+    : null;
+
+  const heroCompetition =
+    event?.type === "match" && event.competition_type
+      ? [t(`events.competitionTypes.${event.competition_type}`), event.competition_name]
+          .filter(Boolean)
+          .join(" — ")
+      : null;
+
+  const countdownLabel = event
+    ? formatDistanceToNowStrict(new Date(event.starts_at), {
+        addSuffix: true,
+        locale: detailLocale,
+      })
+    : null;
+
+  const eventWeather = weatherMap?.[eventId] ?? null;
+
   // Joueur/parent : afficher la liste des convoqués dès que l'événement est publié/envoyé,
   // même si l'utilisateur n'a pas de réponse personnelle à donner.
   const showConvocationSection = isInternalMeeting
@@ -2268,281 +2391,71 @@ function EventDetail() {
     <div className="px-5 pt-4 pb-24 md:pb-6 space-y-5 animate-in fade-in-0 duration-300">
       <BackLink to="/events" />
 
-      {/* ═════════ HERO — Anime Premium ═════════ */}
-      <div className="relative rounded-2xl overflow-hidden shadow-[0_4px_20px_rgba(29,122,69,0.12),0_1px_4px_rgba(0,0,0,0.05)] border border-border bg-card">
-        {/* Top gradient band with diagonal SVG accent + thematic glyph */}
-        <div className="relative h-[88px] overflow-hidden">
-          <svg
-            viewBox="0 0 400 88"
-            preserveAspectRatio="xMidYMid slice"
-            className="absolute inset-0 h-full w-full"
-          >
-            <defs>
-              <linearGradient id={`evt-hero-${eventId}`} x1="0" y1="0" x2="1" y2="1">
-                <stop offset="0%" stopColor="#0f4a26" />
-                <stop offset="100%" stopColor="#1d7a45" />
-              </linearGradient>
-            </defs>
-            <rect width="400" height="88" fill={`url(#evt-hero-${eventId})`} />
-            <path d="M250 0 L400 0 L400 88 L320 88 Z" fill="rgba(255,255,255,0.05)" />
-            <ellipse cx="360" cy="30" rx="65" ry="48" fill="rgba(45,157,95,0.2)" />
-            <line
-              x1="225"
-              y1="88"
-              x2="400"
-              y2="10"
-              stroke="rgba(255,255,255,0.05)"
-              strokeWidth="28"
-            />
-          </svg>
-          {/* Thematic glyph — Trophy for match, Timer for training/other */}
-          <div aria-hidden className="absolute top-3 right-12 z-[1] text-white/25">
-            {event.type === "match" ? (
-              <Trophy className="h-10 w-10" strokeWidth={1.5} />
-            ) : (
-              <Timer className="h-10 w-10" strokeWidth={1.5} />
-            )}
-          </div>
-          <div className="relative z-[2] flex items-start justify-between gap-2 px-4 pt-3">
-            <div className="flex items-center gap-1.5 flex-wrap">
-              <span className="text-[9px] uppercase tracking-[0.5px] font-bold text-white bg-white/22 border border-white/30 px-2 py-[3px] rounded-full">
-                {t(`events.types.${event.type}`)}
-              </span>
-              {event.type === "match" && event.competition_type && (
-                <span className="text-[9px] uppercase tracking-[0.5px] font-bold text-white/90 bg-white/12 px-2 py-[3px] rounded-full">
-                  {t(`events.competitionTypes.${event.competition_type}`)}
-                  {event.competition_name ? ` · ${event.competition_name}` : ""}
-                </span>
-              )}
-              {event.type === "match" && event.is_home !== null && (
-                <span className="text-[9px] uppercase tracking-[0.5px] font-bold text-white/90 bg-white/15 px-2 py-[3px] rounded-full inline-flex items-center gap-1">
-                  {event.is_home ? (
-                    <Home className="h-2.5 w-2.5" />
-                  ) : (
-                    <Plane className="h-2.5 w-2.5" />
-                  )}
-                  {t(event.is_home ? "events.home" : "events.away")}
-                </span>
-              )}
-            </div>
-            {isCoach && (
-              <button
-                type="button"
-                onClick={() => setEditOpen(true)}
-                aria-label={t("common.edit")}
-                className="shrink-0 h-7 w-7 rounded-full bg-white/15 hover:bg-white/25 backdrop-blur-sm flex items-center justify-center transition-colors"
+      <EventDetailHeader
+        type={event.type}
+        title={heroTitle}
+        subtitle={heroSubtitle}
+        competition={heroCompetition}
+        isHome={event.type === "match" ? event.is_home : null}
+        cancelled={event.status === "cancelled"}
+        cancellationReason={event.cancellation_reason}
+        cancelledAtLabel={
+          event.cancelled_at
+            ? t("events.eventCancelledOn", {
+                date: fmt(event.cancelled_at, "d MMM yyyy 'à' HH:mm"),
+              })
+            : null
+        }
+        action={
+          isCoach ? (
+            <button
+              type="button"
+              onClick={() => setEditOpen(true)}
+              aria-label={t("common.edit")}
+              className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-white/24 bg-white/18 text-white transition-colors hover:bg-white/28"
+            >
+              <Pencil className="h-3 w-3" />
+            </button>
+          ) : null
+        }
+      />
+
+      <EventWhenWhere
+        startsAt={new Date(event.starts_at)}
+        endsAt={event.ends_at ? new Date(event.ends_at) : null}
+        convocationAt={event.convocation_time ? new Date(event.convocation_time) : null}
+        countdown={countdownLabel}
+        startLabel={event.type === "match" ? t("events.kickoff") : t("events.timeShort")}
+        startIcon={event.type === "match" ? undefined : <Clock className="h-3 w-3" aria-hidden />}
+        locationName={event.location}
+        meetingPoint={
+          event.type === "match" && event.is_home === false ? event.meeting_point : null
+        }
+        dateLocale={detailLocale}
+        actions={
+          event.location ? (
+            <>
+              <a
+                href={
+                  event.location_url ??
+                  `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(event.location)}`
+                }
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1 rounded-full border border-border px-2.5 py-1 text-[11px] font-semibold text-muted-foreground transition-colors hover:border-primary/45 hover:text-foreground"
               >
-                <Pencil className="h-3 w-3 text-white" />
-              </button>
-            )}
-          </div>
-        </div>
-
-        {/* White body */}
-        <div className="bg-card px-4 pt-3.5 pb-3">
-          <div className="flex items-center gap-3 mb-2.5">
-            {/* Date box — green gradient */}
-            <div className="shrink-0 min-w-[52px] rounded-xl border-[1.5px] border-emerald-300 dark:border-emerald-700 bg-gradient-to-br from-emerald-50 to-emerald-100 dark:from-emerald-900/40 dark:to-emerald-800/30 px-2.5 py-1.5 text-center leading-none">
-              {isMultiDay ? (
-                (() => {
-                  const startIso =
-                    event.ends_at &&
-                    fmt(event.starts_at, "yyyy-MM-dd") !== fmt(event.ends_at, "yyyy-MM-dd")
-                      ? event.starts_at
-                      : scheduleStartDate
-                        ? `${scheduleStartDate}T00:00:00`
-                        : event.starts_at;
-                  const endIso =
-                    event.ends_at &&
-                    fmt(event.starts_at, "yyyy-MM-dd") !== fmt(event.ends_at, "yyyy-MM-dd")
-                      ? event.ends_at
-                      : scheduleEndDate
-                        ? `${scheduleEndDate}T00:00:00`
-                        : (event.ends_at ?? event.starts_at);
-                  return (
-                    <>
-                      <div className="text-[9px] font-bold uppercase tracking-[0.5px] text-emerald-600 dark:text-emerald-300">
-                        {fmt(startIso, "MMM") === fmt(endIso, "MMM")
-                          ? fmt(startIso, "MMM")
-                          : `${fmt(startIso, "MMM")}–${fmt(endIso, "MMM")}`}
-                      </div>
-                      <div className="text-lg font-black text-foreground mt-0.5 tabular-nums leading-tight">
-                        {fmt(startIso, "d")}–{fmt(endIso, "d")}
-                      </div>
-                      <div className="text-[9px] font-semibold uppercase text-muted-foreground mt-0.5">
-                        {fmt(startIso, "EEE")}–{fmt(endIso, "EEE")}
-                      </div>
-                    </>
-                  );
-                })()
-              ) : (
-                <>
-                  <div className="text-[9px] font-bold uppercase tracking-[0.5px] text-emerald-600 dark:text-emerald-300">
-                    {fmt(event.starts_at, "MMM")}
-                  </div>
-                  <div className="text-2xl font-black text-foreground mt-0.5 tabular-nums">
-                    {fmt(event.starts_at, "d")}
-                  </div>
-                  <div className="text-[9px] font-semibold uppercase text-muted-foreground mt-0.5">
-                    {fmt(event.starts_at, "EEE")}
-                  </div>
-                </>
-              )}
-            </div>
-            <div className="min-w-0 flex-1">
-              <h1 className="text-[15px] font-extrabold tracking-[-0.3px] leading-[1.25] text-foreground">
-                {event.title}
-              </h1>
-              <div className="mt-2 flex flex-wrap items-center gap-1.5">
-                {event.convocation_time && (
-                  <span className="inline-flex items-center gap-1 rounded-md bg-amber-50 dark:bg-amber-950/40 px-2 py-0.5 text-[11px] font-semibold text-amber-700 dark:text-amber-300 border border-amber-200/70 dark:border-amber-800/60">
-                    <Clock className="h-3 w-3" />
-                    {t("events.convocationTimeShort")}{" "}
-                    <span className="tabular-nums">{fmt(event.convocation_time, "HH:mm")}</span>
-                  </span>
-                )}
-                {parsedSchedule.items.length === 0 && (
-                  <span className="inline-flex items-center gap-1 rounded-md bg-emerald-50 dark:bg-emerald-950/40 px-2 py-0.5 text-[11px] font-semibold text-emerald-700 dark:text-emerald-300 border border-emerald-200/70 dark:border-emerald-800/60">
-                    <Clock className="h-3 w-3" />
-                    {event.type === "match" ? (
-                      <span>{t("events.matchTimeShort")}</span>
-                    ) : (
-                      <span>{t("events.timeShort")}</span>
-                    )}
-                    <span className="tabular-nums">{fmt(event.starts_at, "HH:mm")}</span>
-                    {event.ends_at &&
-                      fmt(event.starts_at, "yyyy-MM-dd") === fmt(event.ends_at, "yyyy-MM-dd") && (
-                        <span className="opacity-70">→ {fmt(event.ends_at, "HH:mm")}</span>
-                      )}
-                  </span>
-                )}
-              </div>
-            </div>
-          </div>
-
-          {/* Format pill (match only, with team sport game-format if any) */}
-          {event.type === "match" && (
-            <div className="flex flex-wrap items-center gap-1.5">
-              <div className="inline-flex items-center gap-1.5 rounded-lg border-[1.5px] border-border bg-muted/40 px-2.5 py-1 text-[11px] font-semibold text-foreground">
-                <LayoutGrid className="h-3 w-3 text-[#1d7a45]" />
-                {eventTeam?.sport
-                  ? t(`sports.${eventTeam.sport}`, { defaultValue: eventTeam.sport })
-                  : t("events.types.match")}
-              </div>
-              {(() => {
-                const formatLine = event.description?.match(/^Format:\s*(.+?)(?:\n|$)/);
-                if (!formatLine) return null;
-                return (
-                  <span className="inline-flex items-center gap-1 rounded-lg border-[1.5px] border-emerald-200/70 bg-emerald-50/60 px-2.5 py-1 text-[11px] font-semibold text-emerald-700">
-                    <Clock className="h-3 w-3" />
-                    {formatLine[1].trim()}
-                  </span>
-                );
-              })()}
-            </div>
-          )}
-
-          {/* Info rows */}
-          <div className="mt-3 space-y-2.5 text-sm text-muted-foreground">
-            {event.location && (
-              <div className="flex items-start gap-2.5">
-                <MapPin className="h-4 w-4 mt-0.5 shrink-0 text-foreground/60" />
-                <div className="flex-1 min-w-0">
-                  <p className="text-foreground">{event.location}</p>
-                  <div className="mt-1.5 flex flex-wrap items-center gap-x-3 gap-y-1">
-                    <a
-                      href={
-                        event.location_url ??
-                        `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(event.location)}`
-                      }
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-primary inline-flex items-center gap-1 text-xs font-medium hover:underline"
-                    >
-                      {t("events.openInMaps")} <ExternalLink className="h-3 w-3" />
-                    </a>
-                    <a
-                      href={`https://www.waze.com/ul?q=${encodeURIComponent(event.location)}&navigate=yes`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-primary inline-flex items-center gap-1 text-xs font-medium hover:underline"
-                    >
-                      {t("events.openInWaze")} <ExternalLink className="h-3 w-3" />
-                    </a>
-                  </div>
-                </div>
-              </div>
-            )}
-            {event.type === "match" && event.is_home === false && event.meeting_point && (
-              <div className="flex items-start gap-2.5">
-                <Plane className="h-4 w-4 mt-0.5 shrink-0 text-foreground/60" />
-                <div className="flex-1 min-w-0">
-                  <p className="text-foreground">
-                    <span className="font-medium">{t("events.meetingPoint")}:</span>{" "}
-                    {event.meeting_point}
-                  </p>
-                  <div className="mt-1.5 flex flex-wrap items-center gap-x-3 gap-y-1">
-                    <a
-                      href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(event.meeting_point)}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center gap-1 text-xs font-medium text-primary hover:underline"
-                    >
-                      {t("events.openMeetingInMaps")} <ExternalLink className="h-3 w-3" />
-                    </a>
-                  </div>
-                </div>
-              </div>
-            )}
-            {(event.description || parsedSchedule.items.length > 0) && (
-              <div className="space-y-3 pt-1">
-                {parsedSchedule.items.length > 0 && (
-                  <div className="rounded-xl border border-border bg-muted/30 overflow-hidden">
-                    <div className="px-3 py-2 border-b border-border bg-muted/40 flex items-center gap-2 text-xs font-semibold text-foreground">
-                      <Clock className="h-3.5 w-3.5 text-primary" />
-                      {t("events.scheduleTitle")}
-                    </div>
-                    <ul className="divide-y divide-border">
-                      {parsedSchedule.items.map((s) => {
-                        const d = new Date(`${s.date}T00:00:00`);
-                        const label = isNaN(d.getTime())
-                          ? s.date
-                          : d.toLocaleDateString(i18n.language || "fr", {
-                              weekday: "short",
-                              day: "numeric",
-                              month: "short",
-                            });
-                        return (
-                          <li
-                            key={s.date}
-                            className="flex items-center justify-between gap-3 px-3 py-2 text-sm"
-                          >
-                            <span className="font-medium text-foreground capitalize">{label}</span>
-                            <span className="tabular-nums text-foreground/80">
-                              {s.start} <span className="opacity-60">→</span> {s.end}
-                            </span>
-                          </li>
-                        );
-                      })}
-                    </ul>
-                  </div>
-                )}
-                {parsedSchedule.rest && (
-                  <p className="text-foreground/90 leading-relaxed whitespace-pre-line">
-                    {parsedSchedule.rest}
-                  </p>
-                )}
-              </div>
-            )}
-            {(() => {
-              const list = (event.attachments as unknown as Attachment[] | null) ?? [];
-              return list.length > 0 ? (
-                <div className="pt-1">
-                  <AttachmentList items={list} />
-                </div>
-              ) : null;
-            })()}
-            <div className="pt-1">
+                <Navigation className="h-3 w-3" />
+                {t("events.openInMaps")}
+              </a>
+              <a
+                href={`https://www.waze.com/ul?q=${encodeURIComponent(event.location)}&navigate=yes`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1 rounded-full border border-border px-2.5 py-1 text-[11px] font-semibold text-muted-foreground transition-colors hover:border-primary/45 hover:text-foreground"
+              >
+                <Navigation className="h-3 w-3" />
+                {t("events.openInWaze")}
+              </a>
               <AddToCalendarButton
                 event={{
                   id: event.id,
@@ -2556,118 +2469,134 @@ function EventDetail() {
                       ? `${getPublicOrigin()}/events/${event.id}`
                       : null,
                 }}
-                className="h-8 gap-1.5 text-xs"
+                className="h-[26px] gap-1 rounded-full border-border px-2.5 text-[11px]"
               />
-            </div>
-          </div>
+            </>
+          ) : null
+        }
+        weather={<EventWeatherPanel result={eventWeather} dateLocale={detailLocale} />}
+      />
 
-          {/* Primary action toolbar — Lineup / Feedback (edit moved to hero top) */}
-          {teams && (isCoach || showFeedbackButton) && (
-            <div className="mt-3 flex items-center gap-2 flex-wrap">
-              {isCoach && event.type === "match" && isFootball && (
-                <Link
-                  to="/events/$eventId/lineup"
-                  params={{ eventId }}
-                  className={cn(
-                    buttonVariants({ variant: "secondary", size: "sm" }),
-                    "h-9 gap-1.5 flex-1 min-w-[7rem]",
-                  )}
-                  title={t("lineup.title")}
-                >
-                  <CircleDot className="h-4 w-4" />
-                  <span>{t("lineup.title")}</span>
-                </Link>
-              )}
-              {isCoach && event.type === "training" && (
-                <Link
-                  to="/events/$eventId/challenges"
-                  params={{ eventId }}
-                  className={cn(
-                    buttonVariants({ variant: "secondary", size: "sm" }),
-                    "h-9 gap-1.5 flex-1 min-w-[7rem]",
-                  )}
-                  title={t("challenges:list.title")}
-                >
-                  <Trophy className="h-4 w-4" />
-                  <span>{t("challenges:list.title")}</span>
-                </Link>
-              )}
-              {showFeedbackButton && (
-                <Link
-                  to="/events/$eventId/feedback"
-                  params={{ eventId }}
-                  className={cn(
-                    buttonVariants({ variant: "secondary", size: "sm" }),
-                    "h-9 gap-1.5 flex-1 min-w-[7rem]",
-                  )}
-                  title={t("feedback.postMatchTitle")}
-                >
-                  <ClipboardList className="h-4 w-4" />
-                  <span>{t("feedback.postMatchTitle")}</span>
-                </Link>
-              )}
-              {isCoach && (event.type === "match" || event.type === "tournament") && (
-                <Button
-                  type="button"
-                  variant="secondary"
-                  size="sm"
-                  className="h-9 gap-1.5 flex-1 min-w-[7rem]"
-                  onClick={downloadMatchSheet}
-                  disabled={generatingSheet}
-                  title={t(
-                    event.type === "tournament"
-                      ? "events.matchSheet.labelTournament"
-                      : "events.matchSheet.label",
-                    { defaultValue: event.type === "tournament" ? "Player list" : "Match sheet" },
-                  )}
-                >
-                  {generatingSheet ? (
-                    <Loader2 className="h-4 w-4 animate-spin" />
-                  ) : (
-                    <Download className="h-4 w-4" />
-                  )}
-                  <span>
-                    {t(
-                      event.type === "tournament"
-                        ? "events.matchSheet.labelTournament"
-                        : "events.matchSheet.label",
-                      { defaultValue: event.type === "tournament" ? "Player list" : "Match sheet" },
-                    )}
-                  </span>
-                </Button>
-              )}
+      {/* Programme multi-jours, description et pièces jointes */}
+      {(event.description || parsedSchedule.items.length > 0 || attachmentList.length > 0) && (
+        <section className="space-y-3 rounded-2xl border border-border bg-card px-3.5 py-3">
+          {parsedSchedule.items.length > 0 && (
+            <div className="overflow-hidden rounded-xl border border-border">
+              <div className="flex items-center gap-2 border-b border-border bg-muted/40 px-3 py-2 text-xs font-semibold">
+                <Clock className="h-3.5 w-3.5 text-primary" />
+                {t("events.scheduleTitle")}
+              </div>
+              <ul className="divide-y divide-border">
+                {parsedSchedule.items.map((s) => {
+                  const d = new Date(`${s.date}T00:00:00`);
+                  const label = isNaN(d.getTime())
+                    ? s.date
+                    : d.toLocaleDateString(i18n.language || "fr", {
+                        weekday: "short",
+                        day: "numeric",
+                        month: "short",
+                      });
+                  return (
+                    <li
+                      key={s.date}
+                      className="flex items-center justify-between gap-3 px-3 py-2 text-sm"
+                    >
+                      <span className="font-medium capitalize">{label}</span>
+                      <span className="tabular-nums text-foreground/80">
+                        {s.start} <span className="opacity-60">→</span> {s.end}
+                      </span>
+                    </li>
+                  );
+                })}
+              </ul>
             </div>
           )}
+          {parsedSchedule.rest && (
+            <p className="whitespace-pre-line text-sm leading-relaxed text-foreground/90">
+              {parsedSchedule.rest}
+            </p>
+          )}
+          {attachmentList.length > 0 && <AttachmentList items={attachmentList} />}
+        </section>
+      )}
+
+      {/* Actions principales */}
+      {teams && (isCoach || showFeedbackButton) && (
+        <div className="flex flex-wrap items-stretch gap-2">
+          {isCoach && event.type === "match" && isFootball && (
+            <Link
+              to="/events/$eventId/lineup"
+              params={{ eventId }}
+              className={cn(
+                buttonVariants({ variant: "secondary", size: "sm" }),
+                "h-9 min-w-[7rem] flex-1 gap-1.5",
+              )}
+              title={t("lineup.title")}
+            >
+              <CircleDot className="h-4 w-4" />
+              <span>{t("lineup.title")}</span>
+            </Link>
+          )}
+          {isCoach && event.type === "training" && (
+            <Link
+              to="/events/$eventId/challenges"
+              params={{ eventId }}
+              className={cn(
+                buttonVariants({ variant: "secondary", size: "sm" }),
+                "h-9 min-w-[7rem] flex-1 gap-1.5",
+              )}
+              title={t("challenges:list.title")}
+            >
+              <Trophy className="h-4 w-4" />
+              <span>{t("challenges:list.title")}</span>
+            </Link>
+          )}
+          {showFeedbackButton && (
+            <Link
+              to="/events/$eventId/feedback"
+              params={{ eventId }}
+              className={cn(
+                buttonVariants({ variant: "secondary", size: "sm" }),
+                "h-9 min-w-[7rem] flex-1 gap-1.5",
+              )}
+              title={t("feedback.postMatchTitle")}
+            >
+              <ClipboardList className="h-4 w-4" />
+              <span>{t("feedback.postMatchTitle")}</span>
+            </Link>
+          )}
+          {isCoach && (event.type === "match" || event.type === "tournament") && (
+            <Button
+              type="button"
+              variant="secondary"
+              size="sm"
+              className="h-9 min-w-[7rem] flex-1 gap-1.5"
+              onClick={downloadMatchSheet}
+              disabled={generatingSheet}
+            >
+              {generatingSheet ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <Download className="h-4 w-4" />
+              )}
+              <span>
+                {t(
+                  event.type === "tournament"
+                    ? "events.matchSheet.labelTournament"
+                    : "events.matchSheet.label",
+                  { defaultValue: event.type === "tournament" ? "Player list" : "Match sheet" },
+                )}
+              </span>
+            </Button>
+          )}
         </div>
+      )}
 
-        {event.type === "match" && isFootball && (
-          <div className="px-4 pb-3" ref={lineupCardRef}>
-            <PublishedLineupCard eventId={eventId} teamId={event.team_id} />
-          </div>
-        )}
-
-        {event.status === "cancelled" && (
-          <div className="mx-4 mb-4 rounded-xl border border-destructive/40 bg-destructive/10 p-3">
-            <div className="flex items-center gap-2 text-destructive font-semibold text-sm">
-              <Ban className="h-4 w-4" />
-              {t("events.eventCancelled")}
-            </div>
-            {event.cancellation_reason && (
-              <p className="mt-1 text-sm text-foreground">
-                <span className="font-medium">{t("events.cancellationReason")} : </span>
-                {event.cancellation_reason}
-              </p>
-            )}
-            {event.cancelled_at && (
-              <p className="mt-1 text-[11px] text-muted-foreground">
-                {t("events.eventCancelledOn", {
-                  date: fmt(event.cancelled_at, "d MMM yyyy 'à' HH:mm"),
-                })}
-              </p>
-            )}
-          </div>
-        )}
-      </div>
+      {event.type === "match" && isFootball && (
+        <div ref={lineupCardRef}>
+          <PublishedLineupCard eventId={eventId} teamId={event.team_id} />
+        </div>
+      )}
 
       {isCoach && teams && (
         <EventFormSheet
@@ -2881,53 +2810,34 @@ function EventDetail() {
           const convocCount = (convocations ?? []).length;
           return (
             <div className="relative overflow-hidden rounded-2xl border border-border bg-card shadow-sm">
-              {/* Header — green gradient */}
-              <div className="relative overflow-hidden bg-gradient-to-br from-[#0f4a26] via-[#1d7a45] to-[#2d9d5f] px-4 py-3 text-white">
-                <svg
-                  className="pointer-events-none absolute inset-0 h-full w-full opacity-[0.10]"
-                  aria-hidden="true"
-                >
-                  <defs>
-                    <pattern
-                      id="comm-diag"
-                      width="14"
-                      height="14"
-                      patternUnits="userSpaceOnUse"
-                      patternTransform="rotate(45)"
-                    >
-                      <line x1="0" y1="0" x2="0" y2="14" stroke="white" strokeWidth="1" />
-                    </pattern>
-                  </defs>
-                  <rect width="100%" height="100%" fill="url(#comm-diag)" />
-                </svg>
-                <div className="pointer-events-none absolute -top-14 -right-14 h-36 w-36 rounded-full bg-white/20 blur-3xl" />
-                <div className="relative flex items-center justify-between gap-3">
-                  <div className="flex items-center gap-3 min-w-0">
-                    <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-white/15 backdrop-blur-sm ring-1 ring-white/25 shrink-0">
-                      <Send className="h-5 w-5 text-white" />
-                    </div>
-                    <div className="min-w-0 leading-tight">
-                      <div className="text-base font-extrabold tracking-tight">
-                        {t("events.whatsappShare.shareViaWhatsApp")}
-                      </div>
-                      <div className="text-[11px] text-white/75 font-medium mt-0.5">
-                        {t("events.commCard.subtitle", {
-                          count: convocCount,
-                        })}
-                      </div>
-                    </div>
+              {/* En-tête — la carte WhatsApp portait son propre dégradé, motif
+                  diagonal et halo compris : un troisième héros sur une page qui
+                  n'en supporte déjà pas deux. Elle devient une carte comme les
+                  autres ; c'est le bouton qui garde le vert de la marque. */}
+              <div className="flex items-center justify-between gap-3 border-b border-border/60 px-4 py-3">
+                <div className="flex min-w-0 items-center gap-2.5">
+                  <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-primary/12 ring-1 ring-primary/22">
+                    <Send className="h-4 w-4 text-primary" />
+                  </span>
+                  <div className="min-w-0 leading-tight">
+                    <p className="truncate text-sm font-extrabold tracking-tight">
+                      {t("events.whatsappShare.shareViaWhatsApp")}
+                    </p>
+                    <p className="mt-0.5 text-[11px] font-medium text-muted-foreground">
+                      {t("events.commCard.subtitle", { count: convocCount })}
+                    </p>
                   </div>
-                  {groupUrl && (
-                    <a
-                      href={groupUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-[11px] font-semibold text-white/90 hover:text-white inline-flex items-center gap-1 rounded-full bg-white/10 hover:bg-white/15 px-2.5 py-1 ring-1 ring-white/20 shrink-0"
-                    >
-                      {t("events.whatsappShare.openGroup")} <ExternalLink className="h-3 w-3" />
-                    </a>
-                  )}
                 </div>
+                {groupUrl && (
+                  <a
+                    href={groupUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex shrink-0 items-center gap-1 rounded-full border border-border px-2.5 py-1 text-[11px] font-semibold text-muted-foreground transition-colors hover:border-primary/45 hover:text-foreground"
+                  >
+                    {t("events.whatsappShare.openGroup")} <ExternalLink className="h-3 w-3" />
+                  </a>
+                )}
               </div>
 
               {/* Actions */}
@@ -2937,9 +2847,8 @@ function EventDetail() {
                     href={`https://wa.me/?text=${encodeURIComponent(convocMsg)}`}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="group relative overflow-hidden flex items-center gap-3 w-full rounded-2xl bg-gradient-to-br from-[#1d7a45] to-[#25D366] px-4 py-3 text-white shadow-[0_8px_20px_-10px_rgba(29,122,69,0.55)] active:scale-[0.99] transition"
+                    className="flex w-full items-center gap-3 rounded-2xl bg-[#25D366] px-4 py-3 text-white transition active:scale-[0.99] hover:brightness-95"
                   >
-                    <span className="pointer-events-none absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/30 to-transparent group-hover:translate-x-full transition-transform duration-1000" />
                     <span className="relative flex h-9 w-9 items-center justify-center rounded-xl bg-white/15 ring-1 ring-white/25 shrink-0">
                       <svg
                         viewBox="0 0 32 32"
@@ -2968,9 +2877,8 @@ function EventDetail() {
                         href={`https://wa.me/?text=${encodeURIComponent(convocMsg)}`}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="group relative overflow-hidden flex items-center gap-3 w-full rounded-2xl bg-gradient-to-br from-[#1d7a45] to-[#25D366] px-4 py-3 text-white shadow-[0_8px_20px_-10px_rgba(29,122,69,0.55)] active:scale-[0.99] transition"
+                        className="flex w-full items-center gap-3 rounded-2xl bg-[#25D366] px-4 py-3 text-white transition active:scale-[0.99] hover:brightness-95"
                       >
-                        <span className="pointer-events-none absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/30 to-transparent group-hover:translate-x-full transition-transform duration-1000" />
                         <span className="relative flex h-9 w-9 items-center justify-center rounded-xl bg-white/15 ring-1 ring-white/25 shrink-0">
                           <svg
                             viewBox="0 0 32 32"
@@ -2993,9 +2901,8 @@ function EventDetail() {
                         onClick={() => {
                           sendConvocations();
                         }}
-                        className="group relative overflow-hidden flex items-center gap-3 w-full rounded-2xl bg-gradient-to-br from-[#1d7a45] to-[#25D366] px-4 py-3 text-white shadow-[0_8px_20px_-10px_rgba(29,122,69,0.55)] active:scale-[0.99] transition text-left"
+                        className="flex w-full items-center gap-3 rounded-2xl bg-[#25D366] px-4 py-3 text-left text-white transition active:scale-[0.99] hover:brightness-95"
                       >
-                        <span className="pointer-events-none absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/30 to-transparent group-hover:translate-x-full transition-transform duration-1000" />
                         <span className="relative flex h-9 w-9 items-center justify-center rounded-xl bg-white/15 ring-1 ring-white/25 shrink-0">
                           <UserPlus className="h-4 w-4" />
                         </span>
@@ -3017,7 +2924,7 @@ function EventDetail() {
                       >
                         <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-emerald-50 to-emerald-100 ring-1 ring-emerald-200/60 shrink-0">
                           {sharingLineup ? (
-                            <Loader2 className="h-4 w-4 animate-spin text-[#1d7a45]" />
+                            <Loader2 className="h-4 w-4 animate-spin text-primary" />
                           ) : (
                             <svg
                               viewBox="0 0 32 32"
@@ -3560,6 +3467,11 @@ function EventDetail() {
         )}
 
       {/* === Unified Convocation card === */}
+      {/* Pour une réunion, les convoqués sont le contenu principal : la section
+          prend la place qu'occupe la carte des présences sur un match, avant la
+          pile secondaire, et non en fin de page. */}
+      {isInternalMeeting && <MeetingAttendeesSection eventId={eventId} eventType={event.type} />}
+
       {showConvocationSection && (
         <section
           id="my-response"
@@ -3575,52 +3487,29 @@ function EventDetail() {
             // === A. HEADER ===
             if (event.convocations_sent) {
               return (
-                <div className="relative overflow-hidden bg-gradient-to-br from-[#0f4a26] via-[#1d7a45] to-[#2d9d5f] text-white">
-                  <svg
-                    className="pointer-events-none absolute inset-0 h-full w-full opacity-[0.10]"
-                    aria-hidden="true"
-                  >
-                    <defs>
-                      <pattern
-                        id="presences-diag"
-                        width="14"
-                        height="14"
-                        patternUnits="userSpaceOnUse"
-                        patternTransform="rotate(45)"
-                      >
-                        <line x1="0" y1="0" x2="0" y2="14" stroke="white" strokeWidth="1" />
-                      </pattern>
-                    </defs>
-                    <rect width="100%" height="100%" fill="url(#presences-diag)" />
-                  </svg>
-                  <div className="pointer-events-none absolute -top-16 -right-16 h-44 w-44 rounded-full bg-white/20 blur-3xl" />
-
-                  <div className="relative px-4 pt-3 pb-3.5">
-                    {/* Title row + team badge + actions */}
-                    <div className="flex items-start justify-between gap-3 mb-2.5">
-                      <div className="min-w-0">
-                        <div className="flex items-center gap-2 flex-wrap">
-                          <h2 className="text-sm font-extrabold tracking-tight">
-                            {t("attendance.title")}
-                          </h2>
-                          {teamName && (
-                            <span className="inline-flex items-center rounded-full bg-white/15 ring-1 ring-white/25 px-2 py-0.5 text-[10px] font-semibold tracking-wide backdrop-blur-sm">
-                              {teamName}
-                            </span>
-                          )}
-                          {event.responses_locked && (
-                            <span className="inline-flex items-center gap-1 rounded-full bg-amber-300/20 ring-1 ring-amber-200/40 px-2 py-0.5 text-[10px] font-semibold text-amber-100">
-                              <Lock className="h-3 w-3" /> {t("attendance.locked")}
-                            </span>
-                          )}
-                          {convocChanges.length > 0 && (
-                            <span className="inline-flex items-center rounded-full bg-amber-300/90 text-amber-950 px-2 py-0.5 text-[10px] font-bold">
-                              {t("events.resend.updatesBadge", {
-                                count: convocChanges.length,
-                              })}
-                            </span>
-                          )}
-                        </div>
+                <div className="border-b border-border/60">
+                  <div className="px-4 pb-3 pt-3">
+                    {/* Titre + équipe + badges */}
+                    <div className="mb-2.5 flex items-start justify-between gap-3">
+                      <div className="flex min-w-0 flex-wrap items-center gap-2">
+                        <h2 className="text-sm font-extrabold tracking-tight">
+                          {t("attendance.title")}
+                        </h2>
+                        {teamName && (
+                          <span className="inline-flex items-center rounded-full border border-border bg-muted px-2 py-0.5 text-[10px] font-semibold text-muted-foreground">
+                            {teamName}
+                          </span>
+                        )}
+                        {event.responses_locked && (
+                          <span className="inline-flex items-center gap-1 rounded-full border border-amber-500/30 bg-amber-500/15 px-2 py-0.5 text-[10px] font-semibold text-amber-700 dark:text-amber-300">
+                            <Lock className="h-3 w-3" /> {t("attendance.locked")}
+                          </span>
+                        )}
+                        {convocChanges.length > 0 && (
+                          <span className="inline-flex items-center rounded-full border border-amber-500/40 bg-amber-500/20 px-2 py-0.5 text-[10px] font-bold text-amber-700 dark:text-amber-300">
+                            {t("events.resend.updatesBadge", { count: convocChanges.length })}
+                          </span>
+                        )}
                       </div>
                       {isCoach && event.status !== "cancelled" && (
                         <div className="flex items-center gap-1 shrink-0">
@@ -3629,7 +3518,7 @@ function EventDetail() {
                               <Button
                                 variant="ghost"
                                 size="icon"
-                                className="h-7 w-7 text-white hover:bg-white/15 hover:text-white"
+                                className="h-7 w-7 text-muted-foreground"
                               >
                                 <MoreVertical className="h-4 w-4" />
                               </Button>
@@ -3696,30 +3585,26 @@ function EventDetail() {
                       )}
                     </div>
 
-                    {/* Rate + responded */}
-                    <div className="flex items-end justify-between gap-3 mb-2">
+                    {/* Taux de réponse */}
+                    <div className="mb-2 flex items-end justify-between gap-3">
                       <div className="leading-none">
                         <div className="flex items-baseline gap-1">
-                          <span className="text-[32px] font-black tabular-nums tracking-[-0.04em] leading-none">
+                          <span className="font-display text-[34px] font-bold leading-none tracking-[-0.03em] tabular-nums">
                             {rate}
                           </span>
-                          <span className="text-lg font-bold text-white/80">%</span>
+                          <span className="text-base font-bold text-muted-foreground">%</span>
                         </div>
-                        <p className="text-[9px] uppercase tracking-[0.16em] text-white/70 font-bold mt-1">
+                        <p className="mt-1.5 text-[9.5px] font-bold uppercase tracking-[0.13em] text-muted-foreground">
                           {t("attendance.responseRate")}
                         </p>
                       </div>
-                      <div className="text-right leading-tight">
-                        <p className="text-xs font-bold tabular-nums">
-                          {respondedP}
-                          <span className="text-white/65 font-medium">/{totalP}</span>{" "}
-                          <span className="text-white/85 font-semibold">
-                            {t("attendance.responded")}
-                          </span>
+                      <div className="text-right text-xs leading-tight text-muted-foreground">
+                        <p className="tabular-nums">
+                          <span className="font-bold text-foreground">{respondedP}</span>/{totalP}{" "}
+                          {t("attendance.responded")}
                         </p>
                         {counts.pending > 0 && (
-                          <p className="text-[10px] text-white/70 mt-0.5">
-                            ·{" "}
+                          <p className="mt-0.5 text-[11px]">
                             {t("attendance.pendingShort", {
                               defaultValue: "{{count}} en attente",
                               count: counts.pending,
@@ -3729,67 +3614,80 @@ function EventDetail() {
                       </div>
                     </div>
 
-                    {/* Progress bar */}
-                    <div className="relative h-[3px] w-full overflow-hidden rounded-full bg-white/15 flex">
+                    {/* Barre empilée — 2 px de fond entre les segments, sans quoi
+                        deux parts voisines se lisent comme un seul bloc. La piste
+                        porte les non-répondants : ils ne sont pas une quatrième
+                        valeur, ils sont ce qui reste. */}
+                    <div
+                      className="flex h-[7px] gap-0.5 overflow-hidden rounded-full bg-muted"
+                      role="img"
+                      aria-label={[
+                        `${counts.present} ${t("attendance.present")}`,
+                        `${counts.uncertain} ${t("attendance.uncertain")}`,
+                        `${counts.absent} ${t("attendance.absent")}`,
+                        `${counts.pending} ${t("attendance.pending")}`,
+                      ].join(" · ")}
+                    >
                       {counts.present > 0 && (
                         <div
                           style={{ width: `${pct(counts.present)}%` }}
-                          className="bg-gradient-to-r from-emerald-300 to-emerald-200 transition-all"
+                          className="rounded-full bg-present"
                         />
                       )}
                       {counts.uncertain > 0 && (
                         <div
                           style={{ width: `${pct(counts.uncertain)}%` }}
-                          className="bg-gradient-to-r from-amber-300 to-amber-200 transition-all"
+                          className="rounded-full bg-uncertain"
                         />
                       )}
                       {counts.absent > 0 && (
                         <div
                           style={{ width: `${pct(counts.absent)}%` }}
-                          className="bg-gradient-to-r from-rose-300 to-rose-200 transition-all"
+                          className="rounded-full bg-absent"
                         />
                       )}
                     </div>
 
-                    {/* 4 stat blocks */}
-                    <div className="grid grid-cols-4 gap-1.5 mt-2.5">
+                    {/* Quatre compteurs — la pastille de couleur ne porte jamais
+                        l'information seule, le chiffre est écrit à côté. */}
+                    <div className="mt-2.5 grid grid-cols-4 gap-1.5">
                       {[
                         {
                           key: "present",
                           val: counts.present,
                           label: t("attendance.present"),
-                          tone: "bg-emerald-300",
+                          tone: "bg-present",
                         },
                         {
                           key: "uncertain",
                           val: counts.uncertain,
                           label: t("attendance.uncertain"),
-                          tone: "bg-amber-300",
+                          tone: "bg-uncertain",
                         },
                         {
                           key: "absent",
                           val: counts.absent,
                           label: t("attendance.absent"),
-                          tone: "bg-rose-300",
+                          tone: "bg-absent",
                         },
                         {
                           key: "pending",
                           val: counts.pending,
                           label: t("attendance.pending"),
-                          tone: "bg-white/60",
+                          tone: "bg-muted-foreground/40",
                         },
                       ].map((b) => (
                         <div
                           key={b.key}
-                          className="rounded-xl bg-white/10 backdrop-blur-sm ring-1 ring-white/15 px-1.5 py-1.5 text-center"
+                          className="rounded-xl border border-border px-1.5 py-1.5 text-center"
                         >
-                          <div className="flex items-center justify-center gap-1">
+                          <div className="flex items-center justify-center gap-1.5">
                             <span className={cn("h-1.5 w-1.5 rounded-full", b.tone)} />
-                            <span className="text-sm font-extrabold tabular-nums leading-none">
+                            <span className="font-display text-[15px] font-bold leading-none tabular-nums">
                               {b.val}
                             </span>
                           </div>
-                          <p className="text-[9px] uppercase tracking-wider text-white/75 font-semibold mt-0.5 truncate">
+                          <p className="mt-1 truncate text-[9px] font-bold uppercase tracking-wider text-muted-foreground">
                             {b.label}
                           </p>
                         </div>
@@ -3831,9 +3729,7 @@ function EventDetail() {
                 variant={convocChanges.length > 0 ? "default" : "outline"}
                 className={cn(
                   "w-full h-11 rounded-2xl",
-                  convocChanges.length > 0
-                    ? "bg-gradient-to-br from-[#1d7a45] to-[#2d9d5f] hover:from-[#185c34] hover:to-[#22834d] text-white shadow-[0_8px_20px_-10px_rgba(29,122,69,0.55)]"
-                    : "border-[1.5px]",
+                  convocChanges.length > 0 ? "" : "border-[1.5px]",
                 )}
               >
                 <Send className="h-4 w-4" />
@@ -3854,10 +3750,7 @@ function EventDetail() {
           {/* Coach: first-time send */}
           {isCoach && event.status !== "cancelled" && !event.convocations_sent && (
             <div className="p-4">
-              <Button
-                onClick={() => openPicker()}
-                className="w-full h-11 rounded-2xl bg-gradient-to-br from-[#1d7a45] to-[#2d9d5f] hover:from-[#185c34] hover:to-[#22834d] text-white shadow-[0_8px_20px_-10px_rgba(29,122,69,0.55)]"
-              >
+              <Button onClick={() => openPicker()} className="h-11 w-full rounded-2xl">
                 <Send className="h-4 w-4" />
                 {t("events.sendConvocations")}
               </Button>
@@ -4011,9 +3904,8 @@ function EventDetail() {
               <button
                 type="button"
                 onClick={remindAllPending}
-                className="group relative overflow-hidden inline-flex items-center gap-1.5 h-9 px-4 rounded-full bg-gradient-to-br from-[#1d7a45] to-[#2d9d5f] text-white text-xs font-bold shadow-[0_6px_16px_-6px_rgba(29,122,69,0.55)] active:scale-[0.98] transition shrink-0"
+                className="inline-flex h-9 shrink-0 items-center gap-1.5 rounded-full bg-primary px-4 text-xs font-bold text-primary-foreground transition active:scale-[0.98] hover:opacity-90"
               >
-                <span className="pointer-events-none absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/30 to-transparent group-hover:translate-x-full transition-transform duration-1000" />
                 <Bell className="h-3.5 w-3.5" /> {t("attendance.remindAll")}
               </button>
             </div>
@@ -4036,15 +3928,29 @@ function EventDetail() {
                   const shown = truncate ? sortedConvocations.slice(0, 4) : sortedConvocations;
                   return (
                     <>
-                      <div className="px-4 pt-4 pb-2 flex items-center justify-between gap-2">
+                      <div className="flex items-center justify-between gap-2 px-4 pb-2 pt-4">
                         <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-muted-foreground">
                           {t("attendance.convokedPlayers")}
                         </p>
-                        {isCoach && (
-                          <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-muted-foreground/70 pr-11">
-                            {t("attendance.response")}
-                          </p>
-                        )}
+                        {/* Convoquer un joueur de plus n'existait que dans le
+                            menu « ⋮ » de l'en-tête, où personne ne le trouvait.
+                            L'action reste dans le menu, avec le verrouillage et
+                            l'export ; elle gagne ici un accès direct, au-dessus
+                            de la liste où l'on constate justement qu'il manque
+                            quelqu'un. */}
+                        {isCoach &&
+                          event.status !== "cancelled" &&
+                          teamPlayers &&
+                          teamPlayers.length > (convocations?.length ?? 0) && (
+                            <button
+                              type="button"
+                              onClick={() => openPicker()}
+                              className="inline-flex shrink-0 items-center gap-1 rounded-full border border-primary/30 bg-primary/10 px-2.5 py-1 text-[11px] font-bold text-primary transition-colors hover:bg-primary/16"
+                            >
+                              <UserPlus className="h-3.5 w-3.5" />
+                              {t("attendance.addPlayers")}
+                            </button>
+                          )}
                       </div>
 
                       <ul className="px-2 pb-2">
@@ -4185,7 +4091,7 @@ function EventDetail() {
                         <button
                           type="button"
                           onClick={() => setPresencesExpanded((v) => !v)}
-                          className="w-full px-4 py-3 border-t border-border/70 text-xs font-semibold text-[#1d7a45] hover:bg-emerald-50/40 transition-colors flex items-center justify-center gap-1"
+                          className="flex w-full items-center justify-center gap-1 border-t border-border/70 px-4 py-3 text-xs font-semibold text-primary transition-colors hover:bg-primary/8"
                         >
                           {presencesExpanded
                             ? t("attendance.showLess")
@@ -4211,18 +4117,6 @@ function EventDetail() {
           )}
         </section>
       )}
-
-      {!isInternalMeeting &&
-        (isCoach && event?.id && event?.team_id && eventTeam?.club_id && eventDateStr ? (
-          <StaffAssignmentSection
-            eventId={event.id}
-            teamId={event.team_id}
-            clubId={eventTeam.club_id}
-            eventDate={eventDateStr}
-          />
-        ) : ((event as any)?.event_staff_assignments?.length ?? 0) > 0 ? (
-          <StaffAssignmentReadOnly assignments={(event as any)?.event_staff_assignments} />
-        ) : null)}
 
       <ConvocationDetailDialog
         open={!!detailConvocId}
@@ -4422,45 +4316,102 @@ function EventDetail() {
         </DialogContent>
       </Dialog>
 
-      {eventSupportsCarpool(event.type) &&
-        event.status !== "cancelled" &&
-        (isCoach || event.carpool_enabled) && (
-          <CarpoolSection
+      {/* ═══ Pile secondaire ═══
+          Quatre fonctionnalités entières, mais ce n'est pas pour elles qu'on
+          ouvre la page. Repliées, elles laissent les présences atteignables ;
+          leur résumé dit s'il faut ouvrir. Une section en manque s'ouvre
+          d'office : c'est là qu'il y a quelque chose à faire. */}
+      <section className="overflow-hidden rounded-2xl border border-border bg-card">
+        {!isInternalMeeting &&
+          (isCoach && event?.id && event?.team_id && eventTeam?.club_id && eventDateStr ? (
+            <CollapsibleSection
+              icon={UserCog}
+              title={t("staffAssignment.title")}
+              summary={staffCount > 0 ? t("events.stack.coachCount", { count: staffCount }) : null}
+            >
+              <StaffAssignmentSection
+                eventId={event.id}
+                teamId={event.team_id}
+                clubId={eventTeam.club_id}
+                eventDate={eventDateStr}
+              />
+            </CollapsibleSection>
+          ) : staffCount > 0 ? (
+            <CollapsibleSection
+              icon={UserCog}
+              title={t("staffAssignment.title")}
+              summary={t("events.stack.coachCount", { count: staffCount })}
+            >
+              <StaffAssignmentReadOnly assignments={(event as any)?.event_staff_assignments} />
+            </CollapsibleSection>
+          ) : null)}
+
+        {eventSupportsCarpool(event.type) &&
+          event.status !== "cancelled" &&
+          (isCoach || event.carpool_enabled) && (
+            <CollapsibleSection
+              icon={Car}
+              title={t("carpool.tab")}
+              summary={
+                transportMissing > 0
+                  ? t("events.stack.transportMissing", { count: transportMissing })
+                  : null
+              }
+              summaryTone={transportMissing > 0 ? "warn" : "mute"}
+              defaultOpen={transportMissing > 0}
+            >
+              <CarpoolSection
+                eventId={eventId}
+                teamId={event.team_id}
+                isCoach={isCoach}
+                convocations={(convocations ?? []) as any}
+                childrenLinks={(childrenLinks ?? []) as string[]}
+                carpoolEnabled={!!event.carpool_enabled}
+                onToggleEnabled={
+                  isCoach
+                    ? async () => {
+                        const { error } = await supabase
+                          .from("events")
+                          .update({ carpool_enabled: !event.carpool_enabled })
+                          .eq("id", eventId);
+                        if (error) {
+                          toast.error(error.message);
+                          return;
+                        }
+                        qc.invalidateQueries({ queryKey: ["event", eventId] });
+                      }
+                    : undefined
+                }
+              />
+            </CollapsibleSection>
+          )}
+
+        <CollapsibleSection
+          icon={HandHelping}
+          title={t("needs:section.title")}
+          summary={
+            seatsMissing > 0 ? t("events.stack.seatsMissing", { count: seatsMissing }) : null
+          }
+          summaryTone={seatsMissing > 0 ? "warn" : "mute"}
+          defaultOpen={seatsMissing > 0}
+        >
+          <EventNeedsSection
             eventId={eventId}
-            teamId={event.team_id}
-            isCoach={isCoach}
-            convocations={(convocations ?? []) as any}
-            childrenLinks={(childrenLinks ?? []) as string[]}
-            carpoolEnabled={!!event.carpool_enabled}
-            onToggleEnabled={
-              isCoach
-                ? async () => {
-                    const { error } = await supabase
-                      .from("events")
-                      .update({ carpool_enabled: !event.carpool_enabled })
-                      .eq("id", eventId);
-                    if (error) {
-                      toast.error(error.message);
-                      return;
-                    }
-                    qc.invalidateQueries({ queryKey: ["event", eventId] });
-                  }
-                : undefined
-            }
+            eventType={event.type}
+            sport={eventTeam?.sport ?? null}
+            teamId={event.team_id ?? null}
           />
-        )}
+        </CollapsibleSection>
 
-      <EventNeedsSection
-        eventId={eventId}
-        eventType={event.type}
-        sport={eventTeam?.sport ?? null}
-        teamId={event.team_id ?? null}
-      />
-
-      {/* Convocations réunion — ne s'affiche que pour les événements de type "meeting". */}
-      {isInternalMeeting && <MeetingAttendeesSection eventId={eventId} eventType={event.type} />}
-
-      <EventChat eventId={eventId} />
+        <CollapsibleSection
+          icon={MessageSquare}
+          title={t("chat.title")}
+          summary={chatCount ? t("events.stack.messageCount", { count: chatCount }) : null}
+          summaryTone="info"
+        >
+          <EventChat eventId={eventId} />
+        </CollapsibleSection>
+      </section>
 
       {/* Sticky bottom "Répondre" CTA — mobile only, when at least one of the user's convocations is still pending */}
       {hasPendingForMe && (

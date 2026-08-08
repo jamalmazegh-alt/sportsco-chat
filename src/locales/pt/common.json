@@ -1075,6 +1075,8 @@
       "lineup": "Alinhamento"
     },
     "pastBadge": "Passado",
+    "todayShort": "hoje",
+    "live": "A decorrer",
     "calendarHint": "Toca num dia com um ponto para ver os Eventos.",
     "noEventsThisDay": "Nenhum Evento neste dia.",
     "duplicateExists": "Já existe um Evento para esta Equipa nesta data/hora.",
@@ -1130,7 +1132,20 @@
       "invitePlayersFirstTitle": "Convida jogadores",
       "subtitle": "{{count}} jogadores convocados"
     },
-    "scoreDisabledCancelled": "Evento cancelado – edição de pontuação e fatos da partida desativada."
+    "scoreDisabledCancelled": "Evento cancelado – edição de pontuação e fatos da partida desativada.",
+    "whenWhere": "Quando e onde",
+    "kickoff": "Pontapé de saída",
+    "estimatedEnd": "Fim estimado",
+    "stack": {
+      "coachCount_one": "{{count}} treinador",
+      "coachCount_other": "{{count}} treinadores",
+      "transportMissing_one": "{{count}} sem transporte",
+      "transportMissing_other": "{{count}} sem transporte",
+      "seatsMissing_one": "{{count}} vaga por preencher",
+      "seatsMissing_other": "{{count}} vagas por preencher",
+      "messageCount_one": "{{count}} mensagem",
+      "messageCount_other": "{{count}} mensagens"
+    }
   },
   "followUps": {
     "title": "Lembretes",
@@ -1208,7 +1223,8 @@
     "toConfirm": "A confirmar",
     "calledUp": "Convocado",
     "pendingShort": "{{count}} pendentes",
-    "showAll": "Ver os {{count}} jogadores"
+    "showAll": "Ver os {{count}} jogadores",
+    "addPlayers": "Adicionar"
   },
   "stats": {
     "title": "Estatísticas",
@@ -4917,5 +4933,40 @@
     "it": "Italiano",
     "nl": "Neerlandês",
     "pt": "Português"
+  },
+  "weather": {
+    "label": "Previsão",
+    "temperature": "{{value}}°",
+    "precipitationShort": "{{value}} %",
+    "windShort": "{{value}} km/h",
+    "alerts": {
+      "rain": "Chuva prevista no pontapé de saída",
+      "wind": "Vento forte previsto",
+      "cold": "Frio previsto",
+      "heat": "Calor intenso previsto"
+    },
+    "availableFrom": "Previsão a partir de {{date}}",
+    "tooFar": "Demasiado distante",
+    "unavailable": "Previsão indisponível",
+    "noLocation": "Local sem coordenadas",
+    "feelsLike": "Sensação {{value}}°",
+    "windValue": "vento {{value}} km/h",
+    "stripCaption": "da convocatória ao fim",
+    "updated": "Previsão atualizada há {{ago}}",
+    "conditions": {
+      "clear": "Céu limpo",
+      "partly": "Pouco nublado",
+      "cloudy": "Encoberto",
+      "fog": "Nevoeiro",
+      "rain": "Aguaceiros",
+      "snow": "Neve",
+      "storm": "Trovoada"
+    },
+    "alertText": {
+      "rain": "Aguaceiros previstos no pontapé de saída — {{value}} % às {{time}}.",
+      "wind": "Vento forte previsto no pontapé de saída — {{value}} km/h às {{time}}.",
+      "cold": "Frio previsto no pontapé de saída — sensação de {{value}}° às {{time}}.",
+      "heat": "Calor intenso previsto no pontapé de saída — sensação de {{value}}° às {{time}}."
+    }
   }
 }

@@ -1075,6 +1075,8 @@
       "lineup": "Lineup"
     },
     "pastBadge": "Past",
+    "todayShort": "today",
+    "live": "Live",
     "calendarHint": "Tap a day with a dot to see events.",
     "noEventsThisDay": "No events that day.",
     "duplicateExists": "An event already exists for this team at that date/time.",
@@ -1130,7 +1132,20 @@
       "invitePlayersFirstTitle": "Invite players",
       "subtitle": "{{count}} players called up"
     },
-    "scoreDisabledCancelled": "Event cancelled — score and match facts editing disabled."
+    "scoreDisabledCancelled": "Event cancelled — score and match facts editing disabled.",
+    "whenWhere": "When & where",
+    "kickoff": "Kick-off",
+    "estimatedEnd": "Estimated end",
+    "stack": {
+      "coachCount_one": "{{count}} coach",
+      "coachCount_other": "{{count}} coaches",
+      "transportMissing_one": "{{count}} without a ride",
+      "transportMissing_other": "{{count}} without a ride",
+      "seatsMissing_one": "{{count}} slot to fill",
+      "seatsMissing_other": "{{count}} slots to fill",
+      "messageCount_one": "{{count}} message",
+      "messageCount_other": "{{count}} messages"
+    }
   },
   "followUps": {
     "title": "Follow-ups",
@@ -1208,7 +1223,8 @@
     "toConfirm": "To confirm",
     "calledUp": "Called up",
     "pendingShort": "{{count}} pending",
-    "showAll": "Show all {{count}} players"
+    "showAll": "Show all {{count}} players",
+    "addPlayers": "Add"
   },
   "stats": {
     "title": "Stats",
@@ -4917,5 +4933,40 @@
     "it": "Italian",
     "nl": "Dutch",
     "pt": "Portuguese"
+  },
+  "weather": {
+    "label": "Forecast",
+    "temperature": "{{value}}°",
+    "precipitationShort": "{{value}}%",
+    "windShort": "{{value}} km/h",
+    "alerts": {
+      "rain": "Rain expected at kick-off",
+      "wind": "Strong wind expected",
+      "cold": "Cold expected",
+      "heat": "High heat expected"
+    },
+    "availableFrom": "Forecast from {{date}}",
+    "tooFar": "Too far ahead",
+    "unavailable": "Forecast unavailable",
+    "noLocation": "Venue not geolocated",
+    "feelsLike": "Feels like {{value}}°",
+    "windValue": "wind {{value}} km/h",
+    "stripCaption": "from meet-up to the end",
+    "updated": "Forecast updated {{ago}} ago",
+    "conditions": {
+      "clear": "Clear",
+      "partly": "Partly cloudy",
+      "cloudy": "Overcast",
+      "fog": "Fog",
+      "rain": "Showers",
+      "snow": "Snow",
+      "storm": "Thunderstorms"
+    },
+    "alertText": {
+      "rain": "Showers expected at kick-off — {{value}}% chance at {{time}}.",
+      "wind": "Strong wind expected at kick-off — {{value}} km/h at {{time}}.",
+      "cold": "Cold expected at kick-off — feels like {{value}}° at {{time}}.",
+      "heat": "High heat expected at kick-off — feels like {{value}}° at {{time}}."
+    }
   }
 }

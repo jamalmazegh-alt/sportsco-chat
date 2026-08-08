@@ -143,7 +143,7 @@ export function MeetingAttendeesSection({
   const total = attendees.length;
 
   return (
-    <section className="rounded-3xl border-[1.5px] border-border bg-card overflow-hidden shadow-[0_8px_24px_-14px_rgba(15,23,42,0.10)]">
+    <section className="overflow-hidden rounded-2xl border border-border bg-card">
       {(() => {
         const totalP = counts.present + counts.uncertain + counts.absent + counts.pending;
         const respondedP = totalP - counts.pending;
@@ -152,7 +152,7 @@ export function MeetingAttendeesSection({
 
         if (total === 0) {
           return (
-            <header className="flex items-start justify-between gap-3 px-5 py-4 border-b border-border/70">
+            <header className="flex items-start justify-between gap-3 border-b border-border/60 px-4 py-3">
               <div className="min-w-0 flex items-center gap-2">
                 <Users className="h-4 w-4 shrink-0 text-muted-foreground" />
                 <h2 className="text-base font-extrabold tracking-tight text-foreground">
@@ -172,116 +172,121 @@ export function MeetingAttendeesSection({
         }
 
         return (
-          <div className="relative overflow-hidden bg-gradient-to-br from-[#0f4a26] via-[#1d7a45] to-[#2d9d5f] text-white">
-            <div className="pointer-events-none absolute -top-16 -right-16 h-44 w-44 rounded-full bg-white/20 blur-3xl" />
-            <div className="relative px-4 pt-3 pb-3.5">
-              <div className="flex items-start justify-between gap-3 mb-2.5">
-                <div className="min-w-0 flex items-center gap-2 flex-wrap">
-                  <Users className="h-4 w-4 shrink-0" />
-                  <h2 className="text-sm font-extrabold tracking-tight">
-                    {t("meetings:section.title")}
-                  </h2>
-                  <span className="inline-flex items-center rounded-full bg-white/15 ring-1 ring-white/25 px-2 py-0.5 text-[10px] font-semibold tracking-wide backdrop-blur-sm">
-                    {t("meetings:section.count", {
-                      count: total,
-                    })}
+          <div className="border-b border-border/60 px-4 pb-3 pt-3">
+            <div className="mb-2.5 flex items-start justify-between gap-3">
+              <div className="flex min-w-0 flex-wrap items-center gap-2">
+                <Users className="h-4 w-4 shrink-0 text-muted-foreground" />
+                <h2 className="text-sm font-extrabold tracking-tight">
+                  {t("meetings:section.title")}
+                </h2>
+                <span className="inline-flex items-center rounded-full border border-border bg-muted px-2 py-0.5 text-[10px] font-semibold text-muted-foreground">
+                  {t("meetings:section.count", { count: total })}
+                </span>
+              </div>
+              {isStaff && (
+                <ManageAttendeesDialog
+                  eventId={eventId}
+                  onDone={refresh}
+                  initialSelection={sourcesToSelection(attendees)}
+                  hasExistingAttendees={total > 0}
+                />
+              )}
+            </div>
+
+            <div className="mb-2 flex items-end justify-between gap-3">
+              <div className="leading-none">
+                <div className="flex items-baseline gap-1">
+                  <span className="font-display text-[34px] font-bold leading-none tracking-[-0.03em] tabular-nums">
+                    {rate}
                   </span>
+                  <span className="text-base font-bold text-muted-foreground">%</span>
                 </div>
-                {isStaff && (
-                  <ManageAttendeesDialog
-                    eventId={eventId}
-                    onDone={refresh}
-                    initialSelection={sourcesToSelection(attendees)}
-                    hasExistingAttendees={total > 0}
-                  />
-                )}
+                <p className="mt-1.5 text-[9.5px] font-bold uppercase tracking-[0.13em] text-muted-foreground">
+                  {t("attendance.responseRate")}
+                </p>
               </div>
+              <div className="text-right text-xs leading-tight text-muted-foreground">
+                <p className="tabular-nums">
+                  <span className="font-bold text-foreground">{respondedP}</span>/{totalP}{" "}
+                  {t("attendance.responded")}
+                </p>
+              </div>
+            </div>
 
-              <div className="flex items-end justify-between gap-3 mb-2">
-                <div className="leading-none">
-                  <div className="flex items-baseline gap-1">
-                    <span className="text-[32px] font-black tabular-nums tracking-[-0.04em] leading-none">
-                      {rate}
+            {/* Même barre que les présences d'un match : 2 px de fond entre les
+                segments, et la piste porte les non-répondants. */}
+            <div
+              className="flex h-[7px] gap-0.5 overflow-hidden rounded-full bg-muted"
+              role="img"
+              aria-label={[
+                `${counts.present} ${t("attendance.present")}`,
+                `${counts.uncertain} ${t("attendance.uncertain")}`,
+                `${counts.absent} ${t("attendance.absent")}`,
+                `${counts.pending} ${t("attendance.pending")}`,
+              ].join(" · ")}
+            >
+              {counts.present > 0 && (
+                <div
+                  style={{ width: `${pct(counts.present)}%` }}
+                  className="rounded-full bg-present"
+                />
+              )}
+              {counts.uncertain > 0 && (
+                <div
+                  style={{ width: `${pct(counts.uncertain)}%` }}
+                  className="rounded-full bg-uncertain"
+                />
+              )}
+              {counts.absent > 0 && (
+                <div
+                  style={{ width: `${pct(counts.absent)}%` }}
+                  className="rounded-full bg-absent"
+                />
+              )}
+            </div>
+
+            <div className="mt-2.5 grid grid-cols-4 gap-1.5">
+              {[
+                {
+                  key: "present",
+                  val: counts.present,
+                  label: t("attendance.present"),
+                  tone: "bg-present",
+                },
+                {
+                  key: "uncertain",
+                  val: counts.uncertain,
+                  label: t("attendance.uncertain"),
+                  tone: "bg-uncertain",
+                },
+                {
+                  key: "absent",
+                  val: counts.absent,
+                  label: t("attendance.absent"),
+                  tone: "bg-absent",
+                },
+                {
+                  key: "pending",
+                  val: counts.pending,
+                  label: t("attendance.pending"),
+                  tone: "bg-muted-foreground/40",
+                },
+              ].map((b) => (
+                <div
+                  key={b.key}
+                  className="rounded-xl border border-border px-1.5 py-1.5 text-center"
+                >
+                  <div className="flex items-center justify-center gap-1.5">
+                    <span className={cn("h-1.5 w-1.5 rounded-full", b.tone)} />
+                    <span className="font-display text-[15px] font-bold leading-none tabular-nums">
+                      {b.val}
                     </span>
-                    <span className="text-lg font-bold text-white/80">%</span>
                   </div>
-                  <p className="text-[9px] uppercase tracking-[0.16em] text-white/70 font-bold mt-1">
-                    {t("attendance.responseRate")}
+                  <p className="mt-1 truncate text-[9px] font-bold uppercase tracking-wider text-muted-foreground">
+                    {b.label}
                   </p>
                 </div>
-                <div className="text-right leading-tight">
-                  <p className="text-xs font-bold tabular-nums">
-                    {respondedP}
-                    <span className="text-white/65 font-medium">/{totalP}</span>{" "}
-                    <span className="text-white/85 font-semibold">{t("attendance.responded")}</span>
-                  </p>
-                </div>
-              </div>
-
-              <div className="relative h-[3px] w-full overflow-hidden rounded-full bg-white/15 flex">
-                {counts.present > 0 && (
-                  <div
-                    style={{ width: `${pct(counts.present)}%` }}
-                    className="bg-gradient-to-r from-emerald-300 to-emerald-200"
-                  />
-                )}
-                {counts.uncertain > 0 && (
-                  <div
-                    style={{ width: `${pct(counts.uncertain)}%` }}
-                    className="bg-gradient-to-r from-amber-300 to-amber-200"
-                  />
-                )}
-                {counts.absent > 0 && (
-                  <div
-                    style={{ width: `${pct(counts.absent)}%` }}
-                    className="bg-gradient-to-r from-rose-300 to-rose-200"
-                  />
-                )}
-              </div>
-
-              <div className="grid grid-cols-4 gap-1.5 mt-2.5">
-                {[
-                  {
-                    key: "present",
-                    val: counts.present,
-                    label: t("attendance.present"),
-                    tone: "bg-emerald-300",
-                  },
-                  {
-                    key: "uncertain",
-                    val: counts.uncertain,
-                    label: t("attendance.uncertain"),
-                    tone: "bg-amber-300",
-                  },
-                  {
-                    key: "absent",
-                    val: counts.absent,
-                    label: t("attendance.absent"),
-                    tone: "bg-rose-300",
-                  },
-                  {
-                    key: "pending",
-                    val: counts.pending,
-                    label: t("attendance.pending"),
-                    tone: "bg-white/60",
-                  },
-                ].map((b) => (
-                  <div
-                    key={b.key}
-                    className="rounded-xl bg-white/10 backdrop-blur-sm ring-1 ring-white/15 px-1.5 py-1.5 text-center"
-                  >
-                    <div className="flex items-center justify-center gap-1">
-                      <span className={cn("h-1.5 w-1.5 rounded-full", b.tone)} />
-                      <span className="text-sm font-extrabold tabular-nums leading-none">
-                        {b.val}
-                      </span>
-                    </div>
-                    <p className="text-[9px] uppercase tracking-wider text-white/75 font-semibold mt-0.5 truncate">
-                      {b.label}
-                    </p>
-                  </div>
-                ))}
-              </div>
+              ))}
             </div>
           </div>
         );
