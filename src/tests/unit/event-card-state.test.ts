@@ -2,6 +2,7 @@ import { describe, it, expect } from "vitest";
 import {
   cardFooterVisibility,
   eventCardState,
+  isEventDayReached,
   matchOutcome,
   type EventCardEvent,
 } from "@/components/events/event-card-state";
@@ -146,5 +147,21 @@ describe("cardFooterVisibility", () => {
   it("ties the called-up rail to the viewer's own convocation", () => {
     expect(cardFooterVisibility(upcoming).calledRail).toBe(true);
     expect(cardFooterVisibility({ ...upcoming, hasMyConvocation: false }).calledRail).toBe(false);
+  });
+});
+
+describe("isEventDayReached", () => {
+  const kickoff = new Date("2026-03-14T20:00:00Z");
+
+  it("opens from the start of match day, hours before kick-off", () => {
+    expect(isEventDayReached(kickoff, new Date("2026-03-14T08:00:00Z"))).toBe(true);
+  });
+
+  it("stays closed the day before", () => {
+    expect(isEventDayReached(kickoff, new Date("2026-03-13T23:00:00Z"))).toBe(false);
+  });
+
+  it("stays open after the match", () => {
+    expect(isEventDayReached(kickoff, new Date("2026-03-16T09:00:00Z"))).toBe(true);
   });
 });

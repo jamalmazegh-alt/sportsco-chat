@@ -109,3 +109,15 @@ export function cardFooterVisibility(input: FooterVisibilityInput): FooterVisibi
     calledRail: input.hasMyConvocation,
   };
 }
+
+/**
+ * Le jour de l'événement est-il arrivé ?
+ *
+ * Saisir un score ou ouvrir le retour d'après-match ne dépend pas de l'heure du
+ * coup d'envoi mais du jour : un coach qui prépare sa journée le matin d'un
+ * match à 20:00 doit déjà y avoir accès. On compare donc des jours civils et
+ * non des instants — un match à 20:00 est « du jour » dès minuit.
+ */
+export function isEventDayReached(startsAt: Date, now: Date): boolean {
+  return isSameDay(startsAt, now) || startsAt.getTime() < now.getTime();
+}

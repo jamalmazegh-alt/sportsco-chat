@@ -79,6 +79,7 @@ import { CarpoolSection } from "@/components/carpool-section";
 import { AttachmentList, type Attachment } from "@/components/attachments";
 import { PublishedLineupCard } from "@/components/lineup/published-lineup-card";
 import { EventDetailHeader } from "@/components/events/event-detail-header";
+import { isEventDayReached } from "@/components/events/event-card-state";
 import { EventWhenWhere } from "@/components/events/event-when-where";
 import { EventWeatherPanel } from "@/components/events/event-weather-panel";
 import { getEventsWeather } from "@/lib/weather/weather.functions";
@@ -2321,7 +2322,10 @@ function EventDetail() {
     new Date((event.ends_at ?? event.starts_at) as string).getTime() <= Date.now();
   const hasPendingForMe =
     !responsesReadOnly && visibleMyConvocs.some((c: any) => c.status === "pending");
-  const isPastMatch = event.type === "match" && new Date(event.starts_at).getTime() <= Date.now();
+  // Score et retour d'après-match sont ouverts dès le jour du match, pas
+  // seulement après le coup d'envoi.
+  const isPastMatch =
+    event.type === "match" && isEventDayReached(new Date(event.starts_at), new Date());
   const showFeedbackButton = isPastMatch && isCoach;
 
   const detailLocale = dateLocale();

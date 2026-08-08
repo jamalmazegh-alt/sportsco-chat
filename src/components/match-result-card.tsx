@@ -28,6 +28,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth-context";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
+import { isEventDayReached } from "@/components/events/event-card-state";
 import { getSportConfig, SOLO_STAT_KINDS, type StatKind } from "@/lib/sport-config";
 import { ConfettiBurst } from "@/components/confetti-burst";
 import { ScoreStepper } from "@/components/score-stepper";
@@ -92,6 +93,9 @@ export function MatchResultCard({
   const [addingGoal, setAddingGoal] = useState(false);
 
   const isPast = new Date(startsAt).getTime() < Date.now();
+  // Le coach peut saisir le score dès le jour du match, sans attendre le coup
+  // d'envoi ; `isPast` reste réservé à ce qui suit vraiment le coup de sifflet.
+  const dayReached = isEventDayReached(new Date(startsAt), new Date());
 
   const { data: result } = useQuery({
     queryKey: ["match-result", eventId],
@@ -252,7 +256,8 @@ export function MatchResultCard({
     qc.invalidateQueries({ queryKey: ["event-goals", eventId] });
   }
 
-  if (!isPast && !result) {
+  // Avant le jour du match, la carte n'a rien à dire aux non-staff.
+  if (!dayReached && !result) {
     if (!isCoach) return null;
   }
 
@@ -358,11 +363,11 @@ export function MatchResultCard({
           </div>
         )}
 
-        {!editing && !result && !isPast && (
+        {!editing && !result && !dayReached && (
           <p className="text-xs text-muted-foreground italic">{t("match.notPlayedYet")}</p>
         )}
 
-        {!editing && !result && isPast && isCoach && (
+        {!editing && !result && dayReached && isCoach && (
           <div className="flex items-center justify-between gap-3 rounded-xl border border-primary/22 bg-primary/8 px-4 py-3">
             <div className="min-w-0">
               <p className="text-sm font-bold text-foreground">{t("match.finishedTitle")}</p>
@@ -379,7 +384,7 @@ export function MatchResultCard({
           </div>
         )}
 
-        {!editing && !result && isPast && !isCoach && (
+        {!editing && !result && dayReached && !isCoach && (
           <p className="text-xs text-muted-foreground italic">{t("match.noResultYet")}</p>
         )}
 
