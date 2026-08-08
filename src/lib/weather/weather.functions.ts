@@ -2,6 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
+import type { Json } from "@/integrations/supabase/types";
 import { fetchOpenMeteoHourly, mapOpenMeteoHourly } from "./open-meteo";
 import type { OpenMeteoResponse } from "./open-meteo";
 import {
@@ -145,41 +146,6 @@ interface CachedPayload {
   fetchedAt: Date;
 }
 
-interface WeatherCacheRow {
-  cache_key: string;
-  latitude: number;
-  longitude: number;
-  forecast_date: string;
-  payload: OpenMeteoResponse;
-  fetched_at: string;
-}
-
-/**
- * `weather_cache` n'apparaît pas dans `integrations/supabase/types.ts` : ce
- * fichier est généré depuis la base, et la migration de cette branche n'y est
- * pas encore appliquée. Le temps que `supabase gen types` soit rejoué après
- * déploiement, on passe par cet accès typé à la main — la forme des lignes est
- * décrite par `WeatherCacheRow`, elle n'est donc pas perdue pour autant.
- */
-function weatherCacheTable() {
-  return (
-    supabaseAdmin as unknown as {
-      from: (table: "weather_cache") => {
-        select: (columns: string) => {
-          in: (
-            column: string,
-            values: string[],
-          ) => PromiseLike<{ data: WeatherCacheRow[] | null; error: { message: string } | null }>;
-        };
-        upsert: (
-          rows: WeatherCacheRow[],
-          options: { onConflict: string },
-        ) => PromiseLike<{ error: { message: string } | null }>;
-      };
-    }
-  ).from("weather_cache");
-}
-
 /**
  * Résout chaque groupe depuis le cache, et n'appelle le fournisseur que pour
  * les manquants. Un échec réseau sur un groupe n'en fait pas échouer d'autres :
@@ -192,7 +158,12 @@ async function loadPayloads(
   const resolved = new Map<string, CachedPayload>();
   const keys = Array.from(groups.keys());
 
-  const { data: cached } = await weatherCacheTable()
+  // La réponse du fournisseur est stockée telle quelle en jsonb. `Json` et
+  // `OpenMeteoResponse` décrivent la même donnée sous deux angles — l'un
+  // structurel, l'autre contractuel — d'où la conversion aux deux frontières.
+
+  const { data: cached } = await supabaseAdmin
+    .from("weather_cache")
     .select("cache_key, payload, fetched_at")
     .in("cache_key", keys);
 
@@ -200,7 +171,10 @@ async function loadPayloads(
   for (const row of cached ?? []) {
     const fetchedAt = new Date(row.fetched_at);
     if (!isCacheFresh(fetchedAt, now)) continue;
-    resolved.set(row.cache_key, { payload: row.payload, fetchedAt });
+    resolved.set(row.cache_key, {
+      payload: row.payload as unknown as OpenMeteoResponse,
+      fetchedAt,
+    });
     const i = stale.indexOf(row.cache_key);
     if (i >= 0) stale.splice(i, 1);
   }
@@ -216,7 +190,7 @@ async function loadPayloads(
     }),
   );
 
-  const toStore: WeatherCacheRow[] = [];
+  const toStore = [];
   for (const r of fetched) {
     if (r.status !== "fulfilled") {
       console.error("[weather] forecast fetch failed", r.reason);
@@ -228,13 +202,15 @@ async function loadPayloads(
       latitude: r.value.group.latitude,
       longitude: r.value.group.longitude,
       forecast_date: r.value.group.day.toISOString().slice(0, 10),
-      payload: r.value.payload,
+      payload: r.value.payload as unknown as Json,
       fetched_at: now.toISOString(),
     });
   }
 
   if (toStore.length > 0) {
-    const { error } = await weatherCacheTable().upsert(toStore, { onConflict: "cache_key" });
+    const { error } = await supabaseAdmin
+      .from("weather_cache")
+      .upsert(toStore, { onConflict: "cache_key" });
     // Un cache non écrit dégrade la performance, pas le résultat : on continue.
     if (error) console.error("[weather] cache write failed", error.message);
   }
