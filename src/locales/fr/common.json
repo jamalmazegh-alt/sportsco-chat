@@ -1144,7 +1144,13 @@
       "seatsMissing_one": "{{count}} place à pourvoir",
       "seatsMissing_other": "{{count}} places à pourvoir",
       "messageCount_one": "{{count}} message",
-      "messageCount_other": "{{count}} messages"
+      "messageCount_other": "{{count}} messages",
+      "noCoach": "Aucun coach",
+      "transportCovered": "Tous couverts",
+      "carpoolOff": "Désactivé",
+      "seatsFilled": "Complet",
+      "noNeed": "Aucun besoin",
+      "noMessage": "Aucun message"
     }
   },
   "followUps": {
@@ -3008,7 +3014,13 @@
       "noFacilitiesHint": "Aucun terrain configuré pour ce site.",
       "noFacilityOption": "Aucun terrain"
     },
-    "surfacePlaceholder": "Gazon, synthétique, parquet…"
+    "surfacePlaceholder": "Gazon, synthétique, parquet…",
+    "geocode": {
+      "action": "Géolocaliser ({{count}})",
+      "done": "{{count}} lieu(x) géolocalisé(s)",
+      "partial": "{{count}} géolocalisé(s), {{failed}} en échec",
+      "nothingToDo": "Tous les lieux sont déjà géolocalisés"
+    }
   },
   "callUpList": {
     "masked": "Liste masquée",

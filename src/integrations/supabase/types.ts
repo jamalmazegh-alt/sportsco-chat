@@ -7934,6 +7934,33 @@ export type Database = {
         }
         Relationships: []
       }
+      weather_cache: {
+        Row: {
+          cache_key: string
+          fetched_at: string
+          forecast_date: string
+          latitude: number
+          longitude: number
+          payload: Json
+        }
+        Insert: {
+          cache_key: string
+          fetched_at?: string
+          forecast_date: string
+          latitude: number
+          longitude: number
+          payload: Json
+        }
+        Update: {
+          cache_key?: string
+          fetched_at?: string
+          forecast_date?: string
+          latitude?: number
+          longitude?: number
+          payload?: Json
+        }
+        Relationships: []
+      }
     }
     Views: {
       player_season_stats: {

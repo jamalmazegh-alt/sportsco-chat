@@ -5,6 +5,7 @@ import {
   isCacheFresh,
   isValidCoordinate,
   pickAlert,
+  resolveEventCoordinates,
   shouldFetchWeather,
   weatherAvailability,
   weatherCacheKey,
@@ -391,5 +392,82 @@ describe("forecastAvailableFrom", () => {
     expect(forecastAvailableFrom(new Date("2026-03-14T15:00:00Z")).toISOString()).toBe(
       "2026-03-04T15:00:00.000Z",
     );
+  });
+});
+
+describe("resolveEventCoordinates", () => {
+  const stade = {
+    id: "v1",
+    name: "Stade des Lilas",
+    address: "12 avenue des Sports, Vitrolles",
+    latitude: 43.46,
+    longitude: 5.25,
+    isDefault: true,
+  };
+  const gymnase = {
+    id: "v2",
+    name: "Gymnase Nord",
+    address: "3 rue du Nord",
+    latitude: 43.5,
+    longitude: 5.3,
+    isDefault: false,
+  };
+  const venues = [stade, gymnase];
+
+  it("prefers the explicit venue link", () => {
+    const r = resolveEventCoordinates(
+      { venueId: "v2", location: "Stade des Lilas", isHome: true },
+      venues,
+    );
+    expect(r).toEqual({ latitude: 43.5, longitude: 5.3, via: "venue_id" });
+  });
+
+  it("falls back to matching the free-text location by venue name", () => {
+    // Cas réel : l'assistant efface venue_id dès qu'on touche au champ adresse.
+    const r = resolveEventCoordinates(
+      { venueId: null, location: "Stade des Lilas, Vitrolles", isHome: true },
+      venues,
+    );
+    expect(r).toEqual({ latitude: 43.46, longitude: 5.25, via: "location_match" });
+  });
+
+  it("ignores accents and case when matching", () => {
+    const r = resolveEventCoordinates(
+      { venueId: null, location: "GYMNASE NORD", isHome: null },
+      venues,
+    );
+    expect(r?.via).toBe("location_match");
+    expect(r?.latitude).toBe(43.5);
+  });
+
+  it("falls back to the club's default venue for a home event", () => {
+    const r = resolveEventCoordinates(
+      { venueId: null, location: "Terrain annexe", isHome: true },
+      venues,
+    );
+    expect(r).toEqual({ latitude: 43.46, longitude: 5.25, via: "default_venue" });
+  });
+
+  it("never guesses for an away event — a wrong forecast is worse than none", () => {
+    expect(
+      resolveEventCoordinates(
+        { venueId: null, location: "Chez l'adversaire", isHome: false },
+        venues,
+      ),
+    ).toBeNull();
+  });
+
+  it("ignores venues that have no usable coordinates", () => {
+    const ungeocoded = [{ ...stade, latitude: null, longitude: null }];
+    expect(
+      resolveEventCoordinates(
+        { venueId: "v1", location: "Stade des Lilas", isHome: true },
+        ungeocoded,
+      ),
+    ).toBeNull();
+  });
+
+  it("returns null when the club has no venue at all", () => {
+    expect(resolveEventCoordinates({ venueId: null, location: "X", isHome: true }, [])).toBeNull();
   });
 });

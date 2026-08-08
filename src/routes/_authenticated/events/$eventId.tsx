@@ -287,6 +287,10 @@ function EventDetailRoute() {
   return <EventDetail />;
 }
 
+/** Tuile d'action : icône au-dessus du libellé, largeur partagée. */
+const ACTION_TILE =
+  "flex flex-1 min-w-0 flex-col items-center justify-center gap-1.5 rounded-xl border border-border bg-card px-1 py-2.5 text-center text-[10.5px] font-semibold leading-tight transition-colors hover:border-primary/45 hover:bg-primary/5 disabled:opacity-60";
+
 function EventDetail() {
   const { eventId } = Route.useParams();
   const search = Route.useSearch();
@@ -642,6 +646,9 @@ function EventDetail() {
 
   const staffCount = ((event as any)?.event_staff_assignments?.length ?? 0) as number;
   const transportMissing = (carpoolNeeds ?? []).length;
+  const needsCount = ((needsData?.needs ?? []) as Array<{ status: string }>).filter(
+    (n) => n.status === "open",
+  ).length;
   const seatsMissing = (
     (needsData?.needs ?? []) as Array<{ status: string; remaining_seats: number }>
   )
@@ -2520,64 +2527,34 @@ function EventDetail() {
         </section>
       )}
 
-      {/* Actions principales */}
+      {/* Actions principales — tuiles icône au-dessus du libellé, comme la
+          maquette : à cette taille un bouton horizontal ne tient pas trois
+          libellés côte à côte sans les tronquer. */}
       {teams && (isCoach || showFeedbackButton) && (
-        <div className="flex flex-wrap items-stretch gap-2">
+        <div className="flex gap-2">
           {isCoach && event.type === "match" && isFootball && (
-            <Link
-              to="/events/$eventId/lineup"
-              params={{ eventId }}
-              className={cn(
-                buttonVariants({ variant: "secondary", size: "sm" }),
-                "h-9 min-w-[7rem] flex-1 gap-1.5",
-              )}
-              title={t("lineup.title")}
-            >
-              <CircleDot className="h-4 w-4" />
+            <Link to="/events/$eventId/lineup" params={{ eventId }} className={ACTION_TILE}>
+              <CircleDot className="h-[17px] w-[17px] text-primary" />
               <span>{t("lineup.title")}</span>
             </Link>
           )}
           {isCoach && event.type === "training" && (
-            <Link
-              to="/events/$eventId/challenges"
-              params={{ eventId }}
-              className={cn(
-                buttonVariants({ variant: "secondary", size: "sm" }),
-                "h-9 min-w-[7rem] flex-1 gap-1.5",
-              )}
-              title={t("challenges:list.title")}
-            >
-              <Trophy className="h-4 w-4" />
+            <Link to="/events/$eventId/challenges" params={{ eventId }} className={ACTION_TILE}>
+              <Trophy className="h-[17px] w-[17px] text-primary" />
               <span>{t("challenges:list.title")}</span>
             </Link>
           )}
-          {showFeedbackButton && (
-            <Link
-              to="/events/$eventId/feedback"
-              params={{ eventId }}
-              className={cn(
-                buttonVariants({ variant: "secondary", size: "sm" }),
-                "h-9 min-w-[7rem] flex-1 gap-1.5",
-              )}
-              title={t("feedback.postMatchTitle")}
-            >
-              <ClipboardList className="h-4 w-4" />
-              <span>{t("feedback.postMatchTitle")}</span>
-            </Link>
-          )}
           {isCoach && (event.type === "match" || event.type === "tournament") && (
-            <Button
+            <button
               type="button"
-              variant="secondary"
-              size="sm"
-              className="h-9 min-w-[7rem] flex-1 gap-1.5"
+              className={ACTION_TILE}
               onClick={downloadMatchSheet}
               disabled={generatingSheet}
             >
               {generatingSheet ? (
-                <Loader2 className="h-4 w-4 animate-spin" />
+                <Loader2 className="h-[17px] w-[17px] animate-spin text-primary" />
               ) : (
-                <Download className="h-4 w-4" />
+                <Download className="h-[17px] w-[17px] text-primary" />
               )}
               <span>
                 {t(
@@ -2587,7 +2564,13 @@ function EventDetail() {
                   { defaultValue: event.type === "tournament" ? "Player list" : "Match sheet" },
                 )}
               </span>
-            </Button>
+            </button>
+          )}
+          {showFeedbackButton && (
+            <Link to="/events/$eventId/feedback" params={{ eventId }} className={ACTION_TILE}>
+              <ClipboardList className="h-[17px] w-[17px] text-primary" />
+              <span>{t("feedback.postMatchTitle")}</span>
+            </Link>
           )}
         </div>
       )}
@@ -3724,20 +3707,24 @@ function EventDetail() {
               <div className="mb-3 flex justify-end">
                 <CallUpVisibilityBadge eventId={eventId} />
               </div>
+              {/* Comme la maquette : un libellé stable, et le nombre de mises à
+                  jour en pastille à côté plutôt que fondu dans la phrase — c'est
+                  ce qui distingue un renvoi utile d'un spam. */}
               <Button
                 onClick={() => setResendOpen(true)}
                 variant={convocChanges.length > 0 ? "default" : "outline"}
                 className={cn(
-                  "w-full h-11 rounded-2xl",
-                  convocChanges.length > 0 ? "" : "border-[1.5px]",
+                  "h-11 w-full gap-2 rounded-2xl",
+                  convocChanges.length === 0 && "border-[1.5px]",
                 )}
               >
                 <Send className="h-4 w-4" />
-                {convocChanges.length > 0
-                  ? t("events.resend.buttonWithChangesAll", {
-                      count: convocChanges.length,
-                    })
-                  : t("events.resend.buttonAll")}
+                {t("events.resend.buttonAll")}
+                {convocChanges.length > 0 && (
+                  <span className="rounded-full bg-white/22 px-2 py-0.5 text-[10px] font-bold">
+                    {t("events.resend.updatesBadge", { count: convocChanges.length })}
+                  </span>
+                )}
               </Button>
               {convocChanges.length > 0 && (
                 <p className="text-[11px] text-muted-foreground mt-1.5 text-center">
@@ -4327,9 +4314,16 @@ function EventDetail() {
             <CollapsibleSection
               icon={UserCog}
               title={t("staffAssignment.title")}
-              summary={staffCount > 0 ? t("events.stack.coachCount", { count: staffCount }) : null}
+              summary={
+                staffCount > 0
+                  ? t("events.stack.coachCount", { count: staffCount })
+                  : t("events.stack.noCoach")
+              }
+              summaryTone={staffCount > 0 ? "mute" : "warn"}
+              defaultOpen={staffCount === 0}
             >
               <StaffAssignmentSection
+                embedded
                 eventId={event.id}
                 teamId={event.team_id}
                 clubId={eventTeam.club_id}
@@ -4355,12 +4349,15 @@ function EventDetail() {
               summary={
                 transportMissing > 0
                   ? t("events.stack.transportMissing", { count: transportMissing })
-                  : null
+                  : event.carpool_enabled
+                    ? t("events.stack.transportCovered")
+                    : t("events.stack.carpoolOff")
               }
-              summaryTone={transportMissing > 0 ? "warn" : "mute"}
+              summaryTone={transportMissing > 0 ? "warn" : event.carpool_enabled ? "ok" : "mute"}
               defaultOpen={transportMissing > 0}
             >
               <CarpoolSection
+                embedded
                 eventId={eventId}
                 teamId={event.team_id}
                 isCoach={isCoach}
@@ -4390,12 +4387,17 @@ function EventDetail() {
           icon={HandHelping}
           title={t("needs:section.title")}
           summary={
-            seatsMissing > 0 ? t("events.stack.seatsMissing", { count: seatsMissing }) : null
+            seatsMissing > 0
+              ? t("events.stack.seatsMissing", { count: seatsMissing })
+              : needsCount > 0
+                ? t("events.stack.seatsFilled")
+                : t("events.stack.noNeed")
           }
-          summaryTone={seatsMissing > 0 ? "warn" : "mute"}
+          summaryTone={seatsMissing > 0 ? "warn" : needsCount > 0 ? "ok" : "mute"}
           defaultOpen={seatsMissing > 0}
         >
           <EventNeedsSection
+            embedded
             eventId={eventId}
             eventType={event.type}
             sport={eventTeam?.sport ?? null}
@@ -4403,13 +4405,20 @@ function EventDetail() {
           />
         </CollapsibleSection>
 
+        {/* Le chat n'est pas un réglage qu'on va chercher : c'est une
+            conversation. Il vient en dernier et s'ouvre par défaut. */}
         <CollapsibleSection
           icon={MessageSquare}
           title={t("chat.title")}
-          summary={chatCount ? t("events.stack.messageCount", { count: chatCount }) : null}
-          summaryTone="info"
+          summary={
+            chatCount
+              ? t("events.stack.messageCount", { count: chatCount })
+              : t("events.stack.noMessage")
+          }
+          summaryTone={chatCount ? "info" : "mute"}
+          defaultOpen
         >
-          <EventChat eventId={eventId} />
+          <EventChat embedded eventId={eventId} />
         </CollapsibleSection>
       </section>
 

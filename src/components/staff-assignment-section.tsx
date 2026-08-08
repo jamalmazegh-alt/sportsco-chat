@@ -81,12 +81,19 @@ export function StaffAssignmentSection({
   teamId,
   clubId,
   eventDate,
+  embedded = false,
 }: {
   eventId: string;
   teamId: string;
   clubId: string;
   /** YYYY-MM-DD */
   eventDate: string;
+  /**
+   * Rendu à l'intérieur d'une section repliable, qui fournit déjà la carte, le
+   * titre et le résumé : on ne redessine ni coquille ni en-tête, sinon la page
+   * empile deux titres pour un seul bloc.
+   */
+  embedded?: boolean;
 }) {
   const { t } = useTranslation();
   const qc = useQueryClient();
@@ -330,17 +337,21 @@ export function StaffAssignmentSection({
     assignedPeople.length > 0 ? "assured" : availableCount > 0 ? "unassigned" : "uncovered";
 
   return (
-    <section className="rounded-2xl border border-border bg-card p-4 space-y-3">
-      <div className="flex items-center gap-2">
-        <div className="h-8 w-8 rounded-lg bg-primary/10 text-primary flex items-center justify-center shrink-0">
-          <Users className="h-4 w-4" />
+    <section
+      className={cn("space-y-3", !embedded && "rounded-2xl border border-border bg-card p-4")}
+    >
+      {!embedded && (
+        <div className="flex items-center gap-2">
+          <div className="h-8 w-8 rounded-lg bg-primary/10 text-primary flex items-center justify-center shrink-0">
+            <Users className="h-4 w-4" />
+          </div>
+          <div className="flex-1 min-w-0">
+            <h3 className="text-sm font-semibold">{t("staffAssignment.title")}</h3>
+            <p className="text-[11px] text-muted-foreground">{t("staffAssignment.hint")}</p>
+          </div>
+          <StaffCoverageBadge state={coverageState} />
         </div>
-        <div className="flex-1 min-w-0">
-          <h3 className="text-sm font-semibold">{t("staffAssignment.title")}</h3>
-          <p className="text-[11px] text-muted-foreground">{t("staffAssignment.hint")}</p>
-        </div>
-        <StaffCoverageBadge state={coverageState} />
-      </div>
+      )}
 
       {assignedPeople.length === 0 ? (
         <p className="text-xs text-muted-foreground">{t("staffAssignment.noneAssigned")}</p>

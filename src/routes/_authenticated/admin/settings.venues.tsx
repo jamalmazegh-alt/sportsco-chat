@@ -31,6 +31,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import {
+  backfillVenueCoordinates,
   listClubVenues,
   createVenue,
   updateVenue,
@@ -69,6 +70,7 @@ function VenuesSettingsPage() {
   const qc = useQueryClient();
 
   const listFn = useServerFn(listClubVenues);
+  const backfillFn = useServerFn(backfillVenueCoordinates);
   const createVenueFn = useServerFn(createVenue);
   const updateVenueFn = useServerFn(updateVenue);
   const deleteVenueFn = useServerFn(deleteVenue);
@@ -77,6 +79,20 @@ function VenuesSettingsPage() {
   const createFacilityFn = useServerFn(createFacility);
   const updateFacilityFn = useServerFn(updateFacility);
   const deleteFacilityFn = useServerFn(deleteFacility);
+
+  // Les lieux créés avant le géocodage automatique n'ont pas de coordonnées,
+  // donc pas de météo sur leurs événements. Ce rattrapage évite de tous les
+  // rouvrir un par un.
+  const backfillMutation = useMutation({
+    mutationFn: () => backfillFn({ data: { clubId: activeClubId! } }),
+    onSuccess: (r) => {
+      if (r.resolved === 0 && r.failed === 0) toast.info(t("venues.geocode.nothingToDo"));
+      else if (r.failed === 0) toast.success(t("venues.geocode.done", { count: r.resolved }));
+      else toast.warning(t("venues.geocode.partial", { count: r.resolved, failed: r.failed }));
+      qc.invalidateQueries({ queryKey: ["club-venues", activeClubId] });
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
   const setDefaultFacilityFn = useServerFn(setDefaultFacility);
   const reorderFacilitiesFn = useServerFn(reorderFacilities);
 
@@ -198,6 +214,12 @@ function VenuesSettingsPage() {
     invalidate();
   }
 
+  // Sans coordonnées, un lieu ne peut pas porter de météo : on ne propose le
+  // rattrapage que s'il y a effectivement quelque chose à rattraper.
+  const missingCoordinates = (venues ?? []).filter(
+    (v) => v.latitude === null || v.longitude === null,
+  ).length;
+
   if (!roles.includes("admin")) return <Navigate to="/profile" replace />;
 
   return (
@@ -205,20 +227,37 @@ function VenuesSettingsPage() {
       <SettingsSubHeader title={t("venues.pageTitle")} description={t("venues.pageSubtitle")} />
 
       <div className="px-5 py-4 space-y-3">
-        <Button
-          size="sm"
-          onClick={() =>
-            setVenueEdit({
-              name: "",
-              address: "",
-              notes: null,
-              is_default: (venues?.length ?? 0) === 0,
-            })
-          }
-        >
-          <Plus className="h-4 w-4 mr-1" />
-          {t("venues.addSite")}
-        </Button>
+        <div className="flex flex-wrap items-center gap-2">
+          <Button
+            size="sm"
+            onClick={() =>
+              setVenueEdit({
+                name: "",
+                address: "",
+                notes: null,
+                is_default: (venues?.length ?? 0) === 0,
+              })
+            }
+          >
+            <Plus className="h-4 w-4 mr-1" />
+            {t("venues.addSite")}
+          </Button>
+          {missingCoordinates > 0 && (
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => backfillMutation.mutate()}
+              disabled={backfillMutation.isPending}
+            >
+              {backfillMutation.isPending ? (
+                <Loader2 className="h-4 w-4 mr-1 animate-spin" />
+              ) : (
+                <MapPin className="h-4 w-4 mr-1" />
+              )}
+              {t("venues.geocode.action", { count: missingCoordinates })}
+            </Button>
+          )}
+        </div>
 
         {isLoading && (
           <div className="flex justify-center py-10">

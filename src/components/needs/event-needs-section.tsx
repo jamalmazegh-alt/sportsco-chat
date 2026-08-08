@@ -105,6 +105,8 @@ import type { AudienceSelector } from "@/modules/groups/groups.functions";
 import { getNeedVisual, resolveNeedLabel } from "./need-visuals";
 
 type Props = {
+  /** Rendu dans une section repliable qui fournit déjà carte, titre et résumé. */
+  embedded?: boolean;
   eventId: string;
   eventType?: string | null;
   sport?: string | null;
@@ -116,7 +118,7 @@ function useDateLocale() {
   return i18n.language?.startsWith("fr") ? frLocale : enLocale;
 }
 
-export function EventNeedsSection({ eventId, sport, teamId }: Props) {
+export function EventNeedsSection({ eventId, sport, teamId, embedded = false }: Props) {
   const { t } = useTranslation();
   const qc = useQueryClient();
   const listFn = useServerFn(listEventNeeds);
@@ -143,13 +145,25 @@ export function EventNeedsSection({ eventId, sport, teamId }: Props) {
   if (isLoading) return null;
 
   return (
-    <Card id="needs" className="border-[1.5px] scroll-mt-24">
-      <CardHeader className="pb-3">
+    <Card
+      id="needs"
+      className={cn(
+        "scroll-mt-24",
+        embedded ? "border-0 bg-transparent p-0 shadow-none" : "border-[1.5px]",
+      )}
+    >
+      {/* Intégré, le titre et le résumé de couverture vivent sur la ligne de la
+          section repliable : n'y reste que l'action d'ajout. */}
+      <CardHeader className={cn("pb-3", embedded && "px-0 pt-0")}>
         <div className="flex items-center justify-between gap-2">
-          <CardTitle className="flex items-center gap-2 text-base">
-            <HandHelping className="h-4 w-4 text-primary" />
-            {t("needs:section.title")}
-          </CardTitle>
+          {embedded ? (
+            <span />
+          ) : (
+            <CardTitle className="flex items-center gap-2 text-base">
+              <HandHelping className="h-4 w-4 text-primary" />
+              {t("needs:section.title")}
+            </CardTitle>
+          )}
           {isStaff && (
             <Button size="sm" variant="outline" onClick={() => setCreateOpen(true)}>
               <Plus className="h-3.5 w-3.5 mr-1" />
@@ -158,7 +172,7 @@ export function EventNeedsSection({ eventId, sport, teamId }: Props) {
           )}
         </div>
 
-        {openNeeds.length > 0 && (
+        {!embedded && openNeeds.length > 0 && (
           <div className="mt-2">
             {missingSeats === 0 ? (
               <Badge className="bg-emerald-600 text-white">
@@ -181,7 +195,7 @@ export function EventNeedsSection({ eventId, sport, teamId }: Props) {
           <p className="text-xs text-muted-foreground mt-1">{t("needs:section.emptyStaff")}</p>
         )}
       </CardHeader>
-      <CardContent className="space-y-3">
+      <CardContent className={cn("space-y-3", embedded && "px-0 pb-0")}>
         {needs.map((need: NeedRowType) => (
           <NeedRow
             key={need.id}

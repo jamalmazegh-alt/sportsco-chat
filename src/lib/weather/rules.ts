@@ -227,3 +227,84 @@ export function weatherKindFromCode(code: number): WeatherKind {
   if ((code >= 51 && code <= 67) || (code >= 80 && code <= 82)) return "rain";
   return "cloudy";
 }
+
+export interface VenueCandidate {
+  id: string;
+  name: string;
+  address: string | null;
+  latitude: number | null;
+  longitude: number | null;
+  isDefault: boolean;
+}
+
+export interface CoordinateSource {
+  venueId: string | null;
+  /** Texte libre saisi sur l'événement. */
+  location: string | null;
+  /** `false` = extérieur. `null`/`true` = chez nous. */
+  isHome: boolean | null;
+}
+
+export interface ResolvedCoordinates {
+  latitude: number;
+  longitude: number;
+  /** Comment on y est arrivé — utile au diagnostic. */
+  via: "venue_id" | "location_match" | "default_venue";
+}
+
+/** Minuscules, sans accents ni ponctuation : « Stade des Lilas » ≈ « stade des lilas ». */
+function normalize(value: string): string {
+  return value
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, " ")
+    .trim();
+}
+
+/**
+ * Coordonnées d'un événement, par ordre de fiabilité décroissante.
+ *
+ * Le rattachement explicite à un lieu ne suffit pas : dans l'assistant de
+ * création, saisir une adresse dans le champ libre efface `venue_id`. Un
+ * événement au stade du club peut donc n'avoir qu'un texte. On rattrape par le
+ * nom, puis — pour un événement à domicile — par le lieu par défaut du club.
+ */
+export function resolveEventCoordinates(
+  event: CoordinateSource,
+  venues: VenueCandidate[],
+): ResolvedCoordinates | null {
+  const usable = venues.filter((v) => isValidCoordinate(v.latitude, v.longitude));
+  if (usable.length === 0) return null;
+
+  const byId = event.venueId ? usable.find((v) => v.id === event.venueId) : undefined;
+  if (byId) return { latitude: byId.latitude!, longitude: byId.longitude!, via: "venue_id" };
+
+  const text = normalize(event.location ?? "");
+  if (text.length >= 3) {
+    // Le plus long nom qui correspond gagne : « Stade des Lilas » l'emporte sur
+    // « Stade », qui matcherait aussi mais désignerait un autre terrain.
+    const matches = usable
+      .filter((v) => {
+        const name = normalize(v.name);
+        if (name.length >= 3 && (text.includes(name) || name.includes(text))) return true;
+        const address = normalize(v.address ?? "");
+        return address.length >= 6 && text.includes(address);
+      })
+      .sort((a, b) => normalize(b.name).length - normalize(a.name).length);
+    const best = matches[0];
+    if (best) {
+      return { latitude: best.latitude!, longitude: best.longitude!, via: "location_match" };
+    }
+  }
+
+  // À domicile sans rattachement : le lieu par défaut du club est le pari le
+  // plus sûr. À l'extérieur, deviner serait pire que ne rien afficher.
+  if (event.isHome !== false) {
+    const fallback = usable.find((v) => v.isDefault);
+    if (fallback) {
+      return { latitude: fallback.latitude!, longitude: fallback.longitude!, via: "default_venue" };
+    }
+  }
+  return null;
+}

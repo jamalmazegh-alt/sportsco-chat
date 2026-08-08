@@ -1144,7 +1144,13 @@
       "seatsMissing_one": "{{count}} posto da coprire",
       "seatsMissing_other": "{{count}} posti da coprire",
       "messageCount_one": "{{count}} messaggio",
-      "messageCount_other": "{{count}} messaggi"
+      "messageCount_other": "{{count}} messaggi",
+      "noCoach": "Nessun allenatore",
+      "transportCovered": "Tutti coperti",
+      "carpoolOff": "Disattivato",
+      "seatsFilled": "Completo",
+      "noNeed": "Nessuna richiesta",
+      "noMessage": "Nessun messaggio"
     }
   },
   "followUps": {
@@ -3008,7 +3014,13 @@
       "noFacilitiesHint": "Nessun campo configurato.",
       "noFacilityOption": "Nessun campo"
     },
-    "surfacePlaceholder": "Erba, sintetico, parquet…"
+    "surfacePlaceholder": "Erba, sintetico, parquet…",
+    "geocode": {
+      "action": "Geolocalizza ({{count}})",
+      "done": "{{count}} luogo/luoghi geolocalizzati",
+      "partial": "{{count}} geolocalizzati, {{failed}} falliti",
+      "nothingToDo": "Tutti i luoghi sono già geolocalizzati"
+    }
   },
   "callUpList": {
     "masked": "Elenco nascosto",

@@ -1144,7 +1144,13 @@
       "seatsMissing_one": "{{count}} vaga por preencher",
       "seatsMissing_other": "{{count}} vagas por preencher",
       "messageCount_one": "{{count}} mensagem",
-      "messageCount_other": "{{count}} mensagens"
+      "messageCount_other": "{{count}} mensagens",
+      "noCoach": "Sem treinador",
+      "transportCovered": "Todos cobertos",
+      "carpoolOff": "Desativado",
+      "seatsFilled": "Completo",
+      "noNeed": "Sem pedidos",
+      "noMessage": "Sem mensagens"
     }
   },
   "followUps": {
@@ -3008,7 +3014,13 @@
       "noFacilitiesHint": "Nenhum campo configurado.",
       "noFacilityOption": "Sem tribunal"
     },
-    "surfacePlaceholder": "Relvado, sintético, soalho…"
+    "surfacePlaceholder": "Relvado, sintético, soalho…",
+    "geocode": {
+      "action": "Localizar ({{count}})",
+      "done": "{{count}} local(is) localizado(s)",
+      "partial": "{{count}} localizado(s), {{failed}} falharam",
+      "nothingToDo": "Todos os locais já estão localizados"
+    }
   },
   "callUpList": {
     "masked": "Lista oculta",
