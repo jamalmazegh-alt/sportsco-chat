@@ -1,5 +1,6 @@
 import { describe, it, expect } from "vitest";
 import {
+  cardFooterVisibility,
   eventCardState,
   matchOutcome,
   type EventCardEvent,
@@ -94,5 +95,56 @@ describe("matchOutcome", () => {
   it("returns null without a result, and for non-match events", () => {
     expect(matchOutcome(makeEvent({ is_home: true, result: null }))).toBeNull();
     expect(matchOutcome(makeEvent({ type: "training", result }))).toBeNull();
+  });
+});
+
+describe("cardFooterVisibility", () => {
+  const upcoming = {
+    cancelled: false,
+    past: false,
+    isCoach: true,
+    hasResult: false,
+    hasCounts: true,
+    convocationSent: true,
+    hasMyConvocation: true,
+  };
+
+  it("shows counts to staff on an upcoming event, and hides the redundant sent chip", () => {
+    const v = cardFooterVisibility(upcoming);
+    expect(v.counts).toBe(true);
+    expect(v.sent).toBe(false);
+  });
+
+  it("falls back to the sent chip when no counts are available", () => {
+    const v = cardFooterVisibility({ ...upcoming, hasCounts: false });
+    expect(v.counts).toBe(false);
+    expect(v.sent).toBe(true);
+  });
+
+  it("never shows counts to a player, who sees the sent chip instead", () => {
+    const v = cardFooterVisibility({ ...upcoming, isCoach: false });
+    expect(v.counts).toBe(false);
+    expect(v.sent).toBe(true);
+  });
+
+  it("drops every attendance signal once the event is over — the result is what matters", () => {
+    const v = cardFooterVisibility({ ...upcoming, past: true, hasResult: true });
+    expect(v).toEqual({ counts: false, sent: false, response: false, calledRail: false });
+  });
+
+  it("drops them on a past event even without a result", () => {
+    const v = cardFooterVisibility({ ...upcoming, past: true, hasResult: false });
+    expect(v.counts).toBe(false);
+    expect(v.response).toBe(false);
+  });
+
+  it("stays silent on a cancelled event — the only thing to say is that it is off", () => {
+    const v = cardFooterVisibility({ ...upcoming, cancelled: true });
+    expect(v).toEqual({ counts: false, sent: false, response: false, calledRail: false });
+  });
+
+  it("ties the called-up rail to the viewer's own convocation", () => {
+    expect(cardFooterVisibility(upcoming).calledRail).toBe(true);
+    expect(cardFooterVisibility({ ...upcoming, hasMyConvocation: false }).calledRail).toBe(false);
   });
 });

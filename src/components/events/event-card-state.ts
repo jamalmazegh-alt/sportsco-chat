@@ -62,3 +62,50 @@ export function eventCardState(event: EventCardEvent, now: Date): EventCardState
     now.getTime() <= end.getTime();
   return { cancelled, today, past, live };
 }
+
+export interface FooterVisibilityInput {
+  cancelled: boolean;
+  past: boolean;
+  isCoach: boolean;
+  hasResult: boolean;
+  hasCounts: boolean;
+  convocationSent: boolean;
+  hasMyConvocation: boolean;
+}
+
+export interface FooterVisibility {
+  counts: boolean;
+  sent: boolean;
+  response: boolean;
+  /** Liseré « convoqué » sur le bord droit. */
+  calledRail: boolean;
+}
+
+/**
+ * Ce que la ligne d'état affiche, selon le moment de l'événement.
+ *
+ * Une fois le match joué, c'est le résultat qui compte : les compteurs de
+ * présence, la pastille de réponse et « convoc envoyée » n'apprennent plus
+ * rien et encombrent la carte. Ils restent consultables sur le détail, où
+ * l'historique a sa place.
+ *
+ * Sur un événement annulé, tout se tait de la même façon : la seule chose à
+ * dire est qu'il n'aura pas lieu.
+ */
+export function cardFooterVisibility(input: FooterVisibilityInput): FooterVisibility {
+  if (input.cancelled) {
+    return { counts: false, sent: false, response: false, calledRail: false };
+  }
+  if (input.past) {
+    return { counts: false, sent: false, response: false, calledRail: false };
+  }
+  const counts = input.isCoach && input.hasCounts;
+  return {
+    counts,
+    // Les compteurs impliquent déjà l'envoi : la pastille ne s'affiche qu'à
+    // défaut, pour ne jamais laisser un coach sans indication.
+    sent: input.convocationSent && !counts,
+    response: input.hasMyConvocation,
+    calledRail: input.hasMyConvocation,
+  };
+}

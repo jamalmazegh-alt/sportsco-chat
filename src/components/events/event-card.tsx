@@ -5,6 +5,7 @@ import type { Locale } from "date-fns";
 import { Ban, Clock, HelpCircle, Home, MapPin, Plane, Send, Trophy } from "lucide-react";
 import { getEventTypeIcon } from "@/lib/event-type-icon";
 import {
+  cardFooterVisibility,
   eventCardState,
   matchOutcome,
   type EventCardEvent,
@@ -81,7 +82,17 @@ export function EventCard({
 
   const Icon = getEventTypeIcon(event.type);
   const outcome = matchOutcome(event);
-  const called = !!myConvocation;
+
+  const footer = cardFooterVisibility({
+    cancelled: isCancelled,
+    past,
+    isCoach,
+    hasResult: !!outcome,
+    hasCounts: !!counts,
+    convocationSent: !!convocationSent,
+    hasMyConvocation: !!myConvocation,
+  });
+  const called = footer.calledRail;
 
   const competition =
     event.type === "match" && event.competition_type
@@ -116,11 +127,9 @@ export function EventCard({
     event.type === "match" && event.is_home !== null && event.is_home !== undefined;
   const hasWhere = showHomeAway || !!event.location;
 
-  const showCounts = isCoach && !isCancelled && !!counts;
-  // Les compteurs impliquent déjà l'envoi : la pastille ne s'affiche qu'à défaut,
-  // pour ne jamais laisser un coach sans indication quand les compteurs manquent.
-  const showSent = !isCancelled && !!convocationSent && !showCounts;
-  const showResponse = !!myConvocation && !isCancelled;
+  const showCounts = footer.counts;
+  const showSent = footer.sent;
+  const showResponse = footer.response;
   // Une prévision — ou son absence motivée — n'a plus d'objet sur un match
   // joué ou annulé : le serveur n'en renvoie d'ailleurs pas.
   const showWeather = !!weather && !isCancelled && !past;
