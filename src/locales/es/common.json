@@ -1132,7 +1132,10 @@
       "invitePlayersFirstTitle": "Invitar jugadores",
       "subtitle": "{{count}} jugadores convocados"
     },
-    "scoreDisabledCancelled": "Evento cancelado: edición de datos de puntuación y partido deshabilitada."
+    "scoreDisabledCancelled": "Evento cancelado: edición de datos de puntuación y partido deshabilitada.",
+    "whenWhere": "Cuándo y dónde",
+    "kickoff": "Inicio",
+    "estimatedEnd": "Fin estimado"
   },
   "followUps": {
     "title": "Recordatorios",
@@ -4934,6 +4937,25 @@
     "availableFrom": "Previsión desde el {{date}}",
     "tooFar": "Demasiado lejano",
     "unavailable": "Previsión no disponible",
-    "noLocation": "Lugar sin geolocalizar"
+    "noLocation": "Lugar sin geolocalizar",
+    "feelsLike": "Sensación {{value}}°",
+    "windValue": "viento {{value}} km/h",
+    "stripCaption": "de la convocatoria al final",
+    "updated": "Previsión actualizada hace {{ago}}",
+    "conditions": {
+      "clear": "Despejado",
+      "partly": "Poco nuboso",
+      "cloudy": "Cubierto",
+      "fog": "Niebla",
+      "rain": "Chubascos",
+      "snow": "Nieve",
+      "storm": "Tormentas"
+    },
+    "alertText": {
+      "rain": "Chubascos previstos al inicio — {{value}} % a las {{time}}.",
+      "wind": "Viento fuerte previsto al inicio — {{value}} km/h a las {{time}}.",
+      "cold": "Frío previsto al inicio — sensación de {{value}}° a las {{time}}.",
+      "heat": "Calor intenso previsto al inicio — sensación de {{value}}° a las {{time}}."
+    }
   }
 }

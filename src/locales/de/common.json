@@ -1132,7 +1132,10 @@
       "invitePlayersFirstTitle": "Spieler einladen",
       "subtitle": "{{count}} Spieler einberufen"
     },
-    "scoreDisabledCancelled": "Veranstaltung abgesagt – Bearbeitung von Punkte- und Spieldaten deaktiviert."
+    "scoreDisabledCancelled": "Veranstaltung abgesagt – Bearbeitung von Punkte- und Spieldaten deaktiviert.",
+    "whenWhere": "Wann & wo",
+    "kickoff": "Anpfiff",
+    "estimatedEnd": "Voraussichtliches Ende"
   },
   "followUps": {
     "title": "Zu erinnern",
@@ -4939,6 +4942,25 @@
     "availableFrom": "Vorhersage ab {{date}}",
     "tooFar": "Noch zu weit entfernt",
     "unavailable": "Vorhersage nicht verfügbar",
-    "noLocation": "Ort ohne Koordinaten"
+    "noLocation": "Ort ohne Koordinaten",
+    "feelsLike": "Gefühlt {{value}}°",
+    "windValue": "Wind {{value}} km/h",
+    "stripCaption": "vom Treffpunkt bis zum Ende",
+    "updated": "Vorhersage vor {{ago}} aktualisiert",
+    "conditions": {
+      "clear": "Klar",
+      "partly": "Leicht bewölkt",
+      "cloudy": "Bedeckt",
+      "fog": "Nebel",
+      "rain": "Schauer",
+      "snow": "Schnee",
+      "storm": "Gewitter"
+    },
+    "alertText": {
+      "rain": "Schauer zum Anpfiff erwartet — {{value}} % um {{time}}.",
+      "wind": "Starker Wind zum Anpfiff erwartet — {{value}} km/h um {{time}}.",
+      "cold": "Kälte zum Anpfiff erwartet — gefühlt {{value}}° um {{time}}.",
+      "heat": "Große Hitze zum Anpfiff erwartet — gefühlt {{value}}° um {{time}}."
+    }
   }
 }

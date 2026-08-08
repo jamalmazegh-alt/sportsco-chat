@@ -1132,7 +1132,10 @@
       "invitePlayersFirstTitle": "Invite players",
       "subtitle": "{{count}} players called up"
     },
-    "scoreDisabledCancelled": "Event cancelled — score and match facts editing disabled."
+    "scoreDisabledCancelled": "Event cancelled — score and match facts editing disabled.",
+    "whenWhere": "When & where",
+    "kickoff": "Kick-off",
+    "estimatedEnd": "Estimated end"
   },
   "followUps": {
     "title": "Follow-ups",
@@ -4934,6 +4937,25 @@
     "availableFrom": "Forecast from {{date}}",
     "tooFar": "Too far ahead",
     "unavailable": "Forecast unavailable",
-    "noLocation": "Venue not geolocated"
+    "noLocation": "Venue not geolocated",
+    "feelsLike": "Feels like {{value}}°",
+    "windValue": "wind {{value}} km/h",
+    "stripCaption": "from meet-up to the end",
+    "updated": "Forecast updated {{ago}} ago",
+    "conditions": {
+      "clear": "Clear",
+      "partly": "Partly cloudy",
+      "cloudy": "Overcast",
+      "fog": "Fog",
+      "rain": "Showers",
+      "snow": "Snow",
+      "storm": "Thunderstorms"
+    },
+    "alertText": {
+      "rain": "Showers expected at kick-off — {{value}}% chance at {{time}}.",
+      "wind": "Strong wind expected at kick-off — {{value}} km/h at {{time}}.",
+      "cold": "Cold expected at kick-off — feels like {{value}}° at {{time}}.",
+      "heat": "High heat expected at kick-off — feels like {{value}}° at {{time}}."
+    }
   }
 }

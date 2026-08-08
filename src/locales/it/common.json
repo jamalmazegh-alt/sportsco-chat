@@ -1132,7 +1132,10 @@
       "invitePlayersFirstTitle": "Invita giocatori",
       "subtitle": "{{count}} giocatori convocati"
     },
-    "scoreDisabledCancelled": "Evento annullato: modifica del punteggio e degli eventi della partita disabilitata."
+    "scoreDisabledCancelled": "Evento annullato: modifica del punteggio e degli eventi della partita disabilitata.",
+    "whenWhere": "Quando e dove",
+    "kickoff": "Calcio d'inizio",
+    "estimatedEnd": "Fine stimata"
   },
   "followUps": {
     "title": "Da ricordare",
@@ -4934,6 +4937,25 @@
     "availableFrom": "Previsioni dal {{date}}",
     "tooFar": "Troppo lontano",
     "unavailable": "Previsioni non disponibili",
-    "noLocation": "Luogo non geolocalizzato"
+    "noLocation": "Luogo non geolocalizzato",
+    "feelsLike": "Percepiti {{value}}°",
+    "windValue": "vento {{value}} km/h",
+    "stripCaption": "dal ritrovo alla fine",
+    "updated": "Previsioni aggiornate {{ago}} fa",
+    "conditions": {
+      "clear": "Sereno",
+      "partly": "Poco nuvoloso",
+      "cloudy": "Coperto",
+      "fog": "Nebbia",
+      "rain": "Rovesci",
+      "snow": "Neve",
+      "storm": "Temporali"
+    },
+    "alertText": {
+      "rain": "Rovesci previsti al calcio d'inizio — {{value}} % alle {{time}}.",
+      "wind": "Vento forte previsto al calcio d'inizio — {{value}} km/h alle {{time}}.",
+      "cold": "Freddo previsto al calcio d'inizio — percepiti {{value}}° alle {{time}}.",
+      "heat": "Caldo intenso previsto al calcio d'inizio — percepiti {{value}}° alle {{time}}."
+    }
   }
 }

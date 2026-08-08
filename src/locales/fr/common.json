@@ -1132,7 +1132,10 @@
       "invitePlayersFirstTitle": "Inviter les joueurs",
       "subtitle": "{{count}} joueurs convoqués"
     },
-    "scoreDisabledCancelled": "Événement annulé — édition du score et des faits de match désactivée."
+    "scoreDisabledCancelled": "Événement annulé — édition du score et des faits de match désactivée.",
+    "whenWhere": "Quand & où",
+    "kickoff": "Coup d'envoi",
+    "estimatedEnd": "Fin estimée"
   },
   "followUps": {
     "title": "À relancer",
@@ -4934,6 +4937,25 @@
     "availableFrom": "Météo dès le {{date}}",
     "tooFar": "Météo trop lointaine",
     "unavailable": "Météo indisponible",
-    "noLocation": "Lieu non géolocalisé"
+    "noLocation": "Lieu non géolocalisé",
+    "feelsLike": "Ressenti {{value}}°",
+    "windValue": "vent {{value}} km/h",
+    "stripCaption": "du rendez-vous à la fin",
+    "updated": "Prévision mise à jour il y a {{ago}}",
+    "conditions": {
+      "clear": "Ciel dégagé",
+      "partly": "Peu nuageux",
+      "cloudy": "Couvert",
+      "fog": "Brouillard",
+      "rain": "Averses",
+      "snow": "Neige",
+      "storm": "Orages"
+    },
+    "alertText": {
+      "rain": "Averses attendues au coup d'envoi — {{value}} % de risque à {{time}}.",
+      "wind": "Vent fort attendu au coup d'envoi — {{value}} km/h à {{time}}.",
+      "cold": "Froid attendu au coup d'envoi — {{value}}° ressentis à {{time}}.",
+      "heat": "Forte chaleur attendue au coup d'envoi — {{value}}° ressentis à {{time}}."
+    }
   }
 }

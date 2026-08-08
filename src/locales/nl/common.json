@@ -1132,7 +1132,10 @@
       "invitePlayersFirstTitle": "Nodig spelers uit",
       "subtitle": "{{count}} spelers opgeroepen"
     },
-    "scoreDisabledCancelled": "Evenement geannuleerd: bewerken van scores en wedstrijdgegevens uitgeschakeld."
+    "scoreDisabledCancelled": "Evenement geannuleerd: bewerken van scores en wedstrijdgegevens uitgeschakeld.",
+    "whenWhere": "Wanneer & waar",
+    "kickoff": "Aftrap",
+    "estimatedEnd": "Verwacht einde"
   },
   "followUps": {
     "title": "Te herinneren",
@@ -4934,6 +4937,25 @@
     "availableFrom": "Verwachting vanaf {{date}}",
     "tooFar": "Te ver vooruit",
     "unavailable": "Verwachting niet beschikbaar",
-    "noLocation": "Locatie niet gelokaliseerd"
+    "noLocation": "Locatie niet gelokaliseerd",
+    "feelsLike": "Gevoel {{value}}°",
+    "windValue": "wind {{value}} km/u",
+    "stripCaption": "van verzamelen tot einde",
+    "updated": "Verwachting {{ago}} geleden bijgewerkt",
+    "conditions": {
+      "clear": "Onbewolkt",
+      "partly": "Licht bewolkt",
+      "cloudy": "Bewolkt",
+      "fog": "Mist",
+      "rain": "Buien",
+      "snow": "Sneeuw",
+      "storm": "Onweer"
+    },
+    "alertText": {
+      "rain": "Buien verwacht bij de aftrap — {{value}}% om {{time}}.",
+      "wind": "Harde wind verwacht bij de aftrap — {{value}} km/u om {{time}}.",
+      "cold": "Kou verwacht bij de aftrap — gevoel {{value}}° om {{time}}.",
+      "heat": "Grote hitte verwacht bij de aftrap — gevoel {{value}}° om {{time}}."
+    }
   }
 }

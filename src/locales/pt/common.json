@@ -1132,7 +1132,10 @@
       "invitePlayersFirstTitle": "Convida jogadores",
       "subtitle": "{{count}} jogadores convocados"
     },
-    "scoreDisabledCancelled": "Evento cancelado – edição de pontuação e fatos da partida desativada."
+    "scoreDisabledCancelled": "Evento cancelado – edição de pontuação e fatos da partida desativada.",
+    "whenWhere": "Quando e onde",
+    "kickoff": "Pontapé de saída",
+    "estimatedEnd": "Fim estimado"
   },
   "followUps": {
     "title": "Lembretes",
@@ -4934,6 +4937,25 @@
     "availableFrom": "Previsão a partir de {{date}}",
     "tooFar": "Demasiado distante",
     "unavailable": "Previsão indisponível",
-    "noLocation": "Local sem coordenadas"
+    "noLocation": "Local sem coordenadas",
+    "feelsLike": "Sensação {{value}}°",
+    "windValue": "vento {{value}} km/h",
+    "stripCaption": "da convocatória ao fim",
+    "updated": "Previsão atualizada há {{ago}}",
+    "conditions": {
+      "clear": "Céu limpo",
+      "partly": "Pouco nublado",
+      "cloudy": "Encoberto",
+      "fog": "Nevoeiro",
+      "rain": "Aguaceiros",
+      "snow": "Neve",
+      "storm": "Trovoada"
+    },
+    "alertText": {
+      "rain": "Aguaceiros previstos no pontapé de saída — {{value}} % às {{time}}.",
+      "wind": "Vento forte previsto no pontapé de saída — {{value}} km/h às {{time}}.",
+      "cold": "Frio previsto no pontapé de saída — sensação de {{value}}° às {{time}}.",
+      "heat": "Calor intenso previsto no pontapé de saída — sensação de {{value}}° às {{time}}."
+    }
   }
 }
