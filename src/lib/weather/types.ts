@@ -31,3 +31,24 @@ export interface EventWeather {
   /** Date de récupération de la prévision, ISO UTC. */
   fetchedAt: string;
 }
+
+/**
+ * Pourquoi il n'y a pas de prévision. Distinguer les cas permet un message
+ * utile — « revenez le 4 mars » n'est pas « le service est en panne ».
+ */
+export type WeatherUnavailableReason =
+  /** Au-delà de l'horizon du fournisseur : ce n'est pas une erreur, c'est trop tôt. */
+  | "beyond_horizon"
+  /** Le lieu de l'événement n'a pas de coordonnées — un lieu sans adresse géocodée. */
+  | "no_location"
+  /** Appel au fournisseur en échec, ou réponse inexploitable. */
+  | "provider_error";
+
+export type EventWeatherResult =
+  | { ok: true; weather: EventWeather }
+  | {
+      ok: false;
+      reason: WeatherUnavailableReason;
+      /** Jour à partir duquel la prévision existera, ISO — seulement pour `beyond_horizon`. */
+      availableFrom?: string;
+    };

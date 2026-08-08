@@ -21,7 +21,7 @@ import { listMyObligations } from "@/lib/payment-checkout.functions";
 import { isV2 } from "@/config/features";
 import { EventCard } from "@/components/events/event-card";
 import { getEventsWeather } from "@/lib/weather/weather.functions";
-import { shouldFetchWeather } from "@/lib/weather/rules";
+import { weatherAvailability } from "@/lib/weather/rules";
 import { fr, enUS } from "date-fns/locale";
 
 import { DeclareAbsenceDrawer } from "@/components/declare-absence-drawer";
@@ -213,11 +213,13 @@ function HomePage() {
       .filter((e) => {
         if (seen.has(e.id)) return false;
         seen.add(e.id);
-        // Les coordonnées vivent sur le lieu, que l'accueil ne charge pas : le
-        // serveur les résout et écarte lui-même les événements qui n'en ont pas.
-        return shouldFetchWeather(
-          { status: e.status, startsAt: new Date(e.starts_at), latitude: 1, longitude: 1 },
-          now,
+        // On envoie tout ce qui n'est ni passé ni annulé : le serveur connaît
+        // les coordonnées et décide s'il y a une prévision ou un message.
+        return (
+          weatherAvailability(
+            { status: e.status, startsAt: new Date(e.starts_at), latitude: 1, longitude: 1 },
+            now,
+          ) !== "silent"
         );
       })
       .map((e) => e.id);

@@ -21,7 +21,7 @@ import { EventCreateChooser } from "@/components/events/EventCreateChooser";
 import { EmptyState } from "@/components/empty-state";
 import { EventCard } from "@/components/events/event-card";
 import { getEventsWeather } from "@/lib/weather/weather.functions";
-import { shouldFetchWeather } from "@/lib/weather/rules";
+import { weatherAvailability } from "@/lib/weather/rules";
 import {
   buildConvocationCounts,
   type ConvocationCounts,
@@ -298,18 +298,15 @@ function EventsPage() {
   const weatherEventIds = useMemo(() => {
     const now = new Date();
     return (baseVisibleEvents ?? [])
-      .filter((e) =>
-        shouldFetchWeather(
-          {
-            status: e.status,
-            startsAt: new Date(e.starts_at),
-            // Les coordonnées vivent sur le lieu, que la liste ne charge pas :
-            // le serveur les résout et écarte lui-même ce qui n'en a pas.
-            latitude: 1,
-            longitude: 1,
-          },
-          now,
-        ),
+      .filter(
+        (e) =>
+          // On envoie tout ce qui n'est ni passé ni annulé, y compris au-delà de
+          // l'horizon : c'est le serveur qui décide du message, et lui seul
+          // connaît les coordonnées du lieu.
+          weatherAvailability(
+            { status: e.status, startsAt: new Date(e.starts_at), latitude: 1, longitude: 1 },
+            now,
+          ) !== "silent",
       )
       .map((e) => e.id)
       .slice(0, 100);

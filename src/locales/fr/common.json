@@ -4930,6 +4930,10 @@
       "wind": "Vent fort attendu",
       "cold": "Froid attendu",
       "heat": "Forte chaleur attendue"
-    }
+    },
+    "availableFrom": "Météo dès le {{date}}",
+    "tooFar": "Météo trop lointaine",
+    "unavailable": "Météo indisponible",
+    "noLocation": "Lieu non géolocalisé"
   }
 }

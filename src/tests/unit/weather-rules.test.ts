@@ -6,8 +6,10 @@ import {
   isValidCoordinate,
   pickAlert,
   shouldFetchWeather,
+  weatherAvailability,
   weatherCacheKey,
   weatherKindFromCode,
+  forecastAvailableFrom,
 } from "@/lib/weather/rules";
 import { buildOpenMeteoUrl, mapOpenMeteoHourly } from "@/lib/weather/open-meteo";
 import type { WeatherHour } from "@/lib/weather/types";
@@ -336,5 +338,58 @@ describe("buildOpenMeteoUrl", () => {
     const url = buildOpenMeteoUrl(43.46, 5.25, { apiKey: "k-123" });
     expect(url).toContain("customer-api.open-meteo.com");
     expect(url).toContain("apikey=k-123");
+  });
+});
+
+describe("weatherAvailability", () => {
+  const coords = { latitude: 43.46, longitude: 5.25 };
+  const startsAt = new Date("2026-03-14T15:00:00Z");
+
+  it("says nothing is wrong when the forecast is fetchable", () => {
+    expect(weatherAvailability({ status: "published", startsAt, ...coords }, NOW)).toBeNull();
+  });
+
+  it("distinguishes too-far from a genuine failure", () => {
+    expect(
+      weatherAvailability(
+        { status: "published", startsAt: new Date("2026-03-30T15:00:00Z"), ...coords },
+        NOW,
+      ),
+    ).toBe("beyond_horizon");
+  });
+
+  it("names a missing venue location, which staff can act on", () => {
+    expect(
+      weatherAvailability({ status: "published", startsAt, latitude: null, longitude: null }, NOW),
+    ).toBe("no_location");
+  });
+
+  it("stays silent on past and cancelled events — a message there is noise", () => {
+    expect(
+      weatherAvailability(
+        { status: "published", startsAt: new Date("2026-03-01T15:00:00Z"), ...coords },
+        NOW,
+      ),
+    ).toBe("silent");
+    expect(weatherAvailability({ status: "cancelled", startsAt, ...coords }, NOW)).toBe("silent");
+  });
+
+  it("prefers silence over a location complaint on a cancelled event", () => {
+    expect(
+      weatherAvailability({ status: "cancelled", startsAt, latitude: null, longitude: null }, NOW),
+    ).toBe("silent");
+  });
+
+  it("agrees with shouldFetchWeather", () => {
+    const ev = { status: "published", startsAt, ...coords };
+    expect(shouldFetchWeather(ev, NOW)).toBe(weatherAvailability(ev, NOW) === null);
+  });
+});
+
+describe("forecastAvailableFrom", () => {
+  it("returns the day the forecast starts existing — the event minus the horizon", () => {
+    expect(forecastAvailableFrom(new Date("2026-03-14T15:00:00Z")).toISOString()).toBe(
+      "2026-03-04T15:00:00.000Z",
+    );
   });
 });

@@ -1,4 +1,10 @@
-import type { EventWeather, WeatherAlert, WeatherHour, WeatherKind } from "./types";
+import type {
+  EventWeather,
+  WeatherAlert,
+  WeatherHour,
+  WeatherKind,
+  WeatherUnavailableReason,
+} from "./types";
 
 /**
  * Règles d'affichage de la météo — pures, sans I/O, donc testables telles quelles.
@@ -61,10 +67,33 @@ export interface WeatherEligibility {
  * événement annulé, événement passé, au-delà de l'horizon, lieu sans coordonnées.
  */
 export function shouldFetchWeather(event: WeatherEligibility, now: Date): boolean {
-  if (event.status === "cancelled") return false;
-  if (!isValidCoordinate(event.latitude, event.longitude)) return false;
+  return weatherAvailability(event, now) === null;
+}
+
+/**
+ * Pourquoi la prévision manque, ou `null` si elle est demandable.
+ *
+ * Sur un événement annulé ou passé la question ne se pose pas : on renvoie
+ * `"silent"`, qui n'affiche aucun message — dire « météo indisponible » sur un
+ * match joué la semaine dernière serait du bruit, pas de l'information.
+ */
+export function weatherAvailability(
+  event: WeatherEligibility,
+  now: Date,
+): WeatherUnavailableReason | "silent" | null {
   const days = daysUntil(event.startsAt, now);
-  return days >= 0 && days <= FORECAST_HORIZON_DAYS;
+  if (event.status === "cancelled" || days < 0) return "silent";
+  if (!isValidCoordinate(event.latitude, event.longitude)) return "no_location";
+  if (days > FORECAST_HORIZON_DAYS) return "beyond_horizon";
+  return null;
+}
+
+/**
+ * Premier jour où la prévision existera : l'événement moins l'horizon. C'est ce
+ * que le message « météo dès le … » annonce, plutôt qu'un décompte à recalculer.
+ */
+export function forecastAvailableFrom(startsAt: Date): Date {
+  return new Date(startsAt.getTime() - FORECAST_HORIZON_DAYS * MS_PER_DAY);
 }
 
 /**

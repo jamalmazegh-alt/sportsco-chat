@@ -4930,6 +4930,10 @@
       "wind": "Strong wind expected",
       "cold": "Cold expected",
       "heat": "High heat expected"
-    }
+    },
+    "availableFrom": "Forecast from {{date}}",
+    "tooFar": "Too far ahead",
+    "unavailable": "Forecast unavailable",
+    "noLocation": "Venue not geolocated"
   }
 }

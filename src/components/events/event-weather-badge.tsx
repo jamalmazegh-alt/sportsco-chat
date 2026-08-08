@@ -6,11 +6,15 @@ import {
   CloudRain,
   CloudSnow,
   CloudSun,
+  CloudOff,
+  CalendarClock,
   Sun,
   Wind,
   type LucideIcon,
 } from "lucide-react";
-import type { EventWeather, WeatherKind } from "@/lib/weather/types";
+import { format } from "date-fns";
+import type { Locale } from "date-fns";
+import type { EventWeatherResult, WeatherKind } from "@/lib/weather/types";
 import { cn } from "@/lib/utils";
 
 /**
@@ -35,16 +39,46 @@ const KIND_ICON: Record<WeatherKind, LucideIcon> = {
 };
 
 export function EventWeatherBadge({
-  weather,
+  result,
+  dateLocale,
   className,
 }: {
-  weather: EventWeather | null | undefined;
+  result: EventWeatherResult | null | undefined;
+  dateLocale?: Locale;
   className?: string;
 }) {
   const { t } = useTranslation();
-  if (!weather) return null;
+  if (!result) return null;
 
-  const { at, alert } = weather;
+  // Pas de prévision : on dit pourquoi. « Météo dès le 4 mars » et « météo
+  // indisponible » n'appellent pas la même réaction, les confondre serait
+  // laisser croire à une panne à chaque événement un peu lointain.
+  if (!result.ok) {
+    const label =
+      result.reason === "beyond_horizon" && result.availableFrom
+        ? t("weather.availableFrom", {
+            date: format(new Date(result.availableFrom), "d MMM", { locale: dateLocale }),
+          })
+        : result.reason === "beyond_horizon"
+          ? t("weather.tooFar")
+          : result.reason === "no_location"
+            ? t("weather.noLocation")
+            : t("weather.unavailable");
+    const Glyph = result.reason === "beyond_horizon" ? CalendarClock : CloudOff;
+    return (
+      <span
+        className={cn(
+          "inline-flex shrink-0 items-center gap-1 rounded-full border border-border bg-muted/60 px-2 py-0.5 text-[10.5px] font-semibold text-muted-foreground",
+          className,
+        )}
+      >
+        <Glyph className="h-3 w-3 shrink-0" aria-hidden />
+        {label}
+      </span>
+    );
+  }
+
+  const { at, alert } = result.weather;
   // Sur une alerte de vent, l'icône bascule sur le facteur dominant plutôt que
   // sur l'état du ciel — c'est le vent qui décide de la tenue, pas les nuages.
   const Icon = alert === "wind" ? Wind : KIND_ICON[at.kind];

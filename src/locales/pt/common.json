@@ -4930,6 +4930,10 @@
       "wind": "Vento forte previsto",
       "cold": "Frio previsto",
       "heat": "Calor intenso previsto"
-    }
+    },
+    "availableFrom": "Previsão a partir de {{date}}",
+    "tooFar": "Demasiado distante",
+    "unavailable": "Previsão indisponível",
+    "noLocation": "Local sem coordenadas"
   }
 }

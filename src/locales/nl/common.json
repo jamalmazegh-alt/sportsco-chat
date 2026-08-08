@@ -4930,6 +4930,10 @@
       "wind": "Harde wind verwacht",
       "cold": "Kou verwacht",
       "heat": "Grote hitte verwacht"
-    }
+    },
+    "availableFrom": "Verwachting vanaf {{date}}",
+    "tooFar": "Te ver vooruit",
+    "unavailable": "Verwachting niet beschikbaar",
+    "noLocation": "Locatie niet gelokaliseerd"
   }
 }

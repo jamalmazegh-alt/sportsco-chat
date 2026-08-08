@@ -14,7 +14,7 @@ import {
   type ConvocationCounts,
 } from "@/components/convocation-summary-pill";
 import { EventWeatherBadge } from "@/components/events/event-weather-badge";
-import type { EventWeather } from "@/lib/weather/types";
+import type { EventWeatherResult } from "@/lib/weather/types";
 import { cn } from "@/lib/utils";
 
 /**
@@ -43,8 +43,8 @@ export interface EventCardProps {
   myConvocation?: { status: string; playerName: string } | null;
   /** Per-status counts, staff only. */
   counts?: ConvocationCounts | null;
-  /** Forecast for the kickoff hour. Absent beyond J+10, or without venue coordinates. */
-  weather?: EventWeather | null;
+  /** Prévision du coup d'envoi, ou la raison de son absence. */
+  weather?: EventWeatherResult | null;
   /** Home screen: ribbon marking the very next event. */
   highlight?: boolean;
   /** Home screen: amber emphasis when the viewer still has to answer. */
@@ -121,7 +121,8 @@ export function EventCard({
   // pour ne jamais laisser un coach sans indication quand les compteurs manquent.
   const showSent = !isCancelled && !!convocationSent && !showCounts;
   const showResponse = !!myConvocation && !isCancelled;
-  // Une prévision sur un match joué ou annulé n'a plus d'objet.
+  // Une prévision — ou son absence motivée — n'a plus d'objet sur un match
+  // joué ou annulé : le serveur n'en renvoie d'ailleurs pas.
   const showWeather = !!weather && !isCancelled && !past;
   const hasFooter =
     isCancelled ||
@@ -250,7 +251,7 @@ export function EventCard({
           {hasFooter && (
             <div className="mt-1 flex items-center justify-between gap-2">
               <div className="flex min-w-0 items-center gap-1.5">
-                {showWeather && <EventWeatherBadge weather={weather} />}
+                {showWeather && <EventWeatherBadge result={weather} dateLocale={dateLocale} />}
                 {isCancelled ? (
                   <span className="inline-flex shrink-0 items-center gap-1 rounded-full border border-destructive/30 bg-destructive/12 px-2 py-0.5 text-[10.5px] font-bold text-destructive">
                     <Ban className="h-3 w-3" />

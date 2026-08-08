@@ -4,8 +4,14 @@ import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
 import { fetchOpenMeteoHourly, mapOpenMeteoHourly } from "./open-meteo";
 import type { OpenMeteoResponse } from "./open-meteo";
-import { buildEventWeather, isCacheFresh, shouldFetchWeather, weatherCacheKey } from "./rules";
-import type { EventWeather } from "./types";
+import {
+  buildEventWeather,
+  forecastAvailableFrom,
+  isCacheFresh,
+  weatherAvailability,
+  weatherCacheKey,
+} from "./rules";
+import type { EventWeatherResult } from "./types";
 
 /**
  * Météo des événements, par lot.
@@ -25,7 +31,8 @@ const InputSchema = z.object({
   eventIds: z.array(z.string().uuid()).min(1).max(100),
 });
 
-export type EventsWeather = Record<string, EventWeather | null>;
+/** Une entrée par identifiant demandé. Absente = rien à afficher du tout. */
+export type EventsWeather = Record<string, EventWeatherResult | null>;
 
 interface EventRow {
   id: string;
@@ -43,7 +50,6 @@ export const getEventsWeather = createServerFn({ method: "GET" })
     const { supabase } = context;
     const now = new Date();
     const out: EventsWeather = {};
-    for (const id of data.eventIds) out[id] = null;
 
     const { data: events, error } = await supabase
       .from("events")
@@ -56,15 +62,17 @@ export const getEventsWeather = createServerFn({ method: "GET" })
     const venueIds = Array.from(
       new Set(rows.map((e) => e.venue_id).filter((v): v is string => !!v)),
     );
-    if (venueIds.length === 0) return out;
 
-    const { data: venues } = await supabase
-      .from("club_venues")
-      .select("id, latitude, longitude")
-      .in("id", venueIds);
-    const coordsByVenue = new Map(
-      (venues ?? []).map((v) => [v.id, { latitude: v.latitude, longitude: v.longitude }]),
-    );
+    const coordsByVenue = new Map<string, { latitude: number | null; longitude: number | null }>();
+    if (venueIds.length > 0) {
+      const { data: venues } = await supabase
+        .from("club_venues")
+        .select("id, latitude, longitude")
+        .in("id", venueIds);
+      for (const v of venues ?? []) {
+        coordsByVenue.set(v.id, { latitude: v.latitude, longitude: v.longitude });
+      }
+    }
 
     // Regroupement par clé de cache : plusieurs événements d'un même club le
     // même jour partagent une seule prévision.
@@ -78,27 +86,33 @@ export const getEventsWeather = createServerFn({ method: "GET" })
     for (const e of rows) {
       const coords = e.venue_id ? coordsByVenue.get(e.venue_id) : undefined;
       const startsAt = new Date(e.starts_at);
-      if (
-        !coords ||
-        !shouldFetchWeather(
-          {
-            status: e.status,
-            startsAt,
-            latitude: coords.latitude,
-            longitude: coords.longitude,
-          },
-          now,
-        )
-      ) {
+      const reason = weatherAvailability(
+        {
+          status: e.status,
+          startsAt,
+          latitude: coords?.latitude,
+          longitude: coords?.longitude,
+        },
+        now,
+      );
+      if (reason === "silent") continue;
+      if (reason !== null) {
+        out[e.id] =
+          reason === "beyond_horizon"
+            ? { ok: false, reason, availableFrom: forecastAvailableFrom(startsAt).toISOString() }
+            : { ok: false, reason };
         continue;
       }
-      const key = weatherCacheKey(coords.latitude!, coords.longitude!, startsAt);
+      const key = weatherCacheKey(coords!.latitude!, coords!.longitude!, startsAt);
+      // Tant que la prévision n'est pas résolue, l'événement est en erreur :
+      // un groupe qui échoue laisse ainsi le bon message plutôt qu'un blanc.
+      out[e.id] = { ok: false, reason: "provider_error" };
       const group = groups.get(key);
       if (group) group.events.push(e);
       else
         groups.set(key, {
-          latitude: coords.latitude!,
-          longitude: coords.longitude!,
+          latitude: coords!.latitude!,
+          longitude: coords!.longitude!,
           day: startsAt,
           events: [e],
         });
@@ -113,12 +127,13 @@ export const getEventsWeather = createServerFn({ method: "GET" })
       const hours = mapOpenMeteoHourly(entry.payload);
       if (hours.length === 0) continue;
       for (const e of group.events) {
-        out[e.id] = buildEventWeather(hours, {
+        const weather = buildEventWeather(hours, {
           startsAt: new Date(e.starts_at),
           endsAt: e.ends_at ? new Date(e.ends_at) : null,
           convocationAt: e.convocation_time ? new Date(e.convocation_time) : null,
           fetchedAt: entry.fetchedAt,
         });
+        if (weather) out[e.id] = { ok: true, weather };
       }
     }
 

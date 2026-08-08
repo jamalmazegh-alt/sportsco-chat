@@ -4935,6 +4935,10 @@
       "wind": "Starker Wind erwartet",
       "cold": "Kälte erwartet",
       "heat": "Große Hitze erwartet"
-    }
+    },
+    "availableFrom": "Vorhersage ab {{date}}",
+    "tooFar": "Noch zu weit entfernt",
+    "unavailable": "Vorhersage nicht verfügbar",
+    "noLocation": "Ort ohne Koordinaten"
   }
 }
