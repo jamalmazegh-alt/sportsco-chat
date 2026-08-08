@@ -1135,7 +1135,17 @@
     "scoreDisabledCancelled": "Evenement geannuleerd: bewerken van scores en wedstrijdgegevens uitgeschakeld.",
     "whenWhere": "Wanneer & waar",
     "kickoff": "Aftrap",
-    "estimatedEnd": "Verwacht einde"
+    "estimatedEnd": "Verwacht einde",
+    "stack": {
+      "coachCount_one": "{{count}} coach",
+      "coachCount_other": "{{count}} coaches",
+      "transportMissing_one": "{{count}} zonder vervoer",
+      "transportMissing_other": "{{count}} zonder vervoer",
+      "seatsMissing_one": "{{count}} plek te vullen",
+      "seatsMissing_other": "{{count}} plekken te vullen",
+      "messageCount_one": "{{count}} bericht",
+      "messageCount_other": "{{count}} berichten"
+    }
   },
   "followUps": {
     "title": "Te herinneren",

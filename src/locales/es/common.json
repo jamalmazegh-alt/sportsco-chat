@@ -1135,7 +1135,17 @@
     "scoreDisabledCancelled": "Evento cancelado: edición de datos de puntuación y partido deshabilitada.",
     "whenWhere": "Cuándo y dónde",
     "kickoff": "Inicio",
-    "estimatedEnd": "Fin estimado"
+    "estimatedEnd": "Fin estimado",
+    "stack": {
+      "coachCount_one": "{{count}} entrenador",
+      "coachCount_other": "{{count}} entrenadores",
+      "transportMissing_one": "{{count}} sin transporte",
+      "transportMissing_other": "{{count}} sin transporte",
+      "seatsMissing_one": "{{count}} plaza por cubrir",
+      "seatsMissing_other": "{{count}} plazas por cubrir",
+      "messageCount_one": "{{count}} mensaje",
+      "messageCount_other": "{{count}} mensajes"
+    }
   },
   "followUps": {
     "title": "Recordatorios",

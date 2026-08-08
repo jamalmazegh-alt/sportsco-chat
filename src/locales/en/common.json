@@ -1135,7 +1135,17 @@
     "scoreDisabledCancelled": "Event cancelled — score and match facts editing disabled.",
     "whenWhere": "When & where",
     "kickoff": "Kick-off",
-    "estimatedEnd": "Estimated end"
+    "estimatedEnd": "Estimated end",
+    "stack": {
+      "coachCount_one": "{{count}} coach",
+      "coachCount_other": "{{count}} coaches",
+      "transportMissing_one": "{{count}} without a ride",
+      "transportMissing_other": "{{count}} without a ride",
+      "seatsMissing_one": "{{count}} slot to fill",
+      "seatsMissing_other": "{{count}} slots to fill",
+      "messageCount_one": "{{count}} message",
+      "messageCount_other": "{{count}} messages"
+    }
   },
   "followUps": {
     "title": "Follow-ups",

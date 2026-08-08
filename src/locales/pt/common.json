@@ -1135,7 +1135,17 @@
     "scoreDisabledCancelled": "Evento cancelado – edição de pontuação e fatos da partida desativada.",
     "whenWhere": "Quando e onde",
     "kickoff": "Pontapé de saída",
-    "estimatedEnd": "Fim estimado"
+    "estimatedEnd": "Fim estimado",
+    "stack": {
+      "coachCount_one": "{{count}} treinador",
+      "coachCount_other": "{{count}} treinadores",
+      "transportMissing_one": "{{count}} sem transporte",
+      "transportMissing_other": "{{count}} sem transporte",
+      "seatsMissing_one": "{{count}} vaga por preencher",
+      "seatsMissing_other": "{{count}} vagas por preencher",
+      "messageCount_one": "{{count}} mensagem",
+      "messageCount_other": "{{count}} mensagens"
+    }
   },
   "followUps": {
     "title": "Lembretes",

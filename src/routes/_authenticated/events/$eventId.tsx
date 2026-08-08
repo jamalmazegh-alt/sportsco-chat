@@ -71,6 +71,9 @@ import { CallUpVisibilityBadge } from "@/components/call-up-visibility-badge";
 import { useCallUpVisibilityGate } from "@/hooks/use-call-up-visibility";
 import { EventChat } from "@/components/event-chat";
 import { EventNeedsSection } from "@/components/needs/event-needs-section";
+import { listEventNeeds } from "@/lib/needs/needs.functions";
+import { CollapsibleSection } from "@/components/events/collapsible-section";
+import { Car, HandHelping, MessageSquare, UserCog } from "lucide-react";
 import { MeetingAttendeesSection } from "@/components/meetings/meeting-attendees-section";
 import { CarpoolSection } from "@/components/carpool-section";
 import { AttachmentList, type Attachment } from "@/components/attachments";
@@ -603,6 +606,45 @@ function EventDetail() {
     queryFn: () => getEventsWeather({ data: { eventIds: [eventId] } }),
     staleTime: 30 * 60_000,
   });
+
+  // Résumés de la pile secondaire. Les clés de requête sont celles des sections
+  // elles-mêmes : React Query déduplique, donc ces lectures ne coûtent aucun
+  // aller-retour supplémentaire. Sans résumé, replier reviendrait à cacher.
+  const { data: carpoolNeeds } = useQuery({
+    queryKey: ["carpool-needs", eventId],
+    enabled: !!event && eventSupportsCarpool(event.type),
+    queryFn: async () => {
+      const { data } = await supabase.from("carpool_needs").select("id").eq("event_id", eventId);
+      return data ?? [];
+    },
+    staleTime: 60_000,
+  });
+
+  const listNeedsFn = useServerFn(listEventNeeds);
+  const { data: needsData } = useQuery({
+    queryKey: ["event-needs", eventId],
+    queryFn: () => listNeedsFn({ data: { event_id: eventId } }),
+  });
+
+  const { data: chatCount } = useQuery({
+    queryKey: ["event-messages-count", eventId],
+    queryFn: async () => {
+      const { count } = await supabase
+        .from("event_messages")
+        .select("id", { count: "exact", head: true })
+        .eq("event_id", eventId);
+      return count ?? 0;
+    },
+    staleTime: 60_000,
+  });
+
+  const staffCount = ((event as any)?.event_staff_assignments?.length ?? 0) as number;
+  const transportMissing = (carpoolNeeds ?? []).length;
+  const seatsMissing = (
+    (needsData?.needs ?? []) as Array<{ status: string; remaining_seats: number }>
+  )
+    .filter((n) => n.status === "open")
+    .reduce((acc, n) => acc + (n.remaining_seats ?? 0), 0);
 
   const { data: eventAbsences } = useQuery({
     queryKey: ["event-absences", event?.team_id, eventDateStr, (teamPlayers ?? []).length],
@@ -2331,6 +2373,7 @@ function EventDetail() {
     : null;
 
   const eventWeather = weatherMap?.[eventId] ?? null;
+
   // Joueur/parent : afficher la liste des convoqués dès que l'événement est publié/envoyé,
   // même si l'utilisateur n'a pas de réponse personnelle à donner.
   const showConvocationSection = isInternalMeeting
@@ -4091,18 +4134,6 @@ function EventDetail() {
         </section>
       )}
 
-      {!isInternalMeeting &&
-        (isCoach && event?.id && event?.team_id && eventTeam?.club_id && eventDateStr ? (
-          <StaffAssignmentSection
-            eventId={event.id}
-            teamId={event.team_id}
-            clubId={eventTeam.club_id}
-            eventDate={eventDateStr}
-          />
-        ) : ((event as any)?.event_staff_assignments?.length ?? 0) > 0 ? (
-          <StaffAssignmentReadOnly assignments={(event as any)?.event_staff_assignments} />
-        ) : null)}
-
       <ConvocationDetailDialog
         open={!!detailConvocId}
         onOpenChange={(o) => !o && setDetailConvocId(null)}
@@ -4301,45 +4332,105 @@ function EventDetail() {
         </DialogContent>
       </Dialog>
 
-      {eventSupportsCarpool(event.type) &&
-        event.status !== "cancelled" &&
-        (isCoach || event.carpool_enabled) && (
-          <CarpoolSection
-            eventId={eventId}
-            teamId={event.team_id}
-            isCoach={isCoach}
-            convocations={(convocations ?? []) as any}
-            childrenLinks={(childrenLinks ?? []) as string[]}
-            carpoolEnabled={!!event.carpool_enabled}
-            onToggleEnabled={
-              isCoach
-                ? async () => {
-                    const { error } = await supabase
-                      .from("events")
-                      .update({ carpool_enabled: !event.carpool_enabled })
-                      .eq("id", eventId);
-                    if (error) {
-                      toast.error(error.message);
-                      return;
-                    }
-                    qc.invalidateQueries({ queryKey: ["event", eventId] });
-                  }
-                : undefined
-            }
-          />
-        )}
+      {/* ═══ Pile secondaire ═══
+          Quatre fonctionnalités entières, mais ce n'est pas pour elles qu'on
+          ouvre la page. Repliées, elles laissent les présences atteignables ;
+          leur résumé dit s'il faut ouvrir. Une section en manque s'ouvre
+          d'office : c'est là qu'il y a quelque chose à faire. */}
+      <section className="overflow-hidden rounded-2xl border border-border bg-card">
+        {!isInternalMeeting &&
+          (isCoach && event?.id && event?.team_id && eventTeam?.club_id && eventDateStr ? (
+            <CollapsibleSection
+              icon={UserCog}
+              title={t("staffAssignment.title")}
+              summary={staffCount > 0 ? t("events.stack.coachCount", { count: staffCount }) : null}
+            >
+              <StaffAssignmentSection
+                eventId={event.id}
+                teamId={event.team_id}
+                clubId={eventTeam.club_id}
+                eventDate={eventDateStr}
+              />
+            </CollapsibleSection>
+          ) : staffCount > 0 ? (
+            <CollapsibleSection
+              icon={UserCog}
+              title={t("staffAssignment.title")}
+              summary={t("events.stack.coachCount", { count: staffCount })}
+            >
+              <StaffAssignmentReadOnly assignments={(event as any)?.event_staff_assignments} />
+            </CollapsibleSection>
+          ) : null)}
 
-      <EventNeedsSection
-        eventId={eventId}
-        eventType={event.type}
-        sport={eventTeam?.sport ?? null}
-        teamId={event.team_id ?? null}
-      />
+        {eventSupportsCarpool(event.type) &&
+          event.status !== "cancelled" &&
+          (isCoach || event.carpool_enabled) && (
+            <CollapsibleSection
+              icon={Car}
+              title={t("carpool.tab")}
+              summary={
+                transportMissing > 0
+                  ? t("events.stack.transportMissing", { count: transportMissing })
+                  : null
+              }
+              summaryTone={transportMissing > 0 ? "warn" : "mute"}
+              defaultOpen={transportMissing > 0}
+            >
+              <CarpoolSection
+                eventId={eventId}
+                teamId={event.team_id}
+                isCoach={isCoach}
+                convocations={(convocations ?? []) as any}
+                childrenLinks={(childrenLinks ?? []) as string[]}
+                carpoolEnabled={!!event.carpool_enabled}
+                onToggleEnabled={
+                  isCoach
+                    ? async () => {
+                        const { error } = await supabase
+                          .from("events")
+                          .update({ carpool_enabled: !event.carpool_enabled })
+                          .eq("id", eventId);
+                        if (error) {
+                          toast.error(error.message);
+                          return;
+                        }
+                        qc.invalidateQueries({ queryKey: ["event", eventId] });
+                      }
+                    : undefined
+                }
+              />
+            </CollapsibleSection>
+          )}
+
+        <CollapsibleSection
+          icon={HandHelping}
+          title={t("needs:section.title")}
+          summary={
+            seatsMissing > 0 ? t("events.stack.seatsMissing", { count: seatsMissing }) : null
+          }
+          summaryTone={seatsMissing > 0 ? "warn" : "mute"}
+          defaultOpen={seatsMissing > 0}
+        >
+          <EventNeedsSection
+            eventId={eventId}
+            eventType={event.type}
+            sport={eventTeam?.sport ?? null}
+            teamId={event.team_id ?? null}
+          />
+        </CollapsibleSection>
+
+        <CollapsibleSection
+          icon={MessageSquare}
+          title={t("chat.title")}
+          summary={chatCount ? t("events.stack.messageCount", { count: chatCount }) : null}
+          summaryTone="info"
+        >
+          <EventChat eventId={eventId} />
+        </CollapsibleSection>
+      </section>
 
       {/* Convocations réunion — ne s'affiche que pour les événements de type "meeting". */}
       {isInternalMeeting && <MeetingAttendeesSection eventId={eventId} eventType={event.type} />}
-
-      <EventChat eventId={eventId} />
 
       {/* Sticky bottom "Répondre" CTA — mobile only, when at least one of the user's convocations is still pending */}
       {hasPendingForMe && (

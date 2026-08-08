@@ -1135,7 +1135,17 @@
     "scoreDisabledCancelled": "Veranstaltung abgesagt – Bearbeitung von Punkte- und Spieldaten deaktiviert.",
     "whenWhere": "Wann & wo",
     "kickoff": "Anpfiff",
-    "estimatedEnd": "Voraussichtliches Ende"
+    "estimatedEnd": "Voraussichtliches Ende",
+    "stack": {
+      "coachCount_one": "{{count}} Trainer",
+      "coachCount_other": "{{count}} Trainer",
+      "transportMissing_one": "{{count}} ohne Fahrt",
+      "transportMissing_other": "{{count}} ohne Fahrt",
+      "seatsMissing_one": "{{count}} offener Platz",
+      "seatsMissing_other": "{{count}} offene Plätze",
+      "messageCount_one": "{{count}} Nachricht",
+      "messageCount_other": "{{count}} Nachrichten"
+    }
   },
   "followUps": {
     "title": "Zu erinnern",

@@ -1135,7 +1135,17 @@
     "scoreDisabledCancelled": "Événement annulé — édition du score et des faits de match désactivée.",
     "whenWhere": "Quand & où",
     "kickoff": "Coup d'envoi",
-    "estimatedEnd": "Fin estimée"
+    "estimatedEnd": "Fin estimée",
+    "stack": {
+      "coachCount_one": "{{count}} coach",
+      "coachCount_other": "{{count}} coachs",
+      "transportMissing_one": "{{count}} sans transport",
+      "transportMissing_other": "{{count}} sans transport",
+      "seatsMissing_one": "{{count}} place à pourvoir",
+      "seatsMissing_other": "{{count}} places à pourvoir",
+      "messageCount_one": "{{count}} message",
+      "messageCount_other": "{{count}} messages"
+    }
   },
   "followUps": {
     "title": "À relancer",
